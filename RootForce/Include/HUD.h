@@ -17,6 +17,7 @@ namespace RootForce
 		void SetValue(std::string p_key, std::string p_value);
 
 		void SetCooldown(int p_slot, float p_duration);
+		void SetCharges(int p_slot, int p_charges);
 		void SetSelectedAbility(int p_slot);
 		//Expects a slot and a name that corresponds with the filename of an ability icon(without .png)
 		void SetAbility(int p_slot, std::string p_ability);

@@ -5,14 +5,18 @@
 		<script type="text/javascript" src="hud.js"></script>
 	</head>
 	<body onload="OnLoad();">
-		<div id="score" style="z-index:100;">
-			<img src="Team.png" style="height: 45%;"/> <a id="TeamScore" style="color: green">573</a> : <a id="EnemyScore" style="color: red;">195</a><br />
-			<img src="Swordaxe.png" style="height: 45%;"/> <a id="PlayerScore" style="color: green">21</a> <img src="RIP.png" style="height: 45%;"/> <a id="PlayerDeaths" style="color: red;">16</a>
-		</div>
 		<div id="TimeLeftContainer" style="z-index:100;">
-		  <a id="TimeLeft">
-			30:00
-		  </a>
+		  <div id="TimeLeft" class="textcenter">
+				30:00
+		  </div>
+			<div class="textcenter">
+				<a id="Team1Score" style="display:inline-block; background: url('BlueTeamScore.png'); width: 36px; overflow: hidden; text-align: center; font-size: 14px;">
+				0
+				</a>
+				<a id="Team2Score"  style="display:inline-block; background: url('RedTeamScore.png'); width: 36px; overflow: hidden; text-align: center; font-size: 14px;">
+				0
+				</a>
+			</div>
 		</div>
 		<div id="AnnouncementContainer" style="z-index:100;">
 		  <a id="Announcement">
@@ -23,9 +27,13 @@
 			</div>
 			<input id="chatinput" type="text" />
 		</div>
-		<div id="healthcontainer" style="z-index:0;">
-			<img src="health.png" />
-			<a id="Health" style="display: inline-block; vertical-align: middle;"> 100 </a>
+		<div id="healthbar" style="z-index:0;">
+			<div style="z-index: 0;">
+				<div style="position: relative; z-index: -2;">
+					<div style="position: relative; z-index: -1;">
+					</div>
+				</div>
+			</div>
 		</div>
 		<div id="chargebar" style="z-index:0;">
 			<div>
@@ -34,25 +42,35 @@
 			</div>
 		</div>
 		<div id="abilitybar" style="z-index:0;">
-			<div id="slot0" class="slot">
-				<div id="slot0-cooldown" class="cooldown">
-					RMB
-				</div>
-			</div>
-			<div id="slot1" class="slot slotselected">
-				<div id="slot1-cooldown" class="cooldown">
-					1
-				</div>
-			</div>
+      <div id="slot1" class="slot slotselected">
+        <div>
+          <div>
+            <div>
+            </div>
+            <div>
+            </div>
+          </div>
+        </div>
+      </div>
 			<div id="slot2" class="slot">
-				<div id="slot2-cooldown" class="cooldown">
-					2
-				</div>
+        <div>
+          <div>
+            <div>
+            </div>
+            <div>
+            </div>
+          </div>
+        </div>
 			</div>
 			<div id="slot3" class="slot">
-				<div id="slot3-cooldown" class="cooldown">
-					3
-				</div>
+        <div>
+          <div>
+            <div>
+            </div>
+            <div>
+            </div>
+          </div>
+        </div>
 			</div>
 		</div>
 		<div class="verticaltablehax" style="z-index:-500;">

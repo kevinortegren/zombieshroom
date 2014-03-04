@@ -706,15 +706,21 @@ namespace RootForce
 				//Update all the data that is displayed in the HUD
 				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
 				m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-				m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) );
-				m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
+				m_hud->SetValue("Team1Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) );
+				m_hud->SetValue("Team2Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 				if(healthComponent && playerActionComponent)
 				{
 					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );
 					m_hud->SetValue("IsDead", healthComponent->IsDead?"true":"false" );
+
 					m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
 					m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
 					m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
+
+					m_hud->SetCharges(1, playerComponent->AbilityScripts[0].Charges);
+					m_hud->SetCharges(2, playerComponent->AbilityScripts[1].Charges);
+					m_hud->SetCharges(3, playerComponent->AbilityScripts[2].Charges);
+
 					if(playerComponent->AbilityScripts[0].Cooldown > 0 && playerComponent->AbilityScripts[0].Name.compare("") != 0)
 						m_hud->SetCooldown(1, playerComponent->AbilityScripts[0].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[0].Name));
 					else

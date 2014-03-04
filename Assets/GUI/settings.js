@@ -26,7 +26,7 @@ $(document).ready(function() {
 	// Request setting data from the program and parse it
   JSGlobal.LoadSettings = function () {
     var settings = Menu.RequestSettings();
-		$("#controls-settings-wrapper > DIV").remove();
+		$("#controls-settings-wrapper>DIV").remove();
 		
     for(var key in settings)
 		{
@@ -46,7 +46,7 @@ $(document).ready(function() {
 			else if(key.search("settings-key-") > -1)
 			{
 				var prefix = "settings-key-";
-				$("#controls-settings-wrapper > input:first").before('<div><div class="inline-150px">'+key.substr(key.search(prefix)+prefix.length).replace('_',' ')+'</div><input id="'+key+'" value="'+settings[key]+'" class="controls-settings-keybind"/></div>');
+				$("#controls-settings-wrapper>input:first").before('<div><div class="inline-150px">'+key.substr(key.search(prefix)+prefix.length).replace('_',' ')+'</div><input id="'+key+'" value="'+settings[key]+'" class="controls-settings-keybind"/></div>');
 			}
       else
         $("#"+key).val(settings[key]);
