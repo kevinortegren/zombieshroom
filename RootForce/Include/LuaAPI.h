@@ -846,7 +846,7 @@ namespace RootForce
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
 			//Multiply the knockback depending on the health of the target
 			float multiplier = (200 - (float)luaL_checknumber(p_luaState, 5) ) / 100;
-			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), (*(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")) * multiplier, (float)luaL_checknumber(p_luaState, 4));
+			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), (*(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4) * multiplier);
 			return 0;
 		}
 		static int PhysicsCheckRadius(lua_State* p_luaState)
