@@ -12,6 +12,7 @@
 #include <RootSystems/Include/Components.h>
 #include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
 #include <RootEngine/Render/Include/Texture.h>
+#include <QtWidgets/QStyleFactory>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;

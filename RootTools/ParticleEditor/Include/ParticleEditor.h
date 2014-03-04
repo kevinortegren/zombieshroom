@@ -129,8 +129,11 @@ private slots:
 	void MenuViewColorTriangle();
 	void MenuViewColorEndTriangle();
 	void NewEmitter();
+	void OpenNewEmitterWidget();
+	void OpenNewRenameWidget();
 	void DeleteEmitter();
 	void RenameEmitter();
+	void DuplicateEmitter();
 	void EmitterSelected(QListWidgetItem*);
 	void PositionXChanged(double p_x);
 	void PositionYChanged(double p_y);
@@ -157,7 +160,8 @@ private slots:
 	void GridSizeChanged(double p_val);
 	void colorAlphaSliderChanged(int p_val);
 	void endColorAlphaSliderChanged(int p_val);
-	void TemplateChanged(int p_val);
+	void BlendingChanged(int p_val);
+	void RelativeChanged(int p_val);
 	void OrbitRadiusChanged(double p_val);
 	void OrbitSpeedChanged(double p_val);
 	void SpreadSliderChanged(int p_val);

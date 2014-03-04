@@ -16,7 +16,7 @@
   ORBITRADIUS: 0.8
   TEMPLATE: 1
   TEXTURE: Sparkle
-  EFFECT: Particle/ParticleOrbit
+  EFFECT: Particle/ParticleAlphaBlend
   NAME: AbilitySpawn
   ROTATIONSPEEDMIN: 0.0
   ROTATIONSPEEDMAX: 0.0

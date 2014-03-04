@@ -47,7 +47,6 @@ namespace RootEngine
 			outStruct->at(i)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]	= m_context->m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 			outStruct->at(i)->m_material->m_effect		= m_context->m_resourceManager->LoadEffect(effectName);
 			
-
 			//Position
 			doc[i]["POSITION"][0]		>> outStruct->at(i)->m_position.x;
 			doc[i]["POSITION"][1]		>> outStruct->at(i)->m_position.y;
@@ -86,16 +85,49 @@ namespace RootEngine
 			doc[i]["SPREAD"]			>> outStruct->at(i)->m_spread;
 			//Spawn time					
 			doc[i]["SPAWNTIME"]			>> outStruct->at(i)->m_spawnTime;
-			//Orbit
-			doc[i]["ORBITSPEED"]		>> outStruct->at(i)->m_orbitSpeed;
-			doc[i]["ORBITRADIUS"]		>> outStruct->at(i)->m_orbitRadius;
-			//Template
-			doc[i]["TEMPLATE"]			>> outStruct->at(i)->m_template;
-			//Name						
-			doc[i]["NAME"]				>> outStruct->at(i)->m_name;
-			//Rotation speed
-			doc[i]["ROTATIONSPEEDMIN"]	>> outStruct->at(i)->m_rotationSpeedMin;
-			doc[i]["ROTATIONSPEEDMAX"]	>> outStruct->at(i)->m_rotationSpeedMax;
+
+			//Orbit speed
+			if(doc[i].FindValue("ORBITSPEED"))
+				doc[i]["ORBITSPEED"] >> outStruct->at(i)->m_orbitSpeed;
+			else
+				outStruct->at(i)->m_orbitSpeed = 0;
+			
+			//Orbit Radius
+			if(doc[i].FindValue("ORBITRADIUS"))
+				doc[i]["ORBITRADIUS"] >> outStruct->at(i)->m_orbitRadius;
+			else
+				outStruct->at(i)->m_orbitRadius = 0;
+
+			//Blending
+			if(doc[i].FindValue("BLENDING"))
+				doc[i]["BLENDING"] >> outStruct->at(i)->m_blending;
+			else
+				outStruct->at(i)->m_blending = 0;
+
+			//Name		
+			if(doc[i].FindValue("NAME"))
+				doc[i]["NAME"] >>outStruct->at(i)->m_name;
+			else
+				outStruct->at(i)->m_name = "NONAME";
+			
+			//Rotation speed min
+			if(doc[i].FindValue("ROTATIONSPEEDMIN"))
+				doc[i]["ROTATIONSPEEDMIN"] >> outStruct->at(i)->m_rotationSpeedMin;
+			else
+				outStruct->at(i)->m_rotationSpeedMin = 0;
+
+			//Rotation speed max
+			if(doc[i].FindValue("ROTATIONSPEEDMAX"))
+				doc[i]["ROTATIONSPEEDMAX"] >> outStruct->at(i)->m_rotationSpeedMax;
+			else
+				outStruct->at(i)->m_rotationSpeedMax = 0;
+
+			//Relative
+			if(doc[i].FindValue("RELATIVE"))
+				doc[i]["RELATIVE"] >> outStruct->at(i)->m_relative;
+			else
+				outStruct->at(i)->m_relative = 0;
+			
 
 			//Set params
 			outStruct->at(i)->m_params[Render::Semantic::POSITION]			= &outStruct->at(i)->m_position;
@@ -114,12 +146,8 @@ namespace RootEngine
 			outStruct->at(i)->m_params[Render::Semantic::SPAWNTIME]			= &outStruct->at(i)->m_spawnTime;
 			outStruct->at(i)->m_params[Render::Semantic::ROTATIONSPEEDMIN]	= &outStruct->at(i)->m_rotationSpeedMin;
 			outStruct->at(i)->m_params[Render::Semantic::ROTATIONSPEEDMAX]	= &outStruct->at(i)->m_rotationSpeedMax;
-
-			if(outStruct->at(i)->m_template == 1 || outStruct->at(i)->m_template == 3)
-			{
-				outStruct->at(i)->m_params[Render::Semantic::ORBITRADIUS]	= &outStruct->at(i)->m_orbitRadius;
-				outStruct->at(i)->m_params[Render::Semantic::ORBITSPEED]	= &outStruct->at(i)->m_orbitSpeed;
-			}
+			outStruct->at(i)->m_params[Render::Semantic::ORBITRADIUS]		= &outStruct->at(i)->m_orbitRadius;
+			outStruct->at(i)->m_params[Render::Semantic::ORBITSPEED]		= &outStruct->at(i)->m_orbitSpeed;
 		}
 		return outStruct;
 	}

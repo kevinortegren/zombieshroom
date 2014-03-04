@@ -14,9 +14,10 @@
   SPAWNTIME: 0.01
   ORBITSPEED: 0
   ORBITRADIUS: 0
-  TEMPLATE: 1
+  BLENDING: 0
+  RELATIVE: 0
   TEXTURE: smoke
-  EFFECT: Particle/ParticleAlphaBlend
+  EFFECT: Particle/ParticleAdditive
   NAME: Smocke
   ROTATIONSPEEDMIN: 0
   ROTATIONSPEEDMAX: 0
@@ -36,7 +37,8 @@
   SPAWNTIME: 0.01
   ORBITSPEED: 3.4
   ORBITRADIUS: 10
-  TEMPLATE: 0
+  BLENDING: 0
+  RELATIVE: 0
   TEXTURE: stolenfire1
   EFFECT: Particle/ParticleAdditive
   NAME: Elden
@@ -58,7 +60,8 @@
   SPAWNTIME: 0.008
   ORBITSPEED: 1
   ORBITRADIUS: 0.5
-  TEMPLATE: 0
+  BLENDING: 0
+  RELATIVE: 0
   TEXTURE: stolenfire2
   EFFECT: Particle/ParticleAdditive
   NAME: Eldentvo
@@ -80,7 +83,8 @@
   SPAWNTIME: 0.005
   ORBITSPEED: 1
   ORBITRADIUS: 0.5
-  TEMPLATE: 0
+  BLENDING: 0
+  RELATIVE: 0
   TEXTURE: stolenfire3
   EFFECT: Particle/ParticleAdditive
   NAME: Eldentre
