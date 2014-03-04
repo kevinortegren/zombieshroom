@@ -70,6 +70,7 @@ namespace RootSystems
 			if(g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 			{
 				action->JumpDir = facing * action->MovePower + right * action->StrafePower;
+				health->LastDamageSourceID = RootForce::Network::ReservedUserID::NONE;
 			}
 			else
 			{
