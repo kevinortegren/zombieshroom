@@ -208,6 +208,12 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, TeamID);
 		}
 
+		void StatChangeTimeUp::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
+		{
+			p_bs->Serialize(p_writeToBitstream, UserID);
+			p_bs->Serialize(p_writeToBitstream, StatToReset);
+		}
+
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
 		{
 			for (int i = 0; i < 3; ++i)

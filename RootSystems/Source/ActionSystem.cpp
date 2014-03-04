@@ -24,6 +24,7 @@ namespace RootSystems
 		m_physic.Init(m_world->GetEntityManager());
 		m_player.Init(m_world->GetEntityManager());
 		m_health.Init(m_world->GetEntityManager());
+		m_statChange.Init(m_world->GetEntityManager());
 	}
 
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
@@ -40,6 +41,7 @@ namespace RootSystems
 		RootForce::HealthComponent* health = m_health.Get(p_entity);
 		RootForce::StateComponent* state = m_state.Get(p_entity);
 		RootForce::Animation* animation = m_animation.Get(p_entity);
+		RootForce::StatChange* statChange = m_statChange.Get(p_entity);
 
 		bool isGameOver = false;
 		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
@@ -80,7 +82,7 @@ namespace RootSystems
 			{
 				if(glm::length2(action->JumpDir) > 1)
 					action->JumpDir = glm::normalize(action->JumpDir);
-				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed; //* speedChange
+				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed * statChange->SpeedChange;
 				m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position, dt);
 			}
 
@@ -168,7 +170,7 @@ namespace RootSystems
 					if (g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 					{
 						// Apply jump force and go into jump animation
-						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce); //* jumpheightChange
+						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
 
 						if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
 						{
