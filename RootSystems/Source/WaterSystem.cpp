@@ -1,6 +1,8 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootSystems/Include/MatchStateSystem.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 #include <iostream>
 #include <fstream>
 
@@ -86,7 +88,25 @@ namespace RootForce
 		else //if by the edge of the water, start disturbing at given interval
 			
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
-		{		
+		{	
+
+#ifndef COMPILE_LEVEL_EDITOR
+			//Check if player and kill
+			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity) && m_playerWaterDeath)
+			{
+				HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
+				if(!health->IsDead)
+				{
+					health->Health = 0.0f;
+					PlayerComponent* playercomp = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_entity);
+					Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_entity);
+					MatchStateSystem::AwardPlayerKill(health->LastDamageSourceID,network->ID.UserID);
+				}
+
+			}
+#endif
+		
+				
 			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
@@ -110,7 +130,7 @@ namespace RootForce
 	void WaterSystem::CreateWater(float p_height)
 	{
 		//Don't create water if there is no water on the level
-		if(p_height == 0)
+		if(p_height == -99999.0f)
 			return;
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Pouring water into level!");

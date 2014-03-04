@@ -62,4 +62,9 @@ namespace RootForce
 		m_commandBuffer = "";
 	}
 
+	void HUD::SetCharges( int p_slot, int p_charges )
+	{
+		m_commandBuffer = m_commandBuffer + "SetCharges('" + std::to_string(p_slot) + "'," + std::to_string(p_charges) + ");";
+	}
+
 }

@@ -77,7 +77,7 @@ namespace RootForce
 							g_engineContext.m_script->SetFunction(script->Name, "OnDestroy");
 							g_engineContext.m_script->AddParameterUserData(pair.second, sizeof(ECS::Entity*), "Entity");
 							g_engineContext.m_script->ExecuteScript();
-							g_world->GetEntityManager()->RemoveEntity(pair.second);
+							//g_world->GetEntityManager()->RemoveEntity(pair.second);
 						}
 					}
 					ruleSet->CurrentState = MatchState::Match;
@@ -201,6 +201,10 @@ namespace RootForce
 
 			rules->TeamScore[killerPlayerComponent->TeamID]++;
 			killerPlayerComponent->Score++;
+		}
+		else
+		{
+			g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID))->Score --;
 		}
 		g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID))->Deaths ++;
 	}

@@ -18,6 +18,8 @@
   TEXTURE: Fireparticle
   EFFECT: Particle/ParticleOrbit
   NAME: Fire
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0
 - POSITION: [0, 0.2, 0]
   LIFETIMEMIN: 2
   LIFETIMEMAX: 6.5
@@ -38,3 +40,5 @@
   TEXTURE: smoke
   EFFECT: Particle/Particle
   NAME: Smoke
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0

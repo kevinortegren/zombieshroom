@@ -67,6 +67,8 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.spreadSlider,		SIGNAL(sliderMoved(int)),					this, SLOT(SpreadSliderChanged(int)));
 	connect(ui.bgColorComboBox,		SIGNAL(currentIndexChanged(int)),			this, SLOT(BackgroundColorChanged(int)));
 	connect(ui.removeObjectButton,	SIGNAL(clicked()),							this, SLOT(RemoveObjectButton()));
+	connect(ui.RotspeedminSpinbox,	SIGNAL(valueChanged(double)),				this, SLOT(RotationSpeedMinChanged(double)));
+	connect(ui.RotspeedmaxSpinbox,	SIGNAL(valueChanged(double)),				this, SLOT(RotationSpeedMaxChanged(double)));
 }
 
 void ParticleEditor::Init()
@@ -345,41 +347,46 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material = m_context->m_renderer->CreateMaterial("particle" + std::to_string(m_materialIndex++));
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditive");
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_position		= glm::vec3(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin	= 2.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMax	= 2.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMin		= 1.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMax		= 1.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMin		= glm::vec2(0.5f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMax		= glm::vec2(0.5f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeEnd		= glm::vec2(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_color		= glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_colorEnd		= glm::vec4(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_gravity		= glm::vec3(0.0f, 0.0f, 0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_direction	= glm::vec3(0.0f);
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread		= 0.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitSpeed	= 1.0f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitRadius	= 0.5f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime	= 0.1f;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_name			= ui.nameEmitterLineEdit->text().toStdString();
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_template		= 0;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_position			= glm::vec3(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin		= 2.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMax		= 2.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMin			= 0.1f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMax			= 0.1f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMin			= glm::vec2(0.05f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMax			= glm::vec2(0.05f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeEnd			= glm::vec2(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_color			= glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_colorEnd			= glm::vec4(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_gravity			= glm::vec3(0.0f, 0.0f, 0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_direction		= glm::vec3(0.0f);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread			= 0.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitSpeed		= 1.0f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitRadius		= 0.5f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime		= 0.05f;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_name				= ui.nameEmitterLineEdit->text().toStdString();
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_template			= 0;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMin	= 0;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMax	= 0;
+
 
 	//Map data to params list for buffering
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::POSITION]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_position;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::LIFETIMEMIN]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::LIFETIMEMAX]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMax;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPEEDMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMin;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPEEDMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMax;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMin;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMax;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEEND]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeEnd;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::COLOR]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_color;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::COLOREND]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_colorEnd;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::GRAVITY]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_gravity;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::DIRECTION]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_direction;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPREAD]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPAWNTIME]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime;
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::TRANSPOSITION]	= &t->m_position;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::POSITION]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_position;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::LIFETIMEMIN]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::LIFETIMEMAX]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPEEDMIN]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMin;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPEEDMAX]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_speedMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEMIN]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMin;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEMAX]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SIZEEND]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_sizeEnd;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::COLOR]				= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_color;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::COLOREND]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_colorEnd;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::GRAVITY]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_gravity;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::DIRECTION]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_direction;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPREAD]				= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_spread;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::SPAWNTIME]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_spawnTime;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::ROTATIONSPEEDMIN]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMin;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::ROTATIONSPEEDMAX]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::TRANSPOSITION]		= &t->m_position;
 
 	//Add an item representing the emitter to the emitter list with the specified name
 	QListWidgetItem* tempItem = new QListWidgetItem(ui.nameEmitterLineEdit->text());
@@ -524,6 +531,9 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	ui.orbitSpeedSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_orbitSpeed);
 	TemplateChanged(pe->m_particleSystems[m_selectedEmitterIndex]->m_template);
 	ui.templateComboBox->setCurrentIndex(pe->m_particleSystems[m_selectedEmitterIndex]->m_template);
+	//Rotation speed
+	ui.RotspeedminSpinbox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMin);
+	ui.RotspeedmaxSpinbox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMax);
 }
 #pragma endregion
 
@@ -780,6 +790,24 @@ void ParticleEditor::BackgroundColorChanged( int p_value )
 	}
 }
 
+void ParticleEditor::RotationSpeedMinChanged( double p_val )
+{
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMin = (float)p_val;
+	if(p_val > ui.RotspeedmaxSpinbox->value())
+		ui.RotspeedmaxSpinbox->setValue(p_val);
+	Changed();
+}
+
+void ParticleEditor::RotationSpeedMaxChanged( double p_val )
+{
+	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMax = (float)p_val;
+	if(p_val < ui.RotspeedminSpinbox->value())
+		ui.RotspeedminSpinbox->setValue(p_val);
+	Changed();
+}
+
 #pragma endregion
 
 void ParticleEditor::MenuViewColorTriangle()
@@ -969,26 +997,28 @@ void ParticleEditor::ExportParticle( QString p_fullFilePath )
 	{
 		// Export Particle systems
 		emitter << YAML::BeginMap;
-		emitter << YAML::Key << "POSITION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_position.x << (*itr)->m_position.y << (*itr)->m_position.z << YAML::EndSeq; 
-		emitter << YAML::Key << "LIFETIMEMIN"	<< YAML::Value << (*itr)->m_lifeTimeMin;
-		emitter << YAML::Key << "LIFETIMEMAX"	<< YAML::Value << (*itr)->m_lifeTimeMax;
-		emitter << YAML::Key << "SPEEDMIN"		<< YAML::Value << (*itr)->m_speedMin;
-		emitter << YAML::Key << "SPEEDMAX"		<< YAML::Value << (*itr)->m_speedMax;
-		emitter << YAML::Key << "SIZEMIN"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeMin.x	<< (*itr)->m_sizeMin.y << YAML::EndSeq; 
-		emitter << YAML::Key << "SIZEMAX"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeMax.x	<< (*itr)->m_sizeMax.y << YAML::EndSeq; 
-		emitter << YAML::Key << "SIZEEND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeEnd.x	<< (*itr)->m_sizeEnd.y << YAML::EndSeq; 
-		emitter << YAML::Key << "COLOR"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_color.r		<< (*itr)->m_color.g		<< (*itr)->m_color.b		<< (*itr)->m_color.a << YAML::EndSeq; 
-		emitter << YAML::Key << "COLOREND"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_colorEnd.r	<< (*itr)->m_colorEnd.g		<< (*itr)->m_colorEnd.b		<< (*itr)->m_colorEnd.a << YAML::EndSeq; 
-		emitter << YAML::Key << "GRAVITY"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_gravity.x	<< (*itr)->m_gravity.y		<< (*itr)->m_gravity.z		<< YAML::EndSeq; 
-		emitter << YAML::Key << "DIRECTION"		<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_direction.x << (*itr)->m_direction.y	<< (*itr)->m_direction.z	<< YAML::EndSeq; 
-		emitter << YAML::Key << "SPREAD"		<< YAML::Value << (*itr)->m_spread;
-		emitter << YAML::Key << "SPAWNTIME"		<< YAML::Value << (*itr)->m_spawnTime;
-		emitter << YAML::Key << "ORBITSPEED"	<< YAML::Value << (*itr)->m_orbitSpeed;
-		emitter << YAML::Key << "ORBITRADIUS"	<< YAML::Value << (*itr)->m_orbitRadius;
-		emitter << YAML::Key << "TEMPLATE"		<< YAML::Value << (*itr)->m_template;
-		emitter << YAML::Key << "TEXTURE"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
-		emitter << YAML::Key << "EFFECT"		<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr)->m_material->m_effect);
-		emitter << YAML::Key << "NAME"			<< YAML::Value << (*itr)->m_name;
+		emitter << YAML::Key << "POSITION"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_position.x << (*itr)->m_position.y << (*itr)->m_position.z << YAML::EndSeq; 
+		emitter << YAML::Key << "LIFETIMEMIN"		<< YAML::Value << (*itr)->m_lifeTimeMin;
+		emitter << YAML::Key << "LIFETIMEMAX"		<< YAML::Value << (*itr)->m_lifeTimeMax;
+		emitter << YAML::Key << "SPEEDMIN"			<< YAML::Value << (*itr)->m_speedMin;
+		emitter << YAML::Key << "SPEEDMAX"			<< YAML::Value << (*itr)->m_speedMax;
+		emitter << YAML::Key << "SIZEMIN"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeMin.x	<< (*itr)->m_sizeMin.y << YAML::EndSeq; 
+		emitter << YAML::Key << "SIZEMAX"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeMax.x	<< (*itr)->m_sizeMax.y << YAML::EndSeq; 
+		emitter << YAML::Key << "SIZEEND"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_sizeEnd.x	<< (*itr)->m_sizeEnd.y << YAML::EndSeq; 
+		emitter << YAML::Key << "COLOR"				<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_color.r		<< (*itr)->m_color.g		<< (*itr)->m_color.b		<< (*itr)->m_color.a << YAML::EndSeq; 
+		emitter << YAML::Key << "COLOREND"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_colorEnd.r	<< (*itr)->m_colorEnd.g		<< (*itr)->m_colorEnd.b		<< (*itr)->m_colorEnd.a << YAML::EndSeq; 
+		emitter << YAML::Key << "GRAVITY"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_gravity.x	<< (*itr)->m_gravity.y		<< (*itr)->m_gravity.z		<< YAML::EndSeq; 
+		emitter << YAML::Key << "DIRECTION"			<< YAML::Value << YAML::Flow << YAML::BeginSeq << (*itr)->m_direction.x << (*itr)->m_direction.y	<< (*itr)->m_direction.z	<< YAML::EndSeq; 
+		emitter << YAML::Key << "SPREAD"			<< YAML::Value << (*itr)->m_spread;
+		emitter << YAML::Key << "SPAWNTIME"			<< YAML::Value << (*itr)->m_spawnTime;
+		emitter << YAML::Key << "ORBITSPEED"		<< YAML::Value << (*itr)->m_orbitSpeed;
+		emitter << YAML::Key << "ORBITRADIUS"		<< YAML::Value << (*itr)->m_orbitRadius;
+		emitter << YAML::Key << "TEMPLATE"			<< YAML::Value << (*itr)->m_template;
+		emitter << YAML::Key << "TEXTURE"			<< YAML::Value << m_context->m_resourceManager->ResolveStringFromTexture((*itr)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]);
+		emitter << YAML::Key << "EFFECT"			<< YAML::Value << m_context->m_resourceManager->ResolveStringFromEffect((*itr)->m_material->m_effect);
+		emitter << YAML::Key << "NAME"				<< YAML::Value << (*itr)->m_name;
+		emitter << YAML::Key << "ROTATIONSPEEDMIN"	<< YAML::Value << (*itr)->m_rotationSpeedMin;
+		emitter << YAML::Key << "ROTATIONSPEEDMAX"	<< YAML::Value << (*itr)->m_rotationSpeedMax;
 		emitter << YAML::EndMap;
 	}
 

@@ -34,7 +34,7 @@ function Explosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Explosion handle: "..collisionComp:GetHandle());
 	physicsComp:BindNoShape(collisionComp, posVec, Quat.New(0,0,0,1));
 	--Logging.Log(LogLevel.DEBUG_PRINT, "After bind call");
-	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 20);
+	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 10);
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "explosion");
 		--local renderComp = Renderable.New(self);
@@ -62,12 +62,12 @@ function Explosion.OnCollide (self, entity)
 			    local network = entity:GetNetwork();
 			    local hitPos = entity:GetTransformation():GetPos();
 			    local selfPos = self:GetTransformation():GetPos();
-			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback * entity:GetStatChange():GetKnockbackResistance());
 			    local health = entity:GetHealth();
-			    if not health:IsDead() then
+          if not health:IsDead() then
 				    local receiverId = network:GetUserId();
 				    health:Damage(abilityOwnerId, Explosion.damage * entity:GetStatChange():GetDamageResistance(), receiverId);
 			    end
+			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

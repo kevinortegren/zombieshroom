@@ -225,19 +225,36 @@ namespace RootForce
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 		
-		// Set network peer interfaces on the systems that needs to send messages.
+		// Set server peers to null
+		/*
+		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
+		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
+		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
+		m_playerControlSystem->SetClientPeer(nullptr);
+		m_actionSystem->SetServerPeerInterface(nullptr);
+		m_actionSystem->SetClientPeerInterface(nullptr);
+		m_timerSystem->SetServerPeer(nullptr);
+		*/
+
+		// Set the network client peer interfaces.
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
-		m_playerControlSystem->SetHUD(m_hud.get());
 		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
-		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
-		// Set the server peer to the action and abilityspawn system, if we are a server.
+		// Set the network server peer interfaces if we are a server.
 		if (m_networkContext.m_server != nullptr)
 		{
-			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
 			m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
-		}	
+			m_sharedSystems.m_respawnSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+		}
+
+		// Give the player control system access to the HUD.
+		m_playerControlSystem->SetHUD(m_hud.get());
 
 		// Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
@@ -315,6 +332,12 @@ namespace RootForce
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
+		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
+		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
+		m_playerControlSystem->SetClientPeer(nullptr);
+		m_actionSystem->SetServerPeerInterface(nullptr);
+		m_actionSystem->SetClientPeerInterface(nullptr);
 		m_timerSystem->SetServerPeer(nullptr);
 		m_statChangeSystem->SetServerPeer(nullptr);
 
@@ -661,9 +684,7 @@ namespace RootForce
 
 			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
 			PlayerComponent* playerComp =  g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
-			playerComp->Score --;
 			playerComp->Deaths ++;
-			g_world->GetEntityManager()->GetComponent<TDMRuleSet>(g_world->GetTagManager()->GetEntityByTag("MatchState"))->TeamScore[playerComp->TeamID] --;
 
 			// Notify the server of our suicide.
 			NetworkMessage::Suicide m;
@@ -720,15 +741,21 @@ namespace RootForce
 				//Update all the data that is displayed in the HUD
 				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
 				m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-				m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) );
-				m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
+				m_hud->SetValue("Team1Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) );
+				m_hud->SetValue("Team2Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 				if(healthComponent && playerActionComponent)
 				{
 					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );
 					m_hud->SetValue("IsDead", healthComponent->IsDead?"true":"false" );
+
 					m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
 					m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
 					m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
+
+					m_hud->SetCharges(1, playerComponent->AbilityScripts[0].Charges);
+					m_hud->SetCharges(2, playerComponent->AbilityScripts[1].Charges);
+					m_hud->SetCharges(3, playerComponent->AbilityScripts[2].Charges);
+
 					if(playerComponent->AbilityScripts[0].Cooldown > 0 && playerComponent->AbilityScripts[0].Name.compare("") != 0)
 						m_hud->SetCooldown(1, playerComponent->AbilityScripts[0].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[0].Name));
 					else

@@ -29,6 +29,7 @@ namespace Render
 		glm::vec4 m_color;
 		glm::vec3 m_accel;
 		float m_rot;
+		float m_rotSpeed;
 	};
 
 	class ParticleSystemInterface

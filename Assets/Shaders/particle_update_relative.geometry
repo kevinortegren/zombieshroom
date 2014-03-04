@@ -29,6 +29,8 @@ layout(std140) uniform PerObject
 	vec4 	g_colorEnd;
 	vec3	g_transPos;
 	float	g_spawnTime;
+	float	g_rotationSpeedMin;
+	float	g_rotationSpeedMax;
 };
 
 in vec3 vert_initialVel[];
@@ -38,6 +40,7 @@ in float vert_type[];
 in vec4 vert_color[];
 in vec3 vert_accel[];
 in float vert_rotation[];
+in float vert_rotationSpeed[];
 
 
 // Transform feedback values.
@@ -49,6 +52,7 @@ out float vert_type1;
 out vec4 vert_color1;
 out vec3 vert_accel1;
 out float vert_rotation1;
+out float vert_rotationSpeed1;
 
 
 
@@ -61,7 +65,7 @@ vec3 GetRandomDir(float TexCoord)
 
 float GetRandomNumber(float TexCoord, float min, float max)
 {
-	vec3 direction = texture(g_Random, TexCoord + 0.2f).xyz;
+	vec3 direction = texture(g_Random, TexCoord + g_spawnTime * 500).xyz;
 	float magnitud = max - min;
 	float number =  direction.x * magnitud + min;
     return number;
@@ -100,6 +104,8 @@ void main()
 		 	vert_accel1			= g_gravity;
 			lifeTime			= g_spawnTime;
 			vert_rotation1		= GetRandomNumber(g_time+0.01f, 0.0f, 6.29f);
+			vert_rotationSpeed1 = GetRandomNumber(g_time, g_rotationSpeedMin, g_rotationSpeedMax);
+
 			EmitVertex();
 			EndPrimitive();
 		}
@@ -113,6 +119,7 @@ void main()
 		vert_color1			= vert_color[0];  
 		vert_accel1			= vert_accel[0];
 		vert_rotation1		= vert_rotation[0];
+		vert_rotationSpeed1 = 0.0;
 		EmitVertex();
 		EndPrimitive();
 	}
@@ -134,7 +141,8 @@ void main()
 			vert_type1			= 1.0f;
 			vert_color1			= mix(vert_color[0], g_colorEnd, linearFac);  
 			vert_accel1			= vert_accel[0];
-			vert_rotation1		= vert_rotation[0];
+			vert_rotation1		= vert_rotation[0] + vert_rotationSpeed[0] * g_dt;
+			vert_rotationSpeed1 = vert_rotationSpeed[0];
 			EmitVertex();
 			EndPrimitive();
 		}

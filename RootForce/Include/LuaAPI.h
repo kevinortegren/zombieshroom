@@ -851,9 +851,11 @@ namespace RootForce
 		}
 		static int PhysicsKnockBack(lua_State* p_luaState)
 		{
-			NumberOfArgs(4);
+			NumberOfArgs(5);
 			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
-			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4));
+			//Multiply the knockback depending on the health of the target
+			float multiplier = (200 - (float)luaL_checknumber(p_luaState, 5) ) / 100;
+			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), (*(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4) * multiplier);
 			return 0;
 		}
 		static int PhysicsCheckRadius(lua_State* p_luaState)
@@ -1815,6 +1817,13 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->TeamID);
 			return 1;
 		}
+		static int PlayercomponentAddSelectedCharges(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
+			(*s)->AbilityScripts[(*s)->SelectedAbility].Charges += (int)luaL_checknumber(p_luaState, 2);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//PLAYERACTION
 		//////////////////////////////////////////////////////////////////////////
@@ -1859,7 +1868,7 @@ namespace RootForce
 		{
 			NumberOfArgs(2);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			(*s)->AbilityTime = (float) luaL_checknumber(p_luaState, 2);
+			(*s)->CurrentAbilityEvent.Time = (float) luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 		static int PlayerActionSelectAbility(lua_State* p_luaState)
@@ -1910,7 +1919,7 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::PlayerActionComponent **s = (RootForce::PlayerActionComponent**)luaL_checkudata(p_luaState, 1, "PlayerAction");
-			lua_pushnumber(p_luaState, (*s)->AbilityTime);
+			lua_pushnumber(p_luaState, (*s)->CurrentAbilityEvent.Time);
 			return 1;
 		}
 		static int PlayerActionGetSelectedAbility(lua_State* p_luaState)
@@ -2244,7 +2253,7 @@ namespace RootForce
 
 				r->m_material = g_engineContext.m_renderer->CreateMaterial("rayMaterial");
 				r->m_material->m_effect = g_engineContext.m_resourceManager->GetEffect("Ray");
-				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("Laser", Render::TextureType::TEXTURE_2D);
+				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("magic_lightning", Render::TextureType::TEXTURE_2D);
 				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 				r->m_material->m_textures[Render::TextureSemantic::DIFFUSE]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2852,6 +2861,7 @@ namespace RootForce
 			{"GetDeaths",			PlayerComponentGetDeaths},
 			{"GetScore",			PlayerComponentGetScore},
 			{"GetTeamId",			PlayerComponentGetTeamId},
+			{"AddSelectedCharges",	PlayercomponentAddSelectedCharges},
 			{NULL, NULL}
 		};
 

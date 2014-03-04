@@ -17,5 +17,9 @@ function AbilityDash.ChannelingDone(time, userId, actionId)
 	local frontVec  = aimingEnt:GetTransformation():GetOrient():GetFront();
 
 	local handle = playerEnt:GetCollision():GetHandle();
-	playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,0.4,0)+frontVec, AbilityDash.power);
+	
+    playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,0.4,0)+frontVec, AbilityDash.power, 100);
+end
+
+function AbilityDash.Interrupted(time, userId, actionId)
 end

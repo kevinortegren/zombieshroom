@@ -68,7 +68,7 @@ function Homing.OnCreate (userId, actionId)
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "HomingSparkle");
+		local particleComp = ParticleEmitter.New(self, "magic_missile_01");
 	end
 end
 
