@@ -82,6 +82,7 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, Event.ActionID);
 			p_bs->Serialize(p_writeToBitstream, Event.Type);
 			p_bs->Serialize(p_writeToBitstream, Event.ActiveAbility);
+			p_bs->Serialize(p_writeToBitstream, Event.ActiveAbilityScript);
 			p_bs->Serialize(p_writeToBitstream, Event.Time);
 		}
 
