@@ -3,6 +3,7 @@
 #include <Awesomium/STLHelpers.h>
 #include <GL/glew.h>
 #include <GL/GL.h>
+#include <exception>
 #include "guiInstance.h"
 #include "Logging/Logging.h"
 
@@ -75,20 +76,30 @@ namespace RootEngine
 
 		void guiInstance::Render(WebView* p_view)
 		{
-			if(!((WebViewImpl*)p_view)->m_isActive)
+			WebViewImpl* view = (WebViewImpl*)p_view;
+			if(!view->m_isActive)
 				return;
 
-			m_program->Apply();
+			GLTextureSurface* surface = (GLTextureSurface*)view->GetView()->surface();
+			if(!surface)
+				return;
 
-			glBindVertexArray(m_vertexArrayBuffer);
-			//m_drawMutex.lock();
-			glActiveTexture(GL_TEXTURE0);
-			SurfaceToTexture((GLTextureSurface*)((WebViewImpl*)p_view)->m_webView->surface());
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			glBindTexture(GL_TEXTURE_2D, 0);
-			//m_drawMutex.unlock();
+			auto tiles = surface->GetTiles();
+			for(auto& row : *tiles)
+				for(const SurfaceTile& tile : row)
+				{
+					m_program->Apply();
+
+					glBindVertexArray(m_vertexArrayBuffer);
+					//m_drawMutex.lock();
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, tile.Texture);
+					glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+					glBindTexture(GL_TEXTURE_2D, 0);
+					//m_drawMutex.unlock();
 			
-			glBindVertexArray(0);
+					glBindVertexArray(0);
+				}
 		}
 
 		guiInstance* guiInstance::GetInstance()
@@ -125,14 +136,6 @@ namespace RootEngine
 					m_viewBuffer.erase(m_viewBuffer.begin() + i--);
 			m_viewBuffer.shrink_to_fit();
 			m_viewBufferMutex.unlock();
-		}
-
-		void guiInstance::SurfaceToTexture(GLTextureSurface* p_surface)
-		{
-			if(p_surface)
-				glBindTexture(GL_TEXTURE_2D, p_surface->GetTexture());
-			else
-				glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
 		void guiInstance::HandleEvents( SDL_Event p_event )
@@ -195,26 +198,31 @@ namespace RootEngine
 						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
 						
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectKeyboardEvent(tempEvent);
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectKeyboardEvent(tempEvent);
 
 				} break;
 
 				case SDL_MOUSEBUTTONDOWN:
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;
 				case SDL_MOUSEBUTTONUP:
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectMouseUp((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectMouseUp((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;
 				case SDL_MOUSEMOTION:
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectMouseMove(p_event.motion.x, p_event.motion.y);
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectMouseMove(p_event.motion.x, p_event.motion.y);
 					break;
 					
 				case SDL_MOUSEWHEEL:
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectMouseWheel(p_event.wheel.x, p_event.wheel.y);
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectMouseWheel(p_event.wheel.x, p_event.wheel.y);
 					break;
 				default:
 					g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type); 
@@ -300,28 +308,18 @@ namespace RootEngine
 
 					m_viewBufferMutex.lock();
 						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-							if(m_viewBuffer[i])
+							if(m_viewBuffer[i] && m_viewBuffer[i]->m_isActive)
 								m_viewBuffer[i]->Update();
 					m_viewBufferMutex.unlock();
 
-					//m_drawMutex.lock();
-						m_core->Update();
-						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-							if(m_viewBuffer[i] && m_viewBuffer[i]->GetView() && m_viewBuffer[i]->m_isActive)
-							{
-								GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
-								if(surface)
-									surface->UpdateTexture(); // Force a texture update
-							}
-						// Wait until texture updates are complete before releasing the lock
-						/*GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
-						GLenum result; 
-						while(true) 
-						{ 
-							result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
-							if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
-						} */
-					//m_drawMutex.unlock();
+					m_core->Update();
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						if(m_viewBuffer[i] && m_viewBuffer[i]->GetView() && m_viewBuffer[i]->m_isActive)
+						{
+							GLTextureSurface* surface = (GLTextureSurface*)m_viewBuffer[i]->GetView()->surface();
+							if(surface)
+								surface->UpdateTexture(); // Update textures if necessary
+						}
 				
 					uint64_t newTime = SDL_GetPerformanceCounter();
 					float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
@@ -333,6 +331,10 @@ namespace RootEngine
 					}
 				}
 				SDL_GL_DeleteContext(m_glContext);
+			}
+			catch(std::exception e)
+			{
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Awesomium update thread has crashed due to interference in the Force! %s", e.what());
 			}
 			catch(...)
 			{

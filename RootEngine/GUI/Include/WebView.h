@@ -4,7 +4,6 @@
 #include <mutex>
 #include <queue>
 #include <vector>
-#include <atomic>
 #include "Dispatcher.h"
 
 namespace RootEngine
@@ -146,7 +145,7 @@ namespace RootEngine
 			std::vector<Awesomium::MouseButton> m_injectMouseUp;
 			std::vector<std::pair<int,int>> m_injectMouseMove;
 			std::vector<std::pair<int,int>> m_injectMouseWheel;
-			std::atomic_bool m_isActive;
+			bool m_isActive;
 		};
 	}
 }

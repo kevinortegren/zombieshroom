@@ -84,7 +84,7 @@ namespace RootEngine
 			GLuint m_vertexArrayBuffer;
 			GLTextureSurfaceFactory* m_glTexSurfaceFactory;
 
-			void SurfaceToTexture(GLTextureSurface* p_surface);
+			GLuint SurfaceToTexture(GLTextureSurface* p_surface);
 			int MapToAwesomium(SDL_Keycode p_key);
 			int MapEventToAwesomium(SDL_Event p_event);
 			Dispatcher* m_dispatcher;

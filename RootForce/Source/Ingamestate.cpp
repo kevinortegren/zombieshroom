@@ -318,8 +318,6 @@ namespace RootForce
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
-			PROFILE("GUI", g_engineContext.m_profiler);
-
 			g_engineContext.m_gui->Update();
 			//Update Menu to make sure Setting changes are made in the main thread
 			m_ingameMenu->Update();
@@ -332,12 +330,21 @@ namespace RootForce
 			}
 			else
 			{
-				m_hud->GetView()->SetActive(m_displayGuiHUD);
-				if(m_displayGuiHUD)
-					g_engineContext.m_gui->Render(m_hud->GetView());
-				g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
-				if(m_displayDebugHUD)
-					g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				{
+					PROFILE("GUI HUD", g_engineContext.m_profiler);
+
+					m_hud->GetView()->SetActive(m_displayGuiHUD);
+					m_hud->GetView()->Focus();
+					if(m_displayGuiHUD)
+						g_engineContext.m_gui->Render(m_hud->GetView());
+				}
+				{
+					PROFILE("GUI Debug", g_engineContext.m_profiler);
+
+					g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
+					if(m_displayDebugHUD)
+						g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				}
 			}
 		}
 
