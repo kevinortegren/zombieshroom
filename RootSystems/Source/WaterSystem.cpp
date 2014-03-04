@@ -96,11 +96,13 @@ namespace RootForce
 			{
 				HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
 				health->Health = 0.0f;
-				PlayerComponent* playercomp = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_entity);
-				Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_entity);
-				MatchStateSystem::AwardPlayerKill(health->LastDamageSourceID,network->ID.UserID);
+				if(!health->IsDead)
+				{
+					PlayerComponent* playercomp = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_entity);
+					Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_entity);
+					MatchStateSystem::AwardPlayerKill(health->LastDamageSourceID,network->ID.UserID);
+				}
 
-				m_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(m_world->GetTagManager()->GetEntityByTag("MatchState"))->TeamScore[playercomp->TeamID] --;
 			}
 #endif
 		
