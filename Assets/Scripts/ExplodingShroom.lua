@@ -55,9 +55,14 @@ end
 
 function ExplodingShroom.OnCollide (self, entity)
 if entity:DoesExist() then
+	local hitCol = entity:GetCollision();
+	local hitPhys = entity:GetPhysics();
+	local type = hitPhys:GetType(hitCol);
+	if type == PhysicsType.TYPE_STATIC then
 		local network = self:GetNetwork();
 		XplodingMushroomPlanted.OnCreate(network:GetUserId(), network:GetActionId());
 		ExplodingShroom.OnDestroy(self);
+	end
 end
 end
 
