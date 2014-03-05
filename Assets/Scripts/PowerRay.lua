@@ -1,6 +1,8 @@
 PowerRay = {};
 PowerRay.damage = 10;
 PowerRay.knockback = 3;
+PowerRay.currentDamage = 10;
+PowerRay.currentKnockback = 3;
 PowerRay.cooldown = 0.5;
 PowerRay.charges = 40;
 PowerRay.chargeTime = 0;
@@ -8,9 +10,6 @@ PowerRay.channelingTime = 0;
 PowerRay.duration = 1;
 
 function PowerRay.ChargeDone (time, userId, actionId)
-	local self = Entity.New();
-	local networkComp = Network.New(self, userId, actionId);
-	local dakComp = DamageAndKnockback.New(self, PowerRay.damage , PowerRay.knockback);
 	PowerRay.OnCreate(userId, actionId);
 end
 
@@ -22,7 +21,7 @@ end
 
 function PowerRay.OnCreate (userId, actionId)
 	--Entities
-	local self = Entity.GetEntityByNetworkID(userId, actionId, 0);
+	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	--Components
 	local networkComp = Network.New(self, userId, actionId);
@@ -32,6 +31,7 @@ function PowerRay.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "PowerRay");
 	local timerComp = Timer.New(self, PowerRay.duration);
+	local dakComp = DamageAndKnockback.New(self, PowerRay.currentDamage , PowerRay.currentKnockback);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);
@@ -49,7 +49,7 @@ function PowerRay.OnCreate (userId, actionId)
 	--physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(facePos);
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "FallingLeafsParticle");
+		--local particleComp = ParticleEmitter.New(self, "FallingLeafsParticle");
 		local waterComp = WaterCollider.New(self);
 		waterComp:SetDisturbPower(1);
 		waterComp:SetDisturbInterval(0.3);

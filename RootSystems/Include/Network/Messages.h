@@ -30,6 +30,11 @@ namespace RootForce
 	struct TDMRuleSet;
 	struct PlayerPhysics;
 	struct AbilitySpawnComponent;
+	struct TimerComponent;
+	struct FollowComponent;
+	struct HomingComponent;
+	struct DamageAndKnockback;
+	struct StatChange;
 
 	namespace Network
 	{
@@ -381,7 +386,11 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TDMRuleSet* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, AbilitySpawnComponent* p_c);
-
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TimerComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, FollowComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, HomingComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, DamageAndKnockback* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, StatChange* p_c);
 
 		/*
 			Returns true if the specified component can be serialized. False otherwise.

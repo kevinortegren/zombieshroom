@@ -26,7 +26,6 @@ function Explosion.OnCreate (userId, actionId)
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "Explosion");
 	local timerComp = Timer.New(self, Explosion.duration);
-	--Scalable.New(self, 20, 400);
 	collisionComp:CreateHandle(self, 1, true);
 	transformComp:SetPos(posVec);
 	transformComp:SetScale(Vec3.New(10,10,10));
@@ -36,12 +35,7 @@ function Explosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "After bind call");
 	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 10);
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "explosion");
-		--local renderComp = Renderable.New(self);
-		--renderComp:SetModel("Primitives/sphere");
-		--renderComp:SetMaterial("ExplosiveMat");
-		--renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
-		--renderComp:SetMaterialEffect("Mesh_Refractive_Clear");
+		local particleComp = ParticleEmitter.New(self, "Explosion_G-stuf");
 	end
 	Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 end
