@@ -15,6 +15,7 @@ public:
 	void Knockback(const btVector3& p_direction, float p_power);
 	void setWalkDirection(const btVector3& walkDirection);
 	bool IsKnockbacked();
+	void Jump(float p_jumpPower);
 	void JumpBoost(float p_boostPower);
 	void StopKnockback();
 

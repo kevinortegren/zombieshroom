@@ -21,7 +21,7 @@ select
 }
 #main-body
 {
-  background-image: url('menubackground.jpg');
+  background-image: url('menubackground.png');
   background-position: 50% 50%;
   background-size: 100% 100%;
 }

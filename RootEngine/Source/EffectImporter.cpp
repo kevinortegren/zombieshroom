@@ -305,6 +305,14 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::DX, offset);
 						}
+						else if(sem == "ROTATIONSPEEDMIN")
+						{
+							technique->AddUniformParam(Render::Semantic::ROTATIONSPEEDMIN, offset);
+						}
+						else if(sem == "ROTATIONSPEEDMAX")
+						{
+							technique->AddUniformParam(Render::Semantic::ROTATIONSPEEDMAX, offset);
+						}
 					}
 				}
 

@@ -5,3 +5,5 @@ PowerRay
 RefractiveBall
 IceCube
 Homing
+SlowNova
+Boost

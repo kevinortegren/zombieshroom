@@ -17,6 +17,9 @@ end
 function PowerRay.ChannelingDone (time, userId, actionId)
 end
 
+function PowerRay.Interrupted (time, userId, actionId)
+end
+
 function PowerRay.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.GetEntityByNetworkID(userId, actionId, 0);
@@ -71,12 +74,12 @@ if entity:DoesExist() then
 			if not health:IsDead() then
 				local network = entity:GetNetwork();
 				local receiverId = network:GetUserId();
-				health:Damage(abilityOwnerId, dakComp:GetDamage(), receiverId);
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);
 			end
 
 			local hitPos = entity:GetTransformation():GetPos();
 			local selfPos = self:GetTransformation():GetPos();
-			hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback(), health:GetHealth());
+			hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 	end
 end
 end

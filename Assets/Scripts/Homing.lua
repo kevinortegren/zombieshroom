@@ -68,7 +68,7 @@ function Homing.OnCreate (userId, actionId)
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "HomingSparkle");
+		local particleComp = ParticleEmitter.New(self, "magic_missile_01");
 	end
 end
 
@@ -89,7 +89,7 @@ if entity:DoesExist() then
 			if not health:IsDead() then
 				local network = entity:GetNetwork();
 				local receiverId = network:GetUserId();
-				health:Damage(abilityOwnerId, dakComp:GetDamage(), receiverId);
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);
 			end
 			Homing.OnDestroy(self);
 		end

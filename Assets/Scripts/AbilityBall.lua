@@ -15,6 +15,9 @@ end
 function AbilityBall.ChannelingDone (time, userId, actionId)
 end
 
+function AbilityBall.Interrupted(time, userId, actionId)
+end
+
 function AbilityBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
@@ -49,7 +52,7 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialGlow("fireballGlow");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
-		local particleComp = ParticleEmitter.New(self, "AbilityBallFire");
+		local particleComp = ParticleEmitter.New(self, "SmockeochElden");
 		local pointlightComp = PointLight.New(self);
 		pointlightComp:SetColor(Vec4.New(1.0, 0.5, 0.0, 1.0));
 		pointlightComp:SetRange(10.0);
@@ -74,13 +77,13 @@ function AbilityBall.OnCollide (self, entity)
 				if not health:IsDead() then
 					local network = entity:GetNetwork();
 					local receiverId = network:GetUserId();
-					health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
+					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance(), receiverId);
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback, health:GetHealth());
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

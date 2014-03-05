@@ -38,3 +38,5 @@
   TEXTURE: smoke
   EFFECT: Particle/ParticleAlphaBlend
   NAME: Smoke
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0
