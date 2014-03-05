@@ -34,13 +34,13 @@ GLTextureSurface::~GLTextureSurface()
 {
 }
 
-const std::vector<std::vector<SurfaceTile>>* GLTextureSurface::GetTiles() const
+std::vector<std::vector<SurfaceTile>>* GLTextureSurface::GetTiles() const
 {
 	//const_cast<GLTextureSurface*>(this)->UpdateTexture();
 	
 	/*const_cast<GLTextureSurface*>(this)->m_needsUpdateMutex.lock();
 	const_cast<GLTextureSurface*>(this)->m_needsUpdateMutex.unlock();*/
-	return &m_tiles;
+	return const_cast<std::vector<std::vector<SurfaceTile>>*>(&m_tiles);
 }
 
 void GLTextureSurface::Paint(unsigned char* p_buffer, int p_row_span, const Awesomium::Rect& p_src_rect, const Awesomium::Rect& p_dest_rect)
@@ -55,7 +55,7 @@ void GLTextureSurface::Paint(unsigned char* p_buffer, int p_row_span, const Awes
 		for (int tileX = startX; tileX <= endX; ++tileX)
 		{
 			int tileRowStart = max(p_dest_rect.x - tileX*TILE_SIZE, 0);
-			int tileRowEnd = min(p_dest_rect.x + p_dest_rect.width - tileX*TILE_SIZE, 0);
+			int tileRowEnd = max(min(p_dest_rect.x + p_dest_rect.width - tileX*TILE_SIZE, TILE_SIZE), 0);
 			int srcStart = tileRowStart + tileX*TILE_SIZE - p_dest_rect.x + p_src_rect.x;
 			SurfaceTile& tile = m_tiles[tileX][tileY];
 
@@ -129,25 +129,33 @@ void GLTextureSurface::Scroll(int dx, int dy, const Awesomium::Rect& clip_rect)
 void GLTextureSurface::UpdateTexture()
 {
 	for(auto& row : m_tiles)
+	{
 		for(SurfaceTile& tile : row)
+		{
 			if (tile.NeedsUpdate)
 			{
-				glBindTexture(GL_TEXTURE_2D, m_bufferTexture);
+				glBindTexture(GL_TEXTURE_2D, tile.Texture[(int)(!tile.ActiveTexture)]);
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TILE_SIZE, TILE_SIZE,
 					tile.Bpp == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE, tile.Buffer.data());
+		
 				glBindTexture(GL_TEXTURE_2D, 0);
 				tile.NeedsUpdate = false;
-		
-				GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
-				GLenum result;
-				while((result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, 0)) == GL_TIMEOUT_EXPIRED)
-				{
-					Sleep(10);
-				}
-				glDeleteSync(fenceId);
-				std::swap(m_bufferTexture, tile.Texture);
-				glInvalidateTexImage(m_bufferTexture, 0);
+
+				tile.FenceID = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
 			}
+			if(tile.FenceID > 0)
+			{
+				if(glClientWaitSync(tile.FenceID, GL_SYNC_FLUSH_COMMANDS_BIT, 0) != GL_TIMEOUT_EXPIRED)
+				{
+					glDeleteSync(tile.FenceID);
+					tile.FenceID = 0;
+					tile.ActiveTexture = !tile.ActiveTexture;
+					glInvalidateTexImage(tile.Texture[(int)(!tile.ActiveTexture)], 0);
+				}
+			}
+		}
+		Sleep(1);
+	}
 }
 
 

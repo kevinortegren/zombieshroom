@@ -45,23 +45,21 @@ namespace RootEngine
 			g_context.m_resourceManager->LoadEffect("2D_GUI");
 			m_program = g_context.m_resourceManager->GetEffect("2D_GUI")->GetTechniques()[0]->GetPrograms()[0];
 
+			m_program->Apply();
+			glUniform1i(glGetUniformLocation(m_program->GetHandle(), "outputWidth"), p_width);
+			glUniform1i(glGetUniformLocation(m_program->GetHandle(), "outputHeight"), p_height);
+			glUniform1i(glGetUniformLocation(m_program->GetHandle(), "tileSize"), TILE_SIZE);
+
 			// Prepare a quad for texture output
 			glGenVertexArrays(1, &m_vertexArrayBuffer);
 			glBindVertexArray(m_vertexArrayBuffer);
-			GLuint vertexBufferObject;
-			glGenBuffers(1, &vertexBufferObject);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			float quadVertices[] = {
-				-1.f, 1.f, 0.f, 0.f,
-				-1.f, -1.f, 0.f, 1.f,
-				1.f, 1.f, 1.f, 0.f,
-				1.f, -1.f, 1.f, 1.f
-			};
-			glBufferData(GL_ARRAY_BUFFER, 4*4*sizeof(float), quadVertices, GL_STATIC_DRAW);
+
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL);
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float)+sizeof(int), (char*)NULL);
 			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL+2*sizeof(float));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float)+sizeof(int), (char*)NULL+2*sizeof(float));
+			glEnableVertexAttribArray(2);
+			glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, 4*sizeof(float)+sizeof(int), (char*)NULL+4*sizeof(float));
 			// Done, unbind VAO
 			glBindVertexArray(0);
 			
@@ -84,22 +82,45 @@ namespace RootEngine
 			if(!surface)
 				return;
 
-			auto tiles = surface->GetTiles();
-			for(auto& row : *tiles)
-				for(const SurfaceTile& tile : row)
-				{
-					m_program->Apply();
-
-					glBindVertexArray(m_vertexArrayBuffer);
-					//m_drawMutex.lock();
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_2D, tile.Texture);
-					glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-					glBindTexture(GL_TEXTURE_2D, 0);
-					//m_drawMutex.unlock();
+			// Buffer quads in a buffer until max amount of texture units is filled
+			//   then issue a draw call and reset
 			
-					glBindVertexArray(0);
+			glBindVertexArray(m_vertexArrayBuffer);
+
+			GLuint vertexBufferObject = 0;
+			unsigned numTexturesUsed = 0;
+			glGenBuffers(1, &vertexBufferObject);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			float quadVertices[] = {
+				-1.f, 1.f, 0.f, 0.f,
+				-1.f, -1.f, 0.f, 1.f,
+				1.f, 1.f, 1.f, 0.f,
+				1.f, -1.f, 1.f, 1.f
+			};
+			glBufferData(GL_ARRAY_BUFFER, 4*(4*sizeof(float)+sizeof(int)), quadVertices, GL_STATIC_DRAW);
+
+			m_program->Apply();
+			auto tiles = surface->GetTiles();
+			for(unsigned x = 0; x < tiles->size(); ++x)
+			{
+				glUniform1i(glGetUniformLocation(m_program->GetHandle(), "offsetX"), x*TILE_SIZE);
+
+				for(unsigned y = 0; y < tiles->at(x).size(); ++y)
+				{
+					SurfaceTile& tile = tiles->at(x).at(y);
+
+					glUniform1i(glGetUniformLocation(m_program->GetHandle(), ("tile["+std::to_string(y)+"]").c_str()), y);
+					glActiveTexture(GL_TEXTURE0 + y);
+					tile.TextureMutex.lock();
+					glBindTexture(GL_TEXTURE_2D, tile.Texture[tile.ActiveTexture]);
 				}
+
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+				for(unsigned y = 0; y < tiles->at(x).size(); ++y)
+					tiles->at(x).at(y).TextureMutex.unlock();
+			}
+			glBindVertexArray(0);
 		}
 
 		guiInstance* guiInstance::GetInstance()

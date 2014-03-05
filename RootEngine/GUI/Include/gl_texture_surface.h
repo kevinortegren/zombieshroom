@@ -4,45 +4,43 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <vector>
+#include <mutex>
 
 #define TILE_SIZE 256
 
-//class GLTextureSurface : public Awesomium::Surface
-//{
-//public:
-//	virtual void Paint(unsigned char* src_buffer, int src_row_span, const Awesomium::Rect& src_rect, const Awesomium::Rect& dest_rect) = 0;
-//
-//	virtual void Scroll(int dx, int dy, const Awesomium::Rect& clip_rect) = 0;
-//
-//	virtual GLuint GetTiles() const = 0;
-//	virtual int width() const = 0;
-//	virtual int height() const = 0;
-//	virtual int size() const = 0;
-//};
-
-struct SurfaceTile
+class SurfaceTile
 {
+public:
 	std::vector<char> Buffer;
-	GLuint Texture;
+	GLuint Texture[2];
 	bool NeedsUpdate;
 	int Bpp, Rowspan;
+	std::mutex TextureMutex;
+	int ActiveTexture;
+	GLsync FenceID;
 
-	/*SurfaceTile()
-		: Texture(0), NeedsUpdate(false), Bpp(0), Rowspan(0)
-	{
-	}*/
 	SurfaceTile()
-		: Texture(0), NeedsUpdate(false), Bpp(4), Rowspan(TILE_SIZE*4)
+		: NeedsUpdate(false), Bpp(4), Rowspan(TILE_SIZE*4), ActiveTexture(0), FenceID(0)
 	{
 		Buffer.resize(TILE_SIZE*Rowspan);
-		glGenTextures(1, &Texture);
-		glBindTexture(GL_TEXTURE_2D, Texture);
+		glGenTextures(2, Texture);
+		glBindTexture(GL_TEXTURE_2D, Texture[0]);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
+		glBindTexture(GL_TEXTURE_2D, Texture[1]);
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+	SurfaceTile(SurfaceTile& p_other)
+	{
+		int i = 0;
+	}
 	~SurfaceTile()
 	{
-		glDeleteTextures(1, &Texture);
+		glDeleteTextures(2, Texture);
+	}
+	void operator=(SurfaceTile& p_other)
+	{
+		int i = 0;
 	}
 };
 
@@ -52,13 +50,14 @@ public:
 	GLTextureSurface(int width, int height);
 	virtual ~GLTextureSurface();
 
-	const std::vector<std::vector<SurfaceTile>>* GetTiles() const;
+	std::vector<std::vector<SurfaceTile>>* GetTiles() const;
 
 	int width() const { return m_width; }
 
 	int height() const { return m_height; }
 
 	//int size() const { return m_rowspan * m_height; }
+	//int GetActiveTexture() { return m_activeTexture; }
 
 	void UpdateTexture();
 
