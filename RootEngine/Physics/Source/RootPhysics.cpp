@@ -924,10 +924,10 @@ namespace Physics
 		{
 			btQuaternion temp = m_externallyControlled.at(index)->GetOrientation();
 			
-			retVal[0] = temp.w();
-			retVal[1] = temp.x();
-			retVal[2] = temp.y();
-			retVal[3] = temp.z();
+			retVal[0] = temp.y();
+			retVal[1] = temp.z();
+			retVal[2] = temp.w();
+			retVal[3] = temp.x();
 		}
 		return retVal;
 	}
