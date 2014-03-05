@@ -125,33 +125,40 @@ namespace RootForce
 		bool abilityUpdatedThisFrame = false;
 
 		bool onGround = g_engineContext.m_physics->IsOnGround(*collision->m_handle);
-		float power = 0;
+		float forwardPower = 0;
+		float strafePower = 0;
+		float backPower = 0;
+
 		action->MovePower = 0;
 		action->StrafePower = 0;
 		if(onGround)
 		{
-			power = 1;
+			forwardPower = 1;
+			strafePower = 0.7f;
+			backPower = 0.5f;
 		}
 		else
 		{
-			power = 0.03f;
+			forwardPower = 0.03f;
+			strafePower = 0.03f;
+			backPower = 0.03f;
 		}
 		for (PlayerAction::PlayerAction currentAction : m_inputtedActionsCurrentFrame)
 		{
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
-					action->MovePower += power;
+					action->MovePower += forwardPower;
 				
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
-					action->MovePower -= power;
+					action->MovePower -= backPower;
 				break;
 			case PlayerAction::STRAFE_RIGHT:
-					action->StrafePower += power;
+					action->StrafePower += strafePower;
 				break;
 			case PlayerAction::STRAFE_LEFT:
-					action->StrafePower -= power;
+					action->StrafePower -= strafePower;
 				break;
 			case PlayerAction::ORIENTATE:
 				{

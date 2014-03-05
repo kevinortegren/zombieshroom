@@ -24,6 +24,11 @@ namespace RootForce
 			DESCEND,
 			LANDING,
 			SHOOT,
+			BACKWARDS,
+			LEFTFORWARD,
+			RIGHTFORWARD,
+			LEFTBACK,
+			RIGHTBACK,
 			RAGDOLL
 		};
 	}
