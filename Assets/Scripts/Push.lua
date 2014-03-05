@@ -1,5 +1,6 @@
 Push = {};
 Push.knockback = 20;
+Push.currentKnockback = 20;
 Push.cooldown = 1;
 Push.charges = -1;
 Push.chargeTime = 1;
@@ -9,7 +10,7 @@ Push.duration = 0.2;
 function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
 		Push.OnCreate(userId, actionId);
-		Push.knockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
+		Push.currentKnockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
 	--end
 end
 
@@ -68,7 +69,7 @@ function Push.OnCollide (self, entity)
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
 				local health = entity:GetHealth();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.currentKnockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end
