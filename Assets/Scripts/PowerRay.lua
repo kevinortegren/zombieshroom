@@ -1,10 +1,10 @@
 PowerRay = {};
-PowerRay.damage = 10;
+PowerRay.damage = 50;
 PowerRay.knockback = 3;
 PowerRay.currentDamage = 10;
 PowerRay.currentKnockback = 3;
-PowerRay.cooldown = 0.5;
-PowerRay.charges = 40;
+PowerRay.cooldown = 1;
+PowerRay.charges = 10;
 PowerRay.chargeTime = 0;
 PowerRay.channelingTime = 0;
 PowerRay.duration = 1;
