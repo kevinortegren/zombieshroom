@@ -1078,17 +1078,18 @@ namespace Physics
 		{
 			m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->SetOrientation(p_objectOrientation);
 		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			//	m_ragdolls.at(index)->SetOrientation(p_objectOrientation);
+		}
 		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			glm::quat rot = glm::angleAxis(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 			
 			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation*rot);
 		}
-		else
-		{
-			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
-		//	m_ragdolls.at(index)->SetOrientation(p_objectOrientation);
-		}
+		
 	}
 
 
