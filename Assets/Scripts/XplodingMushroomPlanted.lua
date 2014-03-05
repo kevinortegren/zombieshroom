@@ -31,7 +31,10 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 	colRespComp:SetContainer(collisionComp);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rotQuat = Quat.New(0,0,0,1);
-	local tempPos = casterEnt:GetTransformation():GetPos();
+	if casterEnt:DoesExist() then
+		local tempPos = casterEnt:GetTransformation():GetPos();
+	else
+		local tempPos = Vec3.New(0,1,0);
 	local startPos = tempPos;
 	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 2, 1, false, false);
 	transformComp:SetPos(startPos);
