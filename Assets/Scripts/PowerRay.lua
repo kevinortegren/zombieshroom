@@ -25,7 +25,6 @@ function PowerRay.OnCreate (userId, actionId)
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	--Components
 	local networkComp = Network.New(self, userId, actionId);
-	local networkComp = Network.New(self, userId, actionId);
 	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
@@ -50,7 +49,7 @@ function PowerRay.OnCreate (userId, actionId)
 	--physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(facePos);
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "FallingLeafsParticle");
+		--local particleComp = ParticleEmitter.New(self, "FallingLeafsParticle");
 		local waterComp = WaterCollider.New(self);
 		waterComp:SetDisturbPower(1);
 		waterComp:SetDisturbInterval(0.3);
