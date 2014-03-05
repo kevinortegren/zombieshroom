@@ -10,7 +10,7 @@ function Player.OnCreate(userId, actionId)
 	
 	transform:SetPos(Vec3.New(100,10,0));
 
-	playerComponent:SetAbility(3, "Push", -1);
+	playerComponent:SetAbility(3, "Identiray", -1);
 	playerComponent:SelectAbility(0);
  	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);

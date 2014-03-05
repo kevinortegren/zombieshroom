@@ -169,6 +169,15 @@ namespace RootForce
 			return 1;
 		}
 
+		static int EntityGetScript(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Script **s = (RootForce::Script **)lua_newuserdata(p_luaState, sizeof(RootForce::Script *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::Script>(*e);
+			luaL_setmetatable(p_luaState, "Script");
+			return 1;
+		}
 		static int EntityGetTransformation(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -2010,6 +2019,13 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.ActionID);
 			return 1;
 		}
+		static int NetworkGetSequenceId(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Network::NetworkComponent **s = (RootForce::Network::NetworkComponent**)luaL_checkudata(p_luaState, 1, "Network");
+			lua_pushnumber(p_luaState, (lua_Number)(*s)->ID.SequenceID);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//ANIMATION
 		//////////////////////////////////////////////////////////////////////////
@@ -2573,6 +2589,7 @@ namespace RootForce
 		static const struct luaL_Reg entity_m [] = {
 			{"GetId", EntityGetId},
 			{"DoesExist", EntityDoesExist},
+			{"GetScript", EntityGetScript},
 			{"GetTransformation", EntityGetTransformation},
 			{"RemoveTransformation", EntityRemoveTransformation},
 			{"GetRenderable", EntityGetRenderable},
@@ -2933,6 +2950,7 @@ namespace RootForce
 		static const struct luaL_Reg network_m [] = {
 			{"GetUserId", NetworkGetUserId},
 			{"GetActionId", NetworkGetActionId},
+			{"GetSequenceId", NetworkGetSequenceId},
 			{NULL, NULL}
 		};
 
