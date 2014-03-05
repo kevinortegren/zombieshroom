@@ -1,7 +1,7 @@
 PowerRay = {};
 PowerRay.damage = 50;
 PowerRay.knockback = 3;
-PowerRay.currentDamage = 10;
+PowerRay.currentDamage = 50;
 PowerRay.currentKnockback = 3;
 PowerRay.cooldown = 1;
 PowerRay.charges = 10;
