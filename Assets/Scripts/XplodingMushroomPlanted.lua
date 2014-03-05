@@ -35,6 +35,7 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 		local tempPos = casterEnt:GetTransformation():GetPos();
 	else
 		local tempPos = Vec3.New(0,1,0);
+	end
 	local startPos = tempPos;
 	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 2, 1, false, false);
 	transformComp:SetPos(startPos);
