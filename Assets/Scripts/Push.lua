@@ -1,6 +1,6 @@
 Push = {};
-Push.knockback = 20;
-Push.currentKnockback = 20;
+Push.knockback = 50;
+Push.currentKnockback = 50;
 Push.cooldown = 1;
 Push.charges = -1;
 Push.chargeTime = 1;
@@ -21,7 +21,7 @@ function Push.Interrupted (time, userId, actionId)
 end
 
 function Push.OnCreate (userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);

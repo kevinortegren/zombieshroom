@@ -1,9 +1,8 @@
 XplodingMushroomPlanted = {};
 XplodingMushroomPlanted.cooldown = 0;
 XplodingMushroomPlanted.charges = 0;
-XplodingMushroomPlanted.chargeTime = 0;
 XplodingMushroomPlanted.channelingTime = 0;
-XplodingMushroomPlanted.duration = 0;
+XplodingMushroomPlanted.duration = 60;
 
 function XplodingMushroomPlanted.ChargeDone (time, userId, actionId)
 	XplodingMushroomPlanted.OnCreate(userId, actionId);
@@ -52,8 +51,20 @@ if entity:DoesExist() then
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
+	if type == PhysicsType.TYPE_PLAYER then
+		local abilityOwnerNetwork = self:GetNetwork();
+		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+		local targetPlayerComponent = entity:GetPlayerComponent();
+		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+			ShroomExplosion.OnCreate(network:GetUserId(), network:GetActionId());
+			XplodingMushroomPlanted.OnDestroy(self);
+		end
+	end
 end
 end
 
 function XplodingMushroomPlanted.OnDestroy (self)
+	Entity.Remove(self);
 end

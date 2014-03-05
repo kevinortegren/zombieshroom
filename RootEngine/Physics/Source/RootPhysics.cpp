@@ -1085,7 +1085,7 @@ namespace Physics
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
-			glm::quat rot = glm::angleAxis(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+			glm::quat rot = glm::angleAxis(/*-9*/0.0f, glm::vec3(1.0f, 0.0f, 0.0f)); //here be trouble
 			
 			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation*rot);
 		}
