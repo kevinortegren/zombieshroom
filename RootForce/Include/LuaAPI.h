@@ -52,6 +52,38 @@ namespace RootForce
 			return 0;
 		}
 
+		static int LogIdentifyEntity(lua_State* p_luaState)
+		{
+			NumberOfArgs(1); // Entity
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+
+			lua_Debug ar;
+			lua_getstack(p_luaState, 1, &ar);
+			lua_getinfo(p_luaState, "Sl", &ar);
+
+			g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::IDENTIFY_PRINT, "Entity ID: %d, Entity Flag: %llx", (*e)->GetId(), (*e)->GetFlag());
+
+			Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*e);
+			if (network != nullptr)
+			{
+				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::IDENTIFY_PRINT, "User: %u, Action: %u, Sequence: %u", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+			}
+
+			Script* script = g_world->GetEntityManager()->GetComponent<Script>(*e);
+			if (script != nullptr)
+			{
+				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::IDENTIFY_PRINT, "Script: %s", script->Name.c_str());
+			}
+
+			TimerComponent* timer = g_world->GetEntityManager()->GetComponent<TimerComponent>(*e);
+			if (timer != nullptr)
+			{
+				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::IDENTIFY_PRINT, "Timer time left: %f, Time up: %d", timer->TimeLeft, (int) timer->TimeUp);
+			}
+
+			return 0;
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		//ENTITY
 		//////////////////////////////////////////////////////////////////////////
@@ -2566,6 +2598,7 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
+			{"IdentifyEntity", LogIdentifyEntity},
 			{NULL, NULL}
 		};
 

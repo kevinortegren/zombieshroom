@@ -23,6 +23,8 @@ void RootForce::TimerSystem::ProcessEntity( ECS::Entity* p_entity )
 
 	timer->TimeLeft -= m_world->GetDelta();
 
+	//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "TimerSystem (User: %u, Action: %u, Sequence: %u)", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+
 	if (timer->TimeLeft <= 0)
 	{
 		if (m_serverPeer != nullptr)
@@ -47,6 +49,7 @@ void RootForce::TimerSystem::ProcessEntity( ECS::Entity* p_entity )
 		//g_engineContext.m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
 		//g_engineContext.m_script->ExecuteScript();
 
+		g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::PINK_PRINT, "Time up (User: %u, Action: %u, Sequence: %u)", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
 		Network::DeleteEntities(g_networkEntityMap, network->ID, m_world->GetEntityManager());
 		//m_world->GetEntityManager()->RemoveAllComponents(p_entity);
 		//m_world->GetEntityManager()->RemoveEntity(p_entity);

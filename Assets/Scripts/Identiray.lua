@@ -63,17 +63,7 @@ if entity:DoesExist() then
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
     
-    if type == PhysicsType.TYPE_ABILITY then
-        local hitNetwork = entity:GetNetwork();
-        if hitNetwork ~= nil then
-            Logging.Log(LogLevel.DEBUG_PRINT, "Identiray: User: " .. hitNetwork:GetUserId() .. ", Action: " .. hitNetwork:GetActionId() .. ", Sequence: " .. hitNetwork:GetSequenceId());
-        end
-        
-        local hitScript = entity:GetScript();
-        if hitScript ~= nil then
-            Logging.Log(LogLevel.DEBUG_PRINT, "Identiray: Script: " .. hitScript:GetName());
-        end
-    end
+    Logging.IdentifyEntity(entity);
 end
 end
 

@@ -38,13 +38,21 @@ namespace RootForce
 			{
 				// If the entity has a script component, call its OnDestroy script.
 				if(!destroy[i]->second)
+				{
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Entity in network entity map is null when about to be destroyed. (User: %u, Action: %u, Sequence: %u)", destroy[i]->first.UserID, destroy[i]->first.ActionID, destroy[i]->first.SequenceID);
 					continue;
+				}
+
 				Script* script = p_entityManager->GetComponent<Script>(destroy[i]->second);
 				if (script != nullptr)
 				{
 					g_engineContext.m_script->SetFunction(script->Name, "OnDestroy");
 					g_engineContext.m_script->AddParameterUserData(destroy[i]->second, sizeof(ECS::Entity*), "Entity");
 					g_engineContext.m_script->ExecuteScript();
+				}
+				else
+				{
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Entity in network entity map has no script component. Cannot call OnDestroy script. (User: %u, Action: %u, Sequence: %u)", destroy[i]->first.UserID, destroy[i]->first.ActionID, destroy[i]->first.SequenceID);
 				}
 
 				// Remove the entity from the world
