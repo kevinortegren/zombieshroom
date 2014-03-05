@@ -15,7 +15,7 @@
   ORBITSPEED: 0
   ORBITRADIUS: 0
   TEMPLATE: 0
-  TEXTURE: smocke
+  TEXTURE: Particles/smocke
   EFFECT: Particle/ParticleAdditive
   NAME: tits
   ROTATIONSPEEDMIN: -3.1
@@ -37,7 +37,7 @@
   ORBITSPEED: 0
   ORBITRADIUS: 0
   TEMPLATE: 0
-  TEXTURE: smoke
+  TEXTURE: Particles/smoke
   EFFECT: Particle/ParticleAdditive
   NAME: balls
   ROTATIONSPEEDMIN: -3.1
@@ -59,8 +59,8 @@
   ORBITSPEED: 45
   ORBITRADIUS: 1.2
   TEMPLATE: 3
-  TEXTURE: magic_lightning
-  EFFECT: Particle/ParticleAdditiveRelativeOrbit
+  TEXTURE: Particles/magic_lightning
+  EFFECT: Particle/ParticleAdditiveRelative
   NAME: orbitar
   ROTATIONSPEEDMIN: -5.5
   ROTATIONSPEEDMAX: 5.5

@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ParticleEditor_t {
-    QByteArrayData data[62];
-    char stringdata[966];
+    QByteArrayData data[64];
+    char stringdata[1005];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -90,7 +90,9 @@ QT_MOC_LITERAL(57, 867, 22),
 QT_MOC_LITERAL(58, 890, 7),
 QT_MOC_LITERAL(59, 898, 18),
 QT_MOC_LITERAL(60, 917, 23),
-QT_MOC_LITERAL(61, 941, 23)
+QT_MOC_LITERAL(61, 941, 23),
+QT_MOC_LITERAL(62, 965, 18),
+QT_MOC_LITERAL(63, 984, 19)
     },
     "ParticleEditor\0MenuNew\0\0MenuOpen\0"
     "MenuSave\0ManuSaveAs\0MenuExit\0MenuViewStats\0"
@@ -118,7 +120,8 @@ QT_MOC_LITERAL(61, 941, 23)
     "ModelDoubleClicked\0ModelTexDoubleClicked\0"
     "BackgroundColorChanged\0p_value\0"
     "RemoveObjectButton\0RotationSpeedMinChanged\0"
-    "RotationSpeedMaxChanged\0"
+    "RotationSpeedMaxChanged\0MaxPerFrameChanged\0"
+    "ResetParticleSystem\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -128,7 +131,7 @@ static const uint qt_meta_data_ParticleEditor[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      53,   14, // methods
+      55,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -136,59 +139,61 @@ static const uint qt_meta_data_ParticleEditor[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  279,    2, 0x08,
-       3,    0,  280,    2, 0x08,
-       4,    0,  281,    2, 0x08,
-       5,    0,  282,    2, 0x08,
-       6,    0,  283,    2, 0x08,
-       7,    0,  284,    2, 0x08,
-       8,    0,  285,    2, 0x08,
-       9,    0,  286,    2, 0x08,
-      10,    0,  287,    2, 0x08,
-      11,    0,  288,    2, 0x08,
-      12,    0,  289,    2, 0x08,
-      13,    0,  290,    2, 0x08,
-      14,    0,  291,    2, 0x08,
-      15,    0,  292,    2, 0x08,
-      16,    0,  293,    2, 0x08,
-      17,    0,  294,    2, 0x08,
-      18,    1,  295,    2, 0x08,
-      20,    1,  298,    2, 0x08,
-      22,    1,  301,    2, 0x08,
-      24,    1,  304,    2, 0x08,
-      26,    1,  307,    2, 0x08,
-      28,    1,  310,    2, 0x08,
-      29,    1,  313,    2, 0x08,
-      30,    1,  316,    2, 0x08,
-      31,    1,  319,    2, 0x08,
-      32,    1,  322,    2, 0x08,
-      33,    1,  325,    2, 0x08,
-      34,    1,  328,    2, 0x08,
-      35,    1,  331,    2, 0x08,
-      36,    1,  334,    2, 0x08,
-      37,    1,  337,    2, 0x08,
-      38,    1,  340,    2, 0x08,
-      39,    1,  343,    2, 0x08,
-      40,    1,  346,    2, 0x08,
-      41,    1,  349,    2, 0x08,
-      42,    1,  352,    2, 0x08,
-      43,    1,  355,    2, 0x08,
-      44,    1,  358,    2, 0x08,
-      46,    0,  361,    2, 0x08,
-      47,    1,  362,    2, 0x08,
-      48,    1,  365,    2, 0x08,
-      49,    1,  368,    2, 0x08,
-      50,    1,  371,    2, 0x08,
-      51,    1,  374,    2, 0x08,
-      52,    1,  377,    2, 0x08,
-      53,    1,  380,    2, 0x08,
-      54,    1,  383,    2, 0x08,
-      55,    1,  386,    2, 0x08,
-      56,    1,  389,    2, 0x08,
-      57,    1,  392,    2, 0x08,
-      59,    0,  395,    2, 0x08,
-      60,    1,  396,    2, 0x08,
-      61,    1,  399,    2, 0x08,
+       1,    0,  289,    2, 0x08,
+       3,    0,  290,    2, 0x08,
+       4,    0,  291,    2, 0x08,
+       5,    0,  292,    2, 0x08,
+       6,    0,  293,    2, 0x08,
+       7,    0,  294,    2, 0x08,
+       8,    0,  295,    2, 0x08,
+       9,    0,  296,    2, 0x08,
+      10,    0,  297,    2, 0x08,
+      11,    0,  298,    2, 0x08,
+      12,    0,  299,    2, 0x08,
+      13,    0,  300,    2, 0x08,
+      14,    0,  301,    2, 0x08,
+      15,    0,  302,    2, 0x08,
+      16,    0,  303,    2, 0x08,
+      17,    0,  304,    2, 0x08,
+      18,    1,  305,    2, 0x08,
+      20,    1,  308,    2, 0x08,
+      22,    1,  311,    2, 0x08,
+      24,    1,  314,    2, 0x08,
+      26,    1,  317,    2, 0x08,
+      28,    1,  320,    2, 0x08,
+      29,    1,  323,    2, 0x08,
+      30,    1,  326,    2, 0x08,
+      31,    1,  329,    2, 0x08,
+      32,    1,  332,    2, 0x08,
+      33,    1,  335,    2, 0x08,
+      34,    1,  338,    2, 0x08,
+      35,    1,  341,    2, 0x08,
+      36,    1,  344,    2, 0x08,
+      37,    1,  347,    2, 0x08,
+      38,    1,  350,    2, 0x08,
+      39,    1,  353,    2, 0x08,
+      40,    1,  356,    2, 0x08,
+      41,    1,  359,    2, 0x08,
+      42,    1,  362,    2, 0x08,
+      43,    1,  365,    2, 0x08,
+      44,    1,  368,    2, 0x08,
+      46,    0,  371,    2, 0x08,
+      47,    1,  372,    2, 0x08,
+      48,    1,  375,    2, 0x08,
+      49,    1,  378,    2, 0x08,
+      50,    1,  381,    2, 0x08,
+      51,    1,  384,    2, 0x08,
+      52,    1,  387,    2, 0x08,
+      53,    1,  390,    2, 0x08,
+      54,    1,  393,    2, 0x08,
+      55,    1,  396,    2, 0x08,
+      56,    1,  399,    2, 0x08,
+      57,    1,  402,    2, 0x08,
+      59,    0,  405,    2, 0x08,
+      60,    1,  406,    2, 0x08,
+      61,    1,  409,    2, 0x08,
+      62,    1,  412,    2, 0x08,
+      63,    0,  415,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -244,6 +249,8 @@ static const uint qt_meta_data_ParticleEditor[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Double,   27,
     QMetaType::Void, QMetaType::Double,   27,
+    QMetaType::Void, QMetaType::Double,   27,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -306,6 +313,8 @@ void ParticleEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 50: _t->RemoveObjectButton(); break;
         case 51: _t->RotationSpeedMinChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 52: _t->RotationSpeedMaxChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 53: _t->MaxPerFrameChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 54: _t->ResetParticleSystem(); break;
         default: ;
         }
     }
@@ -336,13 +345,13 @@ int ParticleEditor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 53)
+        if (_id < 55)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 53;
+        _id -= 55;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 53)
+        if (_id < 55)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 53;
+        _id -= 55;
     }
     return _id;
 }

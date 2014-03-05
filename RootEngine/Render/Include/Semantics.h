@@ -36,6 +36,7 @@ namespace Render
 			DX,
 			ROTATIONSPEEDMIN,
 			ROTATIONSPEEDMAX,
+			MAXPERFRAME,
 		};
 	}
 

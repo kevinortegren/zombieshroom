@@ -53,7 +53,10 @@
         - sem: ROTATIONSPEEDMIN
           offset: 136
         - sem: ROTATIONSPEEDMAX
-          offset: 140      # The update techniques should be ignored by the render job processor.
+          offset: 140      
+        - sem: MAXPERFRAME
+          offset: 144
+		  # The update techniques should be ignored by the render job processor.
       flags:
         - name: RenderIgnore
 
