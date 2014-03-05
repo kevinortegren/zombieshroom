@@ -191,22 +191,24 @@ namespace RootForce
 		deadNetworkID.ActionID = Network::ReservedActionID::CONNECT;
 		deadNetworkID.SequenceID = 0;
 		
+		ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
+		PlayerComponent* killedPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID));
+		RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
 		// Award score for killer team
 		if(p_killerID != Network::ReservedUserID::NONE)
 		{
-			ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
 			ECS::Entity* killerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(p_killerID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
-			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
 			PlayerComponent* killerPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(killerEntity);
 
 			rules->TeamScore[killerPlayerComponent->TeamID]++;
 			killerPlayerComponent->Score++;
 		}
-		else
+		else //Give minus in score if the kill was a suicide
 		{
-			g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID))->Score --;
+			killedPlayerComponent->Score --;
+			rules->TeamScore[killedPlayerComponent->TeamID]--;
 		}
-		g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID))->Deaths ++;
+		killedPlayerComponent->Deaths ++;
 	}
 
 	
