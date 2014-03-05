@@ -71,6 +71,7 @@ namespace RootForce
 				Death,
 				PlayerTeamSelect,
 				StatChangeTimeUp,
+				PlayerNameChange,
 			};
 		}
 
@@ -365,6 +366,13 @@ namespace RootForce
 		{
 			Network::UserID_t UserID;
 			uint8_t StatToReset;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+		struct PlayerNameChange
+		{
+			RakNet::RakString Name;
+			Network::UserID_t UserID;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};

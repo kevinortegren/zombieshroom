@@ -62,19 +62,19 @@ $(document).ready(function() {
 		Menu.Exit();
 	} );
 		
-	$("#team-select-blue").click(function() {
+	$("#team-select-blueChar").click(function() {
 		if(teamSize[1] > teamSize[2])
 			return;
 		Menu.SelectTeam(1);
 		HideTeamSelect();
 	});
-	$("#team-select-red").click(function() {
+	$("#team-select-redChar").click(function() {
 		if(teamSize[2] > teamSize[1])
 			return;
 		Menu.SelectTeam(2);
 		HideTeamSelect();
 	});
-	$("#team-select-spectate").click(function() {
+	$("#team-select-spectateHover").click(function() {
 		Menu.SelectTeam(0);
 		HideTeamSelect();
 	});

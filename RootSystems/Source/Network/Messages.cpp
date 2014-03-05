@@ -195,6 +195,12 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, StatToReset);
 		}
 
+		void PlayerNameChange::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
+		{
+			p_bs->Serialize(p_writeToBitstream, Name);
+			p_bs->Serialize(p_writeToBitstream, UserID);
+		}
+
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
 		{
 			for (int i = 0; i < 3; ++i)
@@ -334,7 +340,6 @@ namespace RootForce
 				}
 			p_bs->Serialize(p_writeToBitstream, p_c->Timer);
 		}
-
 
 		bool CanSerializeComponent(ComponentType::ComponentType p_type)
 		{
