@@ -1,6 +1,8 @@
 Homing = {};
 Homing.damage = 100;
 Homing.knockback = 0;
+Homing.currentDamage = 100;
+Homing.currentKnockback = 0;
 Homing.cooldown = 10;
 Homing.charges = 2;
 Homing.chargeTime = 0;
@@ -8,9 +10,6 @@ Homing.channelingTime = 0;
 Homing.duration = 60;
 
 function Homing.ChargeDone (time, userId, actionId)
-	local self = Entity.New();
-	local networkComp = Network.New(self, userId, actionId);
-	local dakComp = DamageAndKnockback.New(self, Homing.damage , Homing.knockback);
 	Homing.OnCreate(userId, actionId);
 end
 
@@ -19,15 +18,17 @@ end
 
 function Homing.OnCreate (userId, actionId)
 	--Entities
-	local self = Entity.GetEntityByNetworkID(userId, actionId, 0);
+	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	--Components
+	local networkComp = Network.New(self, userId, actionId);
 	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Homing");
 	local timerComp = Timer.New(self, Homing.duration);
+	local dakComp = DamageAndKnockback.New(self, Homing.currentDamage , Homing.currentKnockback);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
