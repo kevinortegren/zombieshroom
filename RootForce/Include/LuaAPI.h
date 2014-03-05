@@ -68,11 +68,22 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+
+			// Log the removal
+			lua_Debug ar;
+			lua_getstack(p_luaState, 1, &ar);
+			lua_getinfo(p_luaState, "Sl", &ar);
+
+			Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*e);
+			if (network != nullptr)
+				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u).", network->ID.UserID, network->ID.ActionID);
+			else
+				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
+
 			g_world->GetEntityManager()->RemoveAllComponents(*e);
 			g_world->GetEntityManager()->RemoveEntity(*e);
 			for (auto itr = g_networkEntityMap.begin(); itr != g_networkEntityMap.end(); ++itr)
 			{
-				// If the entity has a script component, call its OnDestroy script.
 				if(itr->second != *e)
 					continue;
 				itr = g_networkEntityMap.erase(itr);
