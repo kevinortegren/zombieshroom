@@ -62,7 +62,7 @@ if entity:DoesExist() then
 		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 		local targetPlayerComponent = entity:GetPlayerComponent();
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-			ShroomExplosion.OnCreate(network:GetUserId(), network:GetActionId());
+			ShroomExplosion.OnCreate(abilityOwnerId, abilityOwnerNetwork:GetActionId());
 			XplodingMushroomPlanted.OnDestroy(self);
 		end
 	end
