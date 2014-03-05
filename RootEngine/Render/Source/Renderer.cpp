@@ -615,20 +615,37 @@ namespace Render
 
 	void GLRenderer::Sorting()
 	{	
+		//Sort deferred jobs based on material
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
+
+		//Sort forward jobs base on height compared to the water level
 		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortForwardRenderJobs);
 
 		if(m_forwardJobs.size() > 1)
 		{
+			//Look for water job
 			auto waterItr = std::find_if(m_forwardJobs.begin(), m_forwardJobs.end(), FindWaterJob);
-			if(waterItr != m_forwardJobs.end() && waterItr != m_forwardJobs.begin())
+			
+			//If no water, sort all jobs by distance to camera as normal
+			if(waterItr == m_forwardJobs.end()) 
 			{
-				std::sort(m_forwardJobs.begin(), waterItr - 1, SortOnDistanceFunctor(*this));
-				std::sort(waterItr + 1, m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+				std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+				return;
+			}
+			//If there is a water job, check to see if it's the first or last job(Either everything is above or everything is beneath)
+			if( waterItr == m_forwardJobs.begin() ) //First job(everything is over)
+			{
+				std::sort(m_forwardJobs.begin() + 1 , m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+			}
+			else if( waterItr == m_forwardJobs.end() - 1 ) //Last job(everything is under)
+			{
+				std::sort(m_forwardJobs.begin(), m_forwardJobs.end() - 1, SortOnDistanceFunctor(*this));
 			}
 			else
 			{
-				std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+				//There are object both under and above the water, sort each side individually
+				std::sort(m_forwardJobs.begin(), waterItr - 1, SortOnDistanceFunctor(*this));
+				std::sort(waterItr + 1, m_forwardJobs.end(), SortOnDistanceFunctor(*this));
 			}
 		}
 	}

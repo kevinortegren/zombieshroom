@@ -101,7 +101,7 @@ void main()
 
 				if(g_direction == vec3(0,0,0))
 				{
-					vert_initialVel1	= normalize(GetRandomDir(g_time + i*step)) * GetRandomNumber(g_time + i*step, g_speedMin, g_speedMax);
+					vert_initialVel1	= normalize(GetRandomDir(g_time + i*step + 0.05)) * GetRandomNumber(g_time + i*step + 0.024, g_speedMin, g_speedMax);
 				}
 				else
 				{
@@ -111,17 +111,17 @@ void main()
 				
 					vec3 vektre = vec3(xspread, yspread, zspread);
 
-					vert_initialVel1 	= normalize(vektre + normalize(g_direction)) * GetRandomNumber(g_time + i*step, g_speedMin, g_speedMax);
+					vert_initialVel1 	= normalize(vektre + normalize(g_direction)) * GetRandomNumber(g_time + i*step + 0.034, g_speedMin, g_speedMax);
 				}
 
-				vert_scale1 		= vec2(GetRandomNumber(g_time + i*step, g_sizeMin.x, g_sizeMax.x), GetRandomNumber(g_time + i*step, g_sizeMin.y, g_sizeMax.y));
-				vert_age1 			= GetRandomNumber(g_time + i*0.1, g_lifeTimeMin, g_lifeTimeMax);
+				vert_scale1 		= vec2(GetRandomNumber(g_time + i*step + 0.059, g_sizeMin.x, g_sizeMax.x), GetRandomNumber(g_time + i*step + 0.075, g_sizeMin.y, g_sizeMax.y));
+				vert_age1 			= GetRandomNumber(g_time + i*step + 0.14, g_lifeTimeMin, g_lifeTimeMax);
 				vert_type1 			= 1.0f;
 		 		vert_color1 		= g_color;
 		 		vert_accel1			= g_gravity;
 				lifeTime			= g_spawnTime;
-				vert_rotation1		= GetRandomNumber(g_time+0.01f + i*step, 0.0f, 6.29f);
-				vert_rotationSpeed1 = GetRandomNumber(g_time + i*step, g_rotationSpeedMin, g_rotationSpeedMax);
+				vert_rotation1		= GetRandomNumber(g_time + i*step + 0.011f , 0.0f, 6.29f);
+				vert_rotationSpeed1 = GetRandomNumber(g_time + i*step + 0.087, g_rotationSpeedMin, g_rotationSpeedMax);
 				EmitVertex();
 				EndPrimitive();
 			}
