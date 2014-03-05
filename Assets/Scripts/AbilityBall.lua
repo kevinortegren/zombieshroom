@@ -5,7 +5,7 @@ AbilityBall.cooldown = 3;
 AbilityBall.charges = 0;
 AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
-AbilityBall.duration = 7;
+AbilityBall.duration = 4;
 AbilityBall.charges = -1;
 
 function AbilityBall.ChargeDone (time, userId, actionId)
@@ -90,5 +90,7 @@ function AbilityBall.OnCollide (self, entity)
 end
 
 function AbilityBall.OnDestroy (self)
+	local network = self:GetNetwork();
+	Explosion.OnCreate(network:GetUserId(), network:GetActionId());
 	Entity.Remove(self);
 end

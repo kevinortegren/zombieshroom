@@ -46,7 +46,7 @@ function FireBall.OnCreate (userId, actionId)
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "fireball");
+		local particleComp = ParticleEmitter.New(self, "SmockeochElden");
 	end
 end
 
