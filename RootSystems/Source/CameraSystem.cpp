@@ -33,6 +33,7 @@ namespace RootForce
 			}
 			m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
 			m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);
+			m_engineContext->m_renderer->SetCameraPosition(transform->m_position);
 		}
 	}
 #ifndef COMPILE_LEVEL_EDITOR

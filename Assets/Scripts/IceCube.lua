@@ -41,13 +41,13 @@ function IceCube.OnCreate (userId, actionId)
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
-	transformComp:SetScale(Vec3.New(40, 40, 40));
+	transformComp:SetScale(Vec3.New(5, 5, 5));
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/box");
+		renderComp:SetModel("PentagonSphere");
 		renderComp:SetMaterial("IceCubeer");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
-		renderComp:SetMaterialEffect("Mesh_Refractive");
+		renderComp:SetMaterialEffect("Mesh_Refractive_Clear");
 	end
 end
 
