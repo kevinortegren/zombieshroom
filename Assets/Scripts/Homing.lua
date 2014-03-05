@@ -1,5 +1,5 @@
 Homing = {};
-Homing.damage = 100;
+Homing.damage = 90;
 Homing.knockback = 0;
 Homing.currentDamage = 100;
 Homing.currentKnockback = 0;

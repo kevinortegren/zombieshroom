@@ -21,7 +21,7 @@ function Push.Interrupted (time, userId, actionId)
 end
 
 function Push.OnCreate (userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
@@ -42,9 +42,8 @@ function Push.OnCreate (userId, actionId)
 	transformComp:GetOrient():SetOrientation(rotQuat);
 	--transformComp:GetOrient():Pitch(-90);
 	rotQuat = transformComp:GetOrient():GetQuaternion();
-	local tempPos = casterEnt:GetTransformation():GetPos();
-	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
-	physicsComp:BindConeShape(collisionComp, startPos, rotQuat, 6, 3, 1, false, false);
+	local startPos = casterEnt:GetTransformation():GetPos();
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 6, 1, false, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(startPos);

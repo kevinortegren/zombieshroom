@@ -7,3 +7,5 @@ IceCube
 Homing
 SlowNova
 Boost
+MachineGun
+ExplodingShroom
