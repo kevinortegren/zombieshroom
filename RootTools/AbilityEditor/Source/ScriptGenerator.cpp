@@ -75,6 +75,8 @@ namespace AbilityEditorNameSpace
 		}
 		m_file << m_name << ".damage = " << m_damage << ";\n";
 		m_file << m_name << ".knockback = " << m_knockback << ";\n";
+		m_file << m_name << ".currentDamage = " << m_damage << ";\n";
+		m_file << m_name << ".currentKnockback = " << m_knockback << ";\n";
 		m_file << m_name << ".cooldown = " << m_entity->GetCooldown() << ";\n";
 		m_file << m_name << ".charges = " << m_entity->GetCharges() << ";\n";
 		m_file << m_name << ".chargeTime = " << m_entity->GetChargeTime() << ";\n";
@@ -96,9 +98,6 @@ namespace AbilityEditorNameSpace
 			}
 		}
 
-		m_file << "\tlocal self = Entity.New();\n";
-		m_file << "\tlocal networkComp = Network.New(self, userId, actionId);\n";
-		m_file << "\tlocal dakComp = DamageAndKnockback.New(self, " << m_name << ".damage , " << m_name << ".knockback);\n";
 
 		if (chargeReq > 0.0f)
 		{
@@ -106,8 +105,8 @@ namespace AbilityEditorNameSpace
 		}
 		if (chargeFac >= 1.0f && m_entity->GetChargeTime() > 0.0f)
 		{
-			m_file << "\tdakComp:SetDamage(" << m_name << ".damage * ((time * " << chargeFac << ") / " << m_name << ".chargeTime));\n";
-			m_file << "\tdakComp:SetKnockback(" << m_name << ".knockback * ((time * " << chargeFac << ") / " << m_name << ".chargeTime));\n";
+			m_file << "\t" << m_name << ".currentDamage = " << m_name << ".damage * ((time * " << chargeFac << ") / " << m_name << ".chargeTime);\n";
+			m_file << "\t" << m_name << ".currentKnockback = " << m_name << ".knockback * ((time * " << chargeFac << ") / " << m_name << ".chargeTime));\n";
 		}
 		m_file << "\t" << m_name << ".OnCreate(userId, actionId);\n";
 		if (chargeReq > 0.0f)
@@ -131,16 +130,19 @@ namespace AbilityEditorNameSpace
 		m_file << "function " << m_name << ".OnCreate (userId, actionId)\n";
 
 			m_file << "\t--Entities\n";
-			m_file << "\tlocal self = Entity.GetEntityByNetworkID(userId, actionId, 0);\n";
+
+			m_file << "\tlocal self = Entity.New();\n";
 			m_file << "\tlocal casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);\n";
 
 			m_file << "\t--Components\n";
+			m_file << "\tlocal networkComp = Network.New(self, userId, actionId);\n";
 			m_file << "\tlocal transformComp = Transformation.New(self);\n";
 			m_file << "\tlocal collisionComp = Collision.New(self);\n";
 			m_file << "\tlocal colRespComp = CollisionResponder.New(self);\n";
 			m_file << "\tlocal physicsComp = Physics.New(self);\n";
 			m_file << "\tlocal scriptComp = Script.New(self, \"" << m_name << "\");\n";
 			m_file << "\tlocal timerComp = Timer.New(self, " << m_name << ".duration);\n";
+			m_file << "\tlocal dakComp = DamageAndKnockback.New(self, " << m_name << ".currentDamage , " << m_name << ".currentKnockback);\n";
 
 			
 			//Some standard
