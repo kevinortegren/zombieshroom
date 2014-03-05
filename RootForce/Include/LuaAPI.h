@@ -1695,6 +1695,13 @@ namespace RootForce
 			lua_pushboolean(p_luaState, (*s)->WantsRespawn);
 			return 1;
 		}
+		static int HealthIncreaseHealth(lua_State* p_luaState)
+		{
+			NumberOfArgs(2); //self, health increase
+			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
+			(*s)->Health += (float)luaL_checknumber(p_luaState, 2);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//PLAYERCOMPONENT
 		//////////////////////////////////////////////////////////////////////////
@@ -2372,6 +2379,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Timer");
 			return 1;
 		}
+		static int TimerGetTimeLeft(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TimerComponent **s = (RootForce::TimerComponent**)luaL_checkudata(p_luaState, 1, "Timer");
+			lua_pushnumber(p_luaState, (*s)->TimeLeft);
+			return 1;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		//Damage and knockback
@@ -2754,6 +2768,7 @@ namespace RootForce
 			{"GetHealth",		HealthGetHealth},
 			{"IsDead",			HealthIsDead},
 			{"GetWantsRespawn",	HealthGetWantsRespawn},
+			{"IncreaseHealth",	HealthIncreaseHealth},
 			{NULL, NULL}
 		};
 
@@ -2962,6 +2977,7 @@ namespace RootForce
 
 		static const struct luaL_Reg timercomponent_f [] = {
 			{"New", TimerCreate},
+			{"GetTimeLeft", TimerGetTimeLeft},
 			{NULL, NULL}
 		};
 
