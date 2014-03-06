@@ -44,7 +44,7 @@ namespace RootForce
 			void SetChatSystem(RootForce::ChatSystem* p_chatSystem);
 			void SetWorldSystem(WorldSystem* p_worldSystem);
 			void SetAbilitySpawnSystem(AbilitySpawnSystem* p_abilityspawnSystem) { m_abilitySpawnSystem = p_abilityspawnSystem; }
-			void SetDeserializationSystem(DeserializationSystem* p_deserializationSystem) { p_deserializationSystem = p_deserializationSystem; }
+			void SetDeserializationSystem(DeserializationSystem* p_deserializationSystem) { m_deserializationSystem = p_deserializationSystem; }
 
 			bool ParsePacket(RakNet::MessageID p_id, RakNet::BitStream* p_bs, RakNet::Packet* p_packet, RakNet::Time p_timestamp);
 		private:
