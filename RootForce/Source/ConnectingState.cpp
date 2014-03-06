@@ -121,6 +121,7 @@ namespace RootForce
 		m_networkContext.m_client->Update();
 
 		m_sharedSystems.m_respawnSystem->Process();
+		m_sharedSystems.m_deserializationSystem->Process();
 
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);

@@ -523,6 +523,11 @@ namespace RootForce
 			PROFILE("StateSystem", g_engineContext.m_profiler);
 			m_stateSystem->Process();
 		}
+
+		{
+			PROFILE("DeserializationSystem", g_engineContext.m_profiler);
+			m_sharedSystems.m_deserializationSystem->Process();
+		}
 	
 		{
 			PROFILE("Camera systems", g_engineContext.m_profiler);
