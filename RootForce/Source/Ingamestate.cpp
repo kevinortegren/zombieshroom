@@ -194,9 +194,12 @@ namespace RootForce
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;		
-		m_displayWorldDebug = false;
 		m_displayDebugHUD = true;
 		m_displayGuiHUD = true;
+
+#ifndef _DEBUG
+		m_displayDebugHUD = false;
+#endif
 	}
 
 	void IngameState::Enter()
