@@ -13,7 +13,7 @@ end
 
 function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
-		Push.currentKnockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
+		Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
 		Push.OnCreate(userId, actionId);
 		
 	--end
