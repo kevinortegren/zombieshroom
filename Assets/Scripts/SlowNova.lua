@@ -5,11 +5,18 @@ SlowNova.chargeTime = 0;
 SlowNova.channelingTime = 0;
 SlowNova.duration = 0.6;
 
+function SlowNova.OnLoad()
+	ResourceManager.LoadParticle("frostBlast");
+end
+
 function SlowNova.ChargeDone (time, userId, actionId)
 	SlowNova.OnCreate(userId, actionId);
 end
 
 function SlowNova.ChannelingDone (time, userId, actionId)
+end
+
+function FireBall.Interrupted (time, userId, actionId)
 end
 
 function SlowNova.OnCreate (userId, actionId)
@@ -30,8 +37,7 @@ function SlowNova.OnCreate (userId, actionId)
 	local facePos = casterEnt:GetTransformation():GetPos() + Vec3.New(0,1,0);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rotQuat = Quat.New(0,0,0,1);
-	local tempPos = casterEnt:GetTransformation():GetPos();
-	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
+	local startPos = casterEnt:GetTransformation():GetPos();
 	transformComp:SetPos(startPos);
 	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 15, 1, false, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));

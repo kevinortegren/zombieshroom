@@ -1,3 +1,4 @@
+#include <Windows.h>
 #include <Utility\ECS\Include\EntitySystem.h>
 #include <Utility\ECS\Include\World.h>
 #include <vector>
@@ -82,6 +83,10 @@ void ECS::ConcurrentSystem::Process()
 			End();
 
 			m_run = false;
+		}
+		else
+		{
+			Sleep(10);
 		}
 	}
 }

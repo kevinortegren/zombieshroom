@@ -59,7 +59,7 @@ namespace Physics
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
 	Render::RendererInterface* g_renderer;
 	RootEngine::ResourceManagerInterface* g_resourceManager;
-	
+	const int MAX_STEPSIMULATION_SUBSTEPS = 7;
 	RootPhysics::RootPhysics()
 	{
 
@@ -161,7 +161,8 @@ namespace Physics
 		
 		m_dt = p_dt;
 		//if(m_debugDrawEnabled == false)
-		m_dynamicWorld->stepSimulation(m_dt,4);
+		
+		m_dynamicWorld->stepSimulation(m_dt,MAX_STEPSIMULATION_SUBSTEPS);
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
 			m_playerObjects.at(i)->Update(m_dt);

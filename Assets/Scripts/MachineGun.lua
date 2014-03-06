@@ -7,11 +7,18 @@ MachineGun.chargeTime = 0;
 MachineGun.channelingTime = 0;
 MachineGun.duration = 5;
 
+function MachineGun.OnLoad()
+	ResourceManager.LoadParticle("MachineGun");
+end
+
 function MachineGun.ChargeDone (time, userId, actionId)
 	MachineGun.OnCreate(userId, actionId);
 end
 
 function MachineGun.ChannelingDone (time, userId, actionId)
+end
+
+function FireBall.Interrupted (time, userId, actionId)
 end
 
 function MachineGun.OnCreate (userId, actionId)

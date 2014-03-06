@@ -38,6 +38,7 @@ Logging::Logging() : m_enableLogging(true)
 	m_levelInfo[LogLevel::MASS_DATA_PRINT]	= TagLevelInfo("DATA_PRINT ", false);
 	m_levelInfo[LogLevel::NOLEVEL]			= TagLevelInfo("NOLEVEL    ", true);
 	m_levelInfo[LogLevel::HELP_PRINT]		= TagLevelInfo("HELP_PRINT ", true);
+	m_levelInfo[LogLevel::IDENTIFY_PRINT]   = TagLevelInfo("IDENTIFY   ", true);
 
 }
 
@@ -212,6 +213,12 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 	case LogLevel::HELP_PRINT:
 		{
 			ColorCMD::SetColor(ColorCMD::ConsoleColor::DARK_GREEN, ColorCMD::defbackcol);
+			std::cout<<"";
+			break;
+		}
+	case LogLevel::IDENTIFY_PRINT:
+		{
+			ColorCMD::SetColor(ColorCMD::ConsoleColor::DARK_AQUA, ColorCMD::defbackcol);
 			std::cout<<"";
 			break;
 		}

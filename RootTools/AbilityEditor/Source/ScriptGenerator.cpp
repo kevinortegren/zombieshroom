@@ -47,6 +47,10 @@ namespace AbilityEditorNameSpace
 		WriteChargeDone();
 		m_file << "\n";
 		WriteChannelingDone();
+
+		m_file << "function FireBall.Interrupted (time, userId, actionId)\n";
+		m_file << "end\n";
+
 		m_file << "\n";
 		WriteOnCreate(p_onCreate);
 		m_file << "\n";
@@ -82,6 +86,58 @@ namespace AbilityEditorNameSpace
 		m_file << m_name << ".chargeTime = " << m_entity->GetChargeTime() << ";\n";
 		m_file << m_name << ".channelingTime = " << m_entity->GetChannelingTime() << ";\n";
 		m_file << m_name << ".duration = " << m_entity->GetDuration() << ";\n";
+	}
+
+	void ScriptGenerator::WriteOnLoad()
+	{
+		std::string model = "";
+		std::string mat = "";
+		std::string matDif = "";
+		std::string matSpec = "";
+		std::string matNorm = "";
+		std::string matEffect = "";
+		std::string particle = "";
+		std::string sound = "";
+
+		m_file << "function " << m_name << ".OnLoad()\n";
+		for (unsigned int j = 0; j < m_entity->GetComponents()->size(); j++)
+		{
+			if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::ABILITYMODEL)
+			{
+				model = ((AbilityComponents::AbilityModel*)m_entity->GetComponents()->at(j))->m_modelName;
+				mat = ((AbilityComponents::AbilityModel*)m_entity->GetComponents()->at(j))->m_material;
+				matDif = ((AbilityComponents::AbilityModel*)m_entity->GetComponents()->at(j))->m_materialDiffuse;
+				matSpec = ((AbilityComponents::AbilityModel*)m_entity->GetComponents()->at(j))->m_materialSpecular;
+				matNorm = ((AbilityComponents::AbilityModel*)m_entity->GetComponents()->at(j))->m_materialNormal;
+				matEffect = ((AbilityComponents::AbilityModel*)m_entity->GetComponents()->at(j))->m_materialEffect;
+			}
+			else if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::ABILITYPARTICLE)
+			{
+				particle = ((AbilityComponents::AbilityParticle*)m_entity->GetComponents()->at(j))->m_particleName;
+			}
+			else if(m_entity->GetComponents()->at(j)->m_type == AbilityComponents::ComponentType::SOUND)
+			{
+				sound = ((AbilityComponents::Sound*)m_entity->GetComponents()->at(j))->m_soundName;
+			}
+		}
+		if(model.compare("") != 0)
+			m_file << "\tResourceManager.LoadModel(" << model << ");\n";
+		if(mat.compare("") != 0)
+			m_file << "\tResourceManager.LoadTexture(" << mat << ");\n";
+		if(matDif.compare("") != 0)
+			m_file << "\tResourceManager.LoadTexture(" << matDif << ");\n";
+		if(matSpec.compare("") != 0)
+			m_file << "\tResourceManager.LoadTexture(" << matSpec << ");\n";
+		if(matNorm.compare("") != 0)
+			m_file << "\tResourceManager.LoadTexture(" << matNorm << ");\n";
+		if(matEffect.compare("") != 0)
+			m_file << "\tResourceManager.LoadEffect(" << matEffect << ");\n";
+		if(particle.compare("") != 0)
+			m_file << "\tResourceManager.LoadParticle(" << particle << ");\n";
+		if(sound.compare("") != 0)
+			m_file << "\tResourceManager.LoadSound(" << sound << ");\n";
+
+		m_file << "end\n";
 	}
 
 	void ScriptGenerator::WriteChargeDone()

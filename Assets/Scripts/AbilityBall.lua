@@ -8,6 +8,17 @@ AbilityBall.channelingTime = 0;
 AbilityBall.duration = 4;
 AbilityBall.charges = -1;
 
+function AbilityBall.OnLoad()
+	ResourceManager.LoadModel("Primitives/sphereTangents");
+	ResourceManager.LoadTexture("Fireball");
+	ResourceManager.LoadTexture("fireballDiffuse");
+	ResourceManager.LoadTexture("fireballSpecular");
+	ResourceManager.LoadTexture("fireballNormal");
+	ResourceManager.LoadTexture("fireballGlow");
+	ResourceManager.LoadEffect("Mesh_NormalMap");
+	ResourceManager.LoadParticle("SmockeochElden");
+end
+
 function AbilityBall.ChargeDone (time, userId, actionId)
 	AbilityBall.OnCreate(userId, actionId);
 end
