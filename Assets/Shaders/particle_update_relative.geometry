@@ -120,7 +120,7 @@ void main()
 		 		vert_color1 		= g_color;
 		 		vert_accel1			= g_gravity;
 				lifeTime			= g_spawnTime;
-				vert_rotation1		= GetRandomNumber(g_time + i*step + 0.011f , 0.0f, 6.29f);
+				vert_rotation1		= GetRandomNumber(g_time + i*step + 0.011 , 0.0f, 6.29f);
 				vert_rotationSpeed1 = GetRandomNumber(g_time + i*step + 0.087, g_rotationSpeedMin, g_rotationSpeedMax);
 				EmitVertex();
 				EndPrimitive();
