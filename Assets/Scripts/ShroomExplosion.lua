@@ -6,6 +6,10 @@ ShroomExplosion.chargeTime = 0.0;
 ShroomExplosion.channelingTime = 0.0;
 ShroomExplosion.duration = 1.0;
 
+function ShroomExplosion.OnLoad()
+	ResourceManager.LoadParticle("Explosion_G-stuf");
+end
+
 function ShroomExplosion.OnCreate (userId, actionId)
 	local self = Entity.New();
 	local fatherEntity = Entity.GetEntityByNetworkID(userId, actionId, 1);

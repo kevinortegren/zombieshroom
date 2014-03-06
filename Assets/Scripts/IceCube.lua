@@ -8,6 +8,11 @@ IceCube.channelingTime = 0;
 IceCube.duration = 5;
 IceCube.charges = -1;
 
+function IceCube.OnLoad()
+	ResourceManager.LoadModel("PentagonSphere");
+	ResourceManager.LoadEffect("Mesh_Refractive_Clear");
+end
+
 function IceCube.ChargeDone (time, userId, actionId)
 	IceCube.OnCreate(userId, actionId);
 end

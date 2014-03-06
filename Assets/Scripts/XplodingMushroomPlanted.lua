@@ -4,6 +4,15 @@ XplodingMushroomPlanted.charges = 0;
 XplodingMushroomPlanted.channelingTime = 0;
 XplodingMushroomPlanted.duration = 120;
 
+function XplodingMushroomPlanted.OnLoad()
+	ResourceManager.LoadModel("XplodingMushroom");
+	ResourceManager.LoadTexture("XplodingMushroomDiffuse");
+	ResourceManager.LoadTexture("XplodingMushroomNormal");
+	ResourceManager.LoadEffect("Mesh_NormalMap");
+	ResourceManager.LoadScript("ShroomExplosion");
+	ShroomExplosion.OnLoad();
+end
+
 function XplodingMushroomPlanted.ChargeDone (time, userId, actionId)
 	XplodingMushroomPlanted.OnCreate(userId, actionId);
 end

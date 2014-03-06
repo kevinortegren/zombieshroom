@@ -6,6 +6,10 @@ Explosion.chargeTime = 0.0;
 Explosion.channelingTime = 0.0;
 Explosion.duration = 1.0;
 
+function Explosion.OnLoad()
+	ResourceManager.LoadParticle("Explosion_G-stuf");
+end
+
 function Explosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
 	local self = Entity.New();

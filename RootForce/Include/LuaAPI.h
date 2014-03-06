@@ -2533,6 +2533,47 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Scalable");
 			return 1;
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//Resource manager
+		//////////////////////////////////////////////////////////////////////////
+		static int ResourceLoadTexture(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			g_engineContext.m_resourceManager->LoadTexture(luaL_checkstring(p_luaState, 1), Render::TextureType::TEXTURE_2D);
+			return 0;
+		}
+		static int ResourceLoadEffect(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			g_engineContext.m_resourceManager->LoadEffect(luaL_checkstring(p_luaState, 1));
+			return 0;
+		}
+		static int ResourceLoadModel(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			g_engineContext.m_resourceManager->LoadCollada(luaL_checkstring(p_luaState, 1));
+			return 0;
+		}
+		static int ResourceLoadParticle(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			g_engineContext.m_resourceManager->LoadParticleEmitter(luaL_checkstring(p_luaState, 1), false);
+			return 0;
+		}
+		static int ResourceLoadSound(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			unsigned flags = (unsigned)luaL_checknumber(p_luaState, 2);
+			g_engineContext.m_resourceManager->LoadSoundAudio(luaL_checkstring(p_luaState, 1), flags);
+			return 0;
+		}
+		static int ResourceLoadScript(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			g_engineContext.m_resourceManager->LoadScript(luaL_checkstring(p_luaState, 1));
+			return 0;
+		}
 	
 		//////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////
@@ -3109,6 +3150,20 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg resource_f [] = {
+			{"LoadTexture", ResourceLoadTexture},
+			{"LoadEffect", ResourceLoadEffect},
+			{"LoadModel", ResourceLoadModel},
+			{"LoadParticle", ResourceLoadParticle},
+			{"LoadSound", ResourceLoadSound},
+			{"LoadScript", ResourceLoadScript},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg resource_m [] = {
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -3171,6 +3226,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::damageandknockback_f,	RootForce::LuaAPI::damageandknockback_m,	"DamageAndKnockback"); 
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::scalable_f,				RootForce::LuaAPI::scalable_m,				"Scalable");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statchange_f,			RootForce::LuaAPI::statchange_m,			"StatChange");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::resource_f,				RootForce::LuaAPI::resource_m,				"ResourceManager");
 
 			//No methods
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");

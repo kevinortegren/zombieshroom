@@ -5,6 +5,10 @@ SlowNova.chargeTime = 0;
 SlowNova.channelingTime = 0;
 SlowNova.duration = 0.6;
 
+function SlowNova.OnLoad()
+	ResourceManager.LoadParticle("frostBlast");
+end
+
 function SlowNova.ChargeDone (time, userId, actionId)
 	SlowNova.OnCreate(userId, actionId);
 end
