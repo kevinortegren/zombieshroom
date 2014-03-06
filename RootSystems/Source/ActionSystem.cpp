@@ -248,6 +248,13 @@ namespace RootSystems
 						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
+						// DEBUG
+						// Get the new entity and print its flag
+						//ECS::Entity* entity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(network->ID.UserID, abilityEvent.ActionID, 0));
+						//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "%s (User: %u, Action: %u) created with flag: %llx", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID, entity->GetFlag());
+
+						// /DEBUG
+
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 

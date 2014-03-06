@@ -9,6 +9,9 @@ PowerRay.chargeTime = 0;
 PowerRay.channelingTime = 0;
 PowerRay.duration = 1;
 
+function PowerRay.OnLoad()
+end
+
 function PowerRay.ChargeDone (time, userId, actionId)
 	PowerRay.OnCreate(userId, actionId);
 end

@@ -63,6 +63,7 @@ namespace RootForce
 		//Do not add scripts for abilities that are included in the abilitypacks. They will be loaded automatically
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("Push");
+		g_engineContext.m_resourceManager->LoadScript("Identiray");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");

@@ -8,6 +8,9 @@ AbilityDash.chargeTime = 0.0;
 AbilityDash.channelingTime = 0.0;
 AbilityDash.power = 25;
 
+function AbilityDash.OnLoad()
+end
+
 function AbilityDash.ChargeDone(time, userId, actionId)
 end
 

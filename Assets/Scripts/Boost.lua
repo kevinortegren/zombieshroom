@@ -7,6 +7,9 @@ Boost.chargeTime = 0;
 Boost.channelingTime = 0;
 Boost.duration = 0;
 
+function Boost.OnLoad()
+end
+
 function Boost.ChargeDone (time, userId, actionId)
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local statComp = casterEnt:GetStatChange();

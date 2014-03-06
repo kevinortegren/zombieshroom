@@ -8,6 +8,11 @@ RefractiveBall.channelingTime = 5;
 RefractiveBall.duration = 0;
 RefractiveBall.charges = -1;
 
+function RefractiveBall.OnLoad()
+	ResourceManager.LoadModel("PentagonSphere");
+	ResourceManager.LoadEffect("Mesh_Refractive");
+end
+
 function RefractiveBall.ChargeDone (time, userId, actionId)
 	RefractiveBall.OnCreate(userId, actionId);
 end
