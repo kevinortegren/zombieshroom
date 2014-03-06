@@ -4,6 +4,7 @@
 
 Logging::Logging() : m_enableLogging(true)
 {
+#ifdef _DEBUG
 	ColorCMD::ConsoleColorInit();
 	SetConsoleTitle(L"RootLog");
 	
@@ -39,7 +40,7 @@ Logging::Logging() : m_enableLogging(true)
 	m_levelInfo[LogLevel::NOLEVEL]			= TagLevelInfo("NOLEVEL    ", true);
 	m_levelInfo[LogLevel::HELP_PRINT]		= TagLevelInfo("HELP_PRINT ", true);
 	m_levelInfo[LogLevel::IDENTIFY_PRINT]   = TagLevelInfo("IDENTIFY   ", true);
-
+#endif // _DEBUG
 }
 
 Logging::~Logging()
@@ -91,6 +92,7 @@ std::string Logging::GetTimeString( int p_time )
 //////////////////////////////////////////////////////////////////////////
 void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
+#ifdef _DEBUG
 	va_list args;
 	va_start (args, p_format);
 	if(CheckLevel(p_vLevel) && CheckTag(p_tag))
@@ -99,6 +101,7 @@ void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel
 		WriteToFile(p_func, p_line, p_tag, p_vLevel, p_format, args);
 	}
 	va_end (args);
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -106,6 +109,7 @@ void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel
 //////////////////////////////////////////////////////////////////////////
 void Logging::LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...)
 {
+#ifdef _DEBUG
 	p_luaFunc = GetNameFromPath(p_luaFunc);
 
 	va_list args;
@@ -116,6 +120,7 @@ void Logging::LogScript(std::string p_luaFunc, int p_luaLine, LogTag::LogTag p_t
 		WriteToFile(p_luaFunc, p_luaLine, p_tag, p_vLevel, p_format, args);
 	}
 	va_end (args);
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -133,6 +138,7 @@ void Logging::WriteToFile(std::string p_func, int p_line, LogTag::LogTag p_tag, 
 
 void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, std::string p_format, va_list p_args, bool writeFileLine )
 {
+#ifdef _DEBUG
 	if(!m_enableLogging)
 		return;
 
@@ -234,6 +240,7 @@ void Logging::WriteToConsole(std::string p_func, int p_line, LogTag::LogTag p_ta
 
 	ColorCMD::SetColor(ColorCMD::ConsoleColor::WHITE, ColorCMD::defbackcol);
 	std::cout<<"";
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -287,6 +294,7 @@ std::string Logging::GetNameFromPath( std::string p_path )
 //////////////////////////////////////////////////////////////////////////
 void Logging::ParseCommand( std::stringstream* p_data )
 {
+#ifdef _DEBUG
 	std::string module;
 	std::string value;
 
@@ -364,10 +372,12 @@ void Logging::ParseCommand( std::stringstream* p_data )
 			}
 		}
 	}
+#endif
 }
 
 void Logging::PrintStatus()
 {
+#ifdef _DEBUG
 	LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "LogLevel status");
 	for(auto itr = m_levelInfo.begin(); itr != m_levelInfo.end(); itr++)
 	{
@@ -378,9 +388,12 @@ void Logging::PrintStatus()
 	{
 		LogText(LogTag::NOTAG, LogLevel::NOLEVEL, "\t\t[%s] : %d", itr->second.Name.c_str(), (int)itr->second.Enabled);
 	}
+#endif
 }
 
 void Logging::ClearLog()
 {
+#ifdef _DEBUG
 	system("cls");
+#endif
 }
