@@ -43,7 +43,8 @@ function AbilityBall.OnCreate (userId, actionId)
 	local scriptComp = Script.New(self, "AbilityBall");
 	local networkEnt = Network.New(self, userId, actionId);
 	
-	local timerComp = Timer.New(timerEnt, AbilityBall.duration, "AbilityBall", "OnDestroy", self);
+	local timerNetworkComp = Network.New(timerEnt, userId, actionId);
+	local timerComp = Timer.New(timerEnt, AbilityBall.duration, "OnDestroy", self);
 
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);

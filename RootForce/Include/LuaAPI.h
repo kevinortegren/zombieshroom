@@ -2438,20 +2438,22 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int TimerCreate(lua_State* p_luaState)
 		{
-			NumberOfArgs(5); // TimerEntity, Time, ScriptName, FunctionName, TargetEntity
+			NumberOfArgs(4); // TimerEntity, Time, FunctionName, TargetEntity
 			
 			RootForce::TimerComponent **s = (RootForce::TimerComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::TimerComponent*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::TimerComponent>(*e);
 
 			(*s)->TimeLeft = (float) luaL_checknumber(p_luaState, 2);
-			(*s)->ScriptName = luaL_checkstring(p_luaState, 3);
-			(*s)->FunctionName = luaL_checkstring(p_luaState, 4);
+			(*s)->FunctionName = luaL_checkstring(p_luaState, 3);
 			
-			ECS::Entity** target = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			ECS::Entity** target = (ECS::Entity**)luaL_checkudata(p_luaState, 4, "Entity");
 			Network::NetworkComponent* networkComponent = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*target);
+			Script* scriptComponent = g_world->GetEntityManager()->GetComponent<Script>(*target);
 			assert(networkComponent != nullptr);
+			assert(scriptComponent != nullptr);
 
+			(*s)->ScriptName = scriptComponent->Name.c_str();
 			(*s)->Target = networkComponent->ID;
 
 			luaL_setmetatable(p_luaState, "Timer");
