@@ -32,6 +32,8 @@ layout(std140) uniform PerObject
 	float dx2; //Length between height values
 };    
 
+//vec4 LightColor;
+//vec3 LightDirection;
 vec3 GetVSPositionFromDepth(float z, vec2 screenCoord)
 { 
 	z = z * 2 - 1;
@@ -65,23 +67,23 @@ float linearizeDepth(in float depth) {
 
 void main()
 {
-	float time = gTime/40.0;
+	float time = gTime/7.0;
 
 	////////////////////////////////////////////////////////////////////////////
 	//Normal mapping 2.0
 	////////////////////////////////////////////////////////////////////////////
 	vec2 calcNorm		= texture(g_Normal, TexCoord_FS_in).xy; //RG16F from compute shader
 	vec3 normalMap		= normalize(vec3(calcNorm.x, dx2*2, calcNorm.y));
-	if(gOptions.y == 1.0)
+	if(gOptions.y == 0.0)
 	{
-		vec3 normal1 			= normalize(texture(g_NormalMap, TexCoord_FS_in * 32.0 + vec2(sin(time - 1.0) , time))*2.0-1.0).xyz;
-		vec3 normal2 			= normalize(texture(g_NormalMap, -TexCoord_FS_in * 16.0 + vec2(sin(time*0.5)+1.0 , time*0.5))*2.0-1.0).xyz;
+		vec3 normal1 			= normalize(texture(g_NormalMap, TexCoord_FS_in * 256.0 + vec2(sin(time - 1.0) , time))*2.0-1.0).xyz;
+		vec3 normal2 			= normalize(texture(g_NormalMap, -TexCoord_FS_in * 128.0 + vec2(sin(time*0.5)+1.0 , time*0.5))*2.0-1.0).xyz;
 		vec3 normalT 			= mix(normal1, normal2, 0.5);
 		normalT 				= normalize(normalT);
 		vec3 tangent			= normalize(vec3(dx2, 0, calcNorm.x));
-		vec3 bitangent			= normalize(vec3(0, dx2, calcNorm.y));
+		vec3 bitangent			= normalize(vec3(0, dx2, -calcNorm.y));
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
-		normalMap 				= TBN * normalT;
+		normalMap 				= mix(TBN * normalT, normalMap, 0.8);
 	}
 	vec3 viewNormal			= normalize(viewMatrix * vec4(normalMap,0.0f)).rgb;
 	////////////////////////////////////////////////////////////////////////////
@@ -110,6 +112,8 @@ void main()
 
 	vec3 finalResult =  vec3(0.2, 0.4, 0.47);//texture(g_CubeMap, refW).rgb;
 
+	vec3 viewSpacePosition = GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord);
+
 	////////////////////////////////////////////////////////////////////////////
 	//Real-time Local Reflections using ray marching
 	////////////////////////////////////////////////////////////////////////////
@@ -119,7 +123,7 @@ void main()
 	float initialStepAmount = 0.01;
 
 	//Water fragment view space position
-	vec3 posV 		= GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord);
+	vec3 posV 		= viewSpacePosition;
 	vec3 viewVec	= normalize(posV);
 	//Viewspace vector reflected on the water normal
 	vec3 refV		= normalize(reflect(viewVec, viewNormal));
@@ -224,7 +228,7 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Lerp water color and refraction color
 	////////////////////////////////////////////////////////////////////////////
-	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
+	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - viewSpacePosition.z);
 	float distFac = clamp(gOptions.z*vdist, 0.0f, 1.0f);
 	
 	vec3 waterColor	= mix(refractionColor, vec3(0f, 0.15f, 0.115f), distFac);
@@ -237,13 +241,28 @@ void main()
 	//waterColor = mix(foamWaterColor, waterColor, foamDistFac);
 
 	////////////////////////////////////////////////////////////////////////////
-	//Calculate result color
+	//Calculate result diffuse color
 	////////////////////////////////////////////////////////////////////////////
 	vec4 result = vec4(mix(waterColor, reflectionColor, fresnel), 1.0f);
+
+	////////////////////////////////////////////////////////////////////////////
+	//Lighting
+	////////////////////////////////////////////////////////////////////////////
+	//Temp stuff
+	vec4 viewLightDir 	= viewMatrix * vec4(-1.0, -1.0, 1.0, 0.0);
+	vec3 LightDirection = viewLightDir.xyz;
+	vec4 LightColor		= vec4(1.0);
+
+	vec3 lightVec 	    = -normalize(LightDirection );
+	vec3 viewDir 		= -normalize(viewSpacePosition);
+	vec3 halfVector 	= normalize(viewDir + lightVec);
+    
+	vec3 specularColor 	= LightColor.xyz * 0.7 * pow(clamp(dot(viewNormal, halfVector), 0.0, 1.0), 128.0);
+
 
 	////////////////////////////////////////////////////////////////////////////
 	//Outputs
 	////////////////////////////////////////////////////////////////////////////
 
-    out_color = result;
+    out_color =  vec4(result.xyz + specularColor, 1.0);
 }
