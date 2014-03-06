@@ -2438,13 +2438,21 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int TimerCreate(lua_State* p_luaState)
 		{
-			NumberOfArgs(2);
+			NumberOfArgs(5); // TimerEntity, Time, ScriptName, FunctionName, TargetEntity
+			
 			RootForce::TimerComponent **s = (RootForce::TimerComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::TimerComponent*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::TimerComponent>(*e);
 
-			(*s)->TimeLeft = (float)luaL_checknumber(p_luaState, 2);
-			//(*s)->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(std::string(luaL_checkstring(p_luaState, 2)), false);
+			(*s)->TimeLeft = (float) luaL_checknumber(p_luaState, 2);
+			(*s)->ScriptName = luaL_checkstring(p_luaState, 3);
+			(*s)->FunctionName = luaL_checkstring(p_luaState, 4);
+			
+			ECS::Entity** target = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			Network::NetworkComponent* networkComponent = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*target);
+			assert(networkComponent != nullptr);
+
+			(*s)->Target = networkComponent->ID;
 
 			luaL_setmetatable(p_luaState, "Timer");
 			return 1;

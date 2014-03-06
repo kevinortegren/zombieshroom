@@ -346,6 +346,7 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
 		struct AbilitySpawn
 		{
 			Network::NetworkEntityID ID;
@@ -353,12 +354,14 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
 		struct Death
 		{
 			Network::UserID_t User;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
 		struct PlayerTeamSelect
 		{
 			Network::NetworkEntityID UserID;
@@ -366,6 +369,7 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
 		struct StatChangeTimeUp
 		{
 			Network::UserID_t UserID;
@@ -373,6 +377,7 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
 		/*
 			Serialize functions for components
 		*/

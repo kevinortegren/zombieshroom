@@ -33,14 +33,18 @@ function AbilityBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local networkEnt = Network.New(self, userId, actionId);
+	local timerEnt = Entity.New();
+	
 	--Components
 	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
-	local timerComp = Timer.New(self, AbilityBall.duration);
+	local networkEnt = Network.New(self, userId, actionId);
+	
+	local timerComp = Timer.New(timerEnt, AbilityBall.duration, "AbilityBall", "OnDestroy", self);
+
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);

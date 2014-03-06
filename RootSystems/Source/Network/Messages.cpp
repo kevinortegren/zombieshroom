@@ -177,6 +177,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, ID.SynchronizedID);
 		}
+
 		void AbilitySpawn::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, ID);
@@ -342,6 +343,9 @@ namespace RootForce
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TimerComponent* p_c)
 		{
+			p_bs->Serialize(p_writeToBitstream, p_c->ScriptName);
+			p_bs->Serialize(p_writeToBitstream, p_c->FunctionName);
+			p_bs->Serialize(p_writeToBitstream, p_c->Target);
 			p_bs->Serialize(p_writeToBitstream, p_c->TimeLeft);
 			p_bs->Serialize(p_writeToBitstream, p_c->TimeUp);
 		}
