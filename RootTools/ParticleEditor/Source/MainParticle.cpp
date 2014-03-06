@@ -12,15 +12,44 @@
 int main(int argc, char *argv[])
 {
 	std::string path(argv[0]);
+	std::string loadFile;
+
+	if(argv[1] == 0)
+		loadFile = "";
+	else
+		loadFile = argv[1];//If a .particle file was opened with application
+	
+	
 	std::string rootforcename = "ParticleEditor.exe";
 	path = path.substr(0, path.size() - rootforcename.size());
 	
 	try 
 	{
 		QApplication a(argc, argv);
-		ParticleEditor w;
 		
-		MainParticle m(path, &w);
+		QPalette palette;
+		palette.setColor(QPalette::Window, QColor(53,53,53));
+		palette.setColor(QPalette::WindowText, Qt::white);
+		palette.setColor(QPalette::Base, QColor(15,15,15));
+		palette.setColor(QPalette::AlternateBase, QColor(53,53,53));
+		palette.setColor(QPalette::ToolTipBase, Qt::white);
+		palette.setColor(QPalette::ToolTipText, Qt::white);
+		palette.setColor(QPalette::Text, Qt::white);
+		palette.setColor(QPalette::Button, QColor(53,53,53));
+		palette.setColor(QPalette::ButtonText, Qt::white);
+		palette.setColor(QPalette::BrightText, Qt::red);
+		palette.setColor(QPalette::Highlight, QColor(255,140,0));
+		palette.setColor(QPalette::HighlightedText, Qt::black);
+
+		a.setStyle(QStyleFactory::create("Fusion"));
+		a.setPalette(palette);
+
+		ParticleEditor w;
+
+		w.setStyle(QStyleFactory::create("Fusion"));
+		w.setPalette(palette);
+
+		MainParticle m(path, &w, loadFile);
 		w.show();
 		uint64_t old = SDL_GetPerformanceCounter();
 		bool notExit = true;
@@ -54,7 +83,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_particleEditorQt )
+MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_particleEditorQt, std::string p_loadFile )
 {
 	m_particleEditorQt = p_particleEditorQt;
 	m_workingDirectory = p_workingDirectory;
@@ -184,6 +213,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 
 	cameraThirdPerson->m_targetTag = "AimingDevice";
 	cameraThirdPerson->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
+	cameraThirdPerson->m_distance = 10.0f;
 
 	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
 	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
@@ -201,6 +231,8 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	m_dragging = 0;
 
 	CreateSkyBox();
+
+	m_particleEditorQt->OpenParticleFile(p_loadFile);
 }
 
 MainParticle::~MainParticle()
@@ -230,6 +262,10 @@ void MainParticle::Update( float p_delta )
 	UpdateInput();
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
+	//Manually set skybox position
+	RootForce::Transform* cameraTrans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_cameraEntity);
+	RootForce::Transform* skyboxTrans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_skyBox);
+	skyboxTrans->m_interpolatedPosition = cameraTrans->m_position;
 	UpdateThirdPerson();
 	m_particleSystem->Process();
 	m_pointLightSystem->Process();
@@ -339,10 +375,10 @@ void MainParticle::UpdateThirdPerson()
 void MainParticle::CreateSkyBox()
 {
 	// Setup skybox entity.
-	ECS::Entity* skybox = g_world->GetEntityManager()->CreateEntity();
+	m_skyBox = g_world->GetEntityManager()->CreateEntity();
 
-	RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
-	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
+	RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_skyBox);
+	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_skyBox);
 
 	t->m_scale = glm::vec3(-100);
 	t->m_orientation.Roll(180);
@@ -394,6 +430,6 @@ void MainParticle::CreateSkyBox()
 	r->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Skybox");
 	r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  g_engineContext.m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
-	g_world->GetTagManager()->RegisterEntity("Skybox", skybox);
-	g_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
+	g_world->GetTagManager()->RegisterEntity("Skybox", m_skyBox);
+	g_world->GetGroupManager()->RegisterEntity("NonExport", m_skyBox);
 }

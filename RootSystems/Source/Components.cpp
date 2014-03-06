@@ -41,6 +41,8 @@ namespace RootForce
 			RootForce::HomingComponent::SetTypeId(RootForce::ComponentType::HOMING);
 			RootForce::RayComponent::SetTypeId(RootForce::ComponentType::RAY);
 			RootForce::DamageAndKnockback::SetTypeId(RootForce::ComponentType::DAMAGEANDKNOCKBACK);
+			RootForce::Scalable::SetTypeId(RootForce::ComponentType::SCALABLE);
+			RootForce::StatChange::SetTypeId(RootForce::ComponentType::STATCHANGE);
 		}
 
 		void InitializeServerComponents()

@@ -15,22 +15,22 @@ namespace RootForce
 	{	
 		ComponentType::Initialize();
 
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(20);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TDMRuleSet>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerActionComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerPhysics>(12);
@@ -40,15 +40,17 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilitySpawnComponent>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HomingComponent>(1000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Scalable>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StatChange>(500);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -61,11 +63,13 @@ namespace RootForce
 		//Do not add scripts for abilities that are included in the abilitypacks. They will be loaded automatically
 		g_engineContext.m_resourceManager->LoadScript("Global");
 		g_engineContext.m_resourceManager->LoadScript("Push");
+		g_engineContext.m_resourceManager->LoadScript("Identiray");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
-		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
+		g_engineContext.m_resourceManager->LoadScript("XplodingMushroomPlanted");
+		g_engineContext.m_resourceManager->LoadScript("ShroomExplosion");
 
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
@@ -158,6 +162,10 @@ namespace RootForce
 		m_timerSystem = new RootForce::TimerSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
 
+		// Initialize the stat change timer system.
+		m_statChangeSystem = new RootForce::StatChangeSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::StatChangeSystem>(m_statChangeSystem);
+
 		// Initialize the follow system.
 		m_followSystem = new RootForce::FollowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
@@ -174,6 +182,13 @@ namespace RootForce
 		m_raySystem = new RootForce::RaySystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::RaySystem>(m_raySystem);
 
+		//Initialize water death system.
+		m_waterDeathSystem = new RootForce::WaterDeathSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::WaterDeathSystem>(m_waterDeathSystem);
+
+		//Initialize scale system.
+		m_scaleSystem = new RootForce::ScaleSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ScaleSystem>(m_scaleSystem);
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
@@ -212,19 +227,36 @@ namespace RootForce
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 		
-		// Set network peer interfaces on the systems that needs to send messages.
+		// Set server peers to null
+		/*
+		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
+		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
+		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
+		m_playerControlSystem->SetClientPeer(nullptr);
+		m_actionSystem->SetServerPeerInterface(nullptr);
+		m_actionSystem->SetClientPeerInterface(nullptr);
+		m_timerSystem->SetServerPeer(nullptr);
+		*/
+
+		// Set the network client peer interfaces.
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
-		m_playerControlSystem->SetHUD(m_hud.get());
 		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
-		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
-		// Set the server peer to the action and abilityspawn system, if we are a server.
+		// Set the network server peer interfaces if we are a server.
 		if (m_networkContext.m_server != nullptr)
 		{
-			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
 			m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
-		}	
+			m_sharedSystems.m_respawnSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+		}
+
+		// Give the player control system access to the HUD.
+		m_playerControlSystem->SetHUD(m_hud.get());
 
 		// Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
@@ -248,6 +280,9 @@ namespace RootForce
 
 		if(m_networkContext.m_server != nullptr)
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+
+		if(m_networkContext.m_server != nullptr)
+			m_statChangeSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 
@@ -301,7 +336,14 @@ namespace RootForce
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
+		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
+		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
+		m_playerControlSystem->SetClientPeer(nullptr);
+		m_actionSystem->SetServerPeerInterface(nullptr);
+		m_actionSystem->SetClientPeerInterface(nullptr);
 		m_timerSystem->SetServerPeer(nullptr);
+		m_statChangeSystem->SetServerPeer(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)
@@ -389,6 +431,7 @@ namespace RootForce
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();
+			m_waterDeathSystem->Process();
 		}
 
 		{
@@ -428,6 +471,11 @@ namespace RootForce
 			m_timerSystem->Process();
 		}
 
+		{
+			PROFILE("Stat change system", g_engineContext.m_profiler);
+			m_statChangeSystem->Process();
+		}
+
 		m_animationSystem->Run();
 		
 		{
@@ -450,8 +498,6 @@ namespace RootForce
 			PROFILE("AbilitySpawn system", g_engineContext.m_profiler);
 			m_sharedSystems.m_abilitySpawnSystem->Process();
 		}
-
-		
 
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
@@ -525,6 +571,7 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
+			m_scaleSystem->Process();
 			m_directionlLightSystem->Process();
 			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
@@ -652,9 +699,7 @@ namespace RootForce
 
 			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
 			PlayerComponent* playerComp =  g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
-			playerComp->Score --;
 			playerComp->Deaths ++;
-			g_world->GetEntityManager()->GetComponent<TDMRuleSet>(g_world->GetTagManager()->GetEntityByTag("MatchState"))->TeamScore[playerComp->TeamID] --;
 
 			// Notify the server of our suicide.
 			NetworkMessage::Suicide m;
@@ -711,8 +756,8 @@ namespace RootForce
 				//Update all the data that is displayed in the HUD
 				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
 				m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-				m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) );
-				m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
+				m_hud->SetValue("Team1Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) );
+				m_hud->SetValue("Team2Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 				if(healthComponent && playerActionComponent)
 				{
 					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );

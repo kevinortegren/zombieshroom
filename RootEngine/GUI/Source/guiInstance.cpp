@@ -357,6 +357,7 @@ namespace RootEngine
 					uint64_t newTime = SDL_GetPerformanceCounter();
 					float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
 					oldTime = newTime;
+
 					if(dt < 0.032f)
 					{
 						long time = (long)floorf((0.032f-dt)*1000);

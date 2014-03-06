@@ -10,7 +10,7 @@ function Player.OnCreate(userId, actionId)
 	
 	transform:SetPos(Vec3.New(100,10,0));
 
-	playerComponent:SetAbility(3, "Push", -1);
+	playerComponent:SetAbility(3, "Identiray", -1);
 	playerComponent:SelectAbility(0);
  	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
@@ -44,6 +44,7 @@ function Player.OnTeamSelect(self, teamId)
     local physics = Physics.New(self);
     local collision = Collision.New(self);
     local collisionResponder = CollisionResponder.New(self);
+    local statComp = StatChange.New(self);
     local script = Script.New(self, "Player");
     local playerAction = PlayerAction.New(self);
     local stateComponent = StateComponent.New(self);
@@ -140,11 +141,11 @@ function Player.OnTeamSelect(self, teamId)
 end
 
 function Player.OnCollide (self, entity)
- 	local hitCol = entity:GetCollision();
- 	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
-  if  type == PhysicsType.TYPE_ABILITYSPAWN then
-  end
+ 	--local hitCol = entity:GetCollision();
+ 	--local hitPhys = entity:GetPhysics();
+	--local type = hitPhys:GetType(hitCol);
+  --if  type == PhysicsType.TYPE_ABILITYSPAWN then
+  --end
   
 end
 

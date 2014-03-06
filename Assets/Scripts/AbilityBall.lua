@@ -5,7 +5,7 @@ AbilityBall.cooldown = 3;
 AbilityBall.charges = 0;
 AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
-AbilityBall.duration = 7;
+AbilityBall.duration = 4;
 AbilityBall.charges = -1;
 
 function AbilityBall.ChargeDone (time, userId, actionId)
@@ -13,6 +13,9 @@ function AbilityBall.ChargeDone (time, userId, actionId)
 end
 
 function AbilityBall.ChannelingDone (time, userId, actionId)
+end
+
+function AbilityBall.Interrupted(time, userId, actionId)
 end
 
 function AbilityBall.OnCreate (userId, actionId)
@@ -34,10 +37,11 @@ function AbilityBall.OnCreate (userId, actionId)
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3))
 	
-	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 1, 1, true, true);
+	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 0.5, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
+	transformComp:SetScale(Vec3.New(0.5, 0.5, 0.5));
 
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
@@ -49,7 +53,7 @@ function AbilityBall.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("fireballNormal");
 		renderComp:SetMaterialGlow("fireballGlow");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
-		local particleComp = ParticleEmitter.New(self, "AbilityBallFire");
+		local particleComp = ParticleEmitter.New(self, "SmockeochElden");
 		local pointlightComp = PointLight.New(self);
 		pointlightComp:SetColor(Vec4.New(1.0, 0.5, 0.0, 1.0));
 		pointlightComp:SetRange(10.0);
@@ -68,23 +72,26 @@ function AbilityBall.OnCollide (self, entity)
 			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+			local health = entity:GetHealth();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-				local health = entity:GetHealth();
+				
 				if not health:IsDead() then
 					local network = entity:GetNetwork();
 					local receiverId = network:GetUserId();
-					health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
+					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance(), receiverId);
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback);
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end
 end
 
 function AbilityBall.OnDestroy (self)
+	local network = self:GetNetwork();
+	Explosion.OnCreate(network:GetUserId(), network:GetActionId());
 	Entity.Remove(self);
 end

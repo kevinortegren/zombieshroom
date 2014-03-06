@@ -663,8 +663,8 @@ namespace Physics
 			return;
 
 		unsigned int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
-		m_playerObjects.at(index)->SetJumpForce(p_jumpForce);
-		m_playerObjects.at(index)->Jump();
+		
+		m_playerObjects.at(index)->Jump(p_jumpForce);
 	}
 	
 	void RootPhysics::PlayerJumpBoost( int p_objectHandle, float p_boostPower )
@@ -924,10 +924,10 @@ namespace Physics
 		{
 			btQuaternion temp = m_externallyControlled.at(index)->GetOrientation();
 			
-			retVal[0] = temp.w();
-			retVal[1] = temp.x();
-			retVal[2] = temp.y();
-			retVal[3] = temp.z();
+			retVal[0] = temp.y();
+			retVal[1] = temp.z();
+			retVal[2] = temp.w();
+			retVal[3] = temp.x();
 		}
 		return retVal;
 	}
@@ -1078,17 +1078,18 @@ namespace Physics
 		{
 			m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->SetOrientation(p_objectOrientation);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
-		{
-			glm::quat rot = glm::angleAxis(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-			
-			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation*rot);
-		}
-		else
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
 		{
 			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
-		//	m_ragdolls.at(index)->SetOrientation(p_objectOrientation);
+			//	m_ragdolls.at(index)->SetOrientation(p_objectOrientation);
 		}
+		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
+		{
+			glm::quat rot = glm::angleAxis(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f)); //here be trouble
+			
+			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation/**rot*/);
+		}
+		
 	}
 
 

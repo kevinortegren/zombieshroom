@@ -62,6 +62,8 @@ namespace RootForce
 			job.m_material = emitter->m_particleSystems[i]->m_material;
 			job.m_renderPass = pass;
 			job.m_forward = true;
+			job.m_params[Render::Semantic::POSITION] = &trans->m_position;
+			job.m_position = trans->m_position;
 
 			g_engineContext.m_renderer->AddRenderJob(job);
 		}

@@ -4,7 +4,7 @@ Explosion.pushback = 20;
 Explosion.cooldown = 0;
 Explosion.chargeTime = 0.0;
 Explosion.channelingTime = 0.0;
-Explosion.duration = 1;
+Explosion.duration = 1.0;
 
 function Explosion.OnCreate (userId, actionId)
 	Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
@@ -28,13 +28,14 @@ function Explosion.OnCreate (userId, actionId)
 	local timerComp = Timer.New(self, Explosion.duration);
 	collisionComp:CreateHandle(self, 1, true);
 	transformComp:SetPos(posVec);
+	transformComp:SetScale(Vec3.New(10,10,10));
 	colRespComp:SetContainer(collisionComp);
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Explosion handle: "..collisionComp:GetHandle());
 	physicsComp:BindNoShape(collisionComp, posVec, Quat.New(0,0,0,1));
 	--Logging.Log(LogLevel.DEBUG_PRINT, "After bind call");
-	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 20);
+	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 10);
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "explosion");
+		local particleComp = ParticleEmitter.New(self, "Explosion_G-stuf");
 	end
 	Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 end
@@ -55,12 +56,12 @@ function Explosion.OnCollide (self, entity)
 			    local network = entity:GetNetwork();
 			    local hitPos = entity:GetTransformation():GetPos();
 			    local selfPos = self:GetTransformation():GetPos();
-			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback);
 			    local health = entity:GetHealth();
-			    if not health:IsDead() then
+          if not health:IsDead() then
 				    local receiverId = network:GetUserId();
-				    health:Damage(abilityOwnerId, Explosion.damage, receiverId);
+				    health:Damage(abilityOwnerId, Explosion.damage * entity:GetStatChange():GetDamageResistance(), receiverId);
 			    end
+			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

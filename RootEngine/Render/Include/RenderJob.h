@@ -30,5 +30,6 @@ namespace Render
 		bool m_forward;
 		bool m_refractive;
 		unsigned m_renderPass;
+		glm::vec3 m_position;
 	};
 }

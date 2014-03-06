@@ -12,6 +12,9 @@ function AbilityRay.ChannelingDone(time, userId, actionId)
 	AbilityRay.OnCreate(userId, actionId);
 end
 
+function AbilityRay.Interrupted(time, userId, actionId)
+end
+
 function AbilityRay.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Missile");
 	local self = Entity.New();

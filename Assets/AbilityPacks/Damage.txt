@@ -1,2 +1,4 @@
 AbilityBall
 FireBall
+MachineGun
+PowerRay

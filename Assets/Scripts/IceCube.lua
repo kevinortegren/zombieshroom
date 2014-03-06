@@ -15,6 +15,9 @@ end
 function IceCube.ChannelingDone (time, userId, actionId)
 end
 
+function IceCube.Interrupted (time, userId, actionId)
+end
+
 function IceCube.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
@@ -38,13 +41,13 @@ function IceCube.OnCreate (userId, actionId)
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
-	transformComp:SetScale(Vec3.New(40, 40, 40));
+	transformComp:SetScale(Vec3.New(5, 5, 5));
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/box");
+		renderComp:SetModel("PentagonSphere");
 		renderComp:SetMaterial("IceCubeer");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
-		renderComp:SetMaterialEffect("Mesh_Refractive");
+		renderComp:SetMaterialEffect("Mesh_Refractive_Clear");
 	end
 end
 
@@ -59,8 +62,8 @@ function IceCube.OnCollide (self, entity)
 			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+			local health = entity:GetHealth();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-				local health = entity:GetHealth();
 				if not health:IsDead() then
 					local network = entity:GetNetwork();
 					local receiverId = network:GetUserId();
@@ -70,7 +73,7 @@ function IceCube.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), IceCube.knockback);
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), IceCube.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

@@ -77,7 +77,7 @@ namespace RootForce
 							g_engineContext.m_script->SetFunction(script->Name, "OnDestroy");
 							g_engineContext.m_script->AddParameterUserData(pair.second, sizeof(ECS::Entity*), "Entity");
 							g_engineContext.m_script->ExecuteScript();
-							g_world->GetEntityManager()->RemoveEntity(pair.second);
+							//g_world->GetEntityManager()->RemoveEntity(pair.second);
 						}
 					}
 					ruleSet->CurrentState = MatchState::Match;
@@ -191,18 +191,24 @@ namespace RootForce
 		deadNetworkID.ActionID = Network::ReservedActionID::CONNECT;
 		deadNetworkID.SequenceID = 0;
 		
+		ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
+		PlayerComponent* killedPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID));
+		RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
 		// Award score for killer team
 		if(p_killerID != Network::ReservedUserID::NONE)
 		{
-			ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
 			ECS::Entity* killerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(p_killerID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
-			RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
 			PlayerComponent* killerPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(killerEntity);
 
 			rules->TeamScore[killerPlayerComponent->TeamID]++;
 			killerPlayerComponent->Score++;
 		}
-		g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID))->Deaths ++;
+		else //Give minus in score if the kill was a suicide
+		{
+			killedPlayerComponent->Score --;
+			rules->TeamScore[killedPlayerComponent->TeamID]--;
+		}
+		killedPlayerComponent->Deaths ++;
 	}
 
 	

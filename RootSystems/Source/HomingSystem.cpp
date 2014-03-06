@@ -1,5 +1,7 @@
 #include "HomingSystem.h"
 
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+
 namespace RootForce
 {
 	void HomingSystem::Init()
@@ -15,9 +17,11 @@ namespace RootForce
 		HomingComponent* target = m_target.Get(p_entity);
 		Physics* physics = m_physics.Get(p_entity);
 		
-		if (target->TargetPlayer != nullptr)
+		ECS::Entity* targ = FindEntity(g_networkEntityMap, target->TargetID);
+
+		if (targ != nullptr)
 		{
-			Transform* targetTransform = m_world->GetEntityManager()->GetComponent<Transform>(target->TargetPlayer);
+			Transform* targetTransform = m_world->GetEntityManager()->GetComponent<Transform>(targ);
 
 			target->TargetPosition = targetTransform->m_position;
 			

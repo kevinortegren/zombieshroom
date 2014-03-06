@@ -1,0 +1,42 @@
+- name: MeshRefract
+  techniques:
+    - name: MeshRefract
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      uniforms:
+          - sem: MODEL
+            offset: 0
+          - sem: NORMAL
+            offset: 64
+      textures:
+          - name: g_LA
+            slot: 5
+          - name: g_Depth
+            slot: 10
+      flags:
+          - name: Forward
+          - name: Refractive
+      programs:
+        - name: RefractMesh
+          shaders:
+            - name: refractmesh
+              type: vertex
+            - name: refractmeshClear
+              type: fragment
+          # Blend Mode:
+          # None = 0
+          # AlphaBlend = 1
+          # Additive = 2
+          blend: 0
+          
+          # Depth settings.
+          depth:
+            write: 1
+            test: 1
+           
+
+              
+

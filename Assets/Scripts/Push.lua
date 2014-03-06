@@ -1,5 +1,6 @@
 Push = {};
 Push.knockback = 20;
+Push.currentKnockback = 20;
 Push.cooldown = 1;
 Push.charges = -1;
 Push.chargeTime = 1;
@@ -9,15 +10,18 @@ Push.duration = 0.2;
 function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
 		Push.OnCreate(userId, actionId);
-		Push.knockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
+		Push.currentKnockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
 	--end
 end
 
 function Push.ChannelingDone (time, userId, actionId)
 end
 
+function Push.Interrupted (time, userId, actionId)
+end
+
 function Push.OnCreate (userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Crating push.lua");
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
@@ -38,9 +42,8 @@ function Push.OnCreate (userId, actionId)
 	transformComp:GetOrient():SetOrientation(rotQuat);
 	--transformComp:GetOrient():Pitch(-90);
 	rotQuat = transformComp:GetOrient():GetQuaternion();
-	local tempPos = casterEnt:GetTransformation():GetPos();
-	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
-	physicsComp:BindConeShape(collisionComp, startPos, rotQuat, 6, 3, 1, false, false);
+	local startPos = casterEnt:GetTransformation():GetPos();
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 6, 1, false, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(startPos);
@@ -64,7 +67,8 @@ function Push.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.knockback);
+				local health = entity:GetHealth();
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.currentKnockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

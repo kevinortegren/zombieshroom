@@ -16,6 +16,10 @@ function RefractiveBall.ChannelingDone (time, userId, actionId)
 	RefractiveBall.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
 end
 
+function RefractiveBall.Interrupted (time, userId, actionId)
+	RefractiveBall.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
+end
+
 function RefractiveBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
@@ -38,11 +42,11 @@ function RefractiveBall.OnCreate (userId, actionId)
 	physicsComp:SetVelocity(collisionComp, Vec3.New(0, 0, 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(tempPos);
-	transformComp:SetScale(Vec3.New(5, 5, 5));
+	transformComp:SetScale(Vec3.New(3.5, 3.5, 3.5));
 
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/sphereTangents");
+		renderComp:SetModel("PentagonSphere");
 		renderComp:SetMaterial("RefractiveBaller");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
 		renderComp:SetMaterialEffect("Mesh_Refractive");
@@ -60,8 +64,8 @@ function RefractiveBall.OnCollide (self, entity)
 			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+      local health = entity:GetHealth();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-				local health = entity:GetHealth();
 				if not health:IsDead() then
 					local network = entity:GetNetwork();
 					local receiverId = network:GetUserId();
@@ -71,7 +75,7 @@ function RefractiveBall.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), RefractiveBall.knockback);
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), RefractiveBall.knockback, health:GetHealth());
 			end
 		end
 	end

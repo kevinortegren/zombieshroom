@@ -8,6 +8,7 @@ layout(location = 4) in float	in_type;
 layout(location = 5) in vec4	in_color;
 layout(location = 6) in vec3	in_accel;
 layout(location = 7) in float	in_rot;
+layout(location = 8) in float   in_rotSpeed;
 
 out vec3 vert_initialVel;
 out vec2 vert_scale;
@@ -16,6 +17,7 @@ out float vert_type;
 out vec4 vert_color;
 out vec3 vert_accel;
 out float vert_rotation;
+out float vert_rotationSpeed;
 
 
 void main()
@@ -27,6 +29,7 @@ void main()
 	vert_color = in_color;
 	vert_accel = in_accel;
 	vert_rotation = in_rot;
+	vert_rotationSpeed = in_rotSpeed;
 
 	gl_Position = vec4( in_initialPos, 1.0f );
 }

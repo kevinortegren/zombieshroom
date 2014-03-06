@@ -59,6 +59,7 @@ namespace RootForce
 		m_matrices[p_entity].m_model = glm::scale(m_matrices[p_entity].m_model, transform->m_scale);
 		m_matrices[p_entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_matrices[p_entity].m_model))));
 
+		
 		Render::RenderJob job;	
 		job.m_mesh = renderable->m_model->m_meshes[0];
 		job.m_shadowMesh = renderable->m_model->m_meshes[0];
@@ -69,6 +70,17 @@ namespace RootForce
 		job.m_params[Render::Semantic::MODEL] = &m_matrices[p_entity].m_model;
 		job.m_params[Render::Semantic::NORMAL] = &m_matrices[p_entity].m_normal;
 		job.m_renderPass = renderable->m_pass;
+		job.m_position = transform->m_interpolatedPosition; //Added this for quicker sorting, as particles dont have a modelmatrix
+		//Put forward object above or under water
+		if((job.m_material->m_effect->GetTechniques().at(0)->m_flags & Render::TechniqueFlags::RENDER_DEFERRED1) == Render::TechniqueFlags::RENDER_DEFERRED1 || job.m_forward)
+		{
+			float waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight");
+			if(transform->m_interpolatedPosition.y > waterHeight)
+				job.m_renderPass = RenderPass::RENDERPASS_PARTICLES1;
+			else if(transform->m_interpolatedPosition.y < waterHeight)
+				job.m_renderPass = RenderPass::RENDERPASS_PARTICLES0;
+		}
+
 		m_renderer->AddRenderJob(job);
 
 		if(renderable->m_shadowTech != Render::ShadowTechnique::SHADOW_NONE)

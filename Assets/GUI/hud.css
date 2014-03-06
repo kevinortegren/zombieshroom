@@ -82,12 +82,14 @@ img
 	position: absolute;
 	top:0;
 	left:100%;
-	margin-left: -204px;
+	margin-left: -141px;
+	padding: 0 4px 10px 30px;
 	padding-right: 4px;
-	width: 200px;
-	height: 28px;
+	width: 107px;
+	height: 60px;
 	text-align: right;
-	background-color: rgba(60,60,60,0.5);
+	background: url('TimeBar.png') no-repeat;
+	background-size: 100% 100%;
 	font-size: 24px;
 }
 #AnnouncementContainer
@@ -130,6 +132,7 @@ img
 	height: 20px;
 	font-family: Comic Sans MS;
   color: transparent;
+  background: transparent;
   border: 0;
 }
 #chatinput:focus
@@ -144,7 +147,7 @@ img
 	left: 0;
 	top: 100%;
 	width: 100%;
-	margin: -35px 0 0 0;
+	margin: -35px 0 0 450px;
 	height: 33px;
 }
 #healthbar div
@@ -159,8 +162,16 @@ img
 {
 	padding: 0;
 	height: 33px;
-	width: 304px;
-	background: center url('healthBackground.png');
+	/*width: 304px;*/
+	background: center url('healthBackground.gif');
+	margin: auto;
+}
+#healthbar div div div
+{
+	padding: 0;
+	height: 33px;
+	/*width: 304px;*/
+	background: center url('healthOverflowBackground.gif');
 	margin: auto;
 }
 #chargebar
@@ -259,32 +270,58 @@ img
 	width: 64px;
 	height: 64px;
 	font-size: 18px;
-	margin: 32px 0 0 0;
+	margin: 64px 0 0 0;
 	display: inline-block;
 	text-align: right;
+}
+.slot>div
+{
+<!--	background-image: url('cooldown.png'); -->
+	background-size: 64px;
+	background-repeat: no-repeat;
+	background-position: 0% 64px;
+}
+.slot>div>div
+{
+
 	background-image: url('Abilityring.png');
 	background-repeat: no-repeat;
-	background-position: -2px -2px;
 }
-.slotselected
-{
-	background-image: url('AbilityringSelected.png');
-}
-#slot2
-{
-  position: relative;
-  top: -32px;
-}
-.cooldown
+.slot>div>div>div
 {
 	padding: 30px 15px 0 15px;
 	width: 34px;
 	height: 34px;
 	overflow: hidden;
-	background-image: url('cooldown.png');
-	background-size: 75px;
-	background-repeat: no-repeat;
-	background-position: 0% 75px;
+  background: transparent;
+}
+.slot>div>div>div:nth-child(2)
+{
+	overflow: hidden;
+  position: relative;
+  background: transparent;
+  top:-64px;
+}
+@-webkit-keyframes spin {  
+  from {  
+    -webkit-transform: rotate(0deg);  
+  }  
+  to {  
+    -webkit-transform: rotate(360deg);  
+  } 
+}
+.slotselected>div>div>div:first-child
+{
+  background-image: url('JustGlow.png');
+  -webkit-animation-name: blinker;
+  -webkit-animation-iteration-count: infinite; 
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-duration: 2s; 
+}
+#slot2
+{
+  position: relative;
+  top: -32px;
 }
 
 .verticaltablehax

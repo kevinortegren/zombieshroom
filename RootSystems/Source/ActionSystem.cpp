@@ -24,6 +24,7 @@ namespace RootSystems
 		m_physic.Init(m_world->GetEntityManager());
 		m_player.Init(m_world->GetEntityManager());
 		m_health.Init(m_world->GetEntityManager());
+		m_statChange.Init(m_world->GetEntityManager());
 	}
 
 	void ActionSystem::ProcessEntity( ECS::Entity* p_entity )
@@ -40,6 +41,7 @@ namespace RootSystems
 		RootForce::HealthComponent* health = m_health.Get(p_entity);
 		RootForce::StateComponent* state = m_state.Get(p_entity);
 		RootForce::Animation* animation = m_animation.Get(p_entity);
+		RootForce::StatChange* statChange = m_statChange.Get(p_entity);
 
 		bool isGameOver = false;
 		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
@@ -55,9 +57,12 @@ namespace RootSystems
 					health->WantsRespawn = true;
 					action->WantRespawn = false;
 					action->JumpTime = 0.0f;
-					action->AbilityTime = 0.0f;
-					player->AbilityState = RootForce::AbilityState::OFF;
+					action->JumpDir = glm::vec3(0.0f);
 				}
+
+				// Check abilities here as well, to make sure abilities are properly interrupted.
+				AbilitySwitch(p_entity);
+				player->AbilityState = RootForce::AbilityState::OFF;
 
 				animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
 				return;
@@ -69,6 +74,7 @@ namespace RootSystems
 			if(g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 			{
 				action->JumpDir = facing * action->MovePower + right * action->StrafePower;
+				health->LastDamageSourceID = RootForce::Network::ReservedUserID::NONE;
 			}
 			else
 			{
@@ -79,7 +85,7 @@ namespace RootSystems
 			{
 				if(glm::length2(action->JumpDir) > 1)
 					action->JumpDir = glm::normalize(action->JumpDir);
-				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed;
+				glm::vec3 movement = action->JumpDir * playphys->MovementSpeed * statChange->SpeedChange;
 				m_engineContext->m_physics->Move(*(collision->m_handle), movement + transform->m_position, dt);
 			}
 
@@ -143,13 +149,31 @@ namespace RootSystems
 			if(!isGameOver)
 			{
 				if(action->MovePower < 0)
-					animation->m_animClip = RootForce::AnimationClip::WALKING;
+					animation->m_animClip = RootForce::AnimationClip::BACKWARDS;
 				else if(action->MovePower > 0)
 					animation->m_animClip = RootForce::AnimationClip::WALKING;
 				if(action->StrafePower > 0)
 					animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
 				else if(action->StrafePower < 0)
 					animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+				if(action->MovePower > 0 && action->StrafePower < 0)
+				{
+					animation->m_animClip = RootForce::AnimationClip::LEFTFORWARD;
+				}
+				else if(action->MovePower > 0 && action->StrafePower > 0)
+				{
+					animation->m_animClip = RootForce::AnimationClip::RIGHTFORWARD;
+				}
+				if(action->MovePower < 0 && action->StrafePower < 0)
+				{
+					animation->m_animClip = RootForce::AnimationClip::LEFTBACK;
+				}
+				else if(action->MovePower < 0 && action->StrafePower > 0)
+				{
+					animation->m_animClip = RootForce::AnimationClip::RIGHTBACK;
+				}
+
+
 			}
 		}
 
@@ -167,7 +191,7 @@ namespace RootSystems
 					if (g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 					{
 						// Apply jump force and go into jump animation
-						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce);
+						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
 
 						if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
 						{
@@ -177,7 +201,7 @@ namespace RootSystems
 					}
 					else
 					{
-						m_engineContext->m_physics->PlayerJumpBoost(*(collision->m_handle), playphys->JumpBoostForce);
+						m_engineContext->m_physics->PlayerJumpBoost(*(collision->m_handle), playphys->JumpBoostForce * statChange->JumpHeightChange);
 						// TODO: Apply booster jump force
 					}
 				}
@@ -194,96 +218,96 @@ namespace RootSystems
 
 		player->SelectedAbility = action->SelectedAbility;
 
-		if (action->ActiveAbility != RootForce::ABILITY_INDEX_NONE)
+		while (!action->AbilityEvents.empty())
 		{
-			std::string abilityName = player->AbilityScripts[action->ActiveAbility].Name;
+			// Retrieve the first event in the queue.
+			const RootForce::AbilityEvent& abilityEvent = action->AbilityEvents.front();
+
+			std::string abilityName = abilityEvent.ActiveAbilityScript.C_String();
 			if (abilityName != "")
 			{
-				if (player->AbilityScripts[action->ActiveAbility].OnCooldown)
-					player->AbilityState = RootForce::AbilityState::OFF;
+				g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Received ability event. Slot %d, Event %d", abilityEvent.ActiveAbility, abilityEvent.Type);
 
-				float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", abilityName);
-				float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", abilityName);
 				float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", abilityName);
-
-		
-				switch (player->AbilityState)
+				switch (abilityEvent.Type)
 				{
-				case RootForce::AbilityState::START_CHARGING:
+					case RootForce::AbilityEventType::CHARGE_START:
 					{
 						player->AbilityState = RootForce::AbilityState::CHARGING;
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 
-				case RootForce::AbilityState::START_CHANNELING:
+					case RootForce::AbilityEventType::CHANNELING_START:
 					{
 						player->AbilityState = RootForce::AbilityState::CHANNELING;
 
 						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
-						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.Time);
 						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(action->ActionID);
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+						// DEBUG
+						// Get the new entity and print its flag
+						ECS::Entity* entity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(network->ID.UserID, abilityEvent.ActionID, 0));
+						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "%s (User: %u, Action: %u) created with flag: %llx", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID, entity->GetFlag());
+
+						// /DEBUG
+
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 
-				case RootForce::AbilityState::STOP_CHANNELING:
+					case RootForce::AbilityEventType::CHANNELING_DONE:
 					{
+						player->AbilityState = RootForce::AbilityState::OFF;
+
 						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
-						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.Time);
 						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(action->ActionID);
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
 						// Put ability on cooldown and decrease charges.
-						player->AbilityScripts[action->ActiveAbility].OnCooldown = true;
-						player->AbilityScripts[action->ActiveAbility].Cooldown = abilityCooldownTime;
+						player->AbilityScripts[abilityEvent.ActiveAbility].OnCooldown = true;
+						player->AbilityScripts[abilityEvent.ActiveAbility].Cooldown = abilityCooldownTime;
 
-						player->AbilityScripts[action->ActiveAbility].Charges--;
-						if(player->AbilityScripts[action->ActiveAbility].Charges == 0)
-							player->AbilityScripts[action->ActiveAbility] = RootForce::AbilityInfo();
+						player->AbilityScripts[abilityEvent.ActiveAbility].Charges--;
+						if(player->AbilityScripts[abilityEvent.ActiveAbility].Charges == 0)
+							player->AbilityScripts[abilityEvent.ActiveAbility] = RootForce::AbilityInfo();
 
-						// Reset the action component.
-						player->AbilityState = RootForce::AbilityState::OFF;
-						action->ActiveAbility = RootForce::ABILITY_INDEX_NONE;
-						action->AbilityTime = 0.0f;
-
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 
-				case RootForce::AbilityState::STOP_CHARGING_AND_CHANNELING:
+					case RootForce::AbilityEventType::INTERRUPTED:
 					{
-						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
-						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(action->ActionID);
-						g_engineContext.m_script->ExecuteScript();
+						player->AbilityState = RootForce::AbilityState::OFF;
 
-						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChannelingDone");
-						g_engineContext.m_script->AddParameterNumber(action->AbilityTime);
+						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "Interrupted");
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.Time);
 						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(action->ActionID);
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
 						// Put ability on cooldown and decrease charges.
-						player->AbilityScripts[action->ActiveAbility].OnCooldown = true;
-						player->AbilityScripts[action->ActiveAbility].Cooldown = abilityCooldownTime;
+						player->AbilityScripts[abilityEvent.ActiveAbility].OnCooldown = true;
+						player->AbilityScripts[abilityEvent.ActiveAbility].Cooldown = abilityCooldownTime;
 
-						player->AbilityScripts[action->ActiveAbility].Charges--;
-						if(player->AbilityScripts[action->ActiveAbility].Charges == 0)
-							player->AbilityScripts[action->ActiveAbility] = RootForce::AbilityInfo();
+						player->AbilityScripts[abilityEvent.ActiveAbility].Charges--;
+						if(player->AbilityScripts[abilityEvent.ActiveAbility].Charges == 0)
+							player->AbilityScripts[abilityEvent.ActiveAbility] = RootForce::AbilityInfo();
 
-						// Reset the action component.
-						player->AbilityState = RootForce::AbilityState::OFF;
-						action->ActiveAbility = RootForce::ABILITY_INDEX_NONE;
-						action->AbilityTime = 0.0f;
-
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Stop charging and channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, action->ActionID);
+						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Interrupted ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 				}
 			}
+			else
+			{
+				g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::WARNING, "Received ability event for empty slot. Slot %d, Event: %d", abilityEvent.ActiveAbility, abilityEvent.Type);
+			}
+
+			// Pop the event.
+			action->AbilityEvents.pop();
 		}
 	}
 
@@ -299,25 +323,47 @@ namespace RootSystems
 
 				RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(playerEntity);
 				RootForce::PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<RootForce::PlayerActionComponent>(playerEntity);
-
+				RootForce::HealthComponent*	health	= m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(playerEntity);
 				ECS::Entity* aimingDeviceEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(it->first.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_AIMING_DEVICE_ENTITY));
 				if (aimingDeviceEntity == nullptr)
 					continue;
 
 				RootForce::Transform* aimingDeviceTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(aimingDeviceEntity);
 
-				if(!m_inMenu && action && transform)
+				if(!m_inMenu && action && transform)//assuming there is a health component
 				{
-					// Rotate the model and reset the angle
-					transform->m_orientation.YawGlobal(action->Angle.x);
-					action->Angle.x = 0;
+					if(health->Health > 0)
+					{
+						// Rotate the model and reset the angle
+						transform->m_orientation.YawGlobal(action->Angle.x);
+						action->Angle.x = 0;
 
-					aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
-					aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+						aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
+						aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+					}
+					else //Dead
+					{
+						aimingDeviceTransform->m_orientation.YawGlobal(action->Angle.x);
+						action->Angle.x = 0;
+						aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+						action->Angle.y = 0;
+					}
 				}
 
 				if(transform)
-					aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
+				{
+					if(health)
+					{
+						if(health->Health > 0)
+							aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
+						else //Dead
+							aimingDeviceTransform->m_position = transform->m_position;
+					}
+					else
+					{//no health component
+						aimingDeviceTransform->m_position = transform->m_position + transform->m_orientation.GetUp() * 2.0f;
+					}
+				}
 			}
 		}
 	}

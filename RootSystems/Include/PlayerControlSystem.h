@@ -74,7 +74,7 @@ namespace RootForce
 		void Process();
 		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
 	private:
-		void HandleAbilityPressed(float dt);
+		void HandleAbilityPressed(float p_dt, bool p_push);
 		void HandleAbilityReleased();
 
 		static Network::ActionID_t s_nextActionID;
