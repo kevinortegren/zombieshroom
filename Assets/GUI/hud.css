@@ -275,34 +275,42 @@ img
 	margin: 64px 0 0 0;
 	display: inline-block;
 	text-align: right;
-}
-.slot>div
-{
-<!--	background-image: url('cooldown.png'); -->
-	background-size: 64px;
-	background-repeat: no-repeat;
-	background-position: 0% 64px;
-}
-.slot>div>div
-{
-
+	position: relative;
 	background-image: url('Abilityring.png');
 	background-repeat: no-repeat;
 }
-.slot>div>div>div
+.slot>div.focus
 {
+	height: 64px;
+	width: 64px;
+	position: absolute;
+	top: 0;
+	z-index: 1;
+}
+/* Ability cooldown */
+.slot>div.cooldown
+{
+	height: 64px;
+	width: 64px;
+	position: absolute;
+	top: 0;
+  background-image: url('cooldown.png');
+	background-size: 64px;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	z-index: -1;
+}
+/* Ability icon */
+.slot>div.icon
+{
+	position: absolute;
+	top: 0;
 	padding: 30px 15px 0 15px;
 	width: 34px;
 	height: 34px;
 	overflow: hidden;
   background: transparent;
-}
-.slot>div>div>div:nth-child(2)
-{
-	overflow: hidden;
-  position: relative;
-  background: transparent;
-  top:-64px;
+	z-index: -2;
 }
 @-webkit-keyframes spin {  
   from {  
@@ -312,7 +320,7 @@ img
     -webkit-transform: rotate(360deg);  
   } 
 }
-.slotselected>div>div>div:first-child
+.slotselected>div.focus
 {
   background-image: url('JustGlow.png');
   -webkit-animation-name: blinker;
