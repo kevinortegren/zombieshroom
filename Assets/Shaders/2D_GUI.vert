@@ -2,10 +2,10 @@
 
 layout(location = 0) in vec2 in_position;
 layout(location = 1) in vec2 in_texCoord;
-layout(location = 2) in int in_textureNumber;
+layout(location = 2) in float in_textureNumber;
 
 out vec2 vert_texCoord;
-flat out int vert_textureNumber;
+out float vert_textureNumber;
 
 void main()
 {

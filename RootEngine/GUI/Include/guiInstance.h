@@ -82,6 +82,7 @@ namespace RootEngine
 			GLuint m_texture;
 			std::shared_ptr<Render::ProgramInterface> m_program;
 			GLuint m_vertexArrayBuffer;
+			GLuint m_vertexBufferObject;
 			GLTextureSurfaceFactory* m_glTexSurfaceFactory;
 
 			GLuint SurfaceToTexture(GLTextureSurface* p_surface);

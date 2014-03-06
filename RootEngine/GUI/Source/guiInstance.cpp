@@ -54,9 +54,8 @@ namespace RootEngine
 			glGenVertexArrays(1, &m_vertexArrayBuffer);
 			glBindVertexArray(m_vertexArrayBuffer);
 			
-			GLuint vertexBufferObject;
-			glGenBuffers(1, &vertexBufferObject);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			glGenBuffers(1, &m_vertexBufferObject);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject);
 			glBufferData(GL_ARRAY_BUFFER, GL_MAX_TEXTURE_UNITS*6*sizeof(TileData), 0, GL_DYNAMIC_DRAW);
 
 			glEnableVertexAttribArray(0);
@@ -64,7 +63,7 @@ namespace RootEngine
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(TileData), (char*)NULL+2*sizeof(float));
 			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(2, 1, GL_INT, GL_FALSE, sizeof(TileData), (char*)NULL+4*sizeof(float));
+			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(TileData), (char*)NULL+4*sizeof(float));
 			// Done, unbind VAO
 			glBindVertexArray(0);
 			
@@ -96,6 +95,7 @@ namespace RootEngine
 
 			m_program->Apply();
 			glBindVertexArray(m_vertexArrayBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject);
 			auto tiles = surface->GetTiles();
 			for(unsigned x = 0; x < tiles->size(); ++x)
 				for(unsigned y = 0; y < tiles->at(x).size(); ++y)

@@ -44,11 +44,12 @@ public:
 	}
 };
 
+#pragma pack(1)
 struct TileData
 {
 	float x, y;
 	float u, v;
-	int tex;
+	float tex;
 
 	TileData(float p_x, float p_y, float p_u, float p_v, int p_tex)
 	{
@@ -56,9 +57,10 @@ struct TileData
 		y = p_y;
 		u = p_u;
 		v = p_v;
-		tex = p_tex;
+		tex = (float)p_tex;
 	}
 };
+#pragma pack()
 
 class GLTextureSurface : public Awesomium::Surface
 {

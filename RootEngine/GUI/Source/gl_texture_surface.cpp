@@ -150,7 +150,7 @@ void GLTextureSurface::UpdateTexture()
 					glDeleteSync(tile.FenceID);
 					tile.FenceID = 0;
 					tile.ActiveTexture = !tile.ActiveTexture;
-					//glInvalidateTexImage(tile.Texture[(int)(!tile.ActiveTexture)], 0);
+					glInvalidateTexImage(tile.Texture[(int)(!tile.ActiveTexture)], 0);
 				}
 			}
 		}
