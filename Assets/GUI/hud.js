@@ -151,7 +151,7 @@ function Set(p_id, p_value)
 	}
 	if(p_id == "Health")
 	{
-    var oldHealth = parseInt($("#"+p_id).html());
+    var oldHealth = parseInt((($("#healthbar>div>div").width()+$("#healthbar>div>div>div").width())/$("#healthbar>div").width())*100);
     var newHealth = parseInt(value);
     DamageIndicator(oldHealth-newHealth);
 		// Health (0~100)
