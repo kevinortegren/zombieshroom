@@ -151,7 +151,7 @@ function Set(p_id, p_value)
 	}
 	if(p_id == "Health")
 	{
-    var oldHealth = parseInt($("#"+p_id).html());
+    var oldHealth = parseInt((($("#healthbar>div>div").width()+$("#healthbar>div>div>div").width())/$("#healthbar>div").width())*100);
     var newHealth = parseInt(value);
     DamageIndicator(oldHealth-newHealth);
 		// Health (0~100)
@@ -236,6 +236,8 @@ function DamageIndicator(p_damage)
 
 $(document).ready(function(){
 	SetAbilityFocus(1);
+    Set("Health", 0);
+    //Set("Health", 40);
 	// SetAbility(1, "TestBall");
 	// StartCooldown(1, 3);
 	//UpdateScoreScreen(2, "doqunbop", [[2,"doqunbop",1,11],[1,"The Enemy",11,2],[1,"The Enemy2",0,2],[2,"The Ally",3,0]]);
@@ -248,5 +250,5 @@ $(document).ready(function(){
   SetCharges(1,3);
 	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
 	//$("#healthbar>div>div").css('width', $("#healthbar>div").width()*(99/100.0)+"px");
-	Set('Health', 166);
+	//Set('Health', 166);
 });

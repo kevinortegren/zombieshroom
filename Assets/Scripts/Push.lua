@@ -7,6 +7,10 @@ Push.chargeTime = 1;
 Push.channelingTime = 0;
 Push.duration = 0.2;
 
+function Push.OnLoad()
+	ResourceManager.LoadParticle("fireball");
+end
+
 function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
 		Push.OnCreate(userId, actionId);

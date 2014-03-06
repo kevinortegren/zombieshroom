@@ -8,6 +8,11 @@ IceCube.channelingTime = 0;
 IceCube.duration = 5;
 IceCube.charges = -1;
 
+function IceCube.OnLoad()
+	ResourceManager.LoadModel("PentagonSphere");
+	ResourceManager.LoadEffect("Mesh_Refractive_Clear");
+end
+
 function IceCube.ChargeDone (time, userId, actionId)
 	IceCube.OnCreate(userId, actionId);
 end
@@ -44,7 +49,7 @@ function IceCube.OnCreate (userId, actionId)
 	transformComp:SetScale(Vec3.New(5, 5, 5));
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("PentagonSphere");
+		renderComp:SetModel("HexagonSphere");
 		renderComp:SetMaterial("IceCubeer");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
 		renderComp:SetMaterialEffect("Mesh_Refractive_Clear");

@@ -162,6 +162,7 @@ img
 {
 	padding: 0;
 	height: 33px;
+  width: 0;
 	/*width: 304px;*/
 	background: center url('healthBackground.gif');
 	margin: auto;
@@ -170,6 +171,7 @@ img
 {
 	padding: 0;
 	height: 33px;
+  width: 0;
 	/*width: 304px;*/
 	background: center url('healthOverflowBackground.gif');
 	margin: auto;

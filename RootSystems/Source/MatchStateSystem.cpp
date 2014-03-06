@@ -61,8 +61,6 @@ namespace RootForce
 							if(playerComponent->TeamID != 0)
 							{
 								HealthComponent* health = g_world->GetEntityManager()->GetComponent<HealthComponent>(pair.second);
-								health->Health = 0;
-								health->IsDead = true;
 								health->WantsRespawn = true;
 								health->RespawnDelay = 0.0f;
 							}

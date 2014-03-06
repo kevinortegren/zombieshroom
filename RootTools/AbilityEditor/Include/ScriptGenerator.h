@@ -19,6 +19,7 @@ namespace AbilityEditorNameSpace
 
 	private:
 		void WriteVariables();
+		void WriteOnLoad();
 		void WriteOnCreate(OnCreate* p_onCreate);
 		void WriteChargeDone();
 		void WriteChannelingDone();
