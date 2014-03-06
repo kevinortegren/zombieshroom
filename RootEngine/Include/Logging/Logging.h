@@ -50,6 +50,7 @@ namespace LogLevel
 		MASS_DATA_PRINT,
 		NOLEVEL,
 		HELP_PRINT,
+		IDENTIFY_PRINT,
 	};
 }
 
