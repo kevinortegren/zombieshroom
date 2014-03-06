@@ -29,7 +29,6 @@ function Explosion.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "Explosion");
-	local timerComp = Timer.New(self, Explosion.duration);
 	collisionComp:CreateHandle(self, 1, true);
 	transformComp:SetPos(posVec);
 	transformComp:SetScale(Vec3.New(10,10,10));
@@ -42,6 +41,10 @@ function Explosion.OnCreate (userId, actionId)
 		local particleComp = ParticleEmitter.New(self, "Explosion_G-stuf");
 	end
 	--Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
+
+	local timerEnt = Entity.New();
+	local timerComp = Timer.New(timerEnt, Explosion.duration, "OnDestroy", self);
+	local networkComp = Network.New(timerEnt, userId, actionId);
 end
 
 function Explosion.OnCollide (self, entity)
