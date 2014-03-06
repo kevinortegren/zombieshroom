@@ -44,6 +44,22 @@ public:
 	}
 };
 
+struct TileData
+{
+	float x, y;
+	float u, v;
+	int tex;
+
+	TileData(float p_x, float p_y, float p_u, float p_v, int p_tex)
+	{
+		x = p_x;
+		y = p_y;
+		u = p_u;
+		v = p_v;
+		tex = p_tex;
+	}
+};
+
 class GLTextureSurface : public Awesomium::Surface
 {
 public:
@@ -66,7 +82,7 @@ protected:
 	virtual void Scroll(int dx, int dy, const Awesomium::Rect& clip_rect);
 
 	//GLuint texture_id_;
-	static GLuint m_bufferTexture;
+	//static GLuint m_bufferTexture;
 	//unsigned char* buffer_;
 	std::vector<std::vector<SurfaceTile>> m_tiles;
 	int m_bpp, m_rowspan, m_width, m_height;

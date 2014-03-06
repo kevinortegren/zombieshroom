@@ -2,7 +2,7 @@
 #include "gl_texture_surface.h"
 #include <iostream>
 
-GLuint GLTextureSurface::m_bufferTexture = 0;
+//GLuint GLTextureSurface::m_bufferTexture = 0;
 
 GLTextureSurface::GLTextureSurface(int p_width, int p_height) : 
 	m_width(p_width), m_height(p_height)
@@ -21,13 +21,13 @@ GLTextureSurface::GLTextureSurface(int p_width, int p_height) :
 		}
 	}
 
-	if(m_bufferTexture == 0)
+	/*if(m_bufferTexture == 0)
 	{
 		glGenTextures(1, &m_bufferTexture);
 		glBindTexture(GL_TEXTURE_2D, m_bufferTexture);
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
 	}
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);*/
 }
 
 GLTextureSurface::~GLTextureSurface()
@@ -150,7 +150,7 @@ void GLTextureSurface::UpdateTexture()
 					glDeleteSync(tile.FenceID);
 					tile.FenceID = 0;
 					tile.ActiveTexture = !tile.ActiveTexture;
-					glInvalidateTexImage(tile.Texture[(int)(!tile.ActiveTexture)], 0);
+					//glInvalidateTexImage(tile.Texture[(int)(!tile.ActiveTexture)], 0);
 				}
 			}
 		}
