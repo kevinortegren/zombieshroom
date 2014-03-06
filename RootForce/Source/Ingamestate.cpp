@@ -190,6 +190,9 @@ namespace RootForce
 		m_scaleSystem = new RootForce::ScaleSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ScaleSystem>(m_scaleSystem);
 
+		// Initialize the deserialization system.
+		m_sharedSystems.m_deserializationSystem = std::shared_ptr<RootForce::DeserializationSystem>(new RootForce::DeserializationSystem(g_world));
+
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;

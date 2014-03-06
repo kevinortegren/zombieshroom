@@ -59,6 +59,9 @@ namespace RootForce
 
 		// System responsible for respawning and spawning players.
 		RootSystems::RespawnSystem* m_respawnSystem;
+
+		// System responsible for deserializing game state snapshots.
+		std::shared_ptr<RootForce::DeserializationSystem> m_deserializationSystem;
 	};
 }
 

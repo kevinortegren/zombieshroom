@@ -150,13 +150,7 @@ namespace RootForce
 						{
 							//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
 
-							NetworkComponent* network = m_world->GetEntityManager()->GetComponent<NetworkComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));	
-							NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap, network->ID.UserID);
-
-							if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
-							{
-								clientComponent->State = ClientState::CONNECTED;
-							}
+							m_deserializationSystem->SetData(p_bs);
 						}
 						else
 						{
