@@ -18,6 +18,9 @@ end
 function MachineGun.ChannelingDone (time, userId, actionId)
 end
 
+function FireBall.Interrupted (time, userId, actionId)
+end
+
 function MachineGun.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
