@@ -59,7 +59,8 @@ namespace Physics
 	RootPhysics* RootPhysics::s_physicsInstance = nullptr;
 	Render::RendererInterface* g_renderer;
 	RootEngine::ResourceManagerInterface* g_resourceManager;
-	const int MAX_STEPSIMULATION_SUBSTEPS = 7;
+	const int MAX_STEPSIMULATION_SUBSTEPS = 20;
+
 	RootPhysics::RootPhysics()
 	{
 
@@ -162,7 +163,7 @@ namespace Physics
 		m_dt = p_dt;
 		//if(m_debugDrawEnabled == false)
 		
-		m_dynamicWorld->stepSimulation(m_dt,MAX_STEPSIMULATION_SUBSTEPS);
+		m_dynamicWorld->stepSimulation(m_dt,MAX_STEPSIMULATION_SUBSTEPS, btScalar(1.)/btScalar(120.));
 		for(unsigned int i = 0; i < m_playerObjects.size(); i++)
 		{
 			m_playerObjects.at(i)->Update(m_dt);
@@ -1410,6 +1411,8 @@ namespace Physics
 		{
 				p_body->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 				p_body->setRestitution(0.7f);
+				p_body->setCcdMotionThreshold(3);
+				p_body->setCcdSweptSphereRadius(1.f);
 		}
 		
 		if(!p_collideWithWorld)
