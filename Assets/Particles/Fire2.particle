@@ -15,7 +15,7 @@
   ORBITSPEED: 10
   ORBITRADIUS: 0
   TEMPLATE: 1
-  TEXTURE: Fireparticle
+  TEXTURE: Particles/Fireparticle
   EFFECT: Particle/ParticleAlphaBlend
   NAME: Fire
   ROTATIONSPEEDMIN: 0.0
@@ -37,7 +37,7 @@
   ORBITSPEED: 1
   ORBITRADIUS: 0.5
   TEMPLATE: 0
-  TEXTURE: smoke
+  TEXTURE: Particles/smoke
   EFFECT: Particle/Particle
   NAME: Smoke
   ROTATIONSPEEDMIN: 0.0

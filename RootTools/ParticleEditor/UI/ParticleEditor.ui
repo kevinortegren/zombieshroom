@@ -244,7 +244,7 @@
         <rect>
          <x>4</x>
          <y>16</y>
-         <width>327</width>
+         <width>330</width>
          <height>737</height>
         </rect>
        </property>
@@ -703,6 +703,29 @@
             <string>Relative</string>
            </property>
           </item>
+         </widget>
+        </item>
+        <item row="18" column="5">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string># per spawn:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="18" column="6">
+         <widget class="QDoubleSpinBox" name="loopNumberSpinBox">
+          <property name="decimals">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <double>50.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
          </widget>
         </item>
        </layout>
@@ -1905,6 +1928,19 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>Grid space:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="restartParticleSystemButton">
+     <property name="geometry">
+      <rect>
+       <x>18</x>
+       <y>60</y>
+       <width>173</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Restart particle system</string>
      </property>
     </widget>
    </widget>

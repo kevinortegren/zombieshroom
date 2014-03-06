@@ -313,6 +313,10 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::ROTATIONSPEEDMAX, offset);
 						}
+						else if(sem == "MAXPERFRAME")
+						{
+							technique->AddUniformParam(Render::Semantic::MAXPERFRAME, offset);
+						}
 					}
 				}
 

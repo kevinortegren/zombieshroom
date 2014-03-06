@@ -149,13 +149,31 @@ namespace RootSystems
 			if(!isGameOver)
 			{
 				if(action->MovePower < 0)
-					animation->m_animClip = RootForce::AnimationClip::WALKING;
+					animation->m_animClip = RootForce::AnimationClip::BACKWARDS;
 				else if(action->MovePower > 0)
 					animation->m_animClip = RootForce::AnimationClip::WALKING;
 				if(action->StrafePower > 0)
 					animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
 				else if(action->StrafePower < 0)
 					animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+				if(action->MovePower > 0 && action->StrafePower < 0)
+				{
+					animation->m_animClip = RootForce::AnimationClip::LEFTFORWARD;
+				}
+				else if(action->MovePower > 0 && action->StrafePower > 0)
+				{
+					animation->m_animClip = RootForce::AnimationClip::RIGHTFORWARD;
+				}
+				if(action->MovePower < 0 && action->StrafePower < 0)
+				{
+					animation->m_animClip = RootForce::AnimationClip::LEFTBACK;
+				}
+				else if(action->MovePower < 0 && action->StrafePower > 0)
+				{
+					animation->m_animClip = RootForce::AnimationClip::RIGHTBACK;
+				}
+
+
 			}
 		}
 

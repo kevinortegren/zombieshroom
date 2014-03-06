@@ -382,7 +382,7 @@ namespace Render
 		s_sizes[Semantic::DX]				= sizeof(float);
 		s_sizes[Semantic::ROTATIONSPEEDMIN] = sizeof(float);
 		s_sizes[Semantic::ROTATIONSPEEDMAX] = sizeof(float);
-
+		s_sizes[Semantic::MAXPERFRAME]		= sizeof(float);
 
 		// Slots reserved for geometry buffer and lighting.
 		s_textureSlots[TextureSemantic::GBUFFER_DIFFUSE_SPECULAR]	= 0;
@@ -479,7 +479,10 @@ namespace Render
 		RenderJob* job = new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job);
 
 		if((job->m_material->m_effect->GetTechniques().at(0)->m_flags & TechniqueFlags::RENDER_DEFERRED1) == TechniqueFlags::RENDER_DEFERRED1 || job->m_forward)
+		{
+			
 			m_forwardJobs.push_back(job);
+		}
 		else
 			m_jobs.push_back(job);
 	}
@@ -604,10 +607,47 @@ namespace Render
 		return false;
 	};
 
+	static bool FindWaterJob(RenderJob* a)
+	{
+		if( a->m_renderPass == 3 ) return true;
+		return false;
+	};
+
 	void GLRenderer::Sorting()
 	{	
+		//Sort deferred jobs based on material
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
+
+		//Sort forward jobs base on height compared to the water level
 		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortForwardRenderJobs);
+
+		if(m_forwardJobs.size() > 1)
+		{
+			//Look for water job
+			auto waterItr = std::find_if(m_forwardJobs.begin(), m_forwardJobs.end(), FindWaterJob);
+			
+			//If no water, sort all jobs by distance to camera as normal
+			if(waterItr == m_forwardJobs.end()) 
+			{
+				std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+				return;
+			}
+			//If there is a water job, check to see if it's the first or last job(Either everything is above or everything is beneath)
+			if( waterItr == m_forwardJobs.begin() ) //First job(everything is over)
+			{
+				std::sort(m_forwardJobs.begin() + 1 , m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+			}
+			else if( waterItr == m_forwardJobs.end() - 1 ) //Last job(everything is under)
+			{
+				std::sort(m_forwardJobs.begin(), m_forwardJobs.end() - 1, SortOnDistanceFunctor(*this));
+			}
+			else
+			{
+				//There are object both under and above the water, sort each side individually
+				std::sort(m_forwardJobs.begin(), waterItr - 1, SortOnDistanceFunctor(*this));
+				std::sort(waterItr + 1, m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+			}
+		}
 	}
 
 	void GLRenderer::ShadowPass()
@@ -917,6 +957,11 @@ namespace Render
 	{
 		m_cameraVars.m_projection = p_projectionMatrix;
 		m_cameraVars.m_invProj = glm::inverse(p_projectionMatrix);
+	}
+
+	void GLRenderer::SetCameraPosition( glm::vec3 p_camPos )
+	{
+		m_camPos = p_camPos;
 	}
 
 	void GLRenderer::GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)

@@ -42,11 +42,11 @@ function RefractiveBall.OnCreate (userId, actionId)
 	physicsComp:SetVelocity(collisionComp, Vec3.New(0, 0, 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(tempPos);
-	transformComp:SetScale(Vec3.New(5, 5, 5));
+	transformComp:SetScale(Vec3.New(3.5, 3.5, 3.5));
 
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/sphereTangents");
+		renderComp:SetModel("PentagonSphere");
 		renderComp:SetMaterial("RefractiveBaller");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
 		renderComp:SetMaterialEffect("Mesh_Refractive");

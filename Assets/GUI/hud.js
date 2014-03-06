@@ -242,7 +242,7 @@ $(document).ready(function(){
 	//Set("ShowScore", "false");
 	//UpdateScoreScreen(2,'doqunbop',[[1,'Player',2,2][2,'doqunbop',1,0]]);
   // DamageIndicator(40);
-  // setTimeout("DamageIndicator(40);", 2000);
+   //setTimeout("DamageIndicator(40);", 2000);
 	//Set("ChargeBarValue", 1);
 	// Announce("Waiting for players...", -1);
   SetCharges(1,3);

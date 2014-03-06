@@ -68,7 +68,8 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
-		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
+		g_engineContext.m_resourceManager->LoadScript("XplodingMushroomPlanted");
+		g_engineContext.m_resourceManager->LoadScript("ShroomExplosion");
 
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));

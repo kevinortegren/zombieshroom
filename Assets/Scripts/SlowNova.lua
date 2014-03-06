@@ -3,7 +3,7 @@ SlowNova.cooldown = 7;
 SlowNova.charges = 3;
 SlowNova.chargeTime = 0;
 SlowNova.channelingTime = 0;
-SlowNova.duration = 0.1;
+SlowNova.duration = 0.6;
 
 function SlowNova.ChargeDone (time, userId, actionId)
 	SlowNova.OnCreate(userId, actionId);
@@ -38,6 +38,7 @@ function SlowNova.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 
 	if Global.IsClient then
+		ParticleEmitter.New(self, "frostBlast");
 	end
 end
 

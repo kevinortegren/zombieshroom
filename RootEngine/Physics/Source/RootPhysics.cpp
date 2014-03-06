@@ -924,10 +924,10 @@ namespace Physics
 		{
 			btQuaternion temp = m_externallyControlled.at(index)->GetOrientation();
 			
-			retVal[0] = temp.w();
-			retVal[1] = temp.x();
-			retVal[2] = temp.y();
-			retVal[3] = temp.z();
+			retVal[0] = temp.y();
+			retVal[1] = temp.z();
+			retVal[2] = temp.w();
+			retVal[3] = temp.x();
 		}
 		return retVal;
 	}
@@ -1085,9 +1085,9 @@ namespace Physics
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
-			glm::quat rot = glm::angleAxis(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+			glm::quat rot = glm::angleAxis(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f)); //here be trouble
 			
-			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation*rot);
+			m_externallyControlled.at(index)->SetOrientation(p_objectOrientation/**rot*/);
 		}
 		
 	}

@@ -15,7 +15,7 @@
   ORBITSPEED: 0
   ORBITRADIUS: 0
   TEMPLATE: 0
-  TEXTURE: smoke
+  TEXTURE: Particles/smoke
   EFFECT: Particle/ParticleAdditive
   NAME: Fire
   ROTATIONSPEEDMIN: 0.0

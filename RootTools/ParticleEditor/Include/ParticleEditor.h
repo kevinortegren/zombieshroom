@@ -171,5 +171,7 @@ private slots:
 	void RemoveObjectButton();
 	void RotationSpeedMinChanged(double p_val);
 	void RotationSpeedMaxChanged(double p_val);
+	void MaxPerFrameChanged(double p_val);
+	void ResetParticleSystem();
 };
 

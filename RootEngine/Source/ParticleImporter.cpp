@@ -42,7 +42,6 @@ namespace RootEngine
 			doc[i]["EFFECT"]		>> effectName;
 			doc[i]["TEXTURE"]		>> textureName;
 			
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Particle material: %d", materialIndex);
 			outStruct->at(i)->m_material					= m_context->m_renderer->CreateMaterial(p_fileName + std::to_string(materialIndex++));
 			outStruct->at(i)->m_material->m_textures[Render::TextureSemantic::DIFFUSE]	= m_context->m_resourceManager->LoadTexture(textureName, Render::TextureType::TEXTURE_2D);
 			outStruct->at(i)->m_material->m_effect		= m_context->m_resourceManager->LoadEffect(effectName);
@@ -128,6 +127,11 @@ namespace RootEngine
 			else
 				outStruct->at(i)->m_relative = 0;
 			
+			//Relative
+			if(doc[i].FindValue("MAXPERFRAME"))
+				doc[i]["MAXPERFRAME"] >> outStruct->at(i)->m_maxPerFrame;
+			else
+				outStruct->at(i)->m_maxPerFrame = 1;
 
 			//Set params
 			outStruct->at(i)->m_params[Render::Semantic::POSITION]			= &outStruct->at(i)->m_position;
@@ -148,6 +152,8 @@ namespace RootEngine
 			outStruct->at(i)->m_params[Render::Semantic::ROTATIONSPEEDMAX]	= &outStruct->at(i)->m_rotationSpeedMax;
 			outStruct->at(i)->m_params[Render::Semantic::ORBITRADIUS]		= &outStruct->at(i)->m_orbitRadius;
 			outStruct->at(i)->m_params[Render::Semantic::ORBITSPEED]		= &outStruct->at(i)->m_orbitSpeed;
+			outStruct->at(i)->m_params[Render::Semantic::MAXPERFRAME]		= &outStruct->at(i)->m_maxPerFrame;
+
 		}
 		return outStruct;
 	}

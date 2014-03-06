@@ -1,5 +1,5 @@
 Homing = {};
-Homing.damage = 100;
+Homing.damage = 90;
 Homing.knockback = 0;
 Homing.currentDamage = 100;
 Homing.currentKnockback = 0;
@@ -41,7 +41,7 @@ function Homing.OnCreate (userId, actionId)
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	transformComp:SetPos(startPos);
-	local homingComp = HomingComponent.New(self, 0.1, 50);
+	local homingComp = HomingComponent.New(self, 0.07, 32);
 	local dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rayStartPos = Vec3.New((tempPos.x + dirVecForward.x * 3), (2 + tempPos.y + dirVecForward.y * 3), (tempPos.z + dirVecForward.z * 3));
 	local rayComp = Ray.New(self, collisionComp:GetHandle(), rayStartPos, dirVecForward, 10000, false, false);
@@ -70,6 +70,10 @@ function Homing.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "magic_missile_01");
+		local pointlightComp = PointLight.New(self);
+		pointlightComp:SetColor(Vec4.New(0.2, 0.05, 1.0, 1.0));
+		pointlightComp:SetRange(5.0);
+		pointlightComp:SetAttenuation(Vec3.New(0, 0.2, 0));
 	end
 end
 
