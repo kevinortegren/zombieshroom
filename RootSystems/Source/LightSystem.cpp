@@ -54,7 +54,7 @@ namespace RootForce
 	float PointLightSystem::CalculateScale(PointLight* p_pl)
 	{
 		float sigma = 0.05f;
-		float L = glm::max(glm::max(p_pl->m_color.x, p_pl->m_color.y), p_pl->m_color.z);
+		//float L = glm::max(glm::max(p_pl->m_color.x, p_pl->m_color.y), p_pl->m_color.z);
 		float x;
 		//ax^2 + bx + c - minLuminance = 0, p = a/b, q = a/c
 		float a, b, c;
@@ -77,7 +77,6 @@ namespace RootForce
 
 			x = glm::max(x1, x2);
 		}
-		m_context->m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Point light range: %f", x);
 		return x;
 		//return (L/p_pl->m_attenuation.y)/sigma;
 	}
