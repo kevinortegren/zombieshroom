@@ -7,7 +7,7 @@ Explosion.channelingTime = 0.0;
 Explosion.duration = 1.0;
 
 function Explosion.OnCreate (userId, actionId)
-	Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating Explosion");
 	local self = Entity.New();
 	local fatherEntity = Entity.GetEntityByNetworkID(userId, actionId, 0);
 	local posVec = Vec3.New(0,0,0);
@@ -37,7 +37,7 @@ function Explosion.OnCreate (userId, actionId)
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "Explosion_G-stuf");
 	end
-	Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
+	--Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 end
 
 function Explosion.OnCollide (self, entity)

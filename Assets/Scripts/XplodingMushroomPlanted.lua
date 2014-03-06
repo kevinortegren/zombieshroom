@@ -2,7 +2,7 @@ XplodingMushroomPlanted = {};
 XplodingMushroomPlanted.cooldown = 0;
 XplodingMushroomPlanted.charges = 0;
 XplodingMushroomPlanted.channelingTime = 0;
-XplodingMushroomPlanted.duration = 60;
+XplodingMushroomPlanted.duration = 120;
 
 function XplodingMushroomPlanted.ChargeDone (time, userId, actionId)
 	XplodingMushroomPlanted.OnCreate(userId, actionId);
@@ -37,7 +37,7 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 		startPos = casterEnt:GetTransformation():GetPos();
 	end
 
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 2, 1, false, false);
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 4, 1, false, false);
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then

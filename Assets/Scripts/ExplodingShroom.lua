@@ -1,5 +1,5 @@
 ExplodingShroom = {};
-ExplodingShroom.cooldown = 10;
+ExplodingShroom.cooldown = 3;
 ExplodingShroom.charges = 3;
 ExplodingShroom.chargeTime = 0;
 ExplodingShroom.channelingTime = 0;
