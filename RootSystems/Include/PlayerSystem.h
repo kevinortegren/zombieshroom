@@ -122,9 +122,9 @@ namespace RootForce
 
 		HealthComponent()
 		{
-			Health = 0.0f;
+			Health = 100.0f;
 			LastDamageSourceID = 0;
-			IsDead = true;
+			IsDead = false;
 			WantsRespawn = true;
 			RespawnDelay = 0.0f;
 			SpawnIndex = -1;

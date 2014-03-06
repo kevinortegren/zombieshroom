@@ -7,6 +7,7 @@ in vec3 vert_bitangent;
 
 out vec4 out_color;
 
+uniform sampler2D g_Diffuse;
 uniform sampler2D g_LA;
 uniform sampler2D g_Depth;
 
@@ -42,10 +43,10 @@ void main()
 	else
 		refractionColor	= texelFetch(g_LA, ivec2(gl_FragCoord.xy), 0).rgb;
 
-//	vec3 refractionColor = texture(g_LA, screenTexCoord + vec2(vert_normal.x, vert_normal.y) * 0.05).rgb;
+	vec3 diffuseColor = texture(g_Diffuse, vert_texcoord).rgb;
 	////////////////////////////////////////////////////////////////////////////
 	//Outputs
 	////////////////////////////////////////////////////////////////////////////
-	vec3 result =  mix(refractionColor, vec3(0.2, 0.4, 0.47), 0.2);
+	vec3 result =  mix(refractionColor, diffuseColor, 0.05);
     out_color = vec4(result , 1.0);
 }

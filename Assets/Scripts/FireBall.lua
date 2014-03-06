@@ -6,6 +6,12 @@ FireBall.channelingTime = 0;
 FireBall.duration = 0;
 FireBall.charges = 5;
 
+function FireBall.OnLoad()
+	ResourceManager.LoadParticle("SmockeochElden");
+	ResourceManager.LoadScript("Explosion");
+	Explosion.OnLoad();
+end
+
 function FireBall.ChargeDone (time, userId, actionId)
   if(time >= FireBall.chargeTime) then
     FireBall.OnCreate(userId, actionId);

@@ -250,8 +250,8 @@ namespace RootSystems
 
 						// DEBUG
 						// Get the new entity and print its flag
-						ECS::Entity* entity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(network->ID.UserID, abilityEvent.ActionID, 0));
-						g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "%s (User: %u, Action: %u) created with flag: %llx", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID, entity->GetFlag());
+						//ECS::Entity* entity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(network->ID.UserID, abilityEvent.ActionID, 0));
+						//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "%s (User: %u, Action: %u) created with flag: %llx", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID, entity->GetFlag());
 
 						// /DEBUG
 

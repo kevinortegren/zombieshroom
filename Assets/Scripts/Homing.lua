@@ -9,6 +9,10 @@ Homing.chargeTime = 0;
 Homing.channelingTime = 0;
 Homing.duration = 60;
 
+function Homing.OnLoad()
+	ResourceManager.LoadParticle("magic_missile_01");
+end
+
 function Homing.ChargeDone (time, userId, actionId)
 	Homing.OnCreate(userId, actionId);
 end

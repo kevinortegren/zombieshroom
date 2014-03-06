@@ -6,6 +6,10 @@ ShroomExplosion.chargeTime = 0.0;
 ShroomExplosion.channelingTime = 0.0;
 ShroomExplosion.duration = 1.0;
 
+function ShroomExplosion.OnLoad()
+	ResourceManager.LoadParticle("Explosion_G-stuf");
+end
+
 function ShroomExplosion.OnCreate (userId, actionId)
 	local self = Entity.New();
 	local fatherEntity = Entity.GetEntityByNetworkID(userId, actionId, 1);
@@ -35,7 +39,7 @@ function ShroomExplosion.OnCreate (userId, actionId)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "After bind call");
 	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 10);
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "Explosion");
+		local particleComp = ParticleEmitter.New(self, "Explosion_G-stuf");
 		--local renderComp = Renderable.New(self);
 		--renderComp:SetModel("Primitives/sphere");
 		--renderComp:SetMaterial("ExplosiveMat");
