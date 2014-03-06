@@ -3,7 +3,7 @@
 in vec2 vert_texCoord;
 in float vert_textureNumber;
 
-uniform sampler2D tile[15];
+uniform sampler2D tile[32];
 
 out vec4 frag_color;
 

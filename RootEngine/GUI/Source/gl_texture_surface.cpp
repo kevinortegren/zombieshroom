@@ -132,7 +132,7 @@ void GLTextureSurface::UpdateTexture()
 	{
 		for(SurfaceTile& tile : row)
 		{
-			if (tile.NeedsUpdate)
+			if (tile.NeedsUpdate && tile.FenceID == 0)
 			{
 				glBindTexture(GL_TEXTURE_2D, tile.Texture[(int)(!tile.ActiveTexture)]);
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TILE_SIZE, TILE_SIZE,

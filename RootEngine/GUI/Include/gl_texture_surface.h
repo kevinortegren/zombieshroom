@@ -6,7 +6,7 @@
 #include <vector>
 #include <mutex>
 
-#define TILE_SIZE 256
+#define TILE_SIZE 128
 
 class SurfaceTile
 {

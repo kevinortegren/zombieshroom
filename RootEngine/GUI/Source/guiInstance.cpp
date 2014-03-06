@@ -121,7 +121,7 @@ namespace RootEngine
 					numTexturesUsed++;
 
 					// If max textures used or last tile, do the rendering and restart the texture usage
-					if(numTexturesUsed >= GL_MAX_TEXTURE_UNITS || (x + 1 == tiles->size() && y + 1 == tiles->at(x).size()))
+					if(numTexturesUsed >= 32 || (x + 1 == tiles->size() && y + 1 == tiles->at(x).size()))
 					{
 						glDrawArrays(GL_TRIANGLES, 0, numTexturesUsed*6);
 
