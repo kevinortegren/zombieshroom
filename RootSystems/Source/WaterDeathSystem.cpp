@@ -39,7 +39,7 @@ namespace RootForce
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_entity);
 		
 
-		float waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight") - 10.0f;
+		float waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight") - 5.0f;
 
 		if(transform->m_position.y < waterHeight && health->Health > 0)
 		{

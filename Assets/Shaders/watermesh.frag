@@ -29,6 +29,8 @@ layout(std140) uniform PerObject
 	vec3 gEyeWorldPos;
 	float gTime;
 	vec4 gOptions;
+	vec4 SunColor;
+	vec3 SunDirection;
 	float dx2; //Length between height values
 };    
 
@@ -67,7 +69,7 @@ float linearizeDepth(in float depth) {
 
 void main()
 {
-	float time = gTime/7.0;
+	float time = gTime/6.0;
 
 	////////////////////////////////////////////////////////////////////////////
 	//Normal mapping 2.0
@@ -76,14 +78,14 @@ void main()
 	vec3 normalMap		= normalize(vec3(calcNorm.x, dx2*2, calcNorm.y));
 	if(gOptions.y == 0.0)
 	{
-		vec3 normal1 			= normalize(texture(g_NormalMap, TexCoord_FS_in * 256.0 + vec2(sin(time - 1.0) , time))*2.0-1.0).xyz;
-		vec3 normal2 			= normalize(texture(g_NormalMap, -TexCoord_FS_in * 128.0 + vec2(sin(time*0.5)+1.0 , time*0.5))*2.0-1.0).xyz;
+		vec3 normal1 			= normalize(texture(g_NormalMap,  TexCoord_FS_in * 256.0 + 								vec2(sin(time * 0.89) , time * 0.95)) * 2.0 - 1.0).xyz;
+		vec3 normal2 			= normalize(texture(g_NormalMap, vec2(-TexCoord_FS_in.x, TexCoord_FS_in.y ) * 128.0 + 	vec2(cos(-time*0.45), time * 0.56))       * 2.0 - 1.0).xyz;
 		vec3 normalT 			= mix(normal1, normal2, 0.5);
 		normalT 				= normalize(normalT);
 		vec3 tangent			= normalize(vec3(dx2, 0, calcNorm.x));
 		vec3 bitangent			= normalize(vec3(0, dx2, -calcNorm.y));
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
-		normalMap 				= mix(TBN * normalT, normalMap, 0.8);
+		normalMap 				= mix(TBN * normalT, normalMap, 0.85); //Smooth the normal from the normal map
 	}
 	vec3 viewNormal			= normalize(viewMatrix * vec4(normalMap,0.0f)).rgb;
 	////////////////////////////////////////////////////////////////////////////
@@ -249,15 +251,14 @@ void main()
 	//Lighting
 	////////////////////////////////////////////////////////////////////////////
 	//Temp stuff
-	vec4 viewLightDir 	= viewMatrix * vec4(-1.0, -1.0, 1.0, 0.0);
+	vec4 viewLightDir 	= viewMatrix * vec4(SunDirection, 0.0);
 	vec3 LightDirection = viewLightDir.xyz;
-	vec4 LightColor		= vec4(1.0);
 
 	vec3 lightVec 	    = -normalize(LightDirection );
 	vec3 viewDir 		= -normalize(viewSpacePosition);
 	vec3 halfVector 	= normalize(viewDir + lightVec);
     
-	vec3 specularColor 	= LightColor.xyz * 0.7 * pow(clamp(dot(viewNormal, halfVector), 0.0, 1.0), 128.0);
+	vec3 specularColor 	= SunColor.xyz * 0.5 * pow(clamp(dot(viewNormal, halfVector), 0.0, 1.0), 128.0);
 
 
 	////////////////////////////////////////////////////////////////////////////

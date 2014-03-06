@@ -146,7 +146,7 @@ namespace RootForce
 		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_texSize;
 
 		//Set standard values
-		m_speed		= 11.0f;
+		m_speed		= 13.0f;
 		m_dx		= (m_scale*64.0f) / m_texSize;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
@@ -185,6 +185,10 @@ namespace RootForce
 
 		//Water options
 		m_renderable->m_params[Render::Semantic::COLOR] = &m_waterOptions;
+
+		//Directional light
+		m_renderable->m_params[Render::Semantic::COLOREND] = &m_context->m_renderer->GetDirectionalLight()->m_color;
+		m_renderable->m_params[Render::Semantic::DIRECTION] = &m_context->m_renderer->GetDirectionalLight()->m_direction;
 
 		//Camera position in world space
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 

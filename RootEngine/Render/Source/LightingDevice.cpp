@@ -338,4 +338,10 @@ namespace Render
 	{
 		m_showBackgroundBlend = p_value;
 	}
+
+	DirectionalLight* LightingDevice::GetDirectionalLight()
+	{
+		return &m_lightVars.m_dlights[0];
+	}
+
 }
