@@ -53,10 +53,33 @@ namespace RootForce
 
 	float PointLightSystem::CalculateScale(PointLight* p_pl)
 	{
-		float sigma = 0.1f;
+		float sigma = 0.05f;
 		float L = glm::max(glm::max(p_pl->m_color.x, p_pl->m_color.y), p_pl->m_color.z);
-		
-		return (L/p_pl->m_attenuation.y)/sigma;
+		float x;
+		//ax^2 + bx + c - minLuminance = 0, p = a/b, q = a/c
+		float a, b, c;
+		a = p_pl->m_attenuation.z;
+		b = p_pl->m_attenuation.y;
+		c = p_pl->m_attenuation.x;
+
+		if(a == 0.0f)
+		{
+			assert(b != 0.0f);
+			x = -(c-1/sigma)/b;
+		}
+		else
+		{
+			float p = p_pl->m_attenuation.y / p_pl->m_attenuation.z;
+			float q = (p_pl->m_attenuation.x - 1 / (sigma)) / p_pl->m_attenuation.z;
+				
+			float x1 = -p / 2 + glm::sqrt((p / 2)*(p / 2) - q);
+			float x2 = -p / 2 - glm::sqrt((p / 2)*(p / 2) - q);
+
+			x = glm::max(x1, x2);
+		}
+		m_context->m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Point light range: %f", x);
+		return x;
+		//return (L/p_pl->m_attenuation.y)/sigma;
 	}
 
 	void PointLightSystem::LightStressTest()

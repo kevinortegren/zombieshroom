@@ -120,7 +120,7 @@ namespace RootForce
 
 			PointLight* pl = m_world->GetEntityManager()->CreateComponent<PointLight>(itr->second);
 			pl->m_color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-			pl->m_attenuation = glm::vec3(0.0f, 0.3f, 0.0f);
+			pl->m_attenuation = glm::vec3(1.0f, 0.3f, 0.05f);
 
 		}
 	}
