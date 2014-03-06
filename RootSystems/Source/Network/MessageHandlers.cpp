@@ -405,7 +405,7 @@ namespace RootForce
 								action->JumpTime = halfPing;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStart received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStart received from user %d", m.User);
 							}
 							else
 							{
@@ -445,7 +445,7 @@ namespace RootForce
 								// TODO: Maybe consider the time passed along with the message.
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStop received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStop received from user %d", m.User);
 							}
 							else
 							{
@@ -522,7 +522,7 @@ namespace RootForce
 								playerComponent->AbilityScripts[m.AbilityIndex].OnCooldown = false;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityCooldownOff received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityCooldownOff received from user %d", m.User);
 							}
 							else
 							{

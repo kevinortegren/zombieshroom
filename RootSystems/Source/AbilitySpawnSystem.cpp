@@ -217,6 +217,8 @@ namespace RootForce
 			renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);
 			renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture("AbilityBackground", Render::TextureType::TEXTURE_2D);
 			renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh");
+
+			g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating an ability spawn point render component with material/glow texture %s", respawn->CurrentAbility.Name.c_str());
 		}
 
 	}

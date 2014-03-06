@@ -235,7 +235,7 @@ namespace RootSystems
 					{
 						player->AbilityState = RootForce::AbilityState::CHARGING;
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 
 					case RootForce::AbilityEventType::CHANNELING_START:
@@ -255,7 +255,7 @@ namespace RootSystems
 
 						// /DEBUG
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 
 					case RootForce::AbilityEventType::CHANNELING_DONE:
@@ -276,7 +276,7 @@ namespace RootSystems
 						if(player->AbilityScripts[abilityEvent.ActiveAbility].Charges == 0)
 							player->AbilityScripts[abilityEvent.ActiveAbility] = RootForce::AbilityInfo();
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 
 					case RootForce::AbilityEventType::INTERRUPTED:
@@ -297,7 +297,7 @@ namespace RootSystems
 						if(player->AbilityScripts[abilityEvent.ActiveAbility].Charges == 0)
 							player->AbilityScripts[abilityEvent.ActiveAbility] = RootForce::AbilityInfo();
 
-						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Interrupted ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Interrupted ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 				}
 			}
