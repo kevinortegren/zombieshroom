@@ -29,8 +29,6 @@ namespace RootForce
 	{
 		if (!m_data.empty())
 		{
-			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Processing deserialization message");
-
 			RakNet::BitStream bs(&m_data[0], m_data.size(), false);
 
 			ECS::Entity* clientEntity = m_world->GetTagManager()->GetEntityByTag("Client");
