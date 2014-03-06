@@ -44,7 +44,7 @@ function IceCube.OnCreate (userId, actionId)
 	transformComp:SetScale(Vec3.New(5, 5, 5));
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("PentagonSphere");
+		renderComp:SetModel("HexagonSphere");
 		renderComp:SetMaterial("IceCubeer");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
 		renderComp:SetMaterialEffect("Mesh_Refractive_Clear");

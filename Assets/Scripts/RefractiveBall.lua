@@ -46,8 +46,9 @@ function RefractiveBall.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("PentagonSphere");
+		renderComp:SetModel("HexagonSphere");
 		renderComp:SetMaterial("RefractiveBaller");
+		renderComp:SetMaterialDiffuse("HexagonSpherTex");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
 		renderComp:SetMaterialEffect("Mesh_Refractive");
 	end
