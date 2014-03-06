@@ -45,6 +45,7 @@ private:
 
 	ECS::Entity*							m_cameraEntity;
 	ECS::Entity*							m_aimingDevice;
+	ECS::Entity*							m_skyBox;
 
 	bool m_focusInterpolation;
 	int m_dragging;

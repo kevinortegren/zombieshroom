@@ -72,10 +72,6 @@ function Player.OnTeamSelect(self, teamId)
 
     collision:SetMeshHandle("testchar0");
     Collision.AddPlayerObjectToWorld(self, collision, transform, playerPhysics, collisionResponder);
-
-    health:SetHealth(100);
-    health:SetIsDead(false);
-    health:SetWantsRespawn(true);
     
     if Global.IsClient then
       local renderable = Renderable.New(self);

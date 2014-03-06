@@ -67,14 +67,15 @@ void ParticleEditor::ConnectSignalsAndSlots()
 	connect(ui.colorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(colorAlphaSliderChanged(int)));
 	connect(ui.endcolorAlphaSlider,	SIGNAL(sliderMoved(int)),					this, SLOT(endColorAlphaSliderChanged(int)));
 	connect(ui.orbitRadiusSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitRadiusChanged(double)));
-	connect(ui.orbitSpeedSpinBox,  SIGNAL(valueChanged(double)),				this, SLOT(OrbitSpeedChanged(double)));
+	connect(ui.orbitSpeedSpinBox,   SIGNAL(valueChanged(double)),				this, SLOT(OrbitSpeedChanged(double)));
 	connect(ui.spreadSlider,		SIGNAL(sliderMoved(int)),					this, SLOT(SpreadSliderChanged(int)));
 	connect(ui.removeObjectButton,	SIGNAL(clicked()),							this, SLOT(RemoveObjectButton()));
 	connect(ui.RotspeedminSpinbox,	SIGNAL(valueChanged(double)),				this, SLOT(RotationSpeedMinChanged(double)));
 	connect(ui.RotspeedmaxSpinbox,	SIGNAL(valueChanged(double)),				this, SLOT(RotationSpeedMaxChanged(double)));
 	connect(ui.blendingComboBox,	SIGNAL(currentIndexChanged(int)),			this, SLOT(BlendingChanged(int)));
 	connect(ui.relativeComboBox,	SIGNAL(currentIndexChanged(int)),			this, SLOT(RelativeChanged(int)));
-
+	connect(ui.restartParticleSystemButton, SIGNAL(clicked()),					this, SLOT(ResetParticleSystem()));
+	connect(ui.loopNumberSpinBox,	SIGNAL(valueChanged(double)),				this, SLOT(MaxPerFrameChanged(double)));
 }
 
 void ParticleEditor::Init()
@@ -163,6 +164,9 @@ void ParticleEditor::Init()
 	m_axisAABB[0] = AxisBoundingBox(glm::vec3(0.1f, -0.1f, -0.1f), glm::vec3(0.5f, 0.1f, 0.1f));//X
 	m_axisAABB[1] = AxisBoundingBox(glm::vec3(-0.1f, 0.1f, -0.1f), glm::vec3(0.1f, 0.5f, 0.1f));//Y
 	m_axisAABB[2] = AxisBoundingBox(glm::vec3(-0.1f, -0.1f, 0.1f), glm::vec3(0.1f, 0.1f, 0.5f));//Z
+	
+	//Start with project init
+	MenuNew();
 }
 
 bool ParticleEditor::CheckExit()
@@ -198,7 +202,7 @@ void ParticleEditor::MenuExit()
 
 void ParticleEditor::MenuNew()
 {
-	
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::PINK_PRINT, "New project");
 	if(SaveWarningDialog() == QMessageBox::Cancel)
 		return;
 
@@ -231,6 +235,7 @@ void ParticleEditor::MenuNew()
 
 void ParticleEditor::MenuOpen()
 {
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::PINK_PRINT, "Open project");
 	if(SaveWarningDialog() == QMessageBox::Cancel)
 		return;
 
@@ -270,7 +275,7 @@ void ParticleEditor::OpenParticleFileQ( QString p_filePath )
 		//Add an item representing the emitter to the emitter list with the specified name
 		QListWidgetItem* tempItem = new QListWidgetItem(QString::fromStdString(e->m_particleSystems[i]->m_name));
 		ui.listWidget->addItem(tempItem);
-		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter created: %s", ui.nameEmitterLineEdit->text().toStdString().c_str());
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Emitter loaded: %s", e->m_particleSystems[i]->m_name.c_str());
 
 		//Enable Delete and rename buttons
 		if(m_selectedEmitterIndex == -1)
@@ -303,6 +308,7 @@ void ParticleEditor::OpenParticleFile( std::string p_filePath )
 
 void ParticleEditor::MenuSave()
 {
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::PINK_PRINT, "Save");
 	if(m_savePath.compare("") == 0)
 		ManuSaveAs();
 	else
@@ -311,6 +317,7 @@ void ParticleEditor::MenuSave()
 
 void ParticleEditor::ManuSaveAs()
 {
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::PINK_PRINT, "Save As");
 	ExportParticle(QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("PARTICLE-file (*.particle)")));
 }
 
@@ -328,6 +335,7 @@ void ParticleEditor::MenuHelpAbout()
 #pragma region Emitter management buttons
 void ParticleEditor::NewEmitter()
 {
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::PINK_PRINT, "New emitter");
 	//If name entry is empty, don't rename
 	if(0 == QString::compare(ui.nameEmitterLineEdit->text(), "") || 0 == QString::compare(ui.nameEmitterLineEdit->text(), "thomas"))
 	{
@@ -346,7 +354,7 @@ void ParticleEditor::NewEmitter()
 
 	//Set default data 
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material = m_context->m_renderer->CreateMaterial("particle" + std::to_string(m_materialIndex++));
-	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture("smoke", Render::TextureType::TEXTURE_2D);
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture("Particles/smoke", Render::TextureType::TEXTURE_2D);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditive");
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_position			= glm::vec3(0.0f);
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_lifeTimeMin		= 2.0f;
@@ -369,6 +377,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_relative			= 0;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMin	= 0;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMax	= 0;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_maxPerFrame		= 1.0f;
 
 
 	//Map data to params list for buffering
@@ -390,6 +399,7 @@ void ParticleEditor::NewEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::ORBITSPEED]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitSpeed;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::ROTATIONSPEEDMIN]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMin;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::ROTATIONSPEEDMAX]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::MAXPERFRAME]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_maxPerFrame;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::TRANSPOSITION]		= &t->m_position;
 
 	//Add an item representing the emitter to the emitter list with the specified name
@@ -419,6 +429,7 @@ void ParticleEditor::NewEmitter()
 
 void ParticleEditor::DeleteEmitter()
 {
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::PINK_PRINT, "Delete emitter");
 	QListWidgetItem* tempItem = ui.listWidget->currentItem();
 	if(!tempItem)
 		return;
@@ -430,7 +441,8 @@ void ParticleEditor::DeleteEmitter()
 
 	//delete e->m_particleSystems.at(index);
 	e->m_particleSystems.erase(e->m_particleSystems.begin() + index);
-
+	g_engineContext.m_renderer->FreeParticleSystem(e->m_systems.at(index));
+	e->m_systems.erase(e->m_systems.begin() + index);
 	//Deletes the item
 	ui.listWidget->takeItem(index);
 	
@@ -461,6 +473,7 @@ void ParticleEditor::DeleteEmitter()
 
 void ParticleEditor::DuplicateEmitter()
 {
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::PINK_PRINT, "Duplicate emitter");
 	if(m_selectedEmitterIndex == -1)
 	{
 		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "No emitter selected");
@@ -499,7 +512,7 @@ void ParticleEditor::DuplicateEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_relative			= e->m_particleSystems[m_selectedEmitterIndex]->m_relative;			
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMin	= e->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMin;	
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMax	= e->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMax;	
-
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_maxPerFrame		= e->m_particleSystems[m_selectedEmitterIndex]->m_maxPerFrame;	
 
 	//Map data to params list for buffering
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::POSITION]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_position;
@@ -520,6 +533,7 @@ void ParticleEditor::DuplicateEmitter()
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::ORBITSPEED]			= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_orbitSpeed;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::ROTATIONSPEEDMIN]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMin;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::ROTATIONSPEEDMAX]	= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_rotationSpeedMax;
+	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::MAXPERFRAME]		= &e->m_particleSystems[e->m_particleSystems.size()-1]->m_maxPerFrame;
 	e->m_particleSystems[e->m_particleSystems.size()-1]->m_params[Render::Semantic::TRANSPOSITION]		= &t->m_position;		
 																																
 	//Add an item representing the emitter to the emitter list with the specified name											
@@ -540,6 +554,7 @@ void ParticleEditor::OpenNewRenameWidget()
 
 void ParticleEditor::RenameEmitter()
 {
+	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::PINK_PRINT, "Rename emitter");
 	if(0 == QString::compare(ui.renameEmitterLineEdit->text(), ""))
 	{
 		ShowMessageBox("Invalid name!");
@@ -628,6 +643,9 @@ void ParticleEditor::EmitterSelected( QListWidgetItem* p_item)
 	//Rotation speed
 	ui.RotspeedminSpinbox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMin);
 	ui.RotspeedmaxSpinbox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_rotationSpeedMax);
+
+	//Maxperframe
+	ui.loopNumberSpinBox->setValue(pe->m_particleSystems[m_selectedEmitterIndex]->m_maxPerFrame);
 
 	ui.textureEmitterLineEdit->setText( QString::fromStdString(m_context->m_resourceManager->ResolveStringFromTexture(pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_textures[Render::TextureSemantic::DIFFUSE])));
 }
@@ -904,6 +922,16 @@ void ParticleEditor::RotationSpeedMaxChanged( double p_val )
 	Changed();
 }
 
+void ParticleEditor::MaxPerFrameChanged( double p_val )
+{
+	if(CalculateMaxParticles())
+	{
+		RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
+		pe->m_particleSystems[m_selectedEmitterIndex]->m_maxPerFrame = (float)p_val;
+		Changed();
+	}
+}
+
 #pragma endregion
 
 void ParticleEditor::MenuViewColorTriangle()
@@ -966,7 +994,8 @@ void ParticleEditor::TextureDoubleClicked( const QModelIndex& p_index )
 	}
 	m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Selected new texture: %s", fileInfo.fileName().toStdString().c_str());
 	RootForce::ParticleEmitter* pe = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(m_emitterEntities.at(m_selectedEntityIndex));
-	pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileInfo.baseName().toStdString().c_str(), Render::TextureType::TEXTURE_2D);
+	std::string fileString = "Particles/" + fileInfo.baseName().toStdString();
+	pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_context->m_resourceManager->LoadTexture(fileString.c_str(), Render::TextureType::TEXTURE_2D);
 
 	ui.textureEmitterLineEdit->setText(fileInfo.fileName());
 	Changed();
@@ -1122,6 +1151,7 @@ void ParticleEditor::ExportParticle( QString p_fullFilePath )
 		emitter << YAML::Key << "NAME"				<< YAML::Value << (*itr)->m_name;
 		emitter << YAML::Key << "ROTATIONSPEEDMIN"	<< YAML::Value << (*itr)->m_rotationSpeedMin;
 		emitter << YAML::Key << "ROTATIONSPEEDMAX"	<< YAML::Value << (*itr)->m_rotationSpeedMax;
+		emitter << YAML::Key << "MAXPERFRAME"		<< YAML::Value << (*itr)->m_maxPerFrame;
 		emitter << YAML::EndMap;
 	}
 
@@ -1216,13 +1246,13 @@ void ParticleEditor::BlendingChanged( int p_val )
 		{
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditive");
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_blending = p_val;
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAdditive");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAdditive");
 		}
 		else if(pe->m_particleSystems[m_selectedEmitterIndex]->m_relative == 1) //Relative
 		{
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditiveRelative");
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_blending = p_val;
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAdditiveRelative");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAdditiveRelative");
 		}
 	}
 	else if(p_val == 1)
@@ -1231,13 +1261,13 @@ void ParticleEditor::BlendingChanged( int p_val )
 		{
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAlphaBlend");
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_blending = p_val;
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAlphaBlend");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAlphaBlend");
 		}
 		else if(pe->m_particleSystems[m_selectedEmitterIndex]->m_relative == 1) //Relative
 		{
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAlphaBlendRelative");
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_blending = p_val;
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAlphaBlendRelative");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAlphaBlendRelative");
 		}
 	}
 	Changed();
@@ -1252,13 +1282,13 @@ void ParticleEditor::RelativeChanged( int p_val )
 		{
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditive");
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_relative = p_val;
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAdditive");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAdditive");
 		}
 		else if(pe->m_particleSystems[m_selectedEmitterIndex]->m_blending == 1)
 		{
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAlphaBlend");
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_relative = p_val;
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAlphaBlend");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAlphaBlend");
 		}
 		
 	}
@@ -1268,13 +1298,13 @@ void ParticleEditor::RelativeChanged( int p_val )
 		{
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAdditiveRelative");
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_relative = p_val;
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAdditiveRelative");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAdditiveRelative");
 		}
 		else if(pe->m_particleSystems[m_selectedEmitterIndex]->m_blending == 1)
 		{
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_material->m_effect = m_context->m_resourceManager->LoadEffect("Particle/ParticleAlphaBlendRelative");
 			pe->m_particleSystems[m_selectedEmitterIndex]->m_relative = p_val;
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAlphaBlendRelative");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Using Effect: ParticleAlphaBlendRelative");
 		}
 	}
 	Changed();
@@ -1289,7 +1319,8 @@ int ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos,
 {
 	if(m_selectedEntityIndex == -1)
 		return 0;
-
+	if(m_selectedEmitterIndex == -1)
+		return 0;
 	ECS::Entity* entity = m_emitterEntities.at(0);
 	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
 
@@ -1380,6 +1411,11 @@ void ParticleEditor::DrawPositionAxis()
 
 void ParticleEditor::DragEmitter( int p_axis, glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix )
 {
+	if(m_selectedEntityIndex == -1)
+		return;
+	if(m_selectedEmitterIndex == -1)
+		return;
+
 	//Calculate NDC coords
 	float x = (2.0f * -p_mousePos.x) / (float)ui.frame->width() - 1.0f;
 	float y = (2.0f * p_mousePos.y) / (float)ui.frame->height() + 1.0f;
@@ -1426,6 +1462,11 @@ void ParticleEditor::DragEmitter( int p_axis, glm::ivec2 p_mousePos, glm::vec3 p
 
 float ParticleEditor::CheckRayVsAABB( glm::vec3 p_rayDir, glm::vec3 p_rayOrigin, glm::vec3 p_bound1, glm::vec3 p_bound2 )
 {
+	if(m_selectedEntityIndex == -1)
+		return 0;
+	if(m_selectedEmitterIndex == -1)
+		return 0;
+
 	glm::vec3 invdir = 1.0f / p_rayDir;
 
 	float t1 = (p_bound1.x - p_rayOrigin.x)*invdir.x;
@@ -1471,7 +1512,7 @@ ParticleEditor::PointOnPlane ParticleEditor::GetPointOnPlane( glm::vec3 p_camPos
 		t = denom / glm::dot(normalFlip, p_rayDir);
 		if(t < 0.0f)
 		{
-			m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "t < 0.0f");
+			//m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "t < 0.0f");
 			hit = false; 
 		}
 	}
@@ -1483,14 +1524,33 @@ ParticleEditor::PointOnPlane ParticleEditor::GetPointOnPlane( glm::vec3 p_camPos
 
 bool ParticleEditor::CalculateMaxParticles()
 {
-	double count = ui.lifeTimeMaxSpinBox->value() / ui.spawnTimeSpinBox->value();
+	double count = (ui.lifeTimeMaxSpinBox->value() / ui.spawnTimeSpinBox->value()) * ui.loopNumberSpinBox->value();
 	ui.particleCountSpinBox->setValue(count);
 	if(count > 1000.0)
 	{
-		ShowMessageBox("Particle count over 1000 is not supported!");		
+		//ShowMessageBox("Particle count over 1000 is not supported!");	
+		m_context->m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Particle count may not exceed 1000!");
 		return false;
 	}
 	else
 		return true;
+}
+
+void ParticleEditor::ResetParticleSystem()
+{
+	ECS::Entity* entity = m_emitterEntities.at(0);
+	RootForce::ParticleEmitter* e = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(entity);
+	unsigned numberOfSystems = e->m_systems.size();
+	for(auto itr = e->m_systems.begin(); itr != e->m_systems.end(); ++itr)
+	{
+		g_engineContext.m_renderer->FreeParticleSystem((*itr));
+	}
+
+	e->m_systems.clear();
+
+	for(unsigned i = 0; i < numberOfSystems; ++i)
+	{
+		e->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
+	}
 }
 

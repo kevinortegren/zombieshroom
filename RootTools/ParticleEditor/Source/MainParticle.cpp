@@ -262,6 +262,10 @@ void MainParticle::Update( float p_delta )
 	UpdateInput();
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
+	//Manually set skybox position
+	RootForce::Transform* cameraTrans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_cameraEntity);
+	RootForce::Transform* skyboxTrans = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_skyBox);
+	skyboxTrans->m_interpolatedPosition = cameraTrans->m_position;
 	UpdateThirdPerson();
 	m_particleSystem->Process();
 	m_pointLightSystem->Process();
@@ -371,10 +375,10 @@ void MainParticle::UpdateThirdPerson()
 void MainParticle::CreateSkyBox()
 {
 	// Setup skybox entity.
-	ECS::Entity* skybox = g_world->GetEntityManager()->CreateEntity();
+	m_skyBox = g_world->GetEntityManager()->CreateEntity();
 
-	RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(skybox);
-	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(skybox);
+	RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_skyBox);
+	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_skyBox);
 
 	t->m_scale = glm::vec3(-100);
 	t->m_orientation.Roll(180);
@@ -426,6 +430,6 @@ void MainParticle::CreateSkyBox()
 	r->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Skybox");
 	r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  g_engineContext.m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
 
-	g_world->GetTagManager()->RegisterEntity("Skybox", skybox);
-	g_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
+	g_world->GetTagManager()->RegisterEntity("Skybox", m_skyBox);
+	g_world->GetGroupManager()->RegisterEntity("NonExport", m_skyBox);
 }

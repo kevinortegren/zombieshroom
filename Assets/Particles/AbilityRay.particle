@@ -15,7 +15,7 @@
   ORBITSPEED: 4.5
   ORBITRADIUS: 0.8
   TEMPLATE: 0
-  TEXTURE: Sparkle
+  TEXTURE: Particles/Sparkle
   EFFECT: Particle/ParticleAdditive
   NAME: AbilitySpawn
   ROTATIONSPEEDMIN: 0.0

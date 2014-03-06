@@ -7,27 +7,33 @@ MachineGun.chargeTime = 0;
 MachineGun.channelingTime = 0;
 MachineGun.duration = 5;
 
+function MachineGun.OnLoad()
+	ResourceManager.LoadParticle("MachineGun");
+end
+
 function MachineGun.ChargeDone (time, userId, actionId)
-	local self = Entity.New();
-	local networkComp = Network.New(self, userId, actionId);
-	local dakComp = DamageAndKnockback.New(self, MachineGun.damage , MachineGun.knockback);
 	MachineGun.OnCreate(userId, actionId);
 end
 
 function MachineGun.ChannelingDone (time, userId, actionId)
 end
 
+function FireBall.Interrupted (time, userId, actionId)
+end
+
 function MachineGun.OnCreate (userId, actionId)
 	--Entities
-	local self = Entity.GetEntityByNetworkID(userId, actionId, 0);
+	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	--Components
+	local networkComp = Network.New(self, userId, actionId);
 	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "MachineGun");
 	local timerComp = Timer.New(self, MachineGun.duration);
+	local dakComp = DamageAndKnockback.New(self, MachineGun.damage , MachineGun.knockback);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);

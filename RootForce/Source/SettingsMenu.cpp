@@ -4,14 +4,16 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 namespace RootForce
 {
 
 
-	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context, Keymapper* p_keymapper )
+	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context, Keymapper* p_keymapper)
 		: m_keymapper(p_keymapper)
 	{
 		m_context = p_context;
+		m_workingDir = m_context.m_resourceManager->GetWorkingDirectory();
 		m_fullscreen = m_context.m_configManager->GetConfigValueAsBool("settings-fullscreen");
 		std::string resolutionString = m_context.m_configManager->GetConfigValueAsString("settings-resolution");
 		int splitPos = resolutionString.find('x');
@@ -86,7 +88,7 @@ namespace RootForce
 			);
 		}
 
-		m_context.m_configManager->StoreConfig("config.yaml"); // Hardcoding config file is not nice
+		m_context.m_configManager->StoreConfig(m_workingDir + "config.yaml"); // Hardcoding config file is not nice
 	}
 
 	void SettingsMenu::FocusBindEvent(const Awesomium::JSArray& p_array)

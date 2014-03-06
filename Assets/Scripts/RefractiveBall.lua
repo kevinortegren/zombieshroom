@@ -8,6 +8,11 @@ RefractiveBall.channelingTime = 5;
 RefractiveBall.duration = 0;
 RefractiveBall.charges = -1;
 
+function RefractiveBall.OnLoad()
+	ResourceManager.LoadModel("PentagonSphere");
+	ResourceManager.LoadEffect("Mesh_Refractive");
+end
+
 function RefractiveBall.ChargeDone (time, userId, actionId)
 	RefractiveBall.OnCreate(userId, actionId);
 end
@@ -42,12 +47,13 @@ function RefractiveBall.OnCreate (userId, actionId)
 	physicsComp:SetVelocity(collisionComp, Vec3.New(0, 0, 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(tempPos);
-	transformComp:SetScale(Vec3.New(5, 5, 5));
+	transformComp:SetScale(Vec3.New(3.5, 3.5, 3.5));
 
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
-		renderComp:SetModel("Primitives/sphereTangents");
+		renderComp:SetModel("HexagonSphere");
 		renderComp:SetMaterial("RefractiveBaller");
+		renderComp:SetMaterialDiffuse("HexagonSpherTex");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
 		renderComp:SetMaterialEffect("Mesh_Refractive");
 	end

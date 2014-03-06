@@ -15,6 +15,6 @@
   ORBITSPEED: 1
   ORBITRADIUS: 0.5
   TEMPLATE: 0
-  TEXTURE: RefractiveBall
+  TEXTURE: Particles/RefractiveBall
   EFFECT: Particle/ParticleAdditive
   NAME: Main

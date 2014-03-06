@@ -1,9 +1,19 @@
 ExplodingShroom = {};
-ExplodingShroom.cooldown = 10;
+ExplodingShroom.cooldown = 3;
 ExplodingShroom.charges = 3;
 ExplodingShroom.chargeTime = 0;
 ExplodingShroom.channelingTime = 0;
 ExplodingShroom.duration = 10;
+
+function ExplodingShroom.OnLoad()
+	ResourceManager.LoadModel("XplodingMushroom");
+	ResourceManager.LoadTexture("XplodingMushroomDiffuse");
+	ResourceManager.LoadTexture("XplodingMushroomGlow");
+	ResourceManager.LoadTexture("XplodingMushroomNormal");
+	ResourceManager.LoadEffect("Mesh_NormalMap");
+	ResourceManager.LoadScript("XplodingMushroomPlanted");
+	XplodingMushroomPlanted.OnLoad();
+end
 
 function ExplodingShroom.ChargeDone (time, userId, actionId)
 	ExplodingShroom.OnCreate(userId, actionId);
@@ -55,9 +65,14 @@ end
 
 function ExplodingShroom.OnCollide (self, entity)
 if entity:DoesExist() then
+	local hitCol = entity:GetCollision();
+	local hitPhys = entity:GetPhysics();
+	local type = hitPhys:GetType(hitCol);
+	if type == PhysicsType.TYPE_STATIC then
 		local network = self:GetNetwork();
 		XplodingMushroomPlanted.OnCreate(network:GetUserId(), network:GetActionId());
 		ExplodingShroom.OnDestroy(self);
+	end
 end
 end
 

@@ -1,9 +1,17 @@
 XplodingMushroomPlanted = {};
 XplodingMushroomPlanted.cooldown = 0;
 XplodingMushroomPlanted.charges = 0;
-XplodingMushroomPlanted.chargeTime = 0;
 XplodingMushroomPlanted.channelingTime = 0;
-XplodingMushroomPlanted.duration = 0;
+XplodingMushroomPlanted.duration = 120;
+
+function XplodingMushroomPlanted.OnLoad()
+	ResourceManager.LoadModel("XplodingMushroom");
+	ResourceManager.LoadTexture("XplodingMushroomDiffuse");
+	ResourceManager.LoadTexture("XplodingMushroomNormal");
+	ResourceManager.LoadEffect("Mesh_NormalMap");
+	ResourceManager.LoadScript("ShroomExplosion");
+	ShroomExplosion.OnLoad();
+end
 
 function XplodingMushroomPlanted.ChargeDone (time, userId, actionId)
 	XplodingMushroomPlanted.OnCreate(userId, actionId);
@@ -32,9 +40,13 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 	colRespComp:SetContainer(collisionComp);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rotQuat = Quat.New(0,0,0,1);
-	local tempPos = casterEnt:GetTransformation():GetPos();
-	local startPos = tempPos;
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 2, 1, false, false);
+	
+	local startPos = Vec3.New(0,0,0);
+	if casterEnt:DoesExist() then
+		startPos = casterEnt:GetTransformation():GetPos();
+	end
+
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 4, 1, false, false);
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
@@ -52,8 +64,20 @@ if entity:DoesExist() then
 	local hitCol = entity:GetCollision();
 	local hitPhys = entity:GetPhysics();
 	local type = hitPhys:GetType(hitCol);
+	if type == PhysicsType.TYPE_PLAYER then
+		local abilityOwnerNetwork = self:GetNetwork();
+		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+		local targetPlayerComponent = entity:GetPlayerComponent();
+		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+			ShroomExplosion.OnCreate(abilityOwnerId, abilityOwnerNetwork:GetActionId());
+			XplodingMushroomPlanted.OnDestroy(self);
+		end
+	end
 end
 end
 
 function XplodingMushroomPlanted.OnDestroy (self)
+	Entity.Remove(self);
 end

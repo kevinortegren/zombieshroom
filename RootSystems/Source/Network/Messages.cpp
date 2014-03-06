@@ -13,6 +13,11 @@
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootSystems/Include/AbilitySpawnSystem.h>
+#include <RootSystems/Include/TimerSystem.h>
+#include <RootSystems/Include/FollowSystem.h>
+#include <RootSystems/Include/HomingSystem.h>
+#include <RootSystems/Include/DamageAndKnockback.h>
+#include <RootSystems/Include/StatChangeSystem.h>
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -341,6 +346,47 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, p_c->Timer);
 		}
 
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TimerComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->TimeLeft);
+			p_bs->Serialize(p_writeToBitstream, p_c->TimeUp);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, FollowComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->Offset);
+			p_bs->Serialize(p_writeToBitstream, p_c->TargetID.SynchronizedID);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, HomingComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->Controllability);
+			p_bs->Serialize(p_writeToBitstream, p_c->Speed);
+			p_bs->Serialize(p_writeToBitstream, p_c->TargetID.SynchronizedID);
+			
+			for (int i = 0; i < 3; ++i)
+				p_bs->Serialize(p_writeToBitstream, p_c->TargetPosition[i]);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, DamageAndKnockback* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->Damage);
+			p_bs->Serialize(p_writeToBitstream, p_c->Knockback);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, StatChange* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->DamageResistance);
+			p_bs->Serialize(p_writeToBitstream, p_c->DamageResistanceTime);
+			p_bs->Serialize(p_writeToBitstream, p_c->JumpHeightChange);
+			p_bs->Serialize(p_writeToBitstream, p_c->JumpHeightChangeTime);
+			p_bs->Serialize(p_writeToBitstream, p_c->KnockbackResistance);
+			p_bs->Serialize(p_writeToBitstream, p_c->KnockbackResistanceTime);
+			p_bs->Serialize(p_writeToBitstream, p_c->SpeedChange);
+			p_bs->Serialize(p_writeToBitstream, p_c->SpeedChangeTime);
+		}
+
+
 		bool CanSerializeComponent(ComponentType::ComponentType p_type)
 		{
 			switch (p_type)
@@ -355,6 +401,11 @@ namespace RootForce
 				case ComponentType::TDMRULES:
 				case ComponentType::PLAYERPHYSICS:
 				case ComponentType::ABILITYSPAWN:
+				case ComponentType::TIMER:
+				case ComponentType::FOLLOW:
+				case ComponentType::HOMING:
+				case ComponentType::DAMAGEANDKNOCKBACK:
+				case ComponentType::STATCHANGE:
 					return true;
 				default:
 					return false;
@@ -406,6 +457,26 @@ namespace RootForce
 
 				case ComponentType::ABILITYSPAWN:
 					Serialize(true, p_bs, (RootForce::AbilitySpawnComponent*) p_component);
+				return true;
+
+				case ComponentType::TIMER:
+					Serialize(true, p_bs, (RootForce::TimerComponent*) p_component);
+				return true;
+
+				case ComponentType::FOLLOW:
+					Serialize(true, p_bs, (RootForce::FollowComponent*) p_component);
+				return true;
+
+				case ComponentType::HOMING:
+					Serialize(true, p_bs, (RootForce::HomingComponent*) p_component);
+				return true;
+
+				case ComponentType::DAMAGEANDKNOCKBACK:
+					Serialize(true, p_bs, (RootForce::DamageAndKnockback*) p_component);
+				return true;
+
+				case ComponentType::STATCHANGE:
+					Serialize(true, p_bs, (RootForce::StatChange*) p_component);
 				return true;
 			}
 
@@ -480,6 +551,26 @@ namespace RootForce
 
 				case ComponentType::ABILITYSPAWN:
 					component = CreateOrGetDeserializedComponent<RootForce::AbilitySpawnComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::TIMER:
+					component = CreateOrGetDeserializedComponent<RootForce::TimerComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::FOLLOW:
+					component = CreateOrGetDeserializedComponent<RootForce::FollowComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::HOMING:
+					component = CreateOrGetDeserializedComponent<RootForce::HomingComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::DAMAGEANDKNOCKBACK:
+					component = CreateOrGetDeserializedComponent<RootForce::DamageAndKnockback>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::STATCHANGE:
+					component = CreateOrGetDeserializedComponent<RootForce::StatChange>(p_bs, p_entity, p_entityManager, false);
 				break;
 				
 				default:

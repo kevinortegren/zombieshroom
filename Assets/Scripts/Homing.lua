@@ -1,33 +1,41 @@
 Homing = {};
-Homing.damage = 100;
+Homing.damage = 90;
 Homing.knockback = 0;
+Homing.currentDamage = 100;
+Homing.currentKnockback = 0;
 Homing.cooldown = 10;
 Homing.charges = 2;
 Homing.chargeTime = 0;
 Homing.channelingTime = 0;
 Homing.duration = 60;
 
+function Homing.OnLoad()
+	ResourceManager.LoadParticle("magic_missile_01");
+end
+
 function Homing.ChargeDone (time, userId, actionId)
-	local self = Entity.New();
-	local networkComp = Network.New(self, userId, actionId);
-	local dakComp = DamageAndKnockback.New(self, Homing.damage , Homing.knockback);
 	Homing.OnCreate(userId, actionId);
 end
 
 function Homing.ChannelingDone (time, userId, actionId)
 end
 
+function FireBall.Interrupted (time, userId, actionId)
+end
+
 function Homing.OnCreate (userId, actionId)
 	--Entities
-	local self = Entity.GetEntityByNetworkID(userId, actionId, 0);
+	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	--Components
+	local networkComp = Network.New(self, userId, actionId);
 	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Homing");
 	local timerComp = Timer.New(self, Homing.duration);
+	local dakComp = DamageAndKnockback.New(self, Homing.currentDamage , Homing.currentKnockback);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
@@ -40,7 +48,7 @@ function Homing.OnCreate (userId, actionId)
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	transformComp:SetPos(startPos);
-	local homingComp = HomingComponent.New(self, 0.1, 50);
+	local homingComp = HomingComponent.New(self, 0.07, 32);
 	local dirVecForward = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rayStartPos = Vec3.New((tempPos.x + dirVecForward.x * 3), (2 + tempPos.y + dirVecForward.y * 3), (tempPos.z + dirVecForward.z * 3));
 	local rayComp = Ray.New(self, collisionComp:GetHandle(), rayStartPos, dirVecForward, 10000, false, false);
@@ -69,6 +77,10 @@ function Homing.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "magic_missile_01");
+		local pointlightComp = PointLight.New(self);
+		pointlightComp:SetColor(Vec4.New(0.2, 0.05, 1.0, 1.0));
+		pointlightComp:SetRange(5.0);
+		pointlightComp:SetAttenuation(Vec3.New(0, 0.2, 0));
 	end
 end
 

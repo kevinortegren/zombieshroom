@@ -16,7 +16,7 @@
   ORBITRADIUS: 0
   BLENDING: 1
   RELATIVE: 0
-  TEXTURE: smocke
+  TEXTURE: Particles/smocke
   EFFECT: Particle/ParticleAlphaBlend
   NAME: Smocke
   ROTATIONSPEEDMIN: -1
@@ -39,7 +39,7 @@
   ORBITRADIUS: 0
   BLENDING: 0
   RELATIVE: 0
-  TEXTURE: stolenfire1
+  TEXTURE: Particles/stolenfire1
   EFFECT: Particle/ParticleAdditive
   NAME: Elden
   ROTATIONSPEEDMIN: -3.1
@@ -62,7 +62,7 @@
   ORBITRADIUS: 0
   BLENDING: 0
   RELATIVE: 0
-  TEXTURE: stolenfire2
+  TEXTURE: Particles/stolenfire2
   EFFECT: Particle/ParticleAdditive
   NAME: Eldentvo
   ROTATIONSPEEDMIN: -3.1
@@ -85,7 +85,7 @@
   ORBITRADIUS: 0
   BLENDING: 0
   RELATIVE: 0
-  TEXTURE: stolenfire3
+  TEXTURE: Particles/stolenfire3
   EFFECT: Particle/ParticleAdditive
   NAME: Eldentre
   ROTATIONSPEEDMIN: -4

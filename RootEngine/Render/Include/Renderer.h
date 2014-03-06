@@ -56,6 +56,7 @@ namespace Render
 		// Camera
 		virtual void SetViewMatrix(glm::mat4 p_viewMatrix) = 0;
 		virtual void SetProjectionMatrix(glm::mat4 p_projectionMatrix) = 0;
+		virtual void SetCameraPosition(glm::vec3 p_camPos) = 0;
 
 		// Shadows
 		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index) = 0;
@@ -117,6 +118,7 @@ namespace Render
 		// Camera
 		void SetViewMatrix(glm::mat4 p_viewMatrix);
 		void SetProjectionMatrix(glm::mat4 p_projectionMatrix);
+		void SetCameraPosition(glm::vec3 p_camPos);
 
 		// Shadows
 		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index);
@@ -165,6 +167,22 @@ namespace Render
 		static std::map<TextureSemantic::TextureSemantic, unsigned> s_textureSlots;
 
 		void ParseCommands(std::stringstream* p_ss);
+
+		glm::vec3 m_camPos;
+
+		struct SortOnDistanceFunctor
+		{ 
+			SortOnDistanceFunctor( const GLRenderer& renderer ) : m_renderer(renderer) { }
+			const GLRenderer& m_renderer;
+
+			bool operator()(const RenderJob* a, const RenderJob* b)
+			{ 
+				float aDist = glm::distance(a->m_position, m_renderer.m_camPos);
+				float bDist = glm::distance(b->m_position, m_renderer.m_camPos);
+				if( aDist > bDist ) return true;
+				return false;
+			}
+		};
 
 	private:
 
@@ -238,6 +256,8 @@ namespace Render
 		bool m_layers[2];
 		bool m_displayNormals;
 		bool m_showForward;
+
+
 	};
 }
 

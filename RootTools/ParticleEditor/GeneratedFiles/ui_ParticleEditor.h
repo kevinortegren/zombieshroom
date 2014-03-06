@@ -108,6 +108,8 @@ public:
     QDoubleSpinBox *sizeEndSpinBoxX;
     QSlider *spreadSlider;
     QComboBox *relativeComboBox;
+    QLabel *label_4;
+    QDoubleSpinBox *loopNumberSpinBox;
     QWidget *tab_2;
     QWidget *gridLayoutWidget_2;
     QGridLayout *gridLayout_2;
@@ -175,6 +177,7 @@ public:
     QWidget *dockWidgetContents_5;
     QDoubleSpinBox *gridSpaceSpinBox;
     QLabel *label_5;
+    QPushButton *restartParticleSystemButton;
 
     void setupUi(QMainWindow *ParticleEditorClass)
     {
@@ -280,7 +283,7 @@ public:
         groupBox_3->setFont(font1);
         gridLayoutWidget = new QWidget(groupBox_3);
         gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
-        gridLayoutWidget->setGeometry(QRect(4, 16, 327, 737));
+        gridLayoutWidget->setGeometry(QRect(4, 16, 330, 737));
         gridLayout = new QGridLayout(gridLayoutWidget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
@@ -570,6 +573,20 @@ public:
         relativeComboBox->setObjectName(QStringLiteral("relativeComboBox"));
 
         gridLayout->addWidget(relativeComboBox, 19, 4, 1, 2);
+
+        label_4 = new QLabel(gridLayoutWidget);
+        label_4->setObjectName(QStringLiteral("label_4"));
+
+        gridLayout->addWidget(label_4, 18, 5, 1, 1);
+
+        loopNumberSpinBox = new QDoubleSpinBox(gridLayoutWidget);
+        loopNumberSpinBox->setObjectName(QStringLiteral("loopNumberSpinBox"));
+        loopNumberSpinBox->setDecimals(0);
+        loopNumberSpinBox->setMaximum(50);
+        loopNumberSpinBox->setSingleStep(1);
+        loopNumberSpinBox->setValue(1);
+
+        gridLayout->addWidget(loopNumberSpinBox, 18, 6, 1, 1);
 
         tabWidget->addTab(tabProperties, QString());
         tab_2 = new QWidget();
@@ -950,6 +967,9 @@ public:
         label_5->setObjectName(QStringLiteral("label_5"));
         label_5->setGeometry(QRect(18, 26, 69, 16));
         label_5->setFont(font1);
+        restartParticleSystemButton = new QPushButton(dockWidgetContents_5);
+        restartParticleSystemButton->setObjectName(QStringLiteral("restartParticleSystemButton"));
+        restartParticleSystemButton->setGeometry(QRect(18, 60, 173, 23));
         gridDockWidget->setWidget(dockWidgetContents_5);
         ParticleEditorClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), gridDockWidget);
 
@@ -1039,6 +1059,7 @@ public:
          << QApplication::translate("ParticleEditorClass", "NonRelative", 0)
          << QApplication::translate("ParticleEditorClass", "Relative", 0)
         );
+        label_4->setText(QApplication::translate("ParticleEditorClass", "# per spawn:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tabProperties), QApplication::translate("ParticleEditorClass", "Properties", 0));
         label_16->setText(QApplication::translate("ParticleEditorClass", "Texture:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("ParticleEditorClass", "Textures", 0));
@@ -1104,6 +1125,7 @@ public:
 #endif // QT_NO_ACCESSIBILITY
         gridDockWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "Settings", 0));
         label_5->setText(QApplication::translate("ParticleEditorClass", "Grid space:", 0));
+        restartParticleSystemButton->setText(QApplication::translate("ParticleEditorClass", "Restart particle system", 0));
     } // retranslateUi
 
 };

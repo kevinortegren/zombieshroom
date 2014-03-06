@@ -1,29 +1,30 @@
 SlowNova = {};
-SlowNova.damage = 0;
-SlowNova.knockback = 0;
-SlowNova.cooldown = 4;
+SlowNova.cooldown = 7;
 SlowNova.charges = 3;
-SlowNova.chargeTime = 1;
+SlowNova.chargeTime = 0;
 SlowNova.channelingTime = 0;
-SlowNova.duration = 0.1;
+SlowNova.duration = 0.6;
+
+function SlowNova.OnLoad()
+	ResourceManager.LoadParticle("frostBlast");
+end
 
 function SlowNova.ChargeDone (time, userId, actionId)
-	local self = Entity.New();
-	local networkComp = Network.New(self, userId, actionId);
-	local dakComp = DamageAndKnockback.New(self, SlowNova.damage , SlowNova.knockback);
-	dakComp:SetDamage(SlowNova.damage * ((time * 1) / SlowNova.chargeTime));
-	dakComp:SetKnockback(SlowNova.knockback * ((time * 1) / SlowNova.chargeTime));
 	SlowNova.OnCreate(userId, actionId);
 end
 
 function SlowNova.ChannelingDone (time, userId, actionId)
 end
 
+function FireBall.Interrupted (time, userId, actionId)
+end
+
 function SlowNova.OnCreate (userId, actionId)
 	--Entities
-	local self = Entity.GetEntityByNetworkID(userId, actionId, 0);
+	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	--Components
+	local networkComp = Network.New(self, userId, actionId);
 	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
@@ -36,14 +37,14 @@ function SlowNova.OnCreate (userId, actionId)
 	local facePos = casterEnt:GetTransformation():GetPos() + Vec3.New(0,1,0);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rotQuat = Quat.New(0,0,0,1);
-	local tempPos = casterEnt:GetTransformation():GetPos();
-	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
+	local startPos = casterEnt:GetTransformation():GetPos();
 	transformComp:SetPos(startPos);
 	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 15, 1, false, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 
 	if Global.IsClient then
+		ParticleEmitter.New(self, "frostBlast");
 	end
 end
 
