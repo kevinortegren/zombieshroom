@@ -11,7 +11,7 @@ extern ECS::World* g_world;
 namespace RootForce
 {
 
-	IngameMenu::IngameMenu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper )
+	IngameMenu::IngameMenu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper)
 	{
 		m_return = false;
 		m_exit = false;

@@ -8,8 +8,9 @@
 namespace RootForce
 {
 
-	RootForce::Menu::Menu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper )
+	RootForce::Menu::Menu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper)
 	{
+		m_workingDir = g_engineContext.m_resourceManager->GetWorkingDirectory();
 		m_view = p_view;
 		m_context = p_context;
 		m_settingsMenu = new SettingsMenu(p_context, p_keymapper);
