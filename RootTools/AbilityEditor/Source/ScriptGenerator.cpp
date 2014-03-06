@@ -47,6 +47,10 @@ namespace AbilityEditorNameSpace
 		WriteChargeDone();
 		m_file << "\n";
 		WriteChannelingDone();
+
+		m_file << "function FireBall.Interrupted (time, userId, actionId)\n";
+		m_file << "end\n";
+
 		m_file << "\n";
 		WriteOnCreate(p_onCreate);
 		m_file << "\n";
