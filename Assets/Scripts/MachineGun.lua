@@ -8,7 +8,7 @@ MachineGun.channelingTime = 0;
 MachineGun.duration = 5;
 
 function MachineGun.OnLoad()
-	ResourceManager.LoadParticle("MachineGun");
+	--ResourceManager.LoadParticle("MachineGun");
 end
 
 function MachineGun.ChargeDone (time, userId, actionId)
@@ -51,7 +51,7 @@ function MachineGun.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -0, 0));
 
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "MachineGun");
+		--local particleComp = ParticleEmitter.New(self, "MachineGun");
 		local waterComp = WaterCollider.New(self);
 		waterComp:SetDisturbPower(1);
 		waterComp:SetDisturbInterval(0.3);

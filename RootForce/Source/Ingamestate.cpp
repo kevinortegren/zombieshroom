@@ -602,6 +602,14 @@ namespace RootForce
 			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
 			m_ingameMenu->Reset();
 		}
+		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
+			m_displayIngameMenu = !m_displayIngameMenu;
+			m_ingameMenu->GetView()->SetActive(m_displayIngameMenu);
+			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_ingameMenu->Reset();
+		}
 		if (m_ingameMenu->GetReturn())
 		{
 			m_displayIngameMenu = false;
@@ -735,13 +743,6 @@ namespace RootForce
 		else if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::UP)
 		{
 			m_hud->SetValue("ShowScore", "false" );
-		}
-		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
-			m_displayIngameMenu = !m_displayIngameMenu;
-			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
-			m_ingameMenu->Reset();
 		}
 		if(m_displayIngameMenu)
 		{

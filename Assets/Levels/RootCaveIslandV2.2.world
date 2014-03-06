@@ -1,0 +1,1875 @@
+- Entities:
+    - 0
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 18
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 26
+    - 27
+    - 28
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 35
+    - 36
+    - 37
+    - 38
+    - 39
+    - 40
+    - 41
+    - 42
+    - 43
+    - 44
+    - 45
+    - 46
+    - 47
+    - 48
+    - 49
+    - 50
+    - 51
+    - 52
+    - 53
+    - 54
+    - 55
+    - 56
+    - 57
+    - 58
+    - 59
+    - 60
+    - 61
+    - 62
+    - 63
+    - 64
+    - 65
+    - 66
+    - 67
+    - 68
+    - 69
+    - 70
+    - 71
+    - 72
+    - 73
+    - 74
+    - 75
+    - 76
+    - 77
+    - 78
+    - 79
+    - 80
+    - 81
+    - 82
+    - 83
+    - 84
+    - 85
+    - 86
+    - 87
+    - 88
+    - 89
+    - 90
+    - 91
+    - 92
+    - 93
+    - 94
+    - 95
+    - 96
+    - 97
+    - 98
+    - 99
+    - 100
+    - 101
+    - 102
+    - 103
+    - 104
+    - 105
+    - 106
+    - 107
+- Components:
+    - Type: 0
+      Data:
+        - Entity: 33
+          Model: CaveEntrance4Shape
+          Material:
+            Name: CaveEntranceMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: CaveEntrancediffuse
+            Normal: CaveEntranceNormals
+        - Entity: 34
+          Model: CaveEntrance4Shape
+          Material:
+            Name: CaveEntranceMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: CaveEntrancediffuse
+            Normal: CaveEntranceNormals
+        - Entity: 35
+          Model: CaveEntrance4Shape
+          Material:
+            Name: CaveEntranceMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: CaveEntrancediffuse
+            Normal: CaveEntranceNormals
+        - Entity: 36
+          Model: LowGlowStoneShape
+          Material:
+            Name: LowGlowMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: LowGlowDiffuse
+            Normal: LowGlowNormal
+            Glow: LowGlowGlow
+        - Entity: 37
+          Model: MountainPlaceHolderShape
+          Material:
+            Name: Mountain
+            Effect: Mesh_Blend
+            Diffuse: CaveMountainColor
+            TextureMap: CaveMountainColor
+            TextureRed: RED
+            TextureGreen: Grass
+            TextureBlue: CliffWall
+            TileFactor: 12
+        - Entity: 38
+          Model: FootIslandShape
+          Material:
+            Name: FootIslandMaterial
+            Effect: Mesh_Blend
+            Diffuse: FootIslandcolor
+            TextureMap: FootIslandcolor
+            TextureRed: RED
+            TextureGreen: Grass
+            TextureBlue: CliffWall
+            TileFactor: 12
+        - Entity: 39
+          Model: TempleIslandShape
+          Material:
+            Name: TempleIslandMaterial
+            Effect: Mesh_Blend
+            Diffuse: TempleIslandColor
+            TextureMap: TempleIslandColor
+            TextureRed: RED
+            TextureGreen: grass
+            TextureBlue: CliffWall
+            TileFactor: 12
+        - Entity: 40
+          Model: CaveTestTerrianShape
+          Material:
+            Name: CaveFloor
+            Effect: Mesh_Blend
+            Diffuse: CaveFloorPaint
+            TextureMap: CaveFloorPaint
+            TextureRed: SandAndRocks
+            TextureGreen: GREEN
+            TextureBlue: CaveStones
+            TileFactor: 12
+        - Entity: 41
+          Model: CaveTestRoofShape
+          Material:
+            Name: CaveRoof
+            Effect: Mesh_Blend
+            Diffuse: RED
+            TextureMap: RED
+            TextureRed: CliffWall
+            TextureGreen: GREEN
+            TextureBlue: BLUE
+            TileFactor: 4
+        - Entity: 42
+          Model: LowGlowStoneShape
+          Material:
+            Name: LowGlowMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: LowGlowDiffuse
+            Normal: LowGlowNormal
+            Glow: LowGlowGlow
+        - Entity: 43
+          Model: LowGlowStoneShape
+          Material:
+            Name: LowGlowMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: LowGlowDiffuse
+            Normal: LowGlowNormal
+            Glow: LowGlowGlow
+        - Entity: 44
+          Model: LowGlowStoneShape
+          Material:
+            Name: LowGlowMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: LowGlowDiffuse
+            Normal: LowGlowNormal
+            Glow: LowGlowGlow
+        - Entity: 45
+          Model: RootCaveTreeMotherShape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 46
+          Model: RCIMainBorderShape2
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 47
+          Model: RCIMainBorderShape1
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 48
+          Model: RCIMainShape2
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 49
+          Model: RCIMainShape1
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 50
+          Model: RCIMainLowBorderShape1
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 51
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 52
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 53
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 54
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 55
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 56
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 57
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 58
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 59
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 60
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 61
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 62
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 63
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 64
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 65
+          Model: LowGlowStoneShape
+          Material:
+            Name: LowGlowMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: LowGlowDiffuse
+            Normal: LowGlowNormal
+            Glow: LowGlowGlow
+        - Entity: 66
+          Model: LowGlowStoneShape
+          Material:
+            Name: LowGlowMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: LowGlowDiffuse
+            Normal: LowGlowNormal
+            Glow: LowGlowGlow
+        - Entity: 67
+          Model: FILowerBorderStonesShape
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 68
+          Model: FIBorderStonesShape
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 69
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 70
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 71
+          Model: StoneWallShape
+          Material:
+            Name: WallRockmaterial
+            Effect: Mesh_NormalMap
+            Diffuse: StoneWallDiffuse
+            Normal: StoneWallNormal
+        - Entity: 72
+          Model: WoodPillarShape
+          Material:
+            Name: WoodenPillarMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: TreePillarDiffuse
+            Normal: TreePillarNormal
+        - Entity: 73
+          Model: TILowerBorderStonesShape
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 74
+          Model: CaveIslandWaterFloorShape
+          Material:
+            Name: lambert1
+            Effect: Mesh
+            Diffuse: grayLambert
+        - Entity: 75
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 76
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 77
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 78
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 79
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 80
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 81
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 82
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 83
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 84
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 85
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 86
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 87
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 88
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 89
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 90
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 91
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 92
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 93
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 94
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 95
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 96
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 97
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 98
+          Model: RootCaveTreeMother1Shape
+          Material:
+            Name: TreeMaterial
+            Effect: Mesh_NormalMap
+            Diffuse: Tree2GreenLeaf
+            Normal: Tree1Normal
+        - Entity: 99
+          Model: polySurfaceShape2
+          Material:
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
+        - Entity: 100
+          Model: TIBorderStonesShape
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
+        - Entity: 101
+          Model: ColumnsShape
+          Material:
+            Name: ColumnMaterial1
+            Effect: Mesh_NormalMap
+            Diffuse: ColumnDiffuse
+            Normal: ColumnNormal
+    - Type: 1
+      Data:
+        - Entity: 0
+          Position: [0, 47.1851, 0]
+          Rotation: [0.0630287, 0.738333, -0.666622, 0.0806651]
+          Scale: [1, 1, 1]
+        - Entity: 4
+          Position: [0, -22.9372, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [40, 1, 40]
+        - Entity: 5
+          Position: [-10.8652, 12.3372, 4.96271]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 6
+          Position: [-10.8652, 1.00031, 40.7498]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 7
+          Position: [42.4742, 0.449682, 40.7498]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 8
+          Position: [37.2514, 11.549, -23.7759]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 9
+          Position: [-40.6245, 11.549, -50.6911]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 10
+          Position: [-76.6221, 11.549, -31.6522]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 11
+          Position: [-76.6221, 11.549, 23.8176]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 12
+          Position: [-50.7923, 11.549, 67.4039]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 13
+          Position: [-7.10882, 0.996602, 89.4174]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 14
+          Position: [87.9826, 8.83028, -86.0776]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 15
+          Position: [97.7162, 3.13199, -19.4357]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 16
+          Position: [-10.8652, 9.65865, 4.96271]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 17
+          Position: [-10.8652, -2.33912, 40.7498]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 18
+          Position: [42.4742, -2.09951, 40.7498]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 19
+          Position: [37.2514, 7.80269, -23.7759]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 20
+          Position: [-40.6245, 7.80269, -50.6911]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 21
+          Position: [-76.6221, 7.80269, -31.6522]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 22
+          Position: [-76.6221, 7.80269, 23.8176]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 23
+          Position: [-50.7923, 7.80269, 67.4039]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 24
+          Position: [-7.10882, -2.74971, 89.4174]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 25
+          Position: [87.9826, 5.08397, -86.0776]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 26
+          Position: [97.7162, -0.614319, -19.4357]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 27
+          Position: [-4.2737, 0.996602, 155.496]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 28
+          Position: [-4.2737, -2.74971, 155.496]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 29
+          Position: [-63.1092, 6.15075, 149.284]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 30
+          Position: [-63.1092, 2.40444, 149.284]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 31
+          Position: [-84.413, 14.2155, 107.966]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 32
+          Position: [-84.413, 10.4692, 107.966]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 33
+          Position: [-32.9401, 3.67474, 69.7371]
+          Rotation: [0, -0.670245, 0, 0.74214]
+          Scale: [1, 1, 1]
+        - Entity: 34
+          Position: [23.863, 4.50213, -17.9065]
+          Rotation: [0, 0.813916, 0, 0.580983]
+          Scale: [1, 1, 1]
+        - Entity: 35
+          Position: [9.39428, -5.67327, 4.25652]
+          Rotation: [0, 0.707107, 0, 0.707107]
+          Scale: [1, 1, 1]
+        - Entity: 36
+          Position: [7.05381, -3.66972, 20.5597]
+          Rotation: [0, -0.922128, 0, -0.386884]
+          Scale: [2.36288, 2.36288, 2.36288]
+        - Entity: 37
+          Position: [-22.3185, 0, 26.2675]
+          Rotation: [0, 0, 0, 1]
+          Scale: [116.238, 116.238, 116.238]
+        - Entity: 38
+          Position: [92.6698, -19.2754, -8.97065]
+          Rotation: [0, 0, 0, 1]
+          Scale: [33.6131, 33.6131, 33.6131]
+        - Entity: 39
+          Position: [-76.3719, -17.3997, 121.374]
+          Rotation: [0, 0, 0, 1]
+          Scale: [34.0006, 34.0006, 34.0006]
+        - Entity: 40
+          Position: [-25.2809, -4.59714, 23.4065]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1.32995, 1.32995, 1.32995]
+        - Entity: 41
+          Position: [-17.6637, 16.0599, 13.6388]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 42
+          Position: [18.0894, 6.35851, 51.611]
+          Rotation: [0, -0.513334, 0, -0.858189]
+          Scale: [3.20168, 3.20168, 3.20168]
+        - Entity: 43
+          Position: [-61.5191, 1.20733, 9.10586]
+          Rotation: [0, -0.97806, 0, 0.208325]
+          Scale: [2.36288, 2.36288, 2.36288]
+        - Entity: 44
+          Position: [-42.4374, 6.98647, -24.9875]
+          Rotation: [0, -0.980837, 0, -0.194831]
+          Scale: [2.36288, 2.36288, 2.36288]
+        - Entity: 45
+          Position: [-17.9131, 30.7918, 21.7264]
+          Rotation: [-8.46e-007, 0.939278, -0.000612262, 0.343158]
+          Scale: [7.44191, 7.44191, 7.44191]
+        - Entity: 46
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 47
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 48
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 49
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 50
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 51
+          Position: [-4.08847, 5.58929, -50.738]
+          Rotation: [-0.000335195, 0.599249, -0.000512356, 0.800563]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 52
+          Position: [-49.4201, 5.58929, -41.6918]
+          Rotation: [-0.000505417, -0.812612, 0.00034557, 0.582805]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 53
+          Position: [-92.8901, 5.58929, 38.9621]
+          Rotation: [-0.000489863, -0.837259, 0.000367286, 0.546806]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 54
+          Position: [-77.3532, 5.58929, -5.22457]
+          Rotation: [0.000289812, -0.665986, 0.000539328, -0.745964]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 55
+          Position: [-64.8346, 5.58929, 64.1991]
+          Rotation: [0.000325187, -0.614676, 0.000518767, -0.788779]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 56
+          Position: [39.7685, 5.58929, -16.1145]
+          Rotation: [-0.00037766, -0.950545, 0.000481911, 0.310587]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 57
+          Position: [49.088, -3.83284, 23.5008]
+          Rotation: [-0.000172335, -0.99798, 0.000587508, -0.0635233]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 58
+          Position: [-1.19158, -4.51437, 91.7981]
+          Rotation: [0.000115791, -0.85814, 0.000601213, -0.513416]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 59
+          Position: [40.788, -3.83284, 65.7811]
+          Rotation: [0.00033342, -0.602017, 0.000513514, -0.798483]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 60
+          Position: [-97.2499, 5.5854, -37.0878]
+          Rotation: [0.000358714, -0.56128, 0.000496175, -0.827626]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 61
+          Position: [108.233, -2.62445, -7.59458]
+          Rotation: [-0.00037766, -0.950545, 0.000481911, 0.310587]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 62
+          Position: [114.832, 3.55545, -65.5298]
+          Rotation: [0.000567704, -0.0349652, 0.000229298, -0.999388]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 63
+          Position: [69.955, 3.55545, -90.4787]
+          Rotation: [-0.000218281, -0.999878, 0.00057203, 0.0156403]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 64
+          Position: [84.1955, -2.15214, -33.6131]
+          Rotation: [0.000246795, -0.722225, 0.000560319, -0.691658]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 65
+          Position: [111.831, 5.2179, -68.5281]
+          Rotation: [0, -0.301924, 0, -0.953332]
+          Scale: [2.36288, 2.36288, 2.36288]
+        - Entity: 66
+          Position: [-91.0249, 6.3618, -38.6304]
+          Rotation: [0, 0.86818, 0, -0.496249]
+          Scale: [2.36288, 2.36288, 2.36288]
+        - Entity: 67
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 68
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 69
+          Position: [99.2239, 4.13366, -88.1174]
+          Rotation: [0.000179684, 0.998698, -0.000585302, 0.0510127]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 70
+          Position: [65.2994, 2.9797, -65.5298]
+          Rotation: [0.000597188, 0.126193, 0.000135026, -0.992005]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 71
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 72
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 73
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 74
+          Position: [-121.895, -293.618, -14.6386]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1.64442, 1.64442, 1.64442]
+        - Entity: 75
+          Position: [49.6247, 12.3302, 23.4184]
+          Rotation: [0.000118384, 0.282799, -0.00032543, 0.959179]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 76
+          Position: [40.7779, 12.3311, 66.2961]
+          Rotation: [-0.00022748, -0.54341, 0.000625329, 0.839467]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 77
+          Position: [-0.654796, 11.6487, 91.7157]
+          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 78
+          Position: [-64.8278, 21.7532, 64.7144]
+          Rotation: [-0.000221846, -0.529951, 0.000609841, 0.848028]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 79
+          Position: [40.116, 21.752, -16.5441]
+          Rotation: [0.000258669, 0.617914, -0.000711064, 0.786245]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 80
+          Position: [-4.10234, 21.7532, -50.2231]
+          Rotation: [-0.000228695, -0.546313, 0.000628669, 0.837581]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 81
+          Position: [-16.2913, 84.6562, 22.444]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 82
+          Position: [-49.9219, 21.753, -41.5479]
+          Rotation: [0.00067033, -0.826269, 0.000917836, -0.563274]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 83
+          Position: [-77.2752, 21.7532, -4.71403]
+          Rotation: [-0.00019764, -0.472128, 0.000543301, 0.88153]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 84
+          Position: [-92.7948, 21.752, 38.417]
+          Rotation: [0.000335275, 0.800914, -0.000921651, 0.598778]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 85
+          Position: [-97.1719, 21.7493, -36.5773]
+          Rotation: [-0.000123914, -0.584762, 0.000564697, 0.811204]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 86
+          Position: [108.581, 13.5383, -8.02417]
+          Rotation: [0.000258669, 0.617914, -0.000711064, 0.786245]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 87
+          Position: [115.179, 19.7182, -65.9594]
+          Rotation: [-0.000754899, -0.926705, -5.14559e-005, 0.37579]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 88
+          Position: [70.3024, 19.7182, -90.9082]
+          Rotation: [3.68539e-005, 0.357806, -0.000755753, 0.933796]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 89
+          Position: [84.543, 14.0106, -34.0426]
+          Rotation: [-0.000504981, -0.401822, -0.000563485, 0.915718]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 90
+          Position: [99.5714, 20.2964, -88.547]
+          Rotation: [1.35811e-005, -0.294796, 0.000756529, -0.95556]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 91
+          Position: [65.6468, 19.1424, -65.9594]
+          Rotation: [-0.00075335, -0.975073, 7.06031e-005, 0.221883]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 92
+          Position: [-6.35416, -4.51437, 164.411]
+          Rotation: [0.000115791, -0.85814, 0.000601213, -0.513416]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 93
+          Position: [-5.81737, 11.6487, 164.328]
+          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 94
+          Position: [-56.8708, -0.892227, 178.222]
+          Rotation: [0.000115791, -0.85814, 0.000601213, -0.513416]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 95
+          Position: [-56.334, 15.2708, 178.139]
+          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 96
+          Position: [-94.5584, 0.241792, 153.466]
+          Rotation: [0.000479876, -0.315685, 0.000380242, -0.948864]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 97
+          Position: [-94.0217, 16.4048, 153.384]
+          Rotation: [-0.000257207, -0.782917, -0.000231871, 0.622126]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 98
+          Position: [-79.8493, 7.41421, 114.201]
+          Rotation: [0.000200342, -0.776155, 0.000578557, -0.630542]
+          Scale: [2.23314, 2.23314, 2.23314]
+        - Entity: 99
+          Position: [-79.3125, 23.5772, 114.119]
+          Rotation: [-9.22976e-005, -0.325911, -0.000333768, 0.9454]
+          Scale: [0.300076, 0.300076, 0.300076]
+        - Entity: 100
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 101
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 102
+          Position: [5.20881, -0.238422, 23.0612]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 103
+          Position: [13.9319, 11.4018, 49.6093]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 104
+          Position: [-59.5301, 3.52135, 11.9173]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 105
+          Position: [-44.1257, 10.23, -21.2886]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 106
+          Position: [109.472, 7.14073, -71.3542]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 107
+          Position: [-88.9172, 8.69338, -37.3204]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+    - Type: 2
+      Data:
+        - Entity: 102
+          Attenuation: [0, 0.180995, 0]
+          Color: [0.039, 0.190165, 1, 1]
+          Range: 10
+        - Entity: 103
+          Attenuation: [0, 0.180995, 0]
+          Color: [0.039, 0.190165, 1, 1]
+          Range: 10
+        - Entity: 104
+          Attenuation: [0, 0.180995, 0]
+          Color: [0.039, 0.190165, 1, 1]
+          Range: 10
+        - Entity: 105
+          Attenuation: [0, 0.180995, 0]
+          Color: [0.039, 0.190165, 1, 1]
+          Range: 10
+        - Entity: 106
+          Attenuation: [0, 0.180995, 0]
+          Color: [0.039, 0.190165, 1, 1]
+          Range: 10
+        - Entity: 107
+          Attenuation: [0, 0.180995, 0]
+          Color: [0.039, 0.190165, 1, 1]
+          Range: 10
+    - Type: 3
+      Data:
+        []
+    - Type: 4
+      Data:
+        []
+    - Type: 5
+      Data:
+        []
+    - Type: 6
+      Data:
+        []
+    - Type: 7
+      Data:
+        []
+    - Type: 8
+      Data:
+        []
+    - Type: 9
+      Data:
+        []
+    - Type: 10
+      Data:
+        []
+    - Type: 11
+      Data:
+        - Entity: 33
+          MeshHandle: CaveEntrance4Shape0
+        - Entity: 34
+          MeshHandle: CaveEntrance4Shape0
+        - Entity: 35
+          MeshHandle: CaveEntrance4Shape0
+        - Entity: 36
+          MeshHandle: LowGlowStoneShape0
+        - Entity: 37
+          MeshHandle: MountainPlaceHolderShape0
+        - Entity: 38
+          MeshHandle: FootIslandShape0
+        - Entity: 39
+          MeshHandle: TempleIslandShape0
+        - Entity: 40
+          MeshHandle: CaveTestTerrianShape0
+        - Entity: 41
+          MeshHandle: CaveTestRoofShape0
+        - Entity: 42
+          MeshHandle: LowGlowStoneShape0
+        - Entity: 43
+          MeshHandle: LowGlowStoneShape0
+        - Entity: 44
+          MeshHandle: LowGlowStoneShape0
+        - Entity: 45
+          MeshHandle: RootCaveTreeMotherShape0
+        - Entity: 46
+          MeshHandle: RCIMainBorderShape20
+        - Entity: 47
+          MeshHandle: RCIMainBorderShape10
+        - Entity: 48
+          MeshHandle: RCIMainShape20
+        - Entity: 49
+          MeshHandle: RCIMainShape10
+        - Entity: 50
+          MeshHandle: RCIMainLowBorderShape10
+        - Entity: 51
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 52
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 53
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 54
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 55
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 56
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 57
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 58
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 59
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 60
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 61
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 62
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 63
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 64
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 65
+          MeshHandle: LowGlowStoneShape0
+        - Entity: 66
+          MeshHandle: LowGlowStoneShape0
+        - Entity: 67
+          MeshHandle: FILowerBorderStonesShape0
+        - Entity: 68
+          MeshHandle: FIBorderStonesShape0
+        - Entity: 69
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 70
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 71
+          MeshHandle: StoneWallShape0
+        - Entity: 72
+          MeshHandle: WoodPillarShape0
+        - Entity: 73
+          MeshHandle: TILowerBorderStonesShape0
+        - Entity: 74
+          MeshHandle: CaveIslandWaterFloorShape0
+        - Entity: 75
+          MeshHandle: polySurfaceShape20
+        - Entity: 76
+          MeshHandle: polySurfaceShape20
+        - Entity: 77
+          MeshHandle: polySurfaceShape20
+        - Entity: 78
+          MeshHandle: polySurfaceShape20
+        - Entity: 79
+          MeshHandle: polySurfaceShape20
+        - Entity: 80
+          MeshHandle: polySurfaceShape20
+        - Entity: 81
+          MeshHandle: polySurfaceShape20
+        - Entity: 82
+          MeshHandle: polySurfaceShape20
+        - Entity: 83
+          MeshHandle: polySurfaceShape20
+        - Entity: 84
+          MeshHandle: polySurfaceShape20
+        - Entity: 85
+          MeshHandle: polySurfaceShape20
+        - Entity: 86
+          MeshHandle: polySurfaceShape20
+        - Entity: 87
+          MeshHandle: polySurfaceShape20
+        - Entity: 88
+          MeshHandle: polySurfaceShape20
+        - Entity: 89
+          MeshHandle: polySurfaceShape20
+        - Entity: 90
+          MeshHandle: polySurfaceShape20
+        - Entity: 91
+          MeshHandle: polySurfaceShape20
+        - Entity: 92
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 93
+          MeshHandle: polySurfaceShape20
+        - Entity: 94
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 95
+          MeshHandle: polySurfaceShape20
+        - Entity: 96
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 97
+          MeshHandle: polySurfaceShape20
+        - Entity: 98
+          MeshHandle: RootCaveTreeMother1Shape0
+        - Entity: 99
+          MeshHandle: polySurfaceShape20
+        - Entity: 100
+          MeshHandle: TIBorderStonesShape0
+        - Entity: 101
+          MeshHandle: ColumnsShape0
+    - Type: 12
+      Data:
+        []
+    - Type: 13
+      Data:
+        []
+    - Type: 14
+      Data:
+        []
+    - Type: 15
+      Data:
+        - Entity: 16
+          File: AbilitySpawn
+        - Entity: 17
+          File: AbilitySpawn
+        - Entity: 18
+          File: AbilitySpawn
+        - Entity: 19
+          File: AbilitySpawn
+        - Entity: 20
+          File: AbilitySpawn
+        - Entity: 21
+          File: AbilitySpawn
+        - Entity: 22
+          File: AbilitySpawn
+        - Entity: 23
+          File: AbilitySpawn
+        - Entity: 24
+          File: AbilitySpawn
+        - Entity: 25
+          File: AbilitySpawn
+        - Entity: 26
+          File: AbilitySpawn
+        - Entity: 28
+          File: AbilitySpawn
+        - Entity: 30
+          File: AbilitySpawn
+        - Entity: 32
+          File: AbilitySpawn
+    - Type: 16
+      Data:
+        []
+    - Type: 17
+      Data:
+        []
+    - Type: 18
+      Data:
+        []
+    - Type: 19
+      Data:
+        []
+    - Type: 20
+      Data:
+        - Entity: 0
+          LightSlot: 0
+    - Type: 21
+      Data:
+        - Entity: 0
+          Color: [1, 1, 1, 1]
+    - Type: 22
+      Data:
+        []
+    - Type: 23
+      Data:
+        []
+    - Type: 24
+      Data:
+        []
+    - Type: 25
+      Data:
+        []
+    - Type: 26
+      Data:
+        []
+    - Type: 27
+      Data:
+        []
+    - Type: 28
+      Data:
+        []
+    - Type: 29
+      Data:
+        []
+    - Type: 30
+      Data:
+        []
+    - Type: 31
+      Data:
+        []
+    - Type: 32
+      Data:
+        []
+    - Type: 33
+      Data:
+        []
+    - Type: 34
+      Data:
+        []
+    - Type: 35
+      Data:
+        []
+    - Type: 36
+      Data:
+        []
+    - Type: 37
+      Data:
+        []
+    - Type: 38
+      Data:
+        []
+    - Type: 39
+      Data:
+        []
+    - Type: 40
+      Data:
+        []
+    - Type: 41
+      Data:
+        []
+    - Type: 42
+      Data:
+        []
+    - Type: 43
+      Data:
+        []
+    - Type: 44
+      Data:
+        []
+    - Type: 45
+      Data:
+        []
+    - Type: 46
+      Data:
+        []
+    - Type: 47
+      Data:
+        []
+    - Type: 48
+      Data:
+        []
+    - Type: 49
+      Data:
+        []
+    - Type: 50
+      Data:
+        []
+    - Type: 51
+      Data:
+        []
+    - Type: 52
+      Data:
+        []
+    - Type: 53
+      Data:
+        []
+    - Type: 54
+      Data:
+        []
+    - Type: 55
+      Data:
+        []
+    - Type: 56
+      Data:
+        []
+    - Type: 57
+      Data:
+        []
+    - Type: 58
+      Data:
+        []
+    - Type: 59
+      Data:
+        []
+    - Type: 60
+      Data:
+        []
+    - Type: 61
+      Data:
+        []
+    - Type: 62
+      Data:
+        []
+    - Type: 63
+      Data:
+        []
+- Tags:
+    - Id: 4
+      Tag: NonExport
+    - Id: 0
+      Tag: Sun
+    - Id: 4
+      Tag: Water
+- Groups:
+    - Id: 16
+      Group: AbilitySpawnPoint
+    - Id: 17
+      Group: AbilitySpawnPoint
+    - Id: 18
+      Group: AbilitySpawnPoint
+    - Id: 19
+      Group: AbilitySpawnPoint
+    - Id: 20
+      Group: AbilitySpawnPoint
+    - Id: 21
+      Group: AbilitySpawnPoint
+    - Id: 22
+      Group: AbilitySpawnPoint
+    - Id: 23
+      Group: AbilitySpawnPoint
+    - Id: 24
+      Group: AbilitySpawnPoint
+    - Id: 25
+      Group: AbilitySpawnPoint
+    - Id: 26
+      Group: AbilitySpawnPoint
+    - Id: 28
+      Group: AbilitySpawnPoint
+    - Id: 30
+      Group: AbilitySpawnPoint
+    - Id: 32
+      Group: AbilitySpawnPoint
+    - Id: 37
+      Group: Grass
+    - Id: 38
+      Group: Grass
+    - Id: 39
+      Group: Grass
+    - Id: 37
+      Group: Painted
+    - Id: 38
+      Group: Painted
+    - Id: 39
+      Group: Painted
+    - Id: 40
+      Group: Painted
+    - Id: 41
+      Group: Painted
+    - Id: 108
+      Group: Painted_Split
+    - Id: 109
+      Group: Painted_Split
+    - Id: 110
+      Group: Painted_Split
+    - Id: 111
+      Group: Painted_Split
+    - Id: 112
+      Group: Painted_Split
+    - Id: 113
+      Group: Painted_Split
+    - Id: 114
+      Group: Painted_Split
+    - Id: 115
+      Group: Painted_Split
+    - Id: 116
+      Group: Painted_Split
+    - Id: 117
+      Group: Painted_Split
+    - Id: 118
+      Group: Painted_Split
+    - Id: 119
+      Group: Painted_Split
+    - Id: 120
+      Group: Painted_Split
+    - Id: 121
+      Group: Painted_Split
+    - Id: 122
+      Group: Painted_Split
+    - Id: 123
+      Group: Painted_Split
+    - Id: 124
+      Group: Painted_Split
+    - Id: 125
+      Group: Painted_Split
+    - Id: 126
+      Group: Painted_Split
+    - Id: 127
+      Group: Painted_Split
+    - Id: 128
+      Group: Painted_Split
+    - Id: 129
+      Group: Painted_Split
+    - Id: 130
+      Group: Painted_Split
+    - Id: 131
+      Group: Painted_Split
+    - Id: 132
+      Group: Painted_Split
+    - Id: 133
+      Group: Painted_Split
+    - Id: 134
+      Group: Painted_Split
+    - Id: 135
+      Group: Painted_Split
+    - Id: 136
+      Group: Painted_Split
+    - Id: 137
+      Group: Painted_Split
+    - Id: 138
+      Group: Painted_Split
+    - Id: 139
+      Group: Painted_Split
+    - Id: 140
+      Group: Painted_Split
+    - Id: 141
+      Group: Painted_Split
+    - Id: 142
+      Group: Painted_Split
+    - Id: 143
+      Group: Painted_Split
+    - Id: 144
+      Group: Painted_Split
+    - Id: 145
+      Group: Painted_Split
+    - Id: 146
+      Group: Painted_Split
+    - Id: 147
+      Group: Painted_Split
+    - Id: 148
+      Group: Painted_Split
+    - Id: 149
+      Group: Painted_Split
+    - Id: 150
+      Group: Painted_Split
+    - Id: 151
+      Group: Painted_Split
+    - Id: 152
+      Group: Painted_Split
+    - Id: 153
+      Group: Painted_Split
+    - Id: 154
+      Group: Painted_Split
+    - Id: 155
+      Group: Painted_Split
+    - Id: 156
+      Group: Painted_Split
+    - Id: 157
+      Group: Painted_Split
+    - Id: 158
+      Group: Painted_Split
+    - Id: 159
+      Group: Painted_Split
+    - Id: 160
+      Group: Painted_Split
+    - Id: 161
+      Group: Painted_Split
+    - Id: 162
+      Group: Painted_Split
+    - Id: 163
+      Group: Painted_Split
+    - Id: 164
+      Group: Painted_Split
+    - Id: 165
+      Group: Painted_Split
+    - Id: 166
+      Group: Painted_Split
+    - Id: 167
+      Group: Painted_Split
+    - Id: 168
+      Group: Painted_Split
+    - Id: 169
+      Group: Painted_Split
+    - Id: 170
+      Group: Painted_Split
+    - Id: 171
+      Group: Painted_Split
+    - Id: 172
+      Group: Painted_Split
+    - Id: 173
+      Group: Painted_Split
+    - Id: 174
+      Group: Painted_Split
+    - Id: 175
+      Group: Painted_Split
+    - Id: 176
+      Group: Painted_Split
+    - Id: 177
+      Group: Painted_Split
+    - Id: 178
+      Group: Painted_Split
+    - Id: 179
+      Group: Painted_Split
+    - Id: 180
+      Group: Painted_Split
+    - Id: 181
+      Group: Painted_Split
+    - Id: 182
+      Group: Painted_Split
+    - Id: 183
+      Group: Painted_Split
+    - Id: 184
+      Group: Painted_Split
+    - Id: 185
+      Group: Painted_Split
+    - Id: 186
+      Group: Painted_Split
+    - Id: 187
+      Group: Painted_Split
+    - Id: 188
+      Group: Painted_Split
+    - Id: 189
+      Group: Painted_Split
+    - Id: 190
+      Group: Painted_Split
+    - Id: 191
+      Group: Painted_Split
+    - Id: 192
+      Group: Painted_Split
+    - Id: 193
+      Group: Painted_Split
+    - Id: 194
+      Group: Painted_Split
+    - Id: 195
+      Group: Painted_Split
+    - Id: 196
+      Group: Painted_Split
+    - Id: 197
+      Group: Painted_Split
+    - Id: 198
+      Group: Painted_Split
+    - Id: 199
+      Group: Painted_Split
+    - Id: 200
+      Group: Painted_Split
+    - Id: 201
+      Group: Painted_Split
+    - Id: 202
+      Group: Painted_Split
+    - Id: 203
+      Group: Painted_Split
+    - Id: 204
+      Group: Painted_Split
+    - Id: 205
+      Group: Painted_Split
+    - Id: 206
+      Group: Painted_Split
+    - Id: 207
+      Group: Painted_Split
+    - Id: 208
+      Group: Painted_Split
+    - Id: 209
+      Group: Painted_Split
+    - Id: 210
+      Group: Painted_Split
+    - Id: 211
+      Group: Painted_Split
+    - Id: 212
+      Group: Painted_Split
+    - Id: 213
+      Group: Painted_Split
+    - Id: 214
+      Group: Painted_Split
+    - Id: 215
+      Group: Painted_Split
+    - Id: 216
+      Group: Painted_Split
+    - Id: 217
+      Group: Painted_Split
+    - Id: 218
+      Group: Painted_Split
+    - Id: 219
+      Group: Painted_Split
+    - Id: 220
+      Group: Painted_Split
+    - Id: 221
+      Group: Painted_Split
+    - Id: 222
+      Group: Painted_Split
+    - Id: 223
+      Group: Painted_Split
+    - Id: 5
+      Group: SpawnPoint
+    - Id: 6
+      Group: SpawnPoint
+    - Id: 7
+      Group: SpawnPoint
+    - Id: 8
+      Group: SpawnPoint
+    - Id: 9
+      Group: SpawnPoint
+    - Id: 10
+      Group: SpawnPoint
+    - Id: 11
+      Group: SpawnPoint
+    - Id: 12
+      Group: SpawnPoint
+    - Id: 13
+      Group: SpawnPoint
+    - Id: 14
+      Group: SpawnPoint
+    - Id: 15
+      Group: SpawnPoint
+    - Id: 27
+      Group: SpawnPoint
+    - Id: 29
+      Group: SpawnPoint
+    - Id: 31
+      Group: SpawnPoint
+    - Id: 33
+      Group: Static
+    - Id: 34
+      Group: Static
+    - Id: 35
+      Group: Static
+    - Id: 36
+      Group: Static
+    - Id: 37
+      Group: Static
+    - Id: 38
+      Group: Static
+    - Id: 39
+      Group: Static
+    - Id: 40
+      Group: Static
+    - Id: 41
+      Group: Static
+    - Id: 42
+      Group: Static
+    - Id: 43
+      Group: Static
+    - Id: 44
+      Group: Static
+    - Id: 45
+      Group: Static
+    - Id: 46
+      Group: Static
+    - Id: 47
+      Group: Static
+    - Id: 48
+      Group: Static
+    - Id: 49
+      Group: Static
+    - Id: 50
+      Group: Static
+    - Id: 51
+      Group: Static
+    - Id: 52
+      Group: Static
+    - Id: 53
+      Group: Static
+    - Id: 54
+      Group: Static
+    - Id: 55
+      Group: Static
+    - Id: 56
+      Group: Static
+    - Id: 57
+      Group: Static
+    - Id: 58
+      Group: Static
+    - Id: 59
+      Group: Static
+    - Id: 60
+      Group: Static
+    - Id: 61
+      Group: Static
+    - Id: 62
+      Group: Static
+    - Id: 63
+      Group: Static
+    - Id: 64
+      Group: Static
+    - Id: 65
+      Group: Static
+    - Id: 66
+      Group: Static
+    - Id: 67
+      Group: Static
+    - Id: 68
+      Group: Static
+    - Id: 69
+      Group: Static
+    - Id: 70
+      Group: Static
+    - Id: 71
+      Group: Static
+    - Id: 72
+      Group: Static
+    - Id: 73
+      Group: Static
+    - Id: 92
+      Group: Static
+    - Id: 94
+      Group: Static
+    - Id: 96
+      Group: Static
+    - Id: 98
+      Group: Static
+    - Id: 100
+      Group: Static
+    - Id: 101
+      Group: Static
+    - Id: 75
+      Group: Transparent
+    - Id: 76
+      Group: Transparent
+    - Id: 77
+      Group: Transparent
+    - Id: 78
+      Group: Transparent
+    - Id: 79
+      Group: Transparent
+    - Id: 80
+      Group: Transparent
+    - Id: 81
+      Group: Transparent
+    - Id: 82
+      Group: Transparent
+    - Id: 83
+      Group: Transparent
+    - Id: 84
+      Group: Transparent
+    - Id: 85
+      Group: Transparent
+    - Id: 86
+      Group: Transparent
+    - Id: 87
+      Group: Transparent
+    - Id: 88
+      Group: Transparent
+    - Id: 89
+      Group: Transparent
+    - Id: 90
+      Group: Transparent
+    - Id: 91
+      Group: Transparent
+    - Id: 93
+      Group: Transparent
+    - Id: 95
+      Group: Transparent
+    - Id: 97
+      Group: Transparent
+    - Id: 99
+      Group: Transparent
+    - Id: 3
+      Group: Water
+- Storage:
+    - Key: Ambient
+      Value: 0.357473 0.357473 0.357473 1
+    - Key: GrassBillboard
+      Value: grassStrawBillboard
+    - Key: GrassDiffuse
+      Value: Grass
+    - Key: GrassTranslucency
+      Value: grass_translucency
+    - Key: WaterHeight
+      Value: -22.9372

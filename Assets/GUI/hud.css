@@ -247,10 +247,11 @@ img
 }
 #scorescreen-wrapper
 {
+	padding: 18px 34px 5px;
 	width: 600px;
 	height: 350px;
 	margin: auto;
-	background: rgba(0,0,0,0.5);
+	background-image: url('ScoreBackground.png');
 }
 .scorewrapper
 {
