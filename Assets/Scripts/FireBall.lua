@@ -58,9 +58,21 @@ end
 
 function FireBall.OnCollide (self, entity)
 	if entity:DoesExist() then
-		local network = self:GetNetwork();
-		Explosion.OnCreate(network:GetUserId(), network:GetActionId());
-		FireBall.OnDestroy(self);
+		local hitCol = entity:GetCollision();
+		local hitPhys = entity:GetPhysics();
+		local type = hitPhys:GetType(hitCol);
+		if type == PhysicsType.TYPE_PLAYER then
+			local targetPlayerComponent = entity:GetPlayerComponent();
+			local abilityOwnerNetwork = self:GetNetwork();
+			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+			local health = entity:GetHealth();
+			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+				Explosion.OnCreate(abilityOwnerNetwork:GetUserId(), abilityOwnerNetwork:GetActionId());
+				FireBall.OnDestroy(self);
+			end
+		end
 	end
 end
 
