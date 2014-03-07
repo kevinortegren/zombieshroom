@@ -62,10 +62,11 @@ if entity:DoesExist() then
 		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local statComp = entity:GetStatChange();
-			statComp:SetSpeed(0.5, 5);
-			statComp:SetJumpHeight(0, 5);
-			statComp:SetKnockbackResistance(2, 5);
-			statComp:SetDamageResistance(2, 5);
+			statComp:SetSpeed(0.5);
+			statComp:SetJumpHeight(0);
+			statComp:SetKnockbackResistance(2);
+			statComp:SetDamageResistance(2);
+			TimerEntity.StartTimer(abilityOwnerId, abilityOwnerNetwork:GetActionId(), 5, "SlowNova", "Reset", entity);
 		end
 	end
 end
@@ -73,4 +74,13 @@ end
 
 function SlowNova.OnDestroy (self)
 	Entity.Remove(self);
+end
+
+
+function SlowNova.Reset(self)
+	local statComp = self:GetStatChange();
+	statComp:SetSpeed(1);
+	statComp:SetJumpHeight(1);
+	statComp:SetKnockbackResistance(1);
+	statComp:SetDamageResistance(1);
 end
