@@ -376,6 +376,22 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "Animation");
 			return 1;
 		}
+		static int EntityGetParticleEmitter(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::ParticleEmitter **s = (RootForce::ParticleEmitter **)lua_newuserdata(p_luaState, sizeof(RootForce::ParticleEmitter *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(*e);
+			luaL_setmetatable(p_luaState, "ParticleEmitter");
+			return 1;
+		}
+		static int EntityRemovePointLight(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::PointLight>(*e);
+			return 0;
+		}
 		static int EntityGetAbilitySpawn(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -2277,6 +2293,16 @@ namespace RootForce
 			return 1;
 		}
 
+		static int ParticleSetAlive(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+
+			RootForce::ParticleEmitter** ptemp = (RootForce::ParticleEmitter**)luaL_checkudata(p_luaState, 1, "ParticleEmitter");
+			float alive = (float) luaL_checknumber(p_luaState, 2);
+			(*ptemp)->m_alive = alive;
+			return 0;
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		//Follower
@@ -2742,6 +2768,8 @@ namespace RootForce
 			{"GetStatChange", EntityGetStatChange},
 			{"GetTimer", EntityGetTimer},
 			{"GetAnimation", EntityGetAnimation},
+			{"GetParticleEmitter", EntityGetParticleEmitter},
+			{"RemovePointLight", EntityRemovePointLight},
 			{NULL, NULL}
 		};
 
@@ -3153,6 +3181,7 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg particlecomponent_m [] = {
+			{"SetAlive", ParticleSetAlive},
 			{NULL, NULL}
 		};
 

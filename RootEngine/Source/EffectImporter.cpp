@@ -317,6 +317,10 @@ namespace RootEngine
 						{
 							technique->AddUniformParam(Render::Semantic::MAXPERFRAME, offset);
 						}
+						else if(sem == "ALIVE")
+						{
+							technique->AddUniformParam(Render::Semantic::ALIVE, offset);
+						}
 					}
 				}
 

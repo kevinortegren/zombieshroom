@@ -383,6 +383,7 @@ namespace Render
 		s_sizes[Semantic::ROTATIONSPEEDMIN] = sizeof(float);
 		s_sizes[Semantic::ROTATIONSPEEDMAX] = sizeof(float);
 		s_sizes[Semantic::MAXPERFRAME]		= sizeof(float);
+		s_sizes[Semantic::ALIVE]			= sizeof(float);
 
 		// Slots reserved for geometry buffer and lighting.
 		s_textureSlots[TextureSemantic::GBUFFER_DIFFUSE_SPECULAR]	= 0;

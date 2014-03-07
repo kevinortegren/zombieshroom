@@ -31,6 +31,19 @@ end
 function AbilityBall.Interrupted(time, userId, actionId)
 end
 
+function AbilityBall.Explode(self)
+	if Global.IsClient then
+		self:RemoveRenderable();
+		self:RemovePointLight();
+	end
+	local network = self:GetNetwork();
+	Explosion.OnCreate(network:GetUserId(), network:GetActionId());
+	self:RemovePhysics();
+	self:RemoveCollision();
+	self:RemoveCollisionResponder();
+	self:GetParticleEmitter():SetAlive(-1.0);
+end
+
 function AbilityBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
@@ -43,7 +56,8 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
 	local networkEnt = Network.New(self, userId, actionId);
-	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "OnDestroy", self);
+	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "Explode", self);
+	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration + 2, "AbilityBall", "OnDestroy", self);
 
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
@@ -104,7 +118,5 @@ function AbilityBall.OnCollide (self, entity)
 end
 
 function AbilityBall.OnDestroy (self)
-	local network = self:GetNetwork();
-	Explosion.OnCreate(network:GetUserId(), network:GetActionId());
 	Entity.Remove(self);
 end

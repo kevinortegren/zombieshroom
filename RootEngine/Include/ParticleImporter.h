@@ -36,6 +36,7 @@ namespace RootEngine
 		float		m_rotationSpeedMax;
 		int			m_relative;
 		float		m_maxPerFrame;
+		float		m_alive;
 	};
 
 	class ParticleImporter

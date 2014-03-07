@@ -37,6 +37,7 @@ namespace Render
 			ROTATIONSPEEDMIN,
 			ROTATIONSPEEDMAX,
 			MAXPERFRAME,
+			ALIVE,
 		};
 	}
 
