@@ -191,7 +191,7 @@ namespace RootSystems
 						}
 						else
 						{
-							m_engineContext->m_physics->PlayerJumpBoost(*(collision->m_handle), playphys->JumpBoostForce * statChange->JumpHeightChange);
+							m_engineContext->m_physics->PlayerJumpBoost(*(collision->m_handle), playphys->JumpBoostForce * statChange->JumpHeightChange * dt);
 							// TODO: Apply booster jump force
 						}
 					}
