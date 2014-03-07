@@ -45,6 +45,15 @@ function AddMessage(p_message)
 	$( "<a>" + p_message + "<br></a>").appendTo( $("#chatlog") ).delay(5000).fadeOut(500);
 	$("#chatlog").scrollTop($("#chatlog")[0].scrollHeight);
 }
+function KillAnnouncement(p_murderer, p_victim)
+{
+  var msg;
+  if(p_murderer)
+    msg = $("<div>" + p_murderer + " <img src='Swordaxe.png'> " + p_victim + "</div>");
+  else
+    msg = $("<div><img src='RIP.png'> " + p_victim + "</div>");
+	msg.appendTo( $("#KillAnnouncementContainer") ).delay(3000).fadeOut(500);
+}
 function Send(event)
 {
 	$('#chatinput').blur();
@@ -257,4 +266,6 @@ $(document).ready(function(){
 	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
 	//$("#healthbar>div>div").css('width', $("#healthbar>div").width()*(99/100.0)+"px");
 	//Set('Health', 166);
+  // KillAnnouncement('me', 'you');
+  // KillAnnouncement('','me');
 });

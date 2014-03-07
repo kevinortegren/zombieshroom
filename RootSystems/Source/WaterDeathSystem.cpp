@@ -44,7 +44,6 @@ namespace RootForce
 		if(transform->m_position.y < waterHeight && health->Health > 0)
 		{
 			health->Health = 0;
-			MatchStateSystem::AwardPlayerKill(health->LastDamageSourceID,network->ID.UserID);
 		}
 	}
 

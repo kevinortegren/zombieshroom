@@ -75,9 +75,7 @@ if entity:DoesExist() then
 
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				local network = entity:GetNetwork();
-				local receiverId = network:GetUserId();
-				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());
 			end
 
 			local hitPos = entity:GetTransformation():GetPos();

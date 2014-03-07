@@ -51,6 +51,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Scalable>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StatChange>(500);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::KillAnnouncement>(1);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}

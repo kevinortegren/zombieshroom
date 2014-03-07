@@ -89,9 +89,7 @@ function AbilityTest.OnCollide (self, entity)
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				local network = entity:GetNetwork();
-				local receiverId = network:GetUserId();
-				health:Damage(abilityOwnerId, AbilityBall.damage, receiverId);
+				health:Damage(abilityOwnerId, AbilityBall.damage);
 			end
 			AbilityTest.OnDestroy(self);
 		end
