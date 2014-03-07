@@ -17,6 +17,8 @@ namespace RootForce
 		int numPlayers = 0;
 		ECS::Entity* matchState = m_world->GetTagManager()->GetEntityByTag("MatchState");
 		TDMRuleSet* ruleSet = m_world->GetEntityManager()->GetComponent<TDMRuleSet>( matchState );
+		RootForce::KillAnnouncement* killAnnouncement = m_world->GetEntityManager()->GetComponent<RootForce::KillAnnouncement>(matchState);
+
 		for(auto pair : g_networkEntityMap)
 		{
 			if(pair.first.ActionID != Network::ReservedActionID::CONNECT
@@ -80,12 +82,21 @@ namespace RootForce
 					}
 					ruleSet->CurrentState = MatchState::Match;
 					m_hud->GetView()->BufferJavascript("Announce('May the roots be with you!',3);");
+					killAnnouncement->KillPair.clear();
 				}
 				break;
 			case MatchState::Match:
 				//Nothing, and you will never be nothing!
 				break;
 		}
+
+		for(auto pair : killAnnouncement->KillPair)
+		{
+			PlayerComponent* murderer = pair.first?m_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.first):nullptr;
+			PlayerComponent* victim = m_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
+			m_hud->GetView()->BufferJavascript("KillAnnouncement('" + (murderer?murderer->Name:std::string()) + "','" + victim->Name + "');");
+		}
+		killAnnouncement->KillPair.clear();
 	}
 
 	void MatchStateSystem::UpdateDeltatime( float p_deltaTime )
@@ -175,38 +186,6 @@ namespace RootForce
 			return true;
 		else
 			return false;
-	}
-
-	void MatchStateSystem::AwardPlayerKill( RootForce::Network::UserID_t p_killerID, RootForce::Network::UserID_t p_deadID )
-	{
-		Network::NetworkEntityID killerNetworkID;
-		killerNetworkID.UserID = p_killerID;
-		killerNetworkID.ActionID = Network::ReservedActionID::CONNECT;
-		killerNetworkID.SequenceID = 0;
-
-		Network::NetworkEntityID deadNetworkID;
-		deadNetworkID.UserID = p_deadID;
-		deadNetworkID.ActionID = Network::ReservedActionID::CONNECT;
-		deadNetworkID.SequenceID = 0;
-		
-		ECS::Entity* matchStateEntity = g_world->GetTagManager()->GetEntityByTag("MatchState");
-		PlayerComponent* killedPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, deadNetworkID));
-		RootForce::TDMRuleSet* rules = g_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
-		// Award score for killer team
-		if(p_killerID != Network::ReservedUserID::NONE)
-		{
-			ECS::Entity* killerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(p_killerID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
-			PlayerComponent* killerPlayerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(killerEntity);
-
-			rules->TeamScore[killerPlayerComponent->TeamID]++;
-			killerPlayerComponent->Score++;
-		}
-		else //Give minus in score if the kill was a suicide
-		{
-			killedPlayerComponent->Score --;
-			rules->TeamScore[killedPlayerComponent->TeamID]--;
-		}
-		killedPlayerComponent->Deaths ++;
 	}
 
 	

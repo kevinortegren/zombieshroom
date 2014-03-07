@@ -74,9 +74,7 @@ if entity:DoesExist() then
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				local network = entity:GetNetwork();
-				local receiverId = network:GetUserId();
-				health:Damage(abilityOwnerId, dakComp:GetDamage(), receiverId);
+				health:Damage(abilityOwnerId, dakComp:GetDamage());
 			end
 		end
 	end

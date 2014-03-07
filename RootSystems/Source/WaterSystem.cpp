@@ -98,9 +98,6 @@ namespace RootForce
 				if(!health->IsDead)
 				{
 					health->Health = 0.0f;
-					PlayerComponent* playercomp = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_entity);
-					Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_entity);
-					MatchStateSystem::AwardPlayerKill(health->LastDamageSourceID,network->ID.UserID);
 				}
 
 			}

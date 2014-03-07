@@ -7,6 +7,7 @@ function MatchState.OnCreate(userId, actionId)
 	local script = Script.New(matchState, "MatchState");
 	local network = Network.New(matchState, userId, actionId);
 	local rules = TDMRuleSet.New(matchState);
+  local killAnnouce = KillAnnouncement.New(matchState);
 	
 	-- Set default values for score limit and time left
 	rules:SetScoreLimit(0);

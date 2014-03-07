@@ -186,6 +186,7 @@ namespace RootForce
 		void Death::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, LastDamageSource);
 		}
 
 		void PlayerTeamSelect::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )

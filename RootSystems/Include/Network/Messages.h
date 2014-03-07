@@ -356,6 +356,7 @@ namespace RootForce
 		struct Death
 		{
 			Network::UserID_t User;
+			Network::UserID_t LastDamageSource;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};

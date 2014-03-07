@@ -50,6 +50,10 @@ img
 {
 	text-align: right;
 }
+.v_align_middle
+{
+  vertical-align: middle;
+}
 .red
 {
 	color: #FF9999;
@@ -92,6 +96,26 @@ img
 	background-size: 100% 100%;
 	font-size: 24px;
 }
+#KillAnnouncementContainer
+{
+	position: absolute;
+	top:70px;
+	left:100%;
+  margin-left: -200px;
+	width: 200px;
+	height: 70px;
+	text-align: right;
+	color: white;
+	font-size: 12px;
+}
+#KillAnnouncementContainer img
+{
+  height: 18px;
+}
+#KillAnnouncementContainer *
+{
+  vertical-align: middle;
+}
 #AnnouncementContainer
 {
 	position: absolute;
@@ -121,6 +145,8 @@ img
 	overflow-x: hidden;
 	overflow-y: auto;
 	font-family: Comic Sans MS;
+  display: table-cell;
+  vertical-align: bottom;
 }
 ::-webkit-scrollbar
 {
