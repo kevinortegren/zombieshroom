@@ -2,6 +2,7 @@
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
+#include <RootSystems/Include/Components.h>
 
 
 namespace RootForce
@@ -21,7 +22,9 @@ namespace RootForce
 	{
 		CollisionResponder* cr = m_responders.Get(p_entity);
 
-		for(auto itr = cr->m_collisions.begin(); itr != cr->m_collisions.end(); ++itr)
+		auto collisions = cr->m_collisions;
+
+		for(auto itr = collisions.begin(); itr != collisions.end(); ++itr)
 		{
 			Script* script = m_scripts.Get(p_entity);
 			if(script->Name.compare("AbilitySpawnPoint") == 0)
@@ -36,7 +39,10 @@ namespace RootForce
 				return;
 		}
 
-		cr->m_collisions.clear();
+		if((p_entity->GetFlag() & ComponentType::COLLISIONRESPONDER) == ComponentType::COLLISIONRESPONDER)
+		{
+			cr->m_collisions.clear();
+		}
 	}
 
 	void CollisionSystem::End()
