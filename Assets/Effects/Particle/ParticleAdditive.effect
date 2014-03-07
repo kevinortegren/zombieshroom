@@ -56,6 +56,8 @@
           offset: 140
         - sem: MAXPERFRAME
           offset: 144
+        - sem: ALIVE
+          offset: 148
       # The update techniques should be ignored by the render job processor.
       flags:
         - name: RenderIgnore

@@ -35,6 +35,7 @@ namespace RootForce
 		for(unsigned i = 0; i < emitter->m_particleSystems.size(); i++)
 		{
 			emitter->m_particleSystems[i]->m_params[Render::Semantic::TRANSPOSITION] = &trans->m_position;
+			emitter->m_particleSystems[i]->m_params[Render::Semantic::ALIVE] = &emitter->m_alive;
 
 			auto updateTechnique = emitter->m_particleSystems[i]->m_material->m_effect->GetTechniques()[0];
 
