@@ -42,9 +42,7 @@ function Explosion.OnCreate (userId, actionId)
 	end
 	--Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 
-	local timerEnt = Entity.New();
-	local timerComp = Timer.New(timerEnt, Explosion.duration, "OnDestroy", self);
-	local networkComp = Network.New(timerEnt, userId, actionId);
+	TimerEntity.StartTimer(userId, actionId, Explosion.duration, "OnDestroy", self);
 end
 
 function Explosion.OnCollide (self, entity)

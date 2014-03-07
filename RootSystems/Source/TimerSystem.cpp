@@ -57,9 +57,6 @@ void RootForce::TimerSystem::ProcessEntity( ECS::Entity* p_entity )
 		{
 			g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "No existing entity associated with timer entity.");
 		}
-
-		m_world->GetEntityManager()->RemoveAllComponents(p_entity);
-		m_world->GetEntityManager()->RemoveEntity(p_entity);
 	}
 }
 
