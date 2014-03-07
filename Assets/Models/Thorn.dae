@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>BTH</author>
+      <authoring_tool>OpenCOLLADA2014</authoring_tool>
+      <comments>
+			ColladaMaya export options: 
+			bakeTransforms=0;relativePaths=0;copyTextures=0;exportTriangles=1;exportCgfxFileReferences=1;
+			isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=1;exportLights=0;
+			exportCameras=0;exportJointsAndSkin=0;exportAnimations=0;exportInvisibleNodes=0;exportDefaultCameras=0;
+			exportTexCoords=1;exportNormals=1;exportNormalsPerVertex=0;exportVertexColors=1;exportVertexColorsPerVertex=1;
+			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
+			exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
+		</comments>
+      <source_data>file:///C:/Users/BTH/Documents/maya/projects/default/untitled</source_data>
+    </contributor>
+    <created>2014-03-07T10:03:15</created>
+    <modified>2014-03-07T10:03:15</modified>
+    <unit name="centimeter" meter="0.01"/>
+    <up_axis>Y_UP</up_axis>
+  </asset>
+  <library_materials>
+    <material id="lambert1" name="Thorn_lambert1_1">
+      <instance_effect url="#lambert1-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="lambert1-fx">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.4 0.4 0.4 1</color>
+            </diffuse>
+            <transparent opaque="RGB_ZERO">
+              <color>0 0 0 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="pPyramidShape1" name="Thorn_pPyramidShape1">
+      <mesh>
+        <source id="pPyramidShape1-positions" name="pPyramidShape1-positions">
+          <float_array id="pPyramidShape1-positions-array" count="15">0 -0.353553 -0.135536 -0.135536 -0.353553 0 0 -0.353553 0.135536 0.135536 -0.353553 0 0 0.353553 0</float_array>
+          <technique_common>
+            <accessor source="#pPyramidShape1-positions-array" count="5" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pPyramidShape1-normals" name="pPyramidShape1-normals">
+          <float_array id="pPyramidShape1-normals-array" count="54">0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 -0.7007002 0.134308 -0.7007002 -0.7007002 0.134308 -0.7007002 -0.7007002 0.134308 -0.7007002 -0.7007002 0.134308 0.7007002 -0.7007002 0.134308 0.7007002 -0.7007002 0.134308 0.7007002 0.7007002 0.134308 0.7007002 0.7007002 0.134308 0.7007002 0.7007002 0.134308 0.7007002 0.7007002 0.134308 -0.7007002 0.7007002 0.134308 -0.7007002 0.7007002 0.134308 -0.7007002</float_array>
+          <technique_common>
+            <accessor source="#pPyramidShape1-normals-array" count="18" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pPyramidShape1-pPyramidShape1-map1" name="pPyramidShape1-pPyramidShape1-map1">
+          <float_array id="pPyramidShape1-pPyramidShape1-map1-array" count="20">0.5 0 0.25 0.25 0.5 0.5 0.75 0.25 0.25 0.5 0.375 0.5 0.5 0.5 0.625 0.5 0.75 0.5 0.5 1</float_array>
+          <technique_common>
+            <accessor source="#pPyramidShape1-pPyramidShape1-map1-array" count="10" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pPyramidShape1-textangents">
+          <float_array id="pPyramidShape1-textangents-array" count="54">1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -0.7071068 0 0.7071068 -0.7071068 0 0.7071068 -0.7071068 0 0.7071068 0.7071068 0 0.7071068 0.7071068 0 0.7071068 0.7071068 0 0.7071068 0.7071068 0 -0.7071068 0.7071068 0 -0.7071068 0.7071068 0 -0.7071068 -0.7071068 0 -0.7071068 -0.7071068 0 -0.7071068 -0.7071068 0 -0.7071068</float_array>
+          <technique_common>
+            <accessor source="#pPyramidShape1-textangents-array" count="18" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pPyramidShape1-texbinormals">
+          <float_array id="pPyramidShape1-texbinormals-array" count="54">0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0.09497011 0.9909396 0.09497011 0.09497011 0.9909396 0.09497011 0.09497011 0.9909396 0.09497011 0.09497011 0.9909396 -0.09497011 0.09497011 0.9909396 -0.09497011 0.09497011 0.9909396 -0.09497011 -0.09497011 0.9909396 -0.09497011 -0.09497011 0.9909396 -0.09497011 -0.09497011 0.9909396 -0.09497011 -0.09497011 0.9909396 0.09497011 -0.09497011 0.9909396 0.09497011 -0.09497011 0.9909396 0.09497011</float_array>
+          <technique_common>
+            <accessor source="#pPyramidShape1-texbinormals-array" count="18" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="pPyramidShape1-vertices" name="pPyramidShape1-vertices">
+          <input semantic="POSITION" source="#pPyramidShape1-positions"/>
+        </vertices>
+        <triangles material="Thorn_lambert1_1SG" count="6">
+          <input semantic="VERTEX" source="#pPyramidShape1-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#pPyramidShape1-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#pPyramidShape1-pPyramidShape1-map1" offset="2" set="0"/>
+          <input semantic="TEXTANGENT" source="#pPyramidShape1-textangents" offset="3" set="0"/>
+          <input semantic="TEXBINORMAL" source="#pPyramidShape1-texbinormals" offset="3" set="0"/>
+          <p>0 0 0 0 3 1 3 1 1 2 1 2 1 3 1 3 3 4 3 4 2 5 2 5 0 6 4 6 1 7 5 7 4 8 9 8 1 9 5 9 2 10 6 10 4 11 9 11 2 12 6 12 3 13 7 13 4 14 9 14 3 15 7 15 0 16 8 16 4 17 9 17</p>
+        </triangles>
+      </mesh>
+      <extra>
+        <technique profile="OpenCOLLADAMaya">
+          <originalMayaNodeId>Thorn_pPyramidShape1</originalMayaNodeId>
+          <double_sided>1</double_sided>
+        </technique>
+      </extra>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="VisualSceneNode" name="untitled">
+      <node id="pPyramid1" name="Thorn_pPyramid1" type="NODE">
+        <translate sid="translate">0 0 0.06857106</translate>
+        <rotate sid="rotateZ">0 0 1 0</rotate>
+        <rotate sid="rotateY">0 1 0 0</rotate>
+        <rotate sid="rotateX">1 0 0 -90</rotate>
+        <scale sid="scale">0.325125 0.325125 0.325125</scale>
+        <instance_geometry url="#pPyramidShape1">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Thorn_lambert1_1SG" target="#lambert1"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+        <extra>
+          <technique profile="OpenCOLLADAMaya">
+            <originalMayaNodeId>Thorn_pPyramid1</originalMayaNodeId>
+          </technique>
+        </extra>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#VisualSceneNode"/>
+  </scene>
+</COLLADA>
