@@ -30,7 +30,7 @@ namespace RootForce
 	Awesomium::JSValue SettingsMenu::RequestSettingsEvent( const Awesomium::JSArray& p_array )
 	{
 		// Reload config
-		m_context.m_configManager->LoadConfig("config.yaml");
+		m_context.m_configManager->LoadConfig( m_workingDir + "config.yaml");
 		// Update keybinding manager
 		auto map = m_context.m_configManager->GetConfigValuePairs();
 		for(auto pair : map)
