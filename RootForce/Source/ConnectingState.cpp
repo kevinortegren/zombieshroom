@@ -105,6 +105,8 @@ namespace RootForce
 		// Setup the client
 		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
 		m_networkContext.m_clientMessageHandler->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
+		m_networkContext.m_clientMessageHandler->SetDeserializationSystem(m_sharedSystems.m_deserializationSystem.get());
+
 		// Always set the client peer on the respawning system (this will only not be set for a dedicated server).
 		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 	}
@@ -121,6 +123,7 @@ namespace RootForce
 		m_networkContext.m_client->Update();
 
 		m_sharedSystems.m_respawnSystem->Process();
+		m_sharedSystems.m_deserializationSystem->Process();
 
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);

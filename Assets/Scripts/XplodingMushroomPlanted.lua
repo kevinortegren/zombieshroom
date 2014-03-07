@@ -34,7 +34,7 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "XplodingMushroomPlanted");
-	local timerComp = Timer.New(self, XplodingMushroomPlanted.duration);
+	TimerEntity.StartTimer(userId, actionId, XplodingMushroomPlanted.duration, "XplodingMushroomPlanted", "OnDestroy", self);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);

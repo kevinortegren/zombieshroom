@@ -329,7 +329,7 @@ namespace RootForce
 
 				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 
-				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityInterrupted with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+				//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityInterrupted with ActionID: %d", action->CurrentAbilityEvent.ActionID);
 
 				// Reset the current event.
 				playerComponent->AbilityState = AbilityState::OFF;
@@ -424,7 +424,7 @@ namespace RootForce
 
 			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 
-			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeStart with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+			//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeStart with ActionID: %d", action->CurrentAbilityEvent.ActionID);
 		}
 
 		// Increase the time the ability has been activated.
@@ -461,7 +461,7 @@ namespace RootForce
 			m.Serialize(true, &bs);
 
 			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+			//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
 		}
 
 		if (action->CurrentAbilityEvent.Time >= abilityChargeTime + abilityChannelingTime && playerComponent->AbilityState == AbilityState::CHANNELING)
@@ -481,7 +481,7 @@ namespace RootForce
 			m.Serialize(true, &bs);
 
 			m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-			g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+			//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
 		}
 	}
 
@@ -515,7 +515,7 @@ namespace RootForce
 				m.Serialize(true, &bs);
 
 				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+				//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChargeDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
 			} 
 			
 			// Fall through here!
@@ -537,7 +537,7 @@ namespace RootForce
 				m.Serialize(true, &bs);
 
 				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
-				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
+				//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Sending AbilityChannelingDone with ActionID: %d", action->CurrentAbilityEvent.ActionID);
 			} break;
 		}
 

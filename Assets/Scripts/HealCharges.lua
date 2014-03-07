@@ -24,7 +24,7 @@ function HealCharges.OnCreate (userId, actionId)
 	--Components
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "HealCharges");
-	local timerComp = Timer.New(self, HealCharges.duration);
+	TimerEntity.StartTimer(userId, actionId, HealCharges.duration, "HealCharges", "OnDestroy", self);
 	Follower.New(self, casterEnt, 0);
 	--Setting stuff
 	local tempPos = casterEnt:GetTransformation():GetPos();

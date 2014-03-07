@@ -150,13 +150,7 @@ namespace RootForce
 						{
 							//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
 
-							NetworkComponent* network = m_world->GetEntityManager()->GetComponent<NetworkComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));	
-							NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap, network->ID.UserID);
-
-							if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
-							{
-								clientComponent->State = ClientState::CONNECTED;
-							}
+							m_deserializationSystem->SetData(p_bs);
 						}
 						else
 						{
@@ -405,7 +399,7 @@ namespace RootForce
 								action->JumpTime = halfPing;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStart received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStart received from user %d", m.User);
 							}
 							else
 							{
@@ -445,7 +439,7 @@ namespace RootForce
 								// TODO: Maybe consider the time passed along with the message.
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStop received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStop received from user %d", m.User);
 							}
 							else
 							{
@@ -522,7 +516,7 @@ namespace RootForce
 								playerComponent->AbilityScripts[m.AbilityIndex].OnCooldown = false;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityCooldownOff received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityCooldownOff received from user %d", m.User);
 							}
 							else
 							{
@@ -974,43 +968,6 @@ namespace RootForce
 
 
 				} return true;
-				case NetworkMessage::MessageType::StatChangeTimeUp:
-					{
-						NetworkMessage::StatChangeTimeUp m;
-						m.Serialize(false, p_bs);
-
-						// Make sure we are in the correct state.
-						if(clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
-						{
-
-							ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.UserID, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-
-							// Call the OnCreate script
-							if(player)
-							{
-								StatChange* stat = m_world->GetEntityManager()->GetComponent<StatChange>(player);
-								switch (m.StatToReset)
-								{
-								case 0: 
-									stat->SpeedChangeTime = 0.0f;
-								case 1: 
-									stat->JumpHeightChangeTime = 0.0f;
-								case 2: 
-									stat->KnockbackResistanceTime = 0.0f;
-								case 3: 
-									stat->DamageResistanceTime = 0.0f;
-								default:
-									break;
-								}
-							}
-						}
-						else
-						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "StatChangeTimeUp received in an invalid state (%d).", clientComponent->State);
-						}
-
-
-					} return true;
 				case NetworkMessage::MessageType::PlayerNameChange:
 					{
 						NetworkMessage::PlayerNameChange m;

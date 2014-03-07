@@ -15,6 +15,9 @@ end
 
 function IceCube.ChargeDone (time, userId, actionId)
 	IceCube.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function IceCube.ChannelingDone (time, userId, actionId)
@@ -34,7 +37,7 @@ function IceCube.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "IceCube");
-	local timerComp = Timer.New(self, IceCube.duration);
+	TimerEntity.StartTimer(userId, actionId, IceCube.duration, "IceCube", "OnDestroy", self);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);

@@ -17,6 +17,9 @@ end
 
 function ExplodingShroom.ChargeDone (time, userId, actionId)
 	ExplodingShroom.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function ExplodingShroom.ChannelingDone (time, userId, actionId)
@@ -36,7 +39,7 @@ function ExplodingShroom.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "ExplodingShroom");
-	local timerComp = Timer.New(self, ExplodingShroom.duration);
+	TimerEntity.StartTimer(userId, actionId, ExplodingShroom.duration, "ExplodingShroom", "OnDestroy", self);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);

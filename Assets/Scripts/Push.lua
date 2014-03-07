@@ -15,6 +15,9 @@ function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
 		Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
 		Push.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 		
 	--end
 end
@@ -37,7 +40,7 @@ function Push.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Push");
-	local timerComp = Timer.New(self, Push.duration);
+	TimerEntity.StartTimer(userId, actionId, Push.duration, "Push", "OnDestroy", self);
 	Follower.New(self, casterEnt, 3);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
