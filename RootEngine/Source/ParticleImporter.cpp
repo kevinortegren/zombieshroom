@@ -127,11 +127,14 @@ namespace RootEngine
 			else
 				outStruct->at(i)->m_relative = 0;
 			
-			//Relative
+			//Max per frame
 			if(doc[i].FindValue("MAXPERFRAME"))
 				doc[i]["MAXPERFRAME"] >> outStruct->at(i)->m_maxPerFrame;
 			else
 				outStruct->at(i)->m_maxPerFrame = 1;
+
+			//Alive
+			outStruct->at(i)->m_alive = 1.0f;
 
 			//Set params
 			outStruct->at(i)->m_params[Render::Semantic::POSITION]			= &outStruct->at(i)->m_position;
@@ -153,6 +156,7 @@ namespace RootEngine
 			outStruct->at(i)->m_params[Render::Semantic::ORBITRADIUS]		= &outStruct->at(i)->m_orbitRadius;
 			outStruct->at(i)->m_params[Render::Semantic::ORBITSPEED]		= &outStruct->at(i)->m_orbitSpeed;
 			outStruct->at(i)->m_params[Render::Semantic::MAXPERFRAME]		= &outStruct->at(i)->m_maxPerFrame;
+			outStruct->at(i)->m_params[Render::Semantic::ALIVE]				= &outStruct->at(i)->m_alive;
 
 		}
 		return outStruct;
