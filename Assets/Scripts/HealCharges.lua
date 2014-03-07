@@ -8,12 +8,19 @@ HealCharges.channelingTime = 0;
 HealCharges.duration = 1;
 HealCharges.charges = 3;
 
+function HealCharges.OnLoad()
+	ResourceManager.LoadParticle("HealCharges");
+end
+
 function HealCharges.ChargeDone (time, userId, actionId)
 	HealCharges.OnCreate(userId, actionId);
 end
 
 function HealCharges.ChannelingDone (time, userId, actionId)
 	HealCharges.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
+end
+
+function HealCharges.Interrupted (time, userId, actionId)
 end
 
 function HealCharges.OnCreate (userId, actionId)
@@ -28,12 +35,15 @@ function HealCharges.OnCreate (userId, actionId)
 	Follower.New(self, casterEnt, 0);
 	--Setting stuff
 	local tempPos = casterEnt:GetTransformation():GetPos();
-	
+  
 	transformComp:SetPos(tempPos);
-	transformComp:SetScale(Vec3.New(5, 5, 5));
   
   local health = casterEnt:GetHealth();
   health:IncreaseHealth(25);
+	
+  if Global.IsClient then
+		local particleComp = ParticleEmitter.New(self, "HealCharges");
+  end
 end
 
 function HealCharges.OnCollide (self, entity)
