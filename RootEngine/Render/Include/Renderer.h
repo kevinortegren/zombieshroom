@@ -96,6 +96,8 @@ namespace Render
 
 		virtual void Compute(ComputeJob* p_job) = 0;
 
+		virtual DirectionalLight* GetDirectionalLight() = 0;
+
 		virtual void ParseCommands(std::stringstream* p_ss) = 0;
 	};
 
@@ -158,9 +160,8 @@ namespace Render
 
 		void Compute(ComputeJob* p_job);
 
-
+		DirectionalLight* GetDirectionalLight();
 		
-
 		void InitialziePostProcesses();
 
 		static std::map<Semantic::Semantic, unsigned> s_sizes;

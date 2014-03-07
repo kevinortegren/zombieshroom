@@ -150,13 +150,7 @@ namespace RootForce
 						{
 							//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Received DeltaWorld snapshot! Yay!");
 
-							NetworkComponent* network = m_world->GetEntityManager()->GetComponent<NetworkComponent>(m_world->GetTagManager()->GetEntityByTag("Player"));	
-							NetworkMessage::DeserializeWorld(p_bs, m_world, g_networkEntityMap, network->ID.UserID);
-
-							if (clientComponent->State == ClientState::AWAITING_FIRST_GAMESTATE_DELTA)
-							{
-								clientComponent->State = ClientState::CONNECTED;
-							}
+							m_deserializationSystem->SetData(p_bs);
 						}
 						else
 						{
@@ -405,7 +399,7 @@ namespace RootForce
 								action->JumpTime = halfPing;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStart received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStart received from user %d", m.User);
 							}
 							else
 							{
@@ -445,7 +439,7 @@ namespace RootForce
 								// TODO: Maybe consider the time passed along with the message.
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStop received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "JumpStop received from user %d", m.User);
 							}
 							else
 							{
@@ -522,7 +516,7 @@ namespace RootForce
 								playerComponent->AbilityScripts[m.AbilityIndex].OnCooldown = false;
 
 								// Log the action (debug)
-								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityCooldownOff received from user %d", m.User);
+								//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "AbilityCooldownOff received from user %d", m.User);
 							}
 							else
 							{
@@ -942,6 +936,7 @@ namespace RootForce
 						health->Health = 0;
 						health->IsDead = true;
 						health->RespawnDelay = 3.0f;
+						health->LastDamageSourceID = m.LastDamageSource;
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
 					}
 
@@ -973,42 +968,18 @@ namespace RootForce
 
 
 				} return true;
-				case NetworkMessage::MessageType::StatChangeTimeUp:
+				case NetworkMessage::MessageType::PlayerNameChange:
 					{
-						NetworkMessage::StatChangeTimeUp m;
+						NetworkMessage::PlayerNameChange m;
 						m.Serialize(false, p_bs);
 
 						// Make sure we are in the correct state.
 						if(clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
 						{
-
-							ECS::Entity* player = FindEntity(g_networkEntityMap, NetworkEntityID(m.UserID, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-
-							// Call the OnCreate script
-							if(player)
-							{
-								StatChange* stat = m_world->GetEntityManager()->GetComponent<StatChange>(player);
-								switch (m.StatToReset)
-								{
-								case 0: 
-									stat->SpeedChangeTime = 0.0f;
-								case 1: 
-									stat->JumpHeightChangeTime = 0.0f;
-								case 2: 
-									stat->KnockbackResistanceTime = 0.0f;
-								case 3: 
-									stat->DamageResistanceTime = 0.0f;
-								default:
-									break;
-								}
-							}
+							ECS::Entity* player = FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(m.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
+							PlayerComponent* playerComp = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComp->Name = m.Name.C_String();
 						}
-						else
-						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "StatChangeTimeUp received in an invalid state (%d).", clientComponent->State);
-						}
-
-
 					} return true;
 			}
 
@@ -1856,6 +1827,23 @@ namespace RootForce
 						m.Serialize(true, &bs);
 
 						m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+					} return true;
+				case NetworkMessage::MessageType::PlayerNameChange:
+					{
+						NetworkMessage::PlayerNameChange m;
+						m.Serialize(false, p_bs);
+
+						ECS::Entity* player = FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(m.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
+						ECS::Entity* client = FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(m.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::ReservedSequenceID::CLIENT_ENTITY));
+						PlayerComponent* playerComp = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+						ClientComponent* clientComp = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if(playerComp != nullptr && clientComp != nullptr)
+						{
+							playerComp->Name = m.Name.C_String();
+							clientComp->Name = m.Name;
+						}
+
+						
 					} return true;
 			}
 			

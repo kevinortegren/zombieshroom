@@ -17,6 +17,8 @@ function FireBall.ChargeDone (time, userId, actionId)
     FireBall.OnCreate(userId, actionId);
   else
     local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
     local playerComp = casterEnt:GetPlayerComponent();
     playerComp:AddSelectedCharges(1);
   end
@@ -68,10 +70,13 @@ function FireBall.OnCollide (self, entity)
 			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 			local health = entity:GetHealth();
-			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
+			if abilityOwnerNetwork:GetUserId() ~= entity:GetNetwork():GetUserId() then
 				Explosion.OnCreate(abilityOwnerNetwork:GetUserId(), abilityOwnerNetwork:GetActionId());
 				FireBall.OnDestroy(self);
 			end
+		else
+			Explosion.OnCreate(self:GetNetwork():GetUserId(), self:GetNetwork():GetActionId());
+			FireBall.OnDestroy(self);
 		end
 	end
 end

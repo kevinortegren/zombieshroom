@@ -51,6 +51,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Scalable>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StatChange>(500);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::KillAnnouncement>(1);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -62,6 +63,7 @@ namespace RootForce
 		
 		//Do not add scripts for abilities that are included in the abilitypacks. They will be loaded automatically
 		g_engineContext.m_resourceManager->LoadScript("Global");
+		g_engineContext.m_resourceManager->LoadScript("TimerEntity");
 		g_engineContext.m_resourceManager->LoadScript("Push");
 		g_engineContext.m_resourceManager->LoadScript("Identiray");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
@@ -106,10 +108,10 @@ namespace RootForce
 		m_directionlLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionlLightSystem);
 
-        // Initialize the interpolation system
+		// Initialize the interpolation system
 		m_transformInterpolationSystem = new RootForce::TransformInterpolationSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TransformInterpolationSystem>(m_transformInterpolationSystem);
-        
+		
 		// Initialize anim system.
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -162,10 +164,6 @@ namespace RootForce
 		m_timerSystem = new RootForce::TimerSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
 
-		// Initialize the stat change timer system.
-		m_statChangeSystem = new RootForce::StatChangeSystem(g_world);
-		g_world->GetSystemManager()->AddSystem<RootForce::StatChangeSystem>(m_statChangeSystem);
-
 		// Initialize the follow system.
 		m_followSystem = new RootForce::FollowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
@@ -189,6 +187,9 @@ namespace RootForce
 		//Initialize scale system.
 		m_scaleSystem = new RootForce::ScaleSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::ScaleSystem>(m_scaleSystem);
+
+		// Initialize the deserialization system.
+		m_sharedSystems.m_deserializationSystem = std::shared_ptr<RootForce::DeserializationSystem>(new RootForce::DeserializationSystem(g_world));
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
@@ -284,9 +285,6 @@ namespace RootForce
 		if(m_networkContext.m_server != nullptr)
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 
-		if(m_networkContext.m_server != nullptr)
-			m_statChangeSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
-
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 
 		//Ray stuff
@@ -346,7 +344,6 @@ namespace RootForce
 		m_actionSystem->SetServerPeerInterface(nullptr);
 		m_actionSystem->SetClientPeerInterface(nullptr);
 		m_timerSystem->SetServerPeer(nullptr);
-		m_statChangeSystem->SetServerPeer(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
 		if(m_networkContext.m_server != nullptr)
@@ -474,11 +471,6 @@ namespace RootForce
 			m_timerSystem->Process();
 		}
 
-		{
-			PROFILE("Stat change system", g_engineContext.m_profiler);
-			m_statChangeSystem->Process();
-		}
-
 		m_animationSystem->Run();
 		
 		{
@@ -533,6 +525,11 @@ namespace RootForce
 		{
 			PROFILE("StateSystem", g_engineContext.m_profiler);
 			m_stateSystem->Process();
+		}
+
+		{
+			PROFILE("DeserializationSystem", g_engineContext.m_profiler);
+			m_sharedSystems.m_deserializationSystem->Process();
 		}
 	
 		{
@@ -597,6 +594,14 @@ namespace RootForce
 		//Check status for the display of the ingame menu
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
+			m_displayIngameMenu = !m_displayIngameMenu;
+			m_ingameMenu->GetView()->SetActive(m_displayIngameMenu);
+			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_ingameMenu->Reset();
+		}
+		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 			m_displayIngameMenu = !m_displayIngameMenu;
 			m_ingameMenu->GetView()->SetActive(m_displayIngameMenu);
 			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
@@ -735,13 +740,6 @@ namespace RootForce
 		else if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::UP)
 		{
 			m_hud->SetValue("ShowScore", "false" );
-		}
-		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
-			m_displayIngameMenu = !m_displayIngameMenu;
-			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
-			m_ingameMenu->Reset();
 		}
 		if(m_displayIngameMenu)
 		{

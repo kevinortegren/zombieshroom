@@ -14,6 +14,9 @@ end
 
 function PowerRay.ChargeDone (time, userId, actionId)
 	PowerRay.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function PowerRay.ChannelingDone (time, userId, actionId)
@@ -33,7 +36,7 @@ function PowerRay.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "PowerRay");
-	local timerComp = Timer.New(self, PowerRay.duration);
+	TimerEntity.StartTimer(userId, actionId, PowerRay.duration, "PowerRay", "OnDestroy", self);
 	local dakComp = DamageAndKnockback.New(self, PowerRay.currentDamage , PowerRay.currentKnockback);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
@@ -75,9 +78,7 @@ if entity:DoesExist() then
 
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				local network = entity:GetNetwork();
-				local receiverId = network:GetUserId();
-				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());
 			end
 
 			local hitPos = entity:GetTransformation():GetPos();

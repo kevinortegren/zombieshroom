@@ -22,7 +22,7 @@ namespace RootForce
 			PLAYER,
 			ANIMATION,
 			PARTICLE,
-			TDMRULES, //TODO: name might be inappropriate?
+			TDMRULES, 
 			PLAYERACTION,
 			PLAYERPHYSICS,
 			ENTITYSTATE,
@@ -42,6 +42,7 @@ namespace RootForce
 			DAMAGEANDKNOCKBACK,
 			SCALABLE,
 			STATCHANGE,
+			KILLANNOUNCEMENT,
 		};
 	}
 }

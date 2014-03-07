@@ -21,6 +21,8 @@ end
 
 function AbilityBall.ChargeDone (time, userId, actionId)
 	AbilityBall.OnCreate(userId, actionId);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function AbilityBall.ChannelingDone (time, userId, actionId)
@@ -33,14 +35,16 @@ function AbilityBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local networkEnt = Network.New(self, userId, actionId);
+	
 	--Components
 	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
-	local timerComp = Timer.New(self, AbilityBall.duration);
+	local networkEnt = Network.New(self, userId, actionId);
+	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "OnDestroy", self);
+
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
@@ -87,9 +91,7 @@ function AbilityBall.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				
 				if not health:IsDead() then
-					local network = entity:GetNetwork();
-					local receiverId = network:GetUserId();
-					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance(), receiverId);
+					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance());
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then

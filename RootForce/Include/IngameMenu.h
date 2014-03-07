@@ -27,6 +27,7 @@ namespace RootForce
 		void Return(const Awesomium::JSArray& p_array);
 		void Exit(const Awesomium::JSArray& p_array);
 		void ChangeTeam(const Awesomium::JSArray& p_array);
+		void ChangeName(const Awesomium::JSArray& p_array);
 
 		SettingsMenu* m_settingsMenu;
 		RootEngine::GUISystem::WebView* m_view;
@@ -34,6 +35,7 @@ namespace RootForce
 		bool m_return;
 		bool m_exit;
 		int m_changeTeam;
+		bool m_changeName;
 
 		RakNet::RakPeerInterface* m_clientPeer;
 	};

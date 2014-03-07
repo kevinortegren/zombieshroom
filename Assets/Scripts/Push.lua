@@ -1,11 +1,11 @@
 Push = {};
-Push.knockback = 20;
-Push.currentKnockback = 20;
+Push.knockback = 40;
+Push.currentKnockback = 40;
 Push.cooldown = 1;
 Push.charges = -1;
 Push.chargeTime = 1;
 Push.channelingTime = 0;
-Push.duration = 0.2;
+Push.duration = 0.5;
 
 function Push.OnLoad()
 	ResourceManager.LoadParticle("fireball");
@@ -13,8 +13,12 @@ end
 
 function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
+		Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
 		Push.OnCreate(userId, actionId);
-		Push.currentKnockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+		
 	--end
 end
 
@@ -36,7 +40,7 @@ function Push.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Push");
-	local timerComp = Timer.New(self, Push.duration);
+	TimerEntity.StartTimer(userId, actionId, Push.duration, "Push", "OnDestroy", self);
 	Follower.New(self, casterEnt, 3);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
@@ -53,7 +57,7 @@ function Push.OnCreate (userId, actionId)
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "fireball");
+		local particleComp = ParticleEmitter.New(self, "PushMeMaybe");
 	end
 end
 

@@ -43,6 +43,7 @@ namespace RootForce
 			RootForce::DamageAndKnockback::SetTypeId(RootForce::ComponentType::DAMAGEANDKNOCKBACK);
 			RootForce::Scalable::SetTypeId(RootForce::ComponentType::SCALABLE);
 			RootForce::StatChange::SetTypeId(RootForce::ComponentType::STATCHANGE);
+			RootForce::KillAnnouncement::SetTypeId(RootForce::ComponentType::KILLANNOUNCEMENT);
 		}
 
 		void InitializeServerComponents()
@@ -64,6 +65,7 @@ namespace RootForce
 			RootForce::TimerComponent::SetTypeId(RootForce::ComponentType::TIMER);
 			RootForce::AbilitySpawnComponent::SetTypeId(RootForce::ComponentType::ABILITYSPAWN);
 			RootForce::TryPickupComponent::SetTypeId(RootForce::ComponentType::TRYPICKUPCOMPONENT);
+			RootForce::KillAnnouncement::SetTypeId(RootForce::ComponentType::KILLANNOUNCEMENT);
 		}
 #endif
 	}

@@ -15,6 +15,9 @@ end
 
 function Homing.ChargeDone (time, userId, actionId)
 	Homing.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function Homing.ChannelingDone (time, userId, actionId)
@@ -27,6 +30,7 @@ function Homing.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+
 	--Components
 	local networkComp = Network.New(self, userId, actionId);
 	local transformComp = Transformation.New(self);
@@ -34,7 +38,9 @@ function Homing.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Homing");
-	local timerComp = Timer.New(self, Homing.duration);
+
+	TimerEntity.StartTimer(userId, actionId, Homing.duration, "Homing", "OnDestroy", self);
+
 	local dakComp = DamageAndKnockback.New(self, Homing.currentDamage , Homing.currentKnockback);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
@@ -99,9 +105,7 @@ if entity:DoesExist() then
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				local network = entity:GetNetwork();
-				local receiverId = network:GetUserId();
-				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());
 			end
 			Homing.OnDestroy(self);
 		end
