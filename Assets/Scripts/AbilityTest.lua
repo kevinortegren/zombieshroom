@@ -29,7 +29,7 @@ function AbilityTest.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityTest");
-	local timerComp = Timer.New(self, AbilityTest.duration);
+	TimerEntity.StartTimer(userId, actionId, AbilityTest.duration, "AbilityTest", "OnDestroy", self);
 	--local rayTimerComp = Timer.New(rayEnt, 2);
 	local homingComp = Homing.New(self, 0.1, 50);
 	--Setting stuff

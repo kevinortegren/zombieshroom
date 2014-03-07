@@ -24,7 +24,6 @@ function Homing.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local timerEnt = Entity.New();
 
 	--Components
 	local networkComp = Network.New(self, userId, actionId);
@@ -34,8 +33,7 @@ function Homing.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Homing");
 
-	local timerNetworkComp = Network.New(timerEnt, userId, actionId);
-	local timerComp = Timer.New(timerEnt, Homing.duration, "OnDestroy", self);
+	TimerEntity.StartTimer(userId, actionId, Homing.duration, "Homing", "OnDestroy", self);
 
 	local dakComp = DamageAndKnockback.New(self, Homing.currentDamage , Homing.currentKnockback);
 	--Setting stuff

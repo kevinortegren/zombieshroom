@@ -41,7 +41,7 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
 	local networkEnt = Network.New(self, userId, actionId);
-	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "OnDestroy", self);
+	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "OnDestroy", self);
 
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);

@@ -29,7 +29,7 @@ function MachineGun.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "MachineGun");
-	local timerComp = Timer.New(self, MachineGun.duration);
+	TimerEntity.StartTimer(userId, actionId, MachineGun.duration, "MachineGun", "OnDestroy", self);
 	local dakComp = DamageAndKnockback.New(self, MachineGun.damage , MachineGun.knockback);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);

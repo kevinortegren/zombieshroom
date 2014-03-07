@@ -88,7 +88,6 @@ namespace RootForce
 		RootForce::SoundSystem*							m_soundSystem;
 		RootForce::BotanySystem*						m_botanySystem;
 		RootForce::TimerSystem*							m_timerSystem;
-		RootForce::StatChangeSystem*					m_statChangeSystem;
 		RootForce::FollowSystem*						m_followSystem;
 		RootForce::HomingSystem*						m_homingSystem;
 		RootForce::RaySystem*							m_raySystem;

@@ -195,12 +195,6 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, TeamID);
 		}
 
-		void StatChangeTimeUp::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
-		{
-			p_bs->Serialize(p_writeToBitstream, UserID);
-			p_bs->Serialize(p_writeToBitstream, StatToReset);
-		}
-
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
 		{
 			for (int i = 0; i < 3; ++i)
@@ -375,15 +369,10 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, StatChange* p_c)
 		{
 			p_bs->Serialize(p_writeToBitstream, p_c->DamageResistance);
-			p_bs->Serialize(p_writeToBitstream, p_c->DamageResistanceTime);
 			p_bs->Serialize(p_writeToBitstream, p_c->JumpHeightChange);
-			p_bs->Serialize(p_writeToBitstream, p_c->JumpHeightChangeTime);
 			p_bs->Serialize(p_writeToBitstream, p_c->KnockbackResistance);
-			p_bs->Serialize(p_writeToBitstream, p_c->KnockbackResistanceTime);
 			p_bs->Serialize(p_writeToBitstream, p_c->SpeedChange);
-			p_bs->Serialize(p_writeToBitstream, p_c->SpeedChangeTime);
 		}
-
 
 		bool CanSerializeComponent(ComponentType::ComponentType p_type)
 		{

@@ -28,7 +28,7 @@ function ShroomExplosion.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "ShroomExplosion");
-	local timerComp = Timer.New(self, ShroomExplosion.duration);
+	TimerEntity.StartTimer(userId, actionId, ShroomExplosion.duration, "ShroomExplosion", "OnDestroy", self);
 	--Scalable.New(self, 20, 400);
 	collisionComp:CreateHandle(self, 1, true);
 	transformComp:SetPos(posVec);

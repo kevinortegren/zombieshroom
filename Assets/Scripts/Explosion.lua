@@ -42,7 +42,7 @@ function Explosion.OnCreate (userId, actionId)
 	end
 	--Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 
-	TimerEntity.StartTimer(userId, actionId, Explosion.duration, "OnDestroy", self);
+	TimerEntity.StartTimer(userId, actionId, Explosion.duration, "Explosion", "OnDestroy", self);
 end
 
 function Explosion.OnCollide (self, entity)

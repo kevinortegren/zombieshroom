@@ -1,9 +1,9 @@
 TimerEntity = {}
 
-function TimerEntity.StartTimer(userId, actionId, duration, functionName, target)
+function TimerEntity.StartTimer(userId, actionId, duration, scriptName, functionName, target)
 	local timerEntity = TimerEntity.OnCreate(userId, actionId);
 	local timerComponent = timerEntity:GetTimer();
-	timerComponent:Set(duration, functionName, target);
+	timerComponent:Set(duration, scriptName, functionName, target);
 end
 
 function TimerEntity.OnCreate(userId, actionId)

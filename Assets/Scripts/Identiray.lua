@@ -31,7 +31,7 @@ function Identiray.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Identiray");
-	local timerComp = Timer.New(self, Identiray.duration);
+	TimerEntity.StartTimer(userId, actionId, Identiray.duration, "Identiray", "OnDestroy", self);
     
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);

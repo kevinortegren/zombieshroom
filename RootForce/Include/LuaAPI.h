@@ -2464,18 +2464,17 @@ namespace RootForce
 		}
 		static int TimerSet(lua_State* p_luaState)
 		{
-			NumberOfArgs(4); //TimerComponent, Duration, FunctionName, Target
+			NumberOfArgs(5); //TimerComponent, Duration, ScriptName, FunctionName, Target
 			RootForce::TimerComponent **s = (RootForce::TimerComponent**)luaL_checkudata(p_luaState, 1, "Timer");
 			(*s)->TimeLeft = (float) luaL_checknumber(p_luaState, 2);
-			(*s)->FunctionName = luaL_checkstring(p_luaState, 3);
-			ECS::Entity** target = (ECS::Entity**)luaL_checkudata(p_luaState, 4, "Entity");
+			(*s)->ScriptName = luaL_checkstring(p_luaState, 3);
+			(*s)->FunctionName = luaL_checkstring(p_luaState, 4);
+			ECS::Entity** target = (ECS::Entity**)luaL_checkudata(p_luaState, 5, "Entity");
 			Network::NetworkComponent* networkComponent = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*target);
-			Script* scriptComponent = g_world->GetEntityManager()->GetComponent<Script>(*target);
 			assert(networkComponent != nullptr);
-			assert(scriptComponent != nullptr);
 
 			(*s)->Target = networkComponent->ID;
-			(*s)->ScriptName = scriptComponent->Name.c_str();
+
 			return 0;
 		}
 
@@ -2568,34 +2567,30 @@ namespace RootForce
 		}
 		static int StatChangeSetSpeed(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
 			(*s)->SpeedChange = (float)luaL_checknumber(p_luaState, 2);
-			(*s)->SpeedChangeTime = (float)luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 		static int StatChangeSetJumpHeight(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
 			(*s)->JumpHeightChange = (float)luaL_checknumber(p_luaState, 2);
-			(*s)->JumpHeightChangeTime = (float)luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 		static int StatChangeSetKnockbackResistance(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
 			(*s)->KnockbackResistance = (float)luaL_checknumber(p_luaState, 2);
-			(*s)->KnockbackResistanceTime = (float)luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 		static int StatChangeSetDamageResistance(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
 			(*s)->DamageResistance = (float)luaL_checknumber(p_luaState, 2);
-			(*s)->DamageResistanceTime = (float)luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 
