@@ -306,8 +306,10 @@ namespace RootForce
 		//Team selection stuff
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 		m_displayIngameMenu = true;
+		g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+		g_engineContext.m_inputSys->LockMouseToCenter(false);
 		m_ingameMenu->GetView()->SetActive(true);
-		g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+		g_engineContext.m_inputSys->LockMouseToCenter(false);
 		m_ingameMenu->Reset();
 	}
 
@@ -594,17 +596,21 @@ namespace RootForce
 		//Check status for the display of the ingame menu
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			m_displayIngameMenu = !m_displayIngameMenu;
-			m_ingameMenu->GetView()->SetActive(m_displayIngameMenu);
-			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_displayIngameMenu = true;
+			m_hud->GetView()->SetActive(false);
+			g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+			m_ingameMenu->GetView()->SetActive(true);
+			g_engineContext.m_inputSys->LockMouseToCenter(false);
 			m_ingameMenu->Reset();
 		}
 		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
-			m_displayIngameMenu = !m_displayIngameMenu;
-			m_ingameMenu->GetView()->SetActive(m_displayIngameMenu);
-			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_displayIngameMenu = true;
+			m_hud->GetView()->SetActive(false);
+			g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+			m_ingameMenu->GetView()->SetActive(true);
+			g_engineContext.m_inputSys->LockMouseToCenter(false);
 			m_ingameMenu->Reset();
 		}
 		if (m_ingameMenu->GetReturn())
@@ -612,6 +618,8 @@ namespace RootForce
 			m_displayIngameMenu = false;
 			m_ingameMenu->GetView()->SetActive(false);
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
+			m_hud->GetView()->SetActive(m_displayGuiHUD);
+			g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
 			m_ingameMenu->Reset();
 			// Update keybindings when returning to game
 			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
