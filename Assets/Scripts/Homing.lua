@@ -15,6 +15,9 @@ end
 
 function Homing.ChargeDone (time, userId, actionId)
 	Homing.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function Homing.ChannelingDone (time, userId, actionId)

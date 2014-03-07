@@ -15,6 +15,9 @@ function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
 		Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
 		Push.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 		
 	--end
 end

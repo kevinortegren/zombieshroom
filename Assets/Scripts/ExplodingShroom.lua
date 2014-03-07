@@ -17,6 +17,9 @@ end
 
 function ExplodingShroom.ChargeDone (time, userId, actionId)
 	ExplodingShroom.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function ExplodingShroom.ChannelingDone (time, userId, actionId)

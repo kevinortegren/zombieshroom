@@ -10,6 +10,9 @@ end
 
 function AbilityRay.ChannelingDone(time, userId, actionId)
 	AbilityRay.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function AbilityRay.Interrupted(time, userId, actionId)

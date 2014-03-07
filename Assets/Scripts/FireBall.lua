@@ -17,6 +17,8 @@ function FireBall.ChargeDone (time, userId, actionId)
     FireBall.OnCreate(userId, actionId);
   else
     local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
     local playerComp = casterEnt:GetPlayerComponent();
     playerComp:AddSelectedCharges(1);
   end

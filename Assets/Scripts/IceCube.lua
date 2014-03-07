@@ -15,6 +15,9 @@ end
 
 function IceCube.ChargeDone (time, userId, actionId)
 	IceCube.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function IceCube.ChannelingDone (time, userId, actionId)

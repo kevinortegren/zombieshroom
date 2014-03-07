@@ -14,6 +14,9 @@ end
 
 function PowerRay.ChargeDone (time, userId, actionId)
 	PowerRay.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
 end
 
 function PowerRay.ChannelingDone (time, userId, actionId)
