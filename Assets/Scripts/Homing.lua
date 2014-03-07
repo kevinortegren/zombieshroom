@@ -23,7 +23,7 @@ end
 function Homing.ChannelingDone (time, userId, actionId)
 end
 
-function FireBall.Interrupted (time, userId, actionId)
+function Homing.Interrupted (time, userId, actionId)
 end
 
 function Homing.OnCreate (userId, actionId)
