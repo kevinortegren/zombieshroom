@@ -7,6 +7,7 @@ function Player.OnCreate(userId, actionId)
 	local playerComponent = PlayerComponent.New(player);
  	local network = Network.New(player, userId, actionId);
 	local transform = Transformation.New(player);
+	local script = Script.New(self, "Player");
 	
 	transform:SetPos(Vec3.New(100,10,0));
 
@@ -45,7 +46,6 @@ function Player.OnTeamSelect(self, teamId)
     local collision = Collision.New(self);
     local collisionResponder = CollisionResponder.New(self);
     local statComp = StatChange.New(self);
-    local script = Script.New(self, "Player");
     local playerAction = PlayerAction.New(self);
     local stateComponent = StateComponent.New(self);
     local tryPickup = TryPickupComponent.New(self);
