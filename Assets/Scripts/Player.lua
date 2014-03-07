@@ -68,7 +68,7 @@ function Player.OnTeamSelect(self, teamId)
 
     playerPhysics:SetMovementSpeed(25);
     playerPhysics:SetJumpForce(10); --Do not fucking change without good reason or I will hunt you down //Kim
-    playerPhysics:SetJumpBoostForce(0.9); --See comment above //Kim
+    playerPhysics:SetJumpBoostForce(30); --See comment above //Kim I do what i want //Wingly
 
     collision:SetMeshHandle("testchar0");
     Collision.AddPlayerObjectToWorld(self, collision, transform, playerPhysics, collisionResponder);
