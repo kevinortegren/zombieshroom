@@ -10,23 +10,21 @@ void ECS::EntitySystem::Process()
 		m_activeEntities.erase((*itr));
 	}
 	m_entitiesToRemove.clear();
+
+	Begin();
+
 	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end();)
 	{
 		if((*itr)->GetId() == -1)
 		{
-			std::cout << "Removing entity with ID = -1 from list of active entities in system with flag: " << m_flag << std::endl;
 			itr = m_activeEntities.erase(itr);
 		}
 		else
 		{
+			ProcessEntity((*itr));
 			itr++;
 		}
 	}
-
-	Begin();
-
-	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
-		ProcessEntity((*itr));
 
 	End();	
 }
