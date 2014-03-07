@@ -177,6 +177,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, ID.SynchronizedID);
 		}
+
 		void AbilitySpawn::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, ID);
@@ -193,12 +194,6 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, UserID);
 			p_bs->Serialize(p_writeToBitstream, TeamID);
-		}
-
-		void StatChangeTimeUp::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
-		{
-			p_bs->Serialize(p_writeToBitstream, UserID);
-			p_bs->Serialize(p_writeToBitstream, StatToReset);
 		}
 
 		void PlayerNameChange::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
@@ -349,6 +344,9 @@ namespace RootForce
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TimerComponent* p_c)
 		{
+			p_bs->Serialize(p_writeToBitstream, p_c->ScriptName);
+			p_bs->Serialize(p_writeToBitstream, p_c->FunctionName);
+			p_bs->Serialize(p_writeToBitstream, p_c->Target);
 			p_bs->Serialize(p_writeToBitstream, p_c->TimeLeft);
 			p_bs->Serialize(p_writeToBitstream, p_c->TimeUp);
 		}
@@ -378,15 +376,10 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, StatChange* p_c)
 		{
 			p_bs->Serialize(p_writeToBitstream, p_c->DamageResistance);
-			p_bs->Serialize(p_writeToBitstream, p_c->DamageResistanceTime);
 			p_bs->Serialize(p_writeToBitstream, p_c->JumpHeightChange);
-			p_bs->Serialize(p_writeToBitstream, p_c->JumpHeightChangeTime);
 			p_bs->Serialize(p_writeToBitstream, p_c->KnockbackResistance);
-			p_bs->Serialize(p_writeToBitstream, p_c->KnockbackResistanceTime);
 			p_bs->Serialize(p_writeToBitstream, p_c->SpeedChange);
-			p_bs->Serialize(p_writeToBitstream, p_c->SpeedChangeTime);
 		}
-
 
 		bool CanSerializeComponent(ComponentType::ComponentType p_type)
 		{

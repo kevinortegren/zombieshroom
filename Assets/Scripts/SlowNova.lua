@@ -30,7 +30,7 @@ function SlowNova.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "SlowNova");
-	local timerComp = Timer.New(self, SlowNova.duration);
+	TimerEntity.StartTimer(userId, actionId, SlowNova.duration, "SlowNova", "OnDestroy", self);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);

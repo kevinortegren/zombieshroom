@@ -30,6 +30,7 @@ function Homing.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+
 	--Components
 	local networkComp = Network.New(self, userId, actionId);
 	local transformComp = Transformation.New(self);
@@ -37,7 +38,9 @@ function Homing.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Homing");
-	local timerComp = Timer.New(self, Homing.duration);
+
+	TimerEntity.StartTimer(userId, actionId, Homing.duration, "Homing", "OnDestroy", self);
+
 	local dakComp = DamageAndKnockback.New(self, Homing.currentDamage , Homing.currentKnockback);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);

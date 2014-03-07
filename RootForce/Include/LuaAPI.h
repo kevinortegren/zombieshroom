@@ -468,6 +468,15 @@ namespace RootForce
 			g_world->GetEntityManager()->RemoveComponent<RootForce::WaterCollider>(*e);
 			return 0;
 		}
+		static int EntityGetTimer(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::TimerComponent **s = (RootForce::TimerComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::TimerComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::TimerComponent>(*e);
+			luaL_setmetatable(p_luaState, "Timer");
+			return 1;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		//TRANSFORMATION
@@ -2467,14 +2476,11 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static int TimerCreate(lua_State* p_luaState)
 		{
-			NumberOfArgs(2);
+			NumberOfArgs(1); // TimerEntity
+			
 			RootForce::TimerComponent **s = (RootForce::TimerComponent**)lua_newuserdata(p_luaState, sizeof(RootForce::TimerComponent*));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::TimerComponent>(*e);
-
-			(*s)->TimeLeft = (float)luaL_checknumber(p_luaState, 2);
-			//(*s)->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(std::string(luaL_checkstring(p_luaState, 2)), false);
-
 			luaL_setmetatable(p_luaState, "Timer");
 			return 1;
 		}
@@ -2484,6 +2490,21 @@ namespace RootForce
 			RootForce::TimerComponent **s = (RootForce::TimerComponent**)luaL_checkudata(p_luaState, 1, "Timer");
 			lua_pushnumber(p_luaState, (*s)->TimeLeft);
 			return 1;
+		}
+		static int TimerSet(lua_State* p_luaState)
+		{
+			NumberOfArgs(5); //TimerComponent, Duration, ScriptName, FunctionName, Target
+			RootForce::TimerComponent **s = (RootForce::TimerComponent**)luaL_checkudata(p_luaState, 1, "Timer");
+			(*s)->TimeLeft = (float) luaL_checknumber(p_luaState, 2);
+			(*s)->ScriptName = luaL_checkstring(p_luaState, 3);
+			(*s)->FunctionName = luaL_checkstring(p_luaState, 4);
+			ECS::Entity** target = (ECS::Entity**)luaL_checkudata(p_luaState, 5, "Entity");
+			Network::NetworkComponent* networkComponent = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*target);
+			assert(networkComponent != nullptr);
+
+			(*s)->Target = networkComponent->ID;
+
+			return 0;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -2575,34 +2596,30 @@ namespace RootForce
 		}
 		static int StatChangeSetSpeed(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
 			(*s)->SpeedChange = (float)luaL_checknumber(p_luaState, 2);
-			(*s)->SpeedChangeTime = (float)luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 		static int StatChangeSetJumpHeight(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
 			(*s)->JumpHeightChange = (float)luaL_checknumber(p_luaState, 2);
-			(*s)->JumpHeightChangeTime = (float)luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 		static int StatChangeSetKnockbackResistance(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
 			(*s)->KnockbackResistance = (float)luaL_checknumber(p_luaState, 2);
-			(*s)->KnockbackResistanceTime = (float)luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 		static int StatChangeSetDamageResistance(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::StatChange **s = (RootForce::StatChange**)luaL_checkudata(p_luaState, 1, "StatChange");
 			(*s)->DamageResistance = (float)luaL_checknumber(p_luaState, 2);
-			(*s)->DamageResistanceTime = (float)luaL_checknumber(p_luaState, 3);
 			return 0;
 		}
 
@@ -2723,8 +2740,8 @@ namespace RootForce
 			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
 			{"GetStatChange", EntityGetStatChange},
+			{"GetTimer", EntityGetTimer},
 			{"GetAnimation", EntityGetAnimation},
-			
 			{NULL, NULL}
 		};
 
@@ -3208,11 +3225,12 @@ namespace RootForce
 
 		static const struct luaL_Reg timercomponent_f [] = {
 			{"New", TimerCreate},
-			{"GetTimeLeft", TimerGetTimeLeft},
 			{NULL, NULL}
 		};
 
 		static const struct luaL_Reg timercomponent_m [] = {
+			{"GetTimeLeft", TimerGetTimeLeft},
+			{"Set", TimerSet},
 			{NULL, NULL}
 		};
 
