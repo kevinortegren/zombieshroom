@@ -187,12 +187,19 @@ namespace RootForce
 		void Death::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, LastDamageSource);
 		}
 
 		void PlayerTeamSelect::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
 		{
 			p_bs->Serialize(p_writeToBitstream, UserID);
 			p_bs->Serialize(p_writeToBitstream, TeamID);
+		}
+
+		void PlayerNameChange::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
+		{
+			p_bs->Serialize(p_writeToBitstream, Name);
+			p_bs->Serialize(p_writeToBitstream, UserID);
 		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)

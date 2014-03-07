@@ -20,6 +20,9 @@ end
 function Homing.ChannelingDone (time, userId, actionId)
 end
 
+function FireBall.Interrupted (time, userId, actionId)
+end
+
 function Homing.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
@@ -99,9 +102,7 @@ if entity:DoesExist() then
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				local network = entity:GetNetwork();
-				local receiverId = network:GetUserId();
-				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());
 			end
 			Homing.OnDestroy(self);
 		end

@@ -1,11 +1,11 @@
 Push = {};
-Push.knockback = 20;
-Push.currentKnockback = 20;
+Push.knockback = 40;
+Push.currentKnockback = 40;
 Push.cooldown = 1;
 Push.charges = -1;
 Push.chargeTime = 1;
 Push.channelingTime = 0;
-Push.duration = 0.2;
+Push.duration = 0.5;
 
 function Push.OnLoad()
 	ResourceManager.LoadParticle("fireball");
@@ -13,8 +13,9 @@ end
 
 function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
+		Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
 		Push.OnCreate(userId, actionId);
-		Push.currentKnockback = Push.knockback * ((time * 0.5) / Push.chargeTime);
+		
 	--end
 end
 
@@ -47,13 +48,13 @@ function Push.OnCreate (userId, actionId)
 	--transformComp:GetOrient():Pitch(-90);
 	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local startPos = casterEnt:GetTransformation():GetPos();
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 6, 1, false, false);
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 8, 1, false, false);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "fireball");
+		local particleComp = ParticleEmitter.New(self, "PushMeMaybe");
 	end
 end
 

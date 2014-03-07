@@ -3,6 +3,7 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 namespace RootForce
 {

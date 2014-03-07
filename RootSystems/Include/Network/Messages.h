@@ -75,6 +75,7 @@ namespace RootForce
 				AbilitySpawn,
 				Death,
 				PlayerTeamSelect,
+				PlayerNameChange,
 			};
 		}
 
@@ -357,6 +358,7 @@ namespace RootForce
 		struct Death
 		{
 			Network::UserID_t User;
+			Network::UserID_t LastDamageSource;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -369,6 +371,13 @@ namespace RootForce
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
 
+		struct PlayerNameChange
+		{
+			RakNet::RakString Name;
+			Network::UserID_t UserID;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
 		/*
 			Serialize functions for components
 		*/

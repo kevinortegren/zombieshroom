@@ -37,6 +37,7 @@ namespace RootSystems
 		int GetRandomSpawnpoint();
 		RootForce::Transform* GetSpawnpointTransform(int index);
 		void Respawn(int index, ECS::Entity* p_player);
+		void AwardKill(RootForce::Network::UserID_t p_killerID, ECS::Entity* p_deadEntity);
 
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
 		ECS::ComponentMapper<RootForce::Collision> m_collision;

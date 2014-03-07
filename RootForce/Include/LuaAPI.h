@@ -1712,16 +1712,11 @@ namespace RootForce
 		}
 		static int HealthDamage(lua_State* p_luaState)
 		{
-			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, receiverUserId
+			NumberOfArgs(3); // self, damageSourceUserId, damageAmount
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
 			
 			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
-
-			if((*s)->Health <= 0)
-			{
-				MatchStateSystem::AwardPlayerKill((*s)->LastDamageSourceID, (Network::UserID_t) luaL_checknumber(p_luaState, 4));
-			}
 			
 			return 0;
 		}
@@ -2079,7 +2074,30 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Animation>(*e);
 			luaL_setmetatable(p_luaState, "Animation");
 			return 1;
+		}	
+
+		static int AnimationSetUpperBodyAnimClip(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
+			int aClip = (int)luaL_checknumber(p_luaState, 2);
+			(*anim)->UpperBodyAnim.m_animClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			if(lua_toboolean(p_luaState, 3) != 0)
+				(*anim)->UpperBodyAnim.m_locked = 1;				
+			return 0;
 		}
+
+		static int AnimationSetLowerBodyAnimClip(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
+			int aClip = (int)luaL_checknumber(p_luaState, 2);
+			(*anim)->LowerBodyAnim.m_animClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			if(lua_toboolean(p_luaState, 3) != 0)
+				(*anim)->LowerBodyAnim.m_locked = 1;				
+			return 0;
+		}
+	
 		//////////////////////////////////////////////////////////////////////////
 		//RAGDOLL
 		//////////////////////////////////////////////////////////////////////////
@@ -2228,7 +2246,18 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->TeamScore[(int)luaL_checknumber(p_luaState, 2)]);
 			return 1;
 		}
-
+		//////////////////////////////////////////////////////////////////////////
+		//KILLANNOUNCEMENT
+		//////////////////////////////////////////////////////////////////////////
+		static int KillAnnouncementCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::KillAnnouncement **s = (RootForce::KillAnnouncement**)lua_newuserdata(p_luaState, sizeof(RootForce::KillAnnouncement*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::KillAnnouncement>(*e);
+			luaL_setmetatable(p_luaState, "KillAnnouncement");
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//ParticleEmitter
 		//////////////////////////////////////////////////////////////////////////
@@ -2712,6 +2741,7 @@ namespace RootForce
 			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
 			{"GetStatChange", EntityGetStatChange},
 			{"GetTimer", EntityGetTimer},
+			{"GetAnimation", EntityGetAnimation},
 			{NULL, NULL}
 		};
 
@@ -3053,6 +3083,8 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg animation_m [] = {
+			{"SetUpperAnimClip", AnimationSetUpperBodyAnimClip},
+			{"SetLowerAnimClip", AnimationSetLowerBodyAnimClip},
 			{NULL, NULL}
 		};
 
@@ -3103,6 +3135,15 @@ namespace RootForce
 			{"GetScoreLimit", TDMRuleSetGetScoreLimit},
 			{"GetTimeLeft", TDMRuleSetGetTimeLeft},
 			{"GetTeamScore", TDMRuleSetGetTeamScore},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg killAnnouncement_f [] = {
+			{"New", KillAnnouncementCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg killAnnouncement_m [] = {
 			{NULL, NULL}
 		};
 
@@ -3297,6 +3338,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statecomponent_f,		RootForce::LuaAPI::statecomponent_m,		"StateComponent");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::playercontrol_f,			RootForce::LuaAPI::playercontrol_m,			"PlayerControl");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::tdmruleset_f,			RootForce::LuaAPI::tdmruleset_m,			"TDMRuleSet");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::killAnnouncement_f,		RootForce::LuaAPI::killAnnouncement_m,		"KillAnnouncement");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::particlecomponent_f,		RootForce::LuaAPI::particlecomponent_m,		"ParticleEmitter");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::followercomponent_f,		RootForce::LuaAPI::followercomponent_m,		"Follower");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::homingcomponent_f,		RootForce::LuaAPI::homingcomponent_m,		"HomingComponent");

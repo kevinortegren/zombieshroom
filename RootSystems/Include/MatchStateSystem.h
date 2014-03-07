@@ -20,6 +20,17 @@ namespace RootForce
 		
 	};
 
+	typedef std::pair<ECS::Entity*, ECS::Entity*> KillPairType;
+	struct KillAnnouncement : public ECS::Component<KillAnnouncement>
+	{
+		//First is murderer and second is victim
+		std::vector<KillPairType> KillPair;
+
+		KillAnnouncement()
+		{
+		}
+	};
+
 	struct TDMRuleSet : public ECS::Component<TDMRuleSet>
 	{
 		float TimeLeft;
@@ -61,7 +72,6 @@ namespace RootForce
 		float GetTimeLeft();
 		int GetTeamScore(int p_team);
 
-		static void AwardPlayerKill(Network::UserID_t p_killerID, Network::UserID_t p_deadID); //Assign score and death after a kills has been made
 	private:
 		NetworkContext* m_networkContext;
 		RootEngine::GameSharedContext* m_gameSharedContext;

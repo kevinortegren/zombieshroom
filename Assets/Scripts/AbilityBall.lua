@@ -21,6 +21,10 @@ end
 
 function AbilityBall.ChargeDone (time, userId, actionId)
 	AbilityBall.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+
 end
 
 function AbilityBall.ChannelingDone (time, userId, actionId)
@@ -89,9 +93,7 @@ function AbilityBall.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				
 				if not health:IsDead() then
-					local network = entity:GetNetwork();
-					local receiverId = network:GetUserId();
-					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance(), receiverId);
+					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance());
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then

@@ -16,6 +16,9 @@ end
 function SlowNova.ChannelingDone (time, userId, actionId)
 end
 
+function FireBall.Interrupted (time, userId, actionId)
+end
+
 function SlowNova.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();

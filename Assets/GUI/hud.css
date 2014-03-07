@@ -50,6 +50,10 @@ img
 {
 	text-align: right;
 }
+.v_align_middle
+{
+  vertical-align: middle;
+}
 .red
 {
 	color: #FF9999;
@@ -92,6 +96,26 @@ img
 	background-size: 100% 100%;
 	font-size: 24px;
 }
+#KillAnnouncementContainer
+{
+	position: absolute;
+	top:70px;
+	left:100%;
+  margin-left: -200px;
+	width: 200px;
+	height: 70px;
+	text-align: right;
+	color: white;
+	font-size: 12px;
+}
+#KillAnnouncementContainer img
+{
+  height: 18px;
+}
+#KillAnnouncementContainer *
+{
+  vertical-align: middle;
+}
 #AnnouncementContainer
 {
 	position: absolute;
@@ -121,6 +145,8 @@ img
 	overflow-x: hidden;
 	overflow-y: auto;
 	font-family: Comic Sans MS;
+  display: table-cell;
+  vertical-align: bottom;
 }
 ::-webkit-scrollbar
 {
@@ -247,10 +273,11 @@ img
 }
 #scorescreen-wrapper
 {
+	padding: 18px 34px 5px;
 	width: 600px;
 	height: 350px;
 	margin: auto;
-	background: rgba(0,0,0,0.5);
+	background-image: url('ScoreBackground.png');
 }
 .scorewrapper
 {
@@ -275,34 +302,42 @@ img
 	margin: 64px 0 0 0;
 	display: inline-block;
 	text-align: right;
-}
-.slot>div
-{
-<!--	background-image: url('cooldown.png'); -->
-	background-size: 64px;
-	background-repeat: no-repeat;
-	background-position: 0% 64px;
-}
-.slot>div>div
-{
-
+	position: relative;
 	background-image: url('Abilityring.png');
 	background-repeat: no-repeat;
 }
-.slot>div>div>div
+.slot>div.focus
 {
+	height: 64px;
+	width: 64px;
+	position: absolute;
+	top: 0;
+	z-index: 1;
+}
+/* Ability cooldown */
+.slot>div.cooldown
+{
+	height: 64px;
+	width: 64px;
+	position: absolute;
+	top: 0;
+  background-image: url('cooldown.png');
+	background-size: 64px;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	z-index: -1;
+}
+/* Ability icon */
+.slot>div.icon
+{
+	position: absolute;
+	top: 0;
 	padding: 30px 15px 0 15px;
 	width: 34px;
 	height: 34px;
 	overflow: hidden;
   background: transparent;
-}
-.slot>div>div>div:nth-child(2)
-{
-	overflow: hidden;
-  position: relative;
-  background: transparent;
-  top:-64px;
+	z-index: -2;
 }
 @-webkit-keyframes spin {  
   from {  
@@ -312,7 +347,7 @@ img
     -webkit-transform: rotate(360deg);  
   } 
 }
-.slotselected>div>div>div:first-child
+.slotselected>div.focus
 {
   background-image: url('JustGlow.png');
   -webkit-animation-name: blinker;

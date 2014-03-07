@@ -70,9 +70,7 @@ function IceCube.OnCollide (self, entity)
 			local health = entity:GetHealth();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				if not health:IsDead() then
-					local network = entity:GetNetwork();
-					local receiverId = network:GetUserId();
-					health:Damage(abilityOwnerId, IceCube.damage, receiverId);
+					health:Damage(abilityOwnerId, IceCube.damage);
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then

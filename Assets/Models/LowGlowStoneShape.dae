@@ -13,20 +13,20 @@
 			exportTexTangents=1;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
 			exportXRefs=0;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
 		</comments>
-      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level3/v6.mb</source_data>
+      <source_data>file:///C:/Users/BTH/Dropbox/LvlMap/Level3/v7.mb</source_data>
     </contributor>
-    <created>2014-02-27T16:50:01</created>
-    <modified>2014-02-27T16:50:01</modified>
+    <created>2014-03-06T14:37:15</created>
+    <modified>2014-03-06T14:37:15</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
   </asset>
   <library_materials>
-    <material id="lambert2SG1" name="lambert2SG1">
-      <instance_effect url="#lambert2SG1-fx"/>
+    <material id="LowGlowMaterial" name="LowGlowMaterial">
+      <instance_effect url="#LowGlowMaterial-fx"/>
     </material>
   </library_materials>
   <library_effects>
-    <effect id="lambert2SG1-fx">
+    <effect id="LowGlowMaterial-fx">
       <profile_COMMON>
         <newparam sid="file5-surface">
           <surface type="2D">
@@ -224,7 +224,7 @@
     </geometry>
   </library_geometries>
   <library_visual_scenes>
-    <visual_scene id="VisualSceneNode" name="v6">
+    <visual_scene id="VisualSceneNode" name="v7">
       <node id="LowGlowStone" name="LowGlowStone" type="NODE">
         <translate sid="translate">7.053815 -3.669722 20.55974</translate>
         <rotate sid="rotateZ">0 0 1 0</rotate>
@@ -234,7 +234,7 @@
         <instance_geometry url="#LowGlowStoneShape">
           <bind_material>
             <technique_common>
-              <instance_material symbol="lambert2SG" target="#lambert2SG1">
+              <instance_material symbol="lambert2SG" target="#LowGlowMaterial">
                 <bind_vertex_input semantic="TEX0" input_semantic="TEXCOORD" input_set="0"/>
                 <bind_vertex_input semantic="TEX1" input_semantic="TEXCOORD" input_set="0"/>
               </instance_material>

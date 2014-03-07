@@ -51,6 +51,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Scalable>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StatChange>(500);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::KillAnnouncement>(1);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -194,9 +195,12 @@ namespace RootForce
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;		
-		m_displayWorldDebug = false;
 		m_displayDebugHUD = true;
 		m_displayGuiHUD = true;
+
+#ifndef _DEBUG
+		m_displayDebugHUD = false;
+#endif
 	}
 
 	void IngameState::Enter()
@@ -272,6 +276,7 @@ namespace RootForce
 		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
 		m_ingameMenu->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_displayIngameMenu = false;
+		m_ingameMenu->GetView()->SetActive(false);
 		
 		m_animationSystem->Start();
 
@@ -301,6 +306,7 @@ namespace RootForce
 		//Team selection stuff
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 		m_displayIngameMenu = true;
+		m_ingameMenu->GetView()->SetActive(true);
 		g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
 		m_ingameMenu->Reset();
 	}
@@ -354,8 +360,6 @@ namespace RootForce
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
-			PROFILE("GUI", g_engineContext.m_profiler);
-
 			g_engineContext.m_gui->Update();
 			//Update Menu to make sure Setting changes are made in the main thread
 			m_ingameMenu->Update();
@@ -368,10 +372,21 @@ namespace RootForce
 			}
 			else
 			{
-				if(m_displayGuiHUD)
-				g_engineContext.m_gui->Render(m_hud->GetView());
-				if(m_displayDebugHUD)
-				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				{
+					PROFILE("GUI HUD", g_engineContext.m_profiler);
+
+					m_hud->GetView()->SetActive(m_displayGuiHUD);
+					m_hud->GetView()->Focus();
+					if(m_displayGuiHUD)
+						g_engineContext.m_gui->Render(m_hud->GetView());
+				}
+				{
+					PROFILE("GUI Debug", g_engineContext.m_profiler);
+
+					g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
+					if(m_displayDebugHUD)
+						g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				}
 			}
 		}
 
@@ -580,12 +595,22 @@ namespace RootForce
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
 			m_displayIngameMenu = !m_displayIngameMenu;
+			m_ingameMenu->GetView()->SetActive(m_displayIngameMenu);
+			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_ingameMenu->Reset();
+		}
+		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
+			m_displayIngameMenu = !m_displayIngameMenu;
+			m_ingameMenu->GetView()->SetActive(m_displayIngameMenu);
 			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
 			m_ingameMenu->Reset();
 		}
 		if (m_ingameMenu->GetReturn())
 		{
 			m_displayIngameMenu = false;
+			m_ingameMenu->GetView()->SetActive(false);
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
 			m_ingameMenu->Reset();
 			// Update keybindings when returning to game
@@ -715,13 +740,6 @@ namespace RootForce
 		else if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::UP)
 		{
 			m_hud->SetValue("ShowScore", "false" );
-		}
-		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
-			m_displayIngameMenu = !m_displayIngameMenu;
-			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
-			m_ingameMenu->Reset();
 		}
 		if(m_displayIngameMenu)
 		{

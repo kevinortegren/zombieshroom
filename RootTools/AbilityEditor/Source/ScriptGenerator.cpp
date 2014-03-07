@@ -47,6 +47,10 @@ namespace AbilityEditorNameSpace
 		WriteChargeDone();
 		m_file << "\n";
 		WriteChannelingDone();
+
+		m_file << "function FireBall.Interrupted (time, userId, actionId)\n";
+		m_file << "end\n";
+
 		m_file << "\n";
 		WriteOnCreate(p_onCreate);
 		m_file << "\n";
@@ -594,9 +598,7 @@ namespace AbilityEditorNameSpace
 
 					m_file << "\t\t\tlocal health = entity:GetHealth();\n";
 					m_file << "\t\t\tif not health:IsDead() then\n";
-						m_file << "\t\t\t\tlocal network = entity:GetNetwork();\n";
-						m_file << "\t\t\t\tlocal receiverId = network:GetUserId();\n";
-						m_file << "\t\t\t\thealth:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), receiverId);\n";
+						m_file << "\t\t\t\thealth:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());\n";
 					m_file << "\t\t\tend\n";
 				if(dmgEnum == AbilityComponents::Damage::ENEMIES || dmgEnum == AbilityComponents::Damage::FRIENDLIES)
 					m_file << "\t\tend\n";
