@@ -704,6 +704,38 @@ namespace RootForce
 			return GameStates::Menu;
 		}
 
+		if(RootServer::MatchAny(event.EventType, 1, "KICK"))
+		{
+			if(m_networkContext.m_server != nullptr)
+			{
+				RootForce::Network::UserID_t userID = Network::ReservedUserID::NONE;
+				std::string name;
+				event.Data >> name;
+				event.Data >> name;
+				for(auto pair : g_networkEntityMap)
+				{
+					if(pair.first.ActionID != Network::ReservedActionID::CONNECT || pair.first.SequenceID != RootForce::Network::SEQUENCE_PLAYER_ENTITY || !pair.second)
+						continue;
+					PlayerComponent* playerComp = g_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
+					Network::NetworkComponent* networkComp = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(pair.second);
+					if(playerComp->Name.compare(name) == 0)
+					{
+						userID = networkComp->ID.UserID;
+						break;
+					}
+				}
+				if(userID != Network::ReservedUserID::NONE)
+				{
+					RakNet::SystemAddress sysAddress = m_networkContext.m_server->GetPeerInterface()->GetSystemAddressFromIndex(userID);
+					m_networkContext.m_server->GetPeerInterface()->CloseConnection(sysAddress, true);
+				}
+				else
+				{
+					m_hud->GetChatSystem()->JSAddMessage("Player not found, check your speeling!");
+				}
+			}
+		}
+
 		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
 		{
 			// Kill ourselves.
@@ -725,6 +757,7 @@ namespace RootForce
 
 			m_networkContext.m_client->GetPeerInterface()->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 		}
+
 
 		return GameStates::Ingame;
 	}

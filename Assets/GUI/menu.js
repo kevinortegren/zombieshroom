@@ -43,7 +43,7 @@ $(document).ready(function() {
     var address = $($("#selected").children()[0]).html().split(":");
     if(!address[1] || !address[0])
       return;
-    if($($("#selected").children()[0]).html() == "Yes")
+    if($($("#selected").children()[6]).html() == "Yes")
     {
       $("#lan-password-address").val($($("#selected").children()[0]).html());
       PromptPassword();

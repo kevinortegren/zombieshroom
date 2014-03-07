@@ -48,7 +48,6 @@ namespace RootForce
 	{
 		//JSAddMessage(Awesomium::ToString(p_array[0].ToString()).c_str()); //This line of code sounds retardeded :/
 
-		//TODO: check the first char for a / sign, if found it is a server event and should be treated differently
 		std::string temp = Awesomium::ToString(p_array[0].ToString());
 		if(temp[0] == '/')
 		{
