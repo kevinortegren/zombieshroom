@@ -3,7 +3,7 @@ ExplodingShroom.cooldown = 3;
 ExplodingShroom.charges = 3;
 ExplodingShroom.chargeTime = 0;
 ExplodingShroom.channelingTime = 0;
-ExplodingShroom.duration = 10;
+--ExplodingShroom.duration = 10;
 
 function ExplodingShroom.OnLoad()
 	ResourceManager.LoadModel("XplodingMushroom");
@@ -39,7 +39,7 @@ function ExplodingShroom.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "ExplodingShroom");
-	TimerEntity.StartTimer(userId, actionId, ExplodingShroom.duration, "ExplodingShroom", "OnDestroy", self);
+	--TimerEntity.StartTimer(userId, actionId, ExplodingShroom.duration, "ExplodingShroom", "OnDestroy", self);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);

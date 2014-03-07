@@ -13,8 +13,18 @@ void ECS::EntitySystem::Process()
 
 	Begin();
 
-	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
-		ProcessEntity((*itr));
+	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end();)
+	{
+		if((*itr)->GetId() == -1)
+		{
+			itr = m_activeEntities.erase(itr);
+		}
+		else
+		{
+			ProcessEntity((*itr));
+			itr++;
+		}
+	}
 
 	End();	
 }
