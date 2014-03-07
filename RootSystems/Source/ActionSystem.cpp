@@ -64,7 +64,8 @@ namespace RootSystems
 				AbilitySwitch(p_entity);
 				player->AbilityState = RootForce::AbilityState::OFF;
 
-				animation->m_animClip = RootForce::AnimationClip::RAGDOLL;
+				animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::RAGDOLL;
+				animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::RAGDOLL;
 				return;
 			}
 
@@ -129,13 +130,21 @@ namespace RootSystems
 		}
 
 		if(state->CurrentState == RootForce::EntityState::ASCENDING)
-			animation->m_animClip = RootForce::AnimationClip::ASCEND;
+		{
+			animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::ASCEND;
+			animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::ASCEND;
+		}
 		else if(state->CurrentState == RootForce::EntityState::DESCENDING)
-			animation->m_animClip = RootForce::AnimationClip::DESCEND;
+		{
+			animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::DESCEND;
+			animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::DESCEND;
+		}
 		else if(state->CurrentState == RootForce::EntityState::LANDING)
 		{
-			animation->m_animClip = RootForce::AnimationClip::LANDING;
-			animation->m_locked = 1;
+			animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::LANDING;
+			animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::LANDING;
+			animation->LowerBodyAnim.m_locked = 1;
+			animation->UpperBodyAnim.m_locked = 1;
 
 			state->CurrentState = RootForce::EntityState::GROUNDED;
 
@@ -144,35 +153,51 @@ namespace RootSystems
 		else
 		{
 			//if(action->StrafePower == 0 && action->MovePower == 0)
-			animation->m_animClip = RootForce::AnimationClip::IDLE;
+			animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::IDLE;
+			animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::IDLE;
 
 			if(!isGameOver)
 			{
 				if(action->MovePower < 0)
-					animation->m_animClip = RootForce::AnimationClip::BACKWARDS;
+				{
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::BACKWARDS;
+					animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::BACKWARDS;
+				}
 				else if(action->MovePower > 0)
-					animation->m_animClip = RootForce::AnimationClip::WALKING;
+				{
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::WALKING;
+					animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::WALKING;
+				}
 				if(action->StrafePower > 0)
-					animation->m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
+				{
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
+					animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
+				}
 				else if(action->StrafePower < 0)
-					animation->m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+				{
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+					animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
+				}
 				if(action->MovePower > 0 && action->StrafePower < 0)
 				{
-					animation->m_animClip = RootForce::AnimationClip::LEFTFORWARD;
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::LEFTFORWARD;
+					animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::LEFTFORWARD;
 				}
 				else if(action->MovePower > 0 && action->StrafePower > 0)
 				{
-					animation->m_animClip = RootForce::AnimationClip::RIGHTFORWARD;
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::RIGHTFORWARD;
+					animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::RIGHTFORWARD;
 				}
 				if(action->MovePower < 0 && action->StrafePower < 0)
 				{
-					animation->m_animClip = RootForce::AnimationClip::LEFTBACK;
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::LEFTBACK;
+					animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::LEFTBACK;
 				}
 				else if(action->MovePower < 0 && action->StrafePower > 0)
 				{
-					animation->m_animClip = RootForce::AnimationClip::RIGHTBACK;
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::RIGHTBACK;
+					animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::RIGHTBACK;
 				}
-
 
 			}
 		}
@@ -193,10 +218,12 @@ namespace RootSystems
 						// Apply jump force and go into jump animation
 						m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
 
-						if(animation->m_animClip != RootForce::AnimationClip::ASCEND && animation->m_animClip != RootForce::AnimationClip::DESCEND)
+						if((animation->UpperBodyAnim.m_animClip != RootForce::AnimationClip::ASCEND || animation->LowerBodyAnim.m_animClip != RootForce::AnimationClip::ASCEND ) && (animation->UpperBodyAnim.m_animClip != RootForce::AnimationClip::DESCEND || animation->LowerBodyAnim.m_animClip != RootForce::AnimationClip::DESCEND))
 						{
-							animation->m_animClip = RootForce::AnimationClip::JUMP_START;
-							animation->m_locked = 1;
+							animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::JUMP_START;
+							animation->UpperBodyAnim.m_locked = 1;
+							animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::JUMP_START;
+							animation->LowerBodyAnim.m_locked = 1;
 						}
 					}
 					else

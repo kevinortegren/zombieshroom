@@ -28,7 +28,7 @@ namespace RootForce
 		ECS::Entity* camera = m_world->GetTagManager()->GetEntityByTag("Camera");
 		ThirdPersonBehavior* cameraThird = m_world->GetEntityManager()->GetComponent<ThirdPersonBehavior>(camera);
 		
-		if(animation->m_animClip == AnimationClip::RAGDOLL)
+		if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 		{
 			
 			if(ragdoll->m_firstTime)
