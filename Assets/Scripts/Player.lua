@@ -7,7 +7,7 @@ function Player.OnCreate(userId, actionId)
 	local playerComponent = PlayerComponent.New(player);
  	local network = Network.New(player, userId, actionId);
 	local transform = Transformation.New(player);
-	local script = Script.New(self, "Player");
+	local script = Script.New(player, "Player");
 	
 	transform:SetPos(Vec3.New(100,10,0));
 
