@@ -2065,7 +2065,30 @@ namespace RootForce
 			*s = g_world->GetEntityManager()->CreateComponent<RootForce::Animation>(*e);
 			luaL_setmetatable(p_luaState, "Animation");
 			return 1;
+		}	
+
+		static int AnimationSetUpperBodyAnimClip(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
+			int aClip = (int)luaL_checknumber(p_luaState, 2);
+			(*anim)->UpperBodyAnim.m_animClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			if(lua_toboolean(p_luaState, 3) != 0)
+				(*anim)->UpperBodyAnim.m_locked = 1;				
+			return 0;
 		}
+
+		static int AnimationSetLowerBodyAnimClip(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
+			int aClip = (int)luaL_checknumber(p_luaState, 2);
+			(*anim)->LowerBodyAnim.m_animClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			if(lua_toboolean(p_luaState, 3) != 0)
+				(*anim)->LowerBodyAnim.m_locked = 1;				
+			return 0;
+		}
+	
 		//////////////////////////////////////////////////////////////////////////
 		//RAGDOLL
 		//////////////////////////////////////////////////////////////////////////
@@ -2700,6 +2723,8 @@ namespace RootForce
 			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
 			{"GetStatChange", EntityGetStatChange},
+			{"GetAnimation", EntityGetAnimation},
+			
 			{NULL, NULL}
 		};
 
@@ -3041,6 +3066,8 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg animation_m [] = {
+			{"SetUpperAnimClip", AnimationSetUpperBodyAnimClip},
+			{"SetLowerAnimClip", AnimationSetLowerBodyAnimClip},
 			{NULL, NULL}
 		};
 

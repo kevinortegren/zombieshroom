@@ -21,6 +21,10 @@ end
 
 function AbilityBall.ChargeDone (time, userId, actionId)
 	AbilityBall.OnCreate(userId, actionId);
+	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local animComp	= casterEnt:GetAnimation();
+	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+
 end
 
 function AbilityBall.ChannelingDone (time, userId, actionId)

@@ -40,8 +40,11 @@ namespace RootSystems
 		{
 			if(m_serverPeer != nullptr)
 			{
-				health->IsDead = true;
-				health->RespawnDelay = 3.0f;
+				if(m_clientPeer == nullptr)
+				{
+					health->IsDead = true;
+					health->RespawnDelay = 3.0f;
+				}
 
 				//Broadcast death
 				RootForce::NetworkMessage::Death m;

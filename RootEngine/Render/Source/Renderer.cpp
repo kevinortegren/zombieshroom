@@ -1082,6 +1082,12 @@ namespace Render
 	{
 		m_particles.Free((ParticleSystem*)p_particleSys);
 	}
+
+	DirectionalLight* GLRenderer::GetDirectionalLight()
+	{
+		return m_lighting.GetDirectionalLight();
+	}
+
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

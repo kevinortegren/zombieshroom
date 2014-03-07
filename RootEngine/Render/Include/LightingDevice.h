@@ -31,6 +31,7 @@ namespace Render
 		void SetAmbientLight(const glm::vec4& p_color);
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
+		DirectionalLight* GetDirectionalLight();
 
 		void SSAO();
 		void Clear();

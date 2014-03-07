@@ -77,6 +77,7 @@ $(document).ready(function() {
     $("#player-settings-menu").css("display", "none");
     $("div#settings-menu").css("display", "table");
     $("tr#settings-menu").css("display", "table-row");
+    Menu.ChangeName(true);
   } );
   // Graphics settings
   $("#graphics-settings-back").click(function() {

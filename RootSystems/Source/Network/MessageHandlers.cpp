@@ -1011,6 +1011,19 @@ namespace RootForce
 
 
 					} return true;
+				case NetworkMessage::MessageType::PlayerNameChange:
+					{
+						NetworkMessage::PlayerNameChange m;
+						m.Serialize(false, p_bs);
+
+						// Make sure we are in the correct state.
+						if(clientComponent->IsRemote && clientComponent->State == ClientState::CONNECTED)
+						{
+							ECS::Entity* player = FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(m.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
+							PlayerComponent* playerComp = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+							playerComp->Name = m.Name.C_String();
+						}
+					} return true;
 			}
 
 			return false;
@@ -1857,6 +1870,23 @@ namespace RootForce
 						m.Serialize(true, &bs);
 
 						m_peer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+					} return true;
+				case NetworkMessage::MessageType::PlayerNameChange:
+					{
+						NetworkMessage::PlayerNameChange m;
+						m.Serialize(false, p_bs);
+
+						ECS::Entity* player = FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(m.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
+						ECS::Entity* client = FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(m.UserID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::ReservedSequenceID::CLIENT_ENTITY));
+						PlayerComponent* playerComp = m_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
+						ClientComponent* clientComp = m_world->GetEntityManager()->GetComponent<ClientComponent>(client);
+						if(playerComp != nullptr && clientComp != nullptr)
+						{
+							playerComp->Name = m.Name.C_String();
+							clientComp->Name = m.Name;
+						}
+
+						
 					} return true;
 			}
 			

@@ -1,8 +1,6 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
-#include <RootSystems/Include/MatchStateSystem.h>
-#include <RootSystems/Include/Network/NetworkComponents.h>
 #include <iostream>
 #include <fstream>
 
@@ -88,22 +86,7 @@ namespace RootForce
 		else //if by the edge of the water, start disturbing at given interval
 			
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
-		{	
-
-#ifndef COMPILE_LEVEL_EDITOR
-			//Check if player and kill
-			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity) && m_playerWaterDeath)
-			{
-				HealthComponent* health = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity);
-				if(!health->IsDead)
-				{
-					health->Health = 0.0f;
-				}
-
-			}
-#endif
-		
-				
+		{					
 			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
@@ -163,7 +146,7 @@ namespace RootForce
 		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_texSize;
 
 		//Set standard values
-		m_speed		= 11.0f;
+		m_speed		= 13.0f;
 		m_dx		= (m_scale*64.0f) / m_texSize;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
@@ -202,6 +185,10 @@ namespace RootForce
 
 		//Water options
 		m_renderable->m_params[Render::Semantic::COLOR] = &m_waterOptions;
+
+		//Directional light
+		m_renderable->m_params[Render::Semantic::COLOREND] = &m_context->m_renderer->GetDirectionalLight()->m_color;
+		m_renderable->m_params[Render::Semantic::DIRECTION] = &m_context->m_renderer->GetDirectionalLight()->m_direction;
 
 		//Camera position in world space
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 

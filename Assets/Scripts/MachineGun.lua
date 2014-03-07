@@ -8,7 +8,7 @@ MachineGun.channelingTime = 0;
 MachineGun.duration = 5;
 
 function MachineGun.OnLoad()
-	ResourceManager.LoadParticle("MachineGun");
+	--ResourceManager.LoadParticle("MachineGun");
 end
 
 function MachineGun.ChargeDone (time, userId, actionId)
@@ -41,7 +41,7 @@ function MachineGun.OnCreate (userId, actionId)
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local rotQuat = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetQuaternion();
 	transformComp:GetOrient():SetOrientation(rotQuat);
-	transformComp:GetOrient():Pitch(-90);
+	transformComp:GetOrient():Pitch(-270);
 	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local tempPos = casterEnt:GetTransformation():GetPos();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
@@ -51,7 +51,12 @@ function MachineGun.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -0, 0));
 
 	if Global.IsClient then
-		local particleComp = ParticleEmitter.New(self, "MachineGun");
+		--local particleComp = ParticleEmitter.New(self, "MachineGun");
+		local renderComp = Renderable.New(self);
+		renderComp:SetModel("Thorn");
+		renderComp:SetMaterial("MachineGunMaterialOfPower");
+		renderComp:SetMaterialDiffuse("sandTiles");
+		renderComp:SetMaterialEffect("Mesh");
 		local waterComp = WaterCollider.New(self);
 		waterComp:SetDisturbPower(1);
 		waterComp:SetDisturbInterval(0.3);
@@ -78,6 +83,7 @@ if entity:DoesExist() then
 			end
 		end
 	end
+	MachineGun.OnDestroy(self);
 end
 end
 
