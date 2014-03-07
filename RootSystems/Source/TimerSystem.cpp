@@ -51,12 +51,13 @@ void RootForce::TimerSystem::ProcessEntity( ECS::Entity* p_entity )
 			g_engineContext.m_script->SetFunction(timer->ScriptName.C_String(), timer->FunctionName.C_String());
 			g_engineContext.m_script->AddParameterUserData(target, sizeof(ECS::Entity*), "Entity");
 			g_engineContext.m_script->ExecuteScript();
-			Network::DeleteEntities(g_networkEntityMap, network->ID, m_world->GetEntityManager());
 		}
-		else
-		{
-			g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "No existing entity associated with timer entity.");
-		}
+		//else
+		//{
+		//	g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "No existing entity associated with timer entity.");
+		//}
+
+		Network::DeleteEntities(g_networkEntityMap, network->ID, m_world->GetEntityManager());
 	}
 }
 
