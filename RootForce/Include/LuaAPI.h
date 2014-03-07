@@ -2717,6 +2717,8 @@ namespace RootForce
 			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
 			{"GetStatChange", EntityGetStatChange},
+			{"GetAnimation", EntityGetAnimation},
+			
 			{NULL, NULL}
 		};
 

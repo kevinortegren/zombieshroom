@@ -44,7 +44,6 @@ namespace RootForce
 				p_animation->UpperBodyAnim.m_animClip = p_animation->UpperBodyAnim.m_prevAnimClip;
 			else
 			{
-				std::cout << "UPPER ANIMATION CHANGED TO " << p_animation->UpperBodyAnim.m_animClip << std::endl;
 				p_animation->UpperBodyAnim.m_animTime = 0.0f;
 				p_animation->UpperBodyAnim.m_prevAnimClip = p_animation->UpperBodyAnim.m_animClip;
 				p_animation->UpperBodyAnim.m_blending = true;
