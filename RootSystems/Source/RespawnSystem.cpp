@@ -255,12 +255,13 @@ namespace RootSystems
 
 			ECS::Entity* killerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(p_killerID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
 			RootForce::PlayerComponent* killerPlayerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(killerEntity);
+			RootForce::HealthComponent* victimHealthComponent = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_deadEntity);
 
 			rules->TeamScore[killerPlayerComponent->TeamID]++;
 			killerPlayerComponent->Score++;
 
 			killAnnouncement->KillPair.push_back(RootForce::KillPairType(killerEntity, p_deadEntity));
-			killAnnouncement->AbilityName = "Swordaxe";
+			killAnnouncement->AbilityName = victimHealthComponent->LastDamageAbilityName;
 		}
 		else //Give minus in score if the kill was a suicide
 		{
