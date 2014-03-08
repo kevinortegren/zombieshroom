@@ -120,19 +120,6 @@ namespace RootForce
 			directions[i].z = glm::normalize(frustumCorners[i+4].z - frustumCorners[i].z);
 		}
 
-		// Define near/far planes for the sub frustrums.
-		float _near[RENDER_SHADOW_CASCADES];
-		_near[0] = camera->m_frustum.m_near;
-		_near[1] = 8.0f; //Daniel's 2k-values: 15, 60, 200
-		_near[2] = 40.0f;
-		_near[3] = 150.0f;
-		
-		float _far[RENDER_SHADOW_CASCADES];
-		_far[0] = _near[1];
-		_far[1] = _near[2];
-		_far[2] = _near[3];
-		_far[3] = camera->m_frustum.m_far;
-
 		static glm::vec4 localOBB[8] = 
 		{
 			glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f),
@@ -145,8 +132,21 @@ namespace RootForce
 			glm::vec4(1.0f, -1.0f, 1.0f, 1.0f)
 		};
 
-		if(RENDER_SHADOW_CASCADES > 1)
+		if(RENDER_SHADOW_CASCADES >= 4)
 		{
+			// Define near/far planes for the sub frustrums.
+			float _near[4];
+			_near[0] = camera->m_frustum.m_near;
+			_near[1] = 8.0f; //Daniel's 2k-values: 15, 60, 200
+			_near[2] = 40.0f;
+			_near[3] = 150.0f;
+
+			float _far[4];
+			_far[0] = _near[1];
+			_far[1] = _near[2];
+			_far[2] = _near[3];
+			_far[3] = camera->m_frustum.m_far;
+
 			// Create cascades.
 			for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 			{

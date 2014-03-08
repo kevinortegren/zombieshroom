@@ -34,7 +34,7 @@ uniform sampler2DArray g_ShadowDepth;
 
 out vec4 out_Color;
 
-const int CASCADES = 4;
+const int CASCADES = 1;
 const int PCF_NUM_SAMPLES = 16;
 
 vec2 poissonDisk[16] = vec2[](

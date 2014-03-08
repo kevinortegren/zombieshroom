@@ -26,10 +26,10 @@ public:
 		glGenTextures(2, Texture);
 		glBindTexture(GL_TEXTURE_2D, Texture[0]);
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
-		glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0); 
+		//glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0); 
 		glBindTexture(GL_TEXTURE_2D, Texture[1]);
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
-		glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0);
+		//glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	SurfaceTile(SurfaceTile& p_other)
