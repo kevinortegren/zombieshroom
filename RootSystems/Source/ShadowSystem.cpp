@@ -87,6 +87,8 @@ namespace RootForce
 			}
 		}
 
+		glm::mat4 lazyOrthoAroundMap = glm::ortho(m_minWorldX, m_maxWorldX, m_minWorldY, m_maxWorldY, -m_maxWorldZ, -m_minWorldZ);
+
 		// Get the eye camera.
 		ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
 		RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
@@ -143,36 +145,44 @@ namespace RootForce
 			glm::vec4(1.0f, -1.0f, 1.0f, 1.0f)
 		};
 
-		// Create cascades.
-		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		if(RENDER_SHADOW_CASCADES > 1)
 		{
-			AABB boundingbox;
-			for(int p = 0; p < 4; p++)
+			// Create cascades.
+			for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 			{
-				glm::vec3 nearCorner;
-				nearCorner = glm::swizzle<glm::X, glm::Y, glm::Z>(frustumCorners[p]);
-				boundingbox.Expand(nearCorner + directions[p] * _near[i]);
-				boundingbox.Expand(nearCorner + directions[p] * _far[i]);
+				AABB boundingbox;
+				for(int p = 0; p < 4; p++)
+				{
+					glm::vec3 nearCorner;
+					nearCorner = glm::swizzle<glm::X, glm::Y, glm::Z>(frustumCorners[p]);
+					boundingbox.Expand(nearCorner + directions[p] * _near[i]);
+					boundingbox.Expand(nearCorner + directions[p] * _far[i]);
+				}
+
+				glm::vec3 center = boundingbox.GetCenter();
+				glm::vec3 centerInWorldSpace = glm::swizzle<glm::X, glm::Y, glm::Z>(glm::inverse(camera->m_viewMatrix) * glm::vec4(center, 1.0f)); 
+				glm::vec4 centerInViewSpace = lightSpace * glm::vec4(centerInWorldSpace, 1.0f);
+
+				float nearPlane = 1.0f;
+				float lookAtDistance = glm::length(centerInViewSpace - 2000.0f) + nearPlane;
+				float radius = glm::length(center - glm::vec3(boundingbox.m_maxX, boundingbox.m_maxY, boundingbox.m_maxZ)); 
+				float farPlane = lookAtDistance + radius;
+
+				sc.m_projectionMatrices[i] = glm::ortho(-radius, radius, -radius, radius, nearPlane, farPlane);
+				sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
+				sc.m_viewProjections[i] = sc.m_projectionMatrices[i] * sc.m_viewMatrices[i];
 			}
 
-			glm::vec3 center = boundingbox.GetCenter();
-			glm::vec3 centerInWorldSpace = glm::swizzle<glm::X, glm::Y, glm::Z>(glm::inverse(camera->m_viewMatrix) * glm::vec4(center, 1.0f)); 
-			glm::vec4 centerInViewSpace = lightSpace * glm::vec4(centerInWorldSpace, 1.0f);
-			
-			float nearPlane = 1.0f;
-			float lookAtDistance = glm::length(centerInViewSpace - 2000.0f) + nearPlane;
-			float radius = glm::length(center - glm::vec3(boundingbox.m_maxX, boundingbox.m_maxY, boundingbox.m_maxZ)); 
-			float farPlane = lookAtDistance + radius;
-			
-			sc.m_projectionMatrices[i] = glm::ortho(-radius, radius, -radius, radius, nearPlane, farPlane);
-			sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
-			sc.m_viewProjections[i] = sc.m_projectionMatrices[i] * sc.m_viewMatrices[i];
+			sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] = OrthoProjectionFromFrustum(&camera->m_frustum, lightSpace);
+			sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1] = lightSpace;
+			sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
 		}
-
-		sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] = OrthoProjectionFromFrustum(&camera->m_frustum, lightSpace);
-		sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1] = lightSpace;
-		sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
-
+		else
+		{
+			sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] = lazyOrthoAroundMap;
+			sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1] = lightSpace;
+			sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
+		}
 		g_engineContext.m_renderer->AddShadowcaster(sc, (int)shadowcaster->m_directionalLightSlot);
 	}
 
