@@ -48,6 +48,21 @@ namespace RootForce
 			p_binding.Action = RootForce::PlayerAction::ACTIVATE_PUSH_ABILITY_PRESSED;
 			p_binding.ActionUp = RootForce::PlayerAction::ACTIVATE_PUSH_ABILITY_RELEASED;
 		}
+		else if(p_action.compare("SWITCH_ABILITY_FORWARD") == 0)
+		{
+			p_binding.Action = PlayerAction::SWITCH_ABILITY_FORWARD;
+			p_binding.Edge = true;
+		}
+		else if(p_action.compare("SCROLL_ABILITY_FORWARD") == 0)
+		{
+			p_binding.Action = PlayerAction::SCROLL_ABILITY_FORWARD;
+			p_binding.Edge = true;
+		}
+		else if(p_action.compare("SCROLL_ABILITY_BACKWARD") == 0)
+		{
+			p_binding.Action = PlayerAction::SCROLL_ABILITY_BACKWARD;
+			p_binding.Edge = true;
+		}
 		else
 			p_binding.Action = PlayerAction::NONE;
 

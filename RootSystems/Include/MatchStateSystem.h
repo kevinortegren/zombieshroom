@@ -25,6 +25,7 @@ namespace RootForce
 	{
 		//First is murderer and second is victim
 		std::vector<KillPairType> KillPair;
+		std::string AbilityName;
 
 		KillAnnouncement()
 		{

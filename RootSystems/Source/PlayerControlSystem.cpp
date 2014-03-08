@@ -194,6 +194,16 @@ namespace RootForce
 				//HandleAbilityReleased();
 				action->SelectedAbility = 2;
 			} break;
+			
+			case PlayerAction::SCROLL_ABILITY_FORWARD:
+			case PlayerAction::SWITCH_ABILITY_FORWARD:
+			{
+				action->SelectedAbility = (action->SelectedAbility + 1) % 3;
+			} break;
+			case PlayerAction::SCROLL_ABILITY_BACKWARD:
+			{
+				action->SelectedAbility = (action->SelectedAbility + 2) % 3;
+			} break;
 
 			case PlayerAction::ACTIVATE_ABILITY_PRESSED:
 			{

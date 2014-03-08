@@ -260,6 +260,7 @@ namespace RootSystems
 			killerPlayerComponent->Score++;
 
 			killAnnouncement->KillPair.push_back(RootForce::KillPairType(killerEntity, p_deadEntity));
+			killAnnouncement->AbilityName = "Swordaxe";
 		}
 		else //Give minus in score if the kill was a suicide
 		{
@@ -267,6 +268,7 @@ namespace RootSystems
 			rules->TeamScore[killedPlayerComponent->TeamID]--;
 
 			killAnnouncement->KillPair.push_back(RootForce::KillPairType(nullptr, p_deadEntity));
+			killAnnouncement->AbilityName = "RIP";
 		}
 		killedPlayerComponent->Deaths ++;
 	}

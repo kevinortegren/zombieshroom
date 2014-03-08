@@ -1731,6 +1731,11 @@ namespace RootForce
 			NumberOfArgs(3); // self, damageSourceUserId, damageAmount
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
+
+			Network::NetworkEntityID murdererId((*s)->LastDamageSourceID, Network::ReservedActionID::CONNECT, Network::ReservedSequenceID::CLIENT_ENTITY);
+			ECS::Entity* murderer = g_networkEntityMap[murdererId];
+			PlayerComponent* pc = g_world->GetEntityManager()->GetComponent<PlayerComponent>(murderer);
+			(*s)->LastDamageAbilityName = pc->AbilityScripts[pc->SelectedAbility].Name;
 			
 			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
 			
@@ -1897,12 +1902,19 @@ namespace RootForce
 			lua_pushnumber(p_luaState, (*s)->TeamID);
 			return 1;
 		}
-		static int PlayercomponentAddSelectedCharges(lua_State* p_luaState)
+		static int PlayerComponentAddSelectedCharges(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
 			(*s)->AbilityScripts[(*s)->SelectedAbility].Charges += (int)luaL_checknumber(p_luaState, 2);
-			return 1;
+			return 0;
+		}
+		static int PlayerComponentResetSelectedCooldown(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
+			(*s)->AbilityScripts[(*s)->SelectedAbility].Cooldown = 0;
+			return 0;
 		}
 		//////////////////////////////////////////////////////////////////////////
 		//PLAYERACTION
@@ -3042,20 +3054,21 @@ namespace RootForce
 		};
 
 		static const struct luaL_Reg playercomponent_m [] = {
-			{"SetName",				PlayerComponentSetName},
-			{"SetAbility",			PlayerComponentSetAbility},
-			{"SelectAbility",		PlayerComponentSelectAbility},
-			{"SetDeaths",			PlayerComponentSetDeaths},
-			{"SetScore",			PlayerComponentSetScore},
-			{"SetTeamId",			PlayerComponentSetTeamId},
-			{"StartCooldown",		PlayerComponentStartCooldown},
-			{"GetName",				PlayerComponentGetName},
-			{"GetAbility",			PlayerComponentGetAbility},
-			{"GetSelectedAbility",	PlayerComponentGetSelectedAbility},
-			{"GetDeaths",			PlayerComponentGetDeaths},
-			{"GetScore",			PlayerComponentGetScore},
-			{"GetTeamId",			PlayerComponentGetTeamId},
-			{"AddSelectedCharges",	PlayercomponentAddSelectedCharges},
+			{"SetName",					PlayerComponentSetName},
+			{"SetAbility",				PlayerComponentSetAbility},
+			{"SelectAbility",			PlayerComponentSelectAbility},
+			{"SetDeaths",				PlayerComponentSetDeaths},
+			{"SetScore",				PlayerComponentSetScore},
+			{"SetTeamId",				PlayerComponentSetTeamId},
+			{"StartCooldown",			PlayerComponentStartCooldown},
+			{"GetName",					PlayerComponentGetName},
+			{"GetAbility",				PlayerComponentGetAbility},
+			{"GetSelectedAbility",		PlayerComponentGetSelectedAbility},
+			{"GetDeaths",				PlayerComponentGetDeaths},
+			{"GetScore",				PlayerComponentGetScore},
+			{"GetTeamId",				PlayerComponentGetTeamId},
+			{"AddSelectedCharges",		PlayerComponentAddSelectedCharges},
+			{"ResetSelectedCooldown",	PlayerComponentResetSelectedCooldown},
 			{NULL, NULL}
 		};
 

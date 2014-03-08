@@ -114,6 +114,7 @@ namespace RootForce
 	{	
 		float Health;
 		Network::UserID_t LastDamageSourceID;
+		std::string LastDamageAbilityName;
 		bool IsDead;
 		bool WantsRespawn;
 		float RespawnDelay;
@@ -129,6 +130,7 @@ namespace RootForce
 			RespawnDelay = 0.0f;
 			SpawnIndex = -1;
 			SpawnPointReceived = false;
+			LastDamageAbilityName = "Swordaxe";
 		}
 	};
 #endif

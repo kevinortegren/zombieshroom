@@ -5,7 +5,7 @@ HealCharges.cooldown = 6;
 HealCharges.charges = 0;
 HealCharges.chargeTime = 0;
 HealCharges.channelingTime = 0;
-HealCharges.duration = 1;
+HealCharges.duration = 2;
 HealCharges.charges = 3;
 
 function HealCharges.OnLoad()
@@ -17,10 +17,14 @@ function HealCharges.ChargeDone (time, userId, actionId)
 end
 
 function HealCharges.ChannelingDone (time, userId, actionId)
-	HealCharges.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
+	--HealCharges.OnDestroy(Entity.GetEntityByNetworkID(userId, actionId, 0));
 end
 
 function HealCharges.Interrupted (time, userId, actionId)
+end
+
+function HealCharges.EndEffect(self)
+	self:GetParticleEmitter():SetAlive(-1.0);
 end
 
 function HealCharges.OnCreate (userId, actionId)
@@ -31,7 +35,8 @@ function HealCharges.OnCreate (userId, actionId)
 	--Components
 	local transformComp = Transformation.New(self);
 	local scriptComp = Script.New(self, "HealCharges");
-	TimerEntity.StartTimer(userId, actionId, HealCharges.duration, "HealCharges", "OnDestroy", self);
+	TimerEntity.StartTimer(userId, actionId, HealCharges.duration, "HealCharges", "EndEffect", self);
+	TimerEntity.StartTimer(userId, actionId, HealCharges.duration*2, "HealCharges", "OnDestroy", self);
 	Follower.New(self, casterEnt, 0);
 	--Setting stuff
 	local tempPos = casterEnt:GetTransformation():GetPos();

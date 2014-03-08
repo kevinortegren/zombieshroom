@@ -5,7 +5,7 @@ AbilityBall.cooldown = 3;
 AbilityBall.charges = 0;
 AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
-AbilityBall.duration = 4;
+AbilityBall.duration = 2;
 AbilityBall.charges = -1;
 
 function AbilityBall.OnLoad()
