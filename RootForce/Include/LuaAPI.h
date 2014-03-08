@@ -1732,7 +1732,7 @@ namespace RootForce
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
 
-			Network::NetworkEntityID murdererId((*s)->LastDamageSourceID, Network::ReservedActionID::CONNECT, Network::ReservedSequenceID::CLIENT_ENTITY);
+			Network::NetworkEntityID murdererId((*s)->LastDamageSourceID, Network::ReservedActionID::CONNECT, 0);
 			ECS::Entity* murderer = g_networkEntityMap[murdererId];
 			PlayerComponent* pc = g_world->GetEntityManager()->GetComponent<PlayerComponent>(murderer);
 			(*s)->LastDamageAbilityName = pc->AbilityScripts[pc->SelectedAbility].Name;
