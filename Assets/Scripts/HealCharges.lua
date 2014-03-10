@@ -12,6 +12,9 @@ function HealCharges.OnLoad()
 	ResourceManager.LoadParticle("HealCharges");
 end
 
+function HealCharges.ChargeStart(userId, actionId)
+end
+
 function HealCharges.ChargeDone (time, userId, actionId)
 	HealCharges.OnCreate(userId, actionId);
 end

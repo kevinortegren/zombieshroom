@@ -93,11 +93,12 @@ AnimClip = {
 	ASCEND 			= 5;
 	DESCEND 		= 6;
 	LANDING 		= 7;
-	SHOOT 			= 8;
+	SHOOT1 			= 8;
 	BACKWARDS		= 9;
 	LEFTFORWARD		= 10;
 	RIGHTFORWARD	= 11;
 	LEFTBACK		= 12;
 	RIGHTBACK		= 13;
-	RAGDOLL 		= 14;
+	CHARGING1		= 14;
+	RAGDOLL 		= 15;
 }

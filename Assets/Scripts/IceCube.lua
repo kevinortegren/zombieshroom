@@ -13,11 +13,14 @@ function IceCube.OnLoad()
 	ResourceManager.LoadEffect("Mesh_Refractive_Clear");
 end
 
+function IceCube.ChargeStart(userId, actionId)
+	
+end
+
 function IceCube.ChargeDone (time, userId, actionId)
 	IceCube.OnCreate(userId, actionId);
-	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local animComp	= casterEnt:GetAnimation();
-	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
 function IceCube.ChannelingDone (time, userId, actionId)

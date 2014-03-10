@@ -13,11 +13,14 @@ function Homing.OnLoad()
 	ResourceManager.LoadParticle("magic_missile_01");
 end
 
+function Homing.ChargeStart(userId, actionId)
+	
+end
+
 function Homing.ChargeDone (time, userId, actionId)
 	Homing.OnCreate(userId, actionId);
-	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local animComp	= casterEnt:GetAnimation();
-	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
 function Homing.ChannelingDone (time, userId, actionId)

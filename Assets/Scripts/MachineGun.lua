@@ -11,8 +11,13 @@ function MachineGun.OnLoad()
 	--ResourceManager.LoadParticle("MachineGun");
 end
 
+function MachineGun.ChargeStart(userId, actionId)
+end
+
 function MachineGun.ChargeDone (time, userId, actionId)
 	MachineGun.OnCreate(userId, actionId);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, false);
 end
 
 function MachineGun.ChannelingDone (time, userId, actionId)

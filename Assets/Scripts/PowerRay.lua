@@ -12,11 +12,14 @@ PowerRay.duration = 1;
 function PowerRay.OnLoad()
 end
 
+function PowerRay.ChargeStart(userId, actionId)
+	
+end
+
 function PowerRay.ChargeDone (time, userId, actionId)
 	PowerRay.OnCreate(userId, actionId);
-	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local animComp	= casterEnt:GetAnimation();
-	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
 function PowerRay.ChannelingDone (time, userId, actionId)
