@@ -96,13 +96,6 @@
 - Components:
     - Type: 0
       Data:
-        - Entity: 16
-          Model: WaterModel
-          Material:
-            Name: waterrender
-            Effect: MeshWater
-            Normal: computeTex3
-            Glow: SkyBox
         - Entity: 42
           Model: CharacterShape
           Material:
