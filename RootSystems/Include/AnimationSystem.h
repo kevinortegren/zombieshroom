@@ -23,34 +23,25 @@ namespace RootForce
 			ASCEND,
 			DESCEND,
 			LANDING,
-			SHOOT,
+			SHOOT1,
 			BACKWARDS,
 			LEFTFORWARD,
 			RIGHTFORWARD,
 			LEFTBACK,
 			RIGHTBACK,
-			RAGDOLL
+			CHARGING1,
+			RAGDOLL,
+			NOCLIP,
 		};
 	}
 
-	struct AnimUpper
+	struct AnimBodyPart
 	{
-		AnimUpper() : m_animClip(AnimationClip::WALKING), m_prevAnimClip(AnimationClip::WALKING), m_animTime(0.0f), m_blending(false), m_blendTime(0.0f), m_locked(0){}
+		AnimBodyPart() : m_animClip(AnimationClip::WALKING), m_prevAnimClip(AnimationClip::WALKING), m_animTime(0.0f), m_blending(false), m_blendTime(0.0f), m_locked(0), m_channelingClip(AnimationClip::AnimationClip::NOCLIP), m_chargingClip(AnimationClip::AnimationClip::NOCLIP){}
 		AnimationClip::AnimationClip		m_animClip;
 		AnimationClip::AnimationClip		m_prevAnimClip;
-		std::map<std::string, aiVector3D>	m_blendPos;
-		std::map<std::string, aiQuaternion> m_blendRot;
-		float	m_animTime;
-		int		m_locked;
-		bool	m_blending;
-		float	m_blendTime;
-	};
-
-	struct AnimLower
-	{
-		AnimLower() : m_animClip(AnimationClip::WALKING), m_prevAnimClip(AnimationClip::WALKING), m_animTime(0.0f), m_blending(false), m_blendTime(0.0f), m_locked(0){}
-		AnimationClip::AnimationClip		m_animClip;
-		AnimationClip::AnimationClip		m_prevAnimClip;
+		AnimationClip::AnimationClip		m_chargingClip;
+		AnimationClip::AnimationClip		m_channelingClip;
 		std::map<std::string, aiVector3D>	m_blendPos;
 		std::map<std::string, aiQuaternion> m_blendRot;
 		float	m_animTime;
@@ -63,8 +54,8 @@ namespace RootForce
 	{
 		Animation(){}
 		glm::mat4 m_bones[20];
-		AnimLower LowerBodyAnim;
-		AnimUpper UpperBodyAnim;
+		AnimBodyPart LowerBodyAnim;
+		AnimBodyPart UpperBodyAnim;
 	};
 
 	struct AnimationSystem : public ECS::ConcurrentSystem
@@ -75,7 +66,7 @@ namespace RootForce
 			SetUsage<Animation>();
 			SetUsage<Renderable>();
 			m_logger = nullptr;
-			m_blendTime = 0.1f;
+			m_blendTime = 0.15f;
 		}
 		void Init();
 		void Begin();
@@ -92,6 +83,8 @@ namespace RootForce
 		void UpdateLowerBodyAnimation(Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond );
 		void ReadNodeHeirarchyLower(const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
 		void ReadNodeHeirarchyUpper(const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
+
+		void CalcUpperRootNodeRotation(const aiNode* pNode, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
 
 		const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
 		unsigned int FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
@@ -110,5 +103,7 @@ namespace RootForce
 
 		float m_lowerAnimTime;
 		float m_upperAnimTime;
+
+		glm::mat4 m_upperRootRotation;
 	};
 }

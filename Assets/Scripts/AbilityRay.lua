@@ -5,14 +5,16 @@ AbilityRay.cooldown = 5;
 AbilityRay.chargeTime = 0.0;
 AbilityRay.channelingTime = 0.0;
 
+function AbilityRay.ChargeStart(userId, actionId)
+end
+
 function AbilityRay.ChargeDone(time, userId, actionId)
 end
 
 function AbilityRay.ChannelingDone(time, userId, actionId)
 	AbilityRay.OnCreate(userId, actionId);
-	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local animComp	= casterEnt:GetAnimation();
-	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
 function AbilityRay.Interrupted(time, userId, actionId)

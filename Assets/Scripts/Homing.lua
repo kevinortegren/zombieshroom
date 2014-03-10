@@ -3,8 +3,8 @@ Homing.damage = 90;
 Homing.knockback = 0;
 Homing.currentDamage = 100;
 Homing.currentKnockback = 0;
-Homing.cooldown = 10;
-Homing.charges = 2;
+Homing.cooldown = 1;
+Homing.charges = 3;
 Homing.chargeTime = 0;
 Homing.channelingTime = 0;
 Homing.duration = 60;
@@ -13,11 +13,14 @@ function Homing.OnLoad()
 	ResourceManager.LoadParticle("magic_missile_01");
 end
 
+function Homing.ChargeStart(userId, actionId)
+	
+end
+
 function Homing.ChargeDone (time, userId, actionId)
 	Homing.OnCreate(userId, actionId);
-	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local animComp	= casterEnt:GetAnimation();
-	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
 function Homing.ChannelingDone (time, userId, actionId)

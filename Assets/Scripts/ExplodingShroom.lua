@@ -15,11 +15,13 @@ function ExplodingShroom.OnLoad()
 	XplodingMushroomPlanted.OnLoad();
 end
 
+function ExplodingShroom.ChargeStart(userId, actionId)
+end
+
 function ExplodingShroom.ChargeDone (time, userId, actionId)
 	ExplodingShroom.OnCreate(userId, actionId);
-	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local animComp	= casterEnt:GetAnimation();
-	animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
 function ExplodingShroom.ChannelingDone (time, userId, actionId)

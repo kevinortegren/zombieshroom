@@ -13,6 +13,9 @@ function XplodingMushroomPlanted.OnLoad()
 	ShroomExplosion.OnLoad();
 end
 
+function XplodingMushroomPlanted.ChargeStart(userId, actionId)
+end
+
 function XplodingMushroomPlanted.ChargeDone (time, userId, actionId)
 	XplodingMushroomPlanted.OnCreate(userId, actionId);
 end

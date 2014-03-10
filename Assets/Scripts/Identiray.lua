@@ -9,6 +9,9 @@ Identiray.chargeTime = 0;
 Identiray.channelingTime = 0;
 Identiray.duration = 1;
 
+function Identiray.ChargeStart(userId, actionId)
+end
+
 function Identiray.ChargeDone (time, userId, actionId)
 	Identiray.OnCreate(userId, actionId);
 end

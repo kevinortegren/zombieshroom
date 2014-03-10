@@ -1,6 +1,6 @@
 FireBall = {};
 FireBall.knockback = 20;
-FireBall.cooldown = 3;
+FireBall.cooldown = 0;
 FireBall.chargeTime = 2;
 FireBall.channelingTime = 0;
 FireBall.duration = 0;
@@ -12,12 +12,19 @@ function FireBall.OnLoad()
 	Explosion.OnLoad();
 end
 
+function FireBall.ChargeStart(userId, actionId)
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChargingAnimClip(AnimClip.CHARGING1);
+end
+
 function FireBall.ChargeDone (time, userId, actionId)
   if(time >= FireBall.chargeTime) then
     local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 		local animComp	= casterEnt:GetAnimation();
-		animComp:SetUpperAnimClip(AnimClip.SHOOT, true);
+		animComp:SetUpperAnimClip(AnimClip.SHOOT1, true);
     FireBall.OnCreate(userId, actionId);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
   end
 end
 

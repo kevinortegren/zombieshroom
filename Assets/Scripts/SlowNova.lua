@@ -9,6 +9,9 @@ function SlowNova.OnLoad()
 	ResourceManager.LoadParticle("frostBlast");
 end
 
+function SlowNova.ChargeStart(userId, actionId)
+end
+
 function SlowNova.ChargeDone (time, userId, actionId)
 	SlowNova.OnCreate(userId, actionId);
 end

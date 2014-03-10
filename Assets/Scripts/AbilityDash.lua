@@ -11,6 +11,9 @@ AbilityDash.power = 25;
 function AbilityDash.OnLoad()
 end
 
+function AbilityDash.ChargeStart(userId, actionId)
+end
+
 function AbilityDash.ChargeDone(time, userId, actionId)
 end
 
