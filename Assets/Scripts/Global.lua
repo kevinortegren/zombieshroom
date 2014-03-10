@@ -100,5 +100,8 @@ AnimClip = {
 	LEFTBACK		= 12;
 	RIGHTBACK		= 13;
 	CHARGING1		= 14;
-	RAGDOLL 		= 15;
+	SHOOT2			= 15;
+	SHOOT3			= 16;
+	SHOOT4			= 17;
+	RAGDOLL 		= 18;
 }
