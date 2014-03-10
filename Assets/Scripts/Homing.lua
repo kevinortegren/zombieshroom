@@ -20,7 +20,7 @@ end
 function Homing.ChargeDone (time, userId, actionId)
 	Homing.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
 end
 
 function Homing.ChannelingDone (time, userId, actionId)

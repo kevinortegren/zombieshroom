@@ -18,6 +18,8 @@ end
 
 function RefractiveBall.ChargeDone (time, userId, actionId)
 	RefractiveBall.OnCreate(userId, actionId);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChannelingAnimClip(AnimClip.CHANNELINGSPHERE);
 end
 
 function RefractiveBall.ChannelingDone (time, userId, actionId)
