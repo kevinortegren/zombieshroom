@@ -105,22 +105,25 @@ namespace Physics
 			btAdjustInternalEdgeContacts(p_cp,p_obj2,p_obj1, p_id2,p_index2);
 		if(pointer1->m_collisions != nullptr)
 		{
-			
+			if(pointer1->m_collisions->count(pointer2->m_entity) == 0)
+			{
 				btVector3 temp = p_cp.getPositionWorldOnA();
 				RootForce::CollisionInfo info;
 				info.m_collisionPosition = glm::vec3(temp.x(), temp.y(), temp.z());
 				pointer1->m_collisions->insert(std::make_pair(pointer2->m_entity, info));
+			}
 			
 		}
 			
 		if(pointer2->m_collisions != nullptr)
 		{
-			
+			if(pointer2->m_collisions->count(pointer1->m_entity) == 0)
+			{
 				btVector3 temp = p_cp.getPositionWorldOnA();
 				RootForce::CollisionInfo info;
 				info.m_collisionPosition = glm::vec3(temp.x(), temp.y(), temp.z());
 				pointer2->m_collisions->insert(std::make_pair(pointer1->m_entity, info));
-			
+			}
 				//pointer2->m_collidedEntities->insert(pointer1->m_entity);
 		}
 
@@ -1159,6 +1162,14 @@ namespace Physics
 		
 	}
 
+	void RootPhysics::SetResitution( int p_objectHandle, float p_resitution )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
+			m_dynamicObjects.at(p_objectHandle)->setRestitution(p_resitution);
+	}
+
 	void RootPhysics::Move( int p_objectHandle , glm::vec3 p_position, float p_dt )
 	{
 		if(!DoesObjectExist(p_objectHandle))
@@ -1252,19 +1263,26 @@ namespace Physics
 			z = trans.getRotation().y();
 			w = trans.getRotation().z();
 			trans.setRotation(btQuaternion(x,y,z,w));
-
+			trans.setOrigin(trans.getOrigin() + btVector3(0, -0.5f, 0));
+			>
 			float data[16];
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
 			matrix = glm::make_mat4(data);
 			ragdoll->BuildRagdoll(p_bones, p_rootNode, p_nameToIndex, matrix, p_boneOffset, p_right);
-			//skape ragdoll fanskapet
+			//Deactivate the player and 
 			m_ragdolls.push_back(ragdoll);
 			m_userPointer.at(p_objectHandle)->m_ragdollIndex = m_ragdolls.size()-1;
 			m_userPointer.at(p_objectHandle)->m_type = PhysicsType::TYPE_RAGDOLL;
 			m_playerObjects.at(indexplayer)->Deactivate();
 			index  = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
-			m_ragdolls.at(index)->SetVelocity(m_playerObjects.at(indexplayer)->GetKnockbackVector() );
+			btVector3 knockback = m_playerObjects.at(indexplayer)->GetKnockbackVector();
+			if(knockback.length() > 10)
+				m_ragdolls.at(index)->SetVelocity(knockback );
+			else
+			{
+				m_ragdolls.at(index)->SetVelocity(btVector3(knockback.x() * 10, knockback.y(), knockback.z() * 10));
+			}
 			
 		}	
 		
@@ -1405,6 +1423,7 @@ namespace Physics
 	{
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 		{
+				p_body->setRestitution(0.8f);
 				p_body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
