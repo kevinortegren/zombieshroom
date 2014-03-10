@@ -1,12 +1,12 @@
 HealCharges = {};
 HealCharges.damage = 0;
 HealCharges.knockback = 0;
-HealCharges.cooldown = 6;
+HealCharges.cooldown = 0;
 HealCharges.charges = 0;
 HealCharges.chargeTime = 0;
 HealCharges.channelingTime = 0;
 HealCharges.duration = 1;
-HealCharges.charges = 3;
+HealCharges.charges = 1;
 
 function HealCharges.OnLoad()
 	ResourceManager.LoadParticle("HealCharges");
@@ -39,7 +39,7 @@ function HealCharges.OnCreate (userId, actionId)
 	transformComp:SetPos(tempPos);
   
   local health = casterEnt:GetHealth();
-  health:IncreaseHealth(25);
+  health:IncreaseHealth(50);
 	
   if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "HealCharges");

@@ -1,6 +1,6 @@
 FireBall = {};
 FireBall.knockback = 20;
-FireBall.cooldown = 3;
+FireBall.cooldown = 0;
 FireBall.chargeTime = 2;
 FireBall.channelingTime = 0;
 FireBall.duration = 0;
