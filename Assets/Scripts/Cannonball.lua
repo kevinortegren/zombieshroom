@@ -1,53 +1,55 @@
-AbilityBall = {};
-AbilityBall.damage = 20;
-AbilityBall.knockback = 20;
-AbilityBall.cooldown = 3;
-AbilityBall.charges = 0;
-AbilityBall.chargeTime = 0;
-AbilityBall.channelingTime = 0;
-AbilityBall.duration = 2;
-AbilityBall.charges = -1;
+Cannonball = {};
+Cannonball.damage = 20;
+Cannonball.knockback = 20;
+Cannonball.cooldown = 3;
+Cannonball.charges = 0;
+Cannonball.chargeTime = 0;
+Cannonball.channelingTime = 0;
+Cannonball.duration = 4;
+Cannonball.charges = -1;
 
-function AbilityBall.OnLoad()
+function Cannonball.OnLoad()
 	ResourceManager.LoadModel("Primitives/sphereTangents");
-	ResourceManager.LoadTexture("Fireball");
-	ResourceManager.LoadTexture("fireballDiffuse");
-	ResourceManager.LoadTexture("fireballSpecular");
-	ResourceManager.LoadTexture("fireballNormal");
-	ResourceManager.LoadTexture("fireballGlow");
+	ResourceManager.LoadTexture("Cannonball");
+	ResourceManager.LoadTexture("Cannonball_Diffuse");
+	ResourceManager.LoadTexture("Cannonball_Specular");
+	ResourceManager.LoadTexture("Cannonball_Normal");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("SmockeochElden");
+	ResourceManager.LoadScript("BigExplosion");
+	BigExplosion.OnLoad();
 end
 
-function AbilityBall.ChargeStart(userId, actionId)
+function Cannonball.ChargeStart(userId, actionId)
 end
 
-function AbilityBall.ChargeDone (time, userId, actionId)
-	AbilityBall.OnCreate(userId, actionId);
+function Cannonball.ChargeDone (time, userId, actionId)
+	Cannonball.OnCreate(userId, actionId);
 	--Animation clip
 	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
-function AbilityBall.ChannelingDone (time, userId, actionId)
+function Cannonball.ChannelingDone (time, userId, actionId)
 end
 
-function AbilityBall.Interrupted(time, userId, actionId)
+function Cannonball.Interrupted(time, userId, actionId)
 end
 
-function AbilityBall.Explode(self)
+function Cannonball.Explode(self)
 	if Global.IsClient then
 		self:RemoveRenderable();
-		self:RemovePointLight();
 	end
 	local network = self:GetNetwork();
-	Explosion.OnCreate(network:GetUserId(), network:GetActionId());
+	BigExplosion.OnCreate(network:GetUserId(), network:GetActionId());
 	self:RemovePhysics();
 	self:RemoveCollision();
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
+
+	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "Cannonball", "OnDestroy", self);
 end
 
-function AbilityBall.OnCreate (userId, actionId)
+function Cannonball.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
@@ -57,10 +59,8 @@ function AbilityBall.OnCreate (userId, actionId)
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
-	local scriptComp = Script.New(self, "AbilityBall");
+	local scriptComp = Script.New(self, "Cannonball");
 	local networkEnt = Network.New(self, userId, actionId);
-	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "Explode", self);
-	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration + 2, "AbilityBall", "OnDestroy", self);
 
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
@@ -69,31 +69,25 @@ function AbilityBall.OnCreate (userId, actionId)
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
 	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3))
 	
-	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 0.5, 1, true, true);
+	physicsComp:BindSphereShape(collisionComp, startPos, Quat.New(0,0,0,1), 1, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
-	transformComp:SetScale(Vec3.New(0.5, 0.5, 0.5));
 
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
-		renderComp:SetMaterial("Fireball");
+		renderComp:SetMaterial("Cannonball");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_DYNAMIC);
-		renderComp:SetMaterialDiffuse("fireballDiffuse");
-		renderComp:SetMaterialSpecular("fireballSpecular");
-		renderComp:SetMaterialNormal("fireballNormal");
-		renderComp:SetMaterialGlow("fireballGlow");
+		renderComp:SetMaterialDiffuse("Cannonball_Diffuse");
+		renderComp:SetMaterialSpecular("Cannonball_Specular");
+		renderComp:SetMaterialNormal("Cannonball_Normal");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
-		local particleComp = ParticleEmitter.New(self, "SmockeochElden");
-		local pointlightComp = PointLight.New(self);
-		pointlightComp:SetColor(Vec4.New(1.0, 0.5, 0.0, 1.0));
-		pointlightComp:SetRange(10.0);
-		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
+		local particleComp = ParticleEmitter.New(self, "CannonballTrail");
 	end
 end
 
-function AbilityBall.OnCollide (self, entity)
+function Cannonball.OnCollide (self, entity)
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
 		local hitPhys = entity:GetPhysics();
@@ -108,18 +102,23 @@ function AbilityBall.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				
 				if not health:IsDead() then
-					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance());
+					health:Damage(abilityOwnerId, Cannonball.damage * entity:GetStatChange():GetDamageResistance());
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Cannonball.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
+		end
+
+		if type ~= PhysicsType.TYPE_ABILITYSPAWN then
+			Logging.Log(LogLevel.DEBUG_PRINT, "Type: " .. type);
+			Cannonball.Explode(self);
 		end
 	end
 end
 
-function AbilityBall.OnDestroy (self)
+function Cannonball.OnDestroy (self)
 	Entity.Remove(self);
 end

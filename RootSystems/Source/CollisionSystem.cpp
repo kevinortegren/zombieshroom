@@ -2,6 +2,7 @@
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
+#include <RootSystems/Include/Components.h>
 
 
 namespace RootForce
@@ -21,22 +22,37 @@ namespace RootForce
 	{
 		CollisionResponder* cr = m_responders.Get(p_entity);
 
-		for(auto itr = cr->m_collisions.begin(); itr != cr->m_collisions.end(); ++itr)
+		auto collisions = cr->m_collisions;
+
+		for(auto itr = collisions.begin(); itr != collisions.end(); ++itr)
 		{
 			Script* script = m_scripts.Get(p_entity);
 			if(script->Name.compare("AbilitySpawnPoint") == 0)
 				int i = 0;
+// 			if(script->Name.compare("Cannonball") == 0)
+// 				int i = 0;
+
 			
-			m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
-			m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
-			m_engineContext->m_script->AddParameterUserData((*itr).first, sizeof(ECS::Entity*), "Entity");
-			m_engineContext->m_script->ExecuteScript();
+			RootForce::Collision* otherCollision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>((ECS::Entity*) itr->first);
+			RootForce::CollisionResponder* otherCollisionResponder = m_world->GetEntityManager()->GetComponent<RootForce::CollisionResponder>((ECS::Entity*) itr->first);
+			RootForce::Physics* otherPhysics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>((ECS::Entity*) itr->first);
+
+			if(otherCollision != nullptr)
+			{
+				m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
+				m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
+				m_engineContext->m_script->AddParameterUserData((*itr).first, sizeof(ECS::Entity*), "Entity");
+				m_engineContext->m_script->ExecuteScript();
+			}
 
 			if(p_entity->GetId() == -1)
 				return;
 		}
 
-		cr->m_collisions.clear();
+		if((p_entity->GetFlag() & ComponentType::COLLISIONRESPONDER) == ComponentType::COLLISIONRESPONDER)
+		{
+			cr->m_collisions.clear();
+		}
 	}
 
 	void CollisionSystem::End()

@@ -233,7 +233,7 @@ namespace RootForce
 			Collision* collision = m_world->GetEntityManager()->CreateComponent<Collision>(p_entity);
 			collision->m_handle = m_engineContext->m_physics->CreateHandle((void*)p_entity, RootEngine::Physics::PhysicsType::TYPE_ABILITYSPAWN, true);
 			collision->m_meshHandle = "AbilitySpawnPoint";
-			m_engineContext->m_physics->BindSphereShape(*collision->m_handle, transform->m_position , glm::quat(0,0,0,1), 1.0f, 1.0f, false);
+			m_engineContext->m_physics->BindSphereShape(*collision->m_handle, transform->m_position , glm::quat(0,0,0,1), 3.0f, 1.0f, false);
 			m_engineContext->m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
 		}
 	}

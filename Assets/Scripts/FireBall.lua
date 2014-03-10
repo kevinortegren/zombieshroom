@@ -19,16 +19,22 @@ end
 
 function FireBall.ChargeDone (time, userId, actionId)
   if(time >= FireBall.chargeTime) then
-    FireBall.OnCreate(userId, actionId);
-  else
     local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local animComp	= casterEnt:GetAnimation();
+		local animComp	= casterEnt:GetAnimation();
+		animComp:SetUpperAnimClip(AnimClip.SHOOT1, true);
+    FireBall.OnCreate(userId, actionId);
 	--Animation clip
 	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT2, true);
   end
 end
 
 function FireBall.ChannelingDone (time, userId, actionId)
+  if(time < FireBall.chargeTime) then
+    local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+    local playerComp = casterEnt:GetPlayerComponent();
+    playerComp:AddSelectedCharges(1);
+    playerComp:ResetSelectedCooldown();
+	end
 end
 
 function FireBall.Interrupted (time, userId, actionId)
@@ -59,6 +65,10 @@ function FireBall.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "SmockeochElden");
+		local pointlightComp = PointLight.New(self);
+		pointlightComp:SetColor(Vec4.New(0.2, 0.05, 1.0, 1.0));
+		pointlightComp:SetRange(5.0);
+		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
 	end
 end
 
