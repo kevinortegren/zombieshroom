@@ -1264,7 +1264,7 @@ namespace Physics
 			w = trans.getRotation().z();
 			trans.setRotation(btQuaternion(x,y,z,w));
 			trans.setOrigin(trans.getOrigin() + btVector3(0, -0.5f, 0));
-			>
+			
 			float data[16];
 			glm::mat4 matrix;
 			trans.getOpenGLMatrix(data);
