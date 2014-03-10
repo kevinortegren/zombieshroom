@@ -157,7 +157,7 @@ namespace RootEngine
 			virtual void SetPosition(int p_objectHandle, glm::vec3 p_position) = 0;
 			virtual void Move(int p_objectHandle , glm::vec3 p_position, float p_dt) = 0;
 			virtual void SetCollisionContainer(int p_objectHandle, std::map<void*, RootForce::CollisionInfo>* p_collisions) = 0;
-
+			virtual void SetResitution(int p_objectHandle, float p_resitution) = 0;
 			//virtual void SetPlayerOrientation(int p_objectHandle, float* p_playerOrientation) = 0;
 			
 
@@ -222,6 +222,7 @@ namespace RootEngine
 			glm::quat GetOrientation(int p_objectHandle);
 			glm::vec3 GetPlayerKnockbackVector(int p_objectHandle);
 			float GetPlayerVerticalVelocity(int p_objectHandle);
+
 			//Setters
 			void SetGravity(int p_objectHandle, glm::vec3 p_gravity);
 			void SetVelocity(int p_objectHandle, glm::vec3 p_velocity);
@@ -230,6 +231,8 @@ namespace RootEngine
 			void SetPosition(int p_objectHandle, glm::vec3 p_position);
 			void Move(int p_objectHandle , glm::vec3 p_position, float p_dt);
 			void SetCollisionContainer(int p_objectHandle , std::map<void*, RootForce::CollisionInfo>* p_collisions);
+			void SetResitution(int p_objectHandle, float p_resitution);
+
 			void RemoveObject(int p_objectHandle);
 			void RemoveAll();
 			std::shared_ptr<PhysicsMeshInterface> CreatePhysicsMesh() { return std::shared_ptr<PhysicsMeshInterface>(new PhysicsMesh); }

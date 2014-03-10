@@ -38,10 +38,10 @@ namespace Ragdoll
 	void Ragdoll::BuildRagdoll(glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_transform, glm::mat4 p_boneOffset[20], glm::vec3 p_right)
 	{
 		
-		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.57f, 0);
+		m_bodyPosOffset[BodyPart::SPINE] = btVector3(0, 0.47f, 0);
 
-		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(-0.0, -0.30f ,0);
-		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0.0, -0.30f ,0);
+		m_bodyPosOffset[BodyPart::LEFTUPLEG] = btVector3(-0.0, -0.20f ,0);
+		m_bodyPosOffset[BodyPart::RIGHTUPLEG] = btVector3(0.0, -0.20f ,0);
 		//m_bodyPosOffset[BodyPart::HIPS]= btVector3(0.0f , -0.4f, 0.0f);
 		m_nameToIndex = p_nameToIndex;
 		m_right = p_right;
@@ -545,7 +545,7 @@ namespace Ragdoll
 
 	void Ragdoll::SetVelocity( const btVector3& p_velocity )
 	{
-		
+
 		for(int i = 0 ;  i < BodyPart::TOTAL_BONE_AMUNT; i++)
 		{
 			if(i != BodyPart::HIPS && i !=BodyPart::SPINE)

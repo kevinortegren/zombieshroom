@@ -143,7 +143,9 @@ namespace RootSystems
 			
 			health->WantsRespawn = false;
 		}
-
+		
+		if(g_engineContext.m_physics->IsOnGround(*collision->m_handle))
+			health->LastDamageSourceID = RootForce::Network::ReservedUserID::NONE;
 		if(health->IsDead)
 			health->RespawnDelay -= dt;
 		if(health->Health > 200.0f)
