@@ -81,7 +81,7 @@ if entity:DoesExist() then
 
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), "PowerRay");
 			end
 
 			local hitPos = entity:GetTransformation():GetPos();

@@ -76,7 +76,7 @@ function IceCube.OnCollide (self, entity)
 			local health = entity:GetHealth();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				if not health:IsDead() then
-					health:Damage(abilityOwnerId, IceCube.damage);
+					health:Damage(abilityOwnerId, IceCube.damage, "IceCube");
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then

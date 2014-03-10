@@ -108,7 +108,7 @@ function AbilityBall.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				
 				if not health:IsDead() then
-					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance());
+					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance(), "AbilityBall");
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then

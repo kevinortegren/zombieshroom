@@ -108,7 +108,7 @@ if entity:DoesExist() then
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), "Homing");
 			end
 			Homing.OnDestroy(self);
 		end
