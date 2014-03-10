@@ -15,9 +15,15 @@ void ECS::EntitySystem::Process()
 
 	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end();)
 	{
+		auto removeIterator = std::find(m_entitiesToRemove.begin(), m_entitiesToRemove.end(), (*itr));
 		if((*itr)->GetId() == -1)
 		{
 			itr = m_activeEntities.erase(itr);
+		}
+		else if(removeIterator != m_entitiesToRemove.end())
+		{
+			itr = m_activeEntities.erase(itr);
+			m_entitiesToRemove.erase(removeIterator);
 		}
 		else
 		{

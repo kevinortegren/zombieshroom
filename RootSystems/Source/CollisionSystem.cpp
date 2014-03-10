@@ -30,10 +30,17 @@ namespace RootForce
 			if(script->Name.compare("AbilitySpawnPoint") == 0)
 				int i = 0;
 			
-			m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
-			m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
-			m_engineContext->m_script->AddParameterUserData((*itr).first, sizeof(ECS::Entity*), "Entity");
-			m_engineContext->m_script->ExecuteScript();
+			RootForce::Collision* otherCollision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>((ECS::Entity*) itr->first);
+			RootForce::CollisionResponder* otherCollisionResponder = m_world->GetEntityManager()->GetComponent<RootForce::CollisionResponder>((ECS::Entity*) itr->first);
+			RootForce::Physics* otherPhysics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>((ECS::Entity*) itr->first);
+
+			if(otherCollision != nullptr && otherPhysics != nullptr)
+			{
+				m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
+				m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
+				m_engineContext->m_script->AddParameterUserData((*itr).first, sizeof(ECS::Entity*), "Entity");
+				m_engineContext->m_script->ExecuteScript();
+			}
 
 			if(p_entity->GetId() == -1)
 				return;
