@@ -7,6 +7,9 @@ AbilityTest.chargeTime = 0;
 AbilityTest.channelingTime = 0;
 AbilityTest.duration = 50;
 
+function AbilityTest.ChargeStart(userId, actionId)
+end
+
 function AbilityTest.ChargeDone (time, userId, actionId)
 	AbilityTest.OnCreate(userId, actionId);
 end

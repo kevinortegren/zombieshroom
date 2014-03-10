@@ -195,6 +195,32 @@ namespace RootSystems
 						}
 					}
 				}
+				if(player->AbilityState == RootForce::AbilityState::CHARGING)
+				{
+					if(animation->UpperBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP)
+					{
+						animation->UpperBodyAnim.m_animClip = animation->UpperBodyAnim.m_chargingClip;
+						animation->UpperBodyAnim.m_locked = 0;
+					}
+					if(animation->LowerBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE)
+					{
+						animation->LowerBodyAnim.m_animClip = animation->LowerBodyAnim.m_chargingClip;
+						animation->LowerBodyAnim.m_locked = 0;
+					}
+				}
+				else if(player->AbilityState == RootForce::AbilityState::CHANNELING)
+				{
+					if(animation->UpperBodyAnim.m_channelingClip != RootForce::AnimationClip::NOCLIP)
+					{
+						animation->UpperBodyAnim.m_animClip = animation->UpperBodyAnim.m_channelingClip;
+						animation->UpperBodyAnim.m_locked = 0;
+					}
+					if(animation->LowerBodyAnim.m_channelingClip != RootForce::AnimationClip::NOCLIP && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE)
+					{
+						animation->LowerBodyAnim.m_animClip = animation->LowerBodyAnim.m_channelingClip;
+						animation->LowerBodyAnim.m_locked = 0;
+					}
+				}
 			}
 
 			// Activate ability! Pew pew!
@@ -238,6 +264,7 @@ namespace RootSystems
 		RootForce::PlayerComponent* player = m_player.Get(p_entity);
 		RootForce::PlayerActionComponent* action = m_action.Get(p_entity);
 		RootForce::Network::NetworkComponent* network = m_network.Get(p_entity);
+		RootForce::Animation* animation = m_animation.Get(p_entity);
 
 		player->SelectedAbility = action->SelectedAbility;
 
@@ -257,6 +284,10 @@ namespace RootSystems
 					case RootForce::AbilityEventType::CHARGE_START:
 					{
 						player->AbilityState = RootForce::AbilityState::CHARGING;
+						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeStart");
+						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
+						g_engineContext.m_script->ExecuteScript();
 
 						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
@@ -299,6 +330,10 @@ namespace RootSystems
 						if(player->AbilityScripts[abilityEvent.ActiveAbility].Charges == 0)
 							player->AbilityScripts[abilityEvent.ActiveAbility] = RootForce::AbilityInfo();
 
+						animation->UpperBodyAnim.m_channelingClip = RootForce::AnimationClip::NOCLIP;
+						animation->LowerBodyAnim.m_channelingClip = RootForce::AnimationClip::NOCLIP;
+						animation->UpperBodyAnim.m_chargingClip = RootForce::AnimationClip::NOCLIP;
+						animation->LowerBodyAnim.m_chargingClip = RootForce::AnimationClip::NOCLIP;
 						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Stop channeling ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 
@@ -320,6 +355,10 @@ namespace RootSystems
 						if(player->AbilityScripts[abilityEvent.ActiveAbility].Charges == 0)
 							player->AbilityScripts[abilityEvent.ActiveAbility] = RootForce::AbilityInfo();
 
+						animation->UpperBodyAnim.m_channelingClip = RootForce::AnimationClip::NOCLIP;
+						animation->LowerBodyAnim.m_channelingClip = RootForce::AnimationClip::NOCLIP;
+						animation->UpperBodyAnim.m_chargingClip = RootForce::AnimationClip::NOCLIP;
+						animation->LowerBodyAnim.m_chargingClip = RootForce::AnimationClip::NOCLIP;
 						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Interrupted ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
 					} break;
 				}

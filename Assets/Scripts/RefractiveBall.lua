@@ -13,6 +13,9 @@ function RefractiveBall.OnLoad()
 	ResourceManager.LoadEffect("Mesh_Refractive");
 end
 
+function RefractiveBall.ChargeStart(userId, actionId)
+end
+
 function RefractiveBall.ChargeDone (time, userId, actionId)
 	RefractiveBall.OnCreate(userId, actionId);
 end

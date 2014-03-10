@@ -2113,6 +2113,42 @@ namespace RootForce
 				(*anim)->LowerBodyAnim.m_locked = 1;				
 			return 0;
 		}
+
+		static int AnimationSetUpperBodyChargingAnimClip(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
+			int aClip = (int)luaL_checknumber(p_luaState, 2);
+			(*anim)->UpperBodyAnim.m_chargingClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			return 0;
+		}
+
+		static int AnimationSetLowerBodyChargingAnimClip(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
+			int aClip = (int)luaL_checknumber(p_luaState, 2);
+			(*anim)->LowerBodyAnim.m_chargingClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			return 0;
+		}
+
+		static int AnimationSetUpperBodyChannelingAnimClip(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
+			int aClip = (int)luaL_checknumber(p_luaState, 2);
+			(*anim)->UpperBodyAnim.m_channelingClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			return 0;
+		}
+
+		static int AnimationSetLowerBodyChannelingAnimClip(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
+			int aClip = (int)luaL_checknumber(p_luaState, 2);
+			(*anim)->LowerBodyAnim.m_channelingClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			return 0;
+		}
 	
 		//////////////////////////////////////////////////////////////////////////
 		//RAGDOLL
@@ -3113,6 +3149,10 @@ namespace RootForce
 		static const struct luaL_Reg animation_m [] = {
 			{"SetUpperAnimClip", AnimationSetUpperBodyAnimClip},
 			{"SetLowerAnimClip", AnimationSetLowerBodyAnimClip},
+			{"SetUpperChargingAnimClip", AnimationSetUpperBodyChargingAnimClip},
+			{"SetLowerChargingAnimClip", AnimationSetLowerBodyChargingAnimClip},
+			{"SetUpperChannelingAnimClip", AnimationSetUpperBodyChannelingAnimClip},
+			{"SetLowerChannelingAnimClip", AnimationSetLowerBodyChannelingAnimClip},
 			{NULL, NULL}
 		};
 
