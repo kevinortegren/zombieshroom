@@ -29,7 +29,8 @@ namespace RootForce
 
 			UpdateUpperBodyAnimation(renderable, animation, TicksPerSecond);
 			UpdateLowerBodyAnimation(renderable, animation, TicksPerSecond);
-
+			//Calc upper root node rotation
+			CalcUpperRootNodeRotation(tempScene->mRootNode, animation, renderable, tempScene);
 			//Begin with lower body, which includes the hips(root node in animation)
 			ReadNodeHeirarchyLower(tempScene->mRootNode, glm::mat4(1.0), animation, renderable, tempScene);
 		}
@@ -127,17 +128,11 @@ namespace RootForce
 		glm::mat4x4 gm = glm::mat4x4();
 		memcpy(&gm[0][0], &am[0][0], sizeof(aiMatrix4x4));
 		glm::mat4 NodeTransformation(glm::transpose(gm));
-
+		glm::mat4 NodeTranslate;
 		const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
 
 		if (pNodeAnim) 
 		{
-			/*
-			// Interpolate scaling and generate scaling transformation matrix
-			aiVector3D Scaling;
-			CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-			glm::mat4 ScalingM = glm::scale(glm::mat4(1.0f), glm::vec3(Scaling.x, Scaling.y, Scaling.z));*/
-			// Interpolate rotation and generate rotation transformation matrix
 			aiQuaternion RotationQ;
 			if(p_anim->LowerBodyAnim.m_blending)
 				CalcBlendedRotation(RotationQ, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->LowerBodyAnim.m_animClip)->m_startFrame, p_anim->LowerBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()], p_anim->LowerBodyAnim.m_blendTime );
@@ -168,6 +163,7 @@ namespace RootForce
 
 			// Combine the above transformations
 			NodeTransformation =  TranslationM * RotationM;
+			NodeTranslate = TranslationM;
 		}
 		glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
 
@@ -182,7 +178,7 @@ namespace RootForce
 			if(i != 2)
 				ReadNodeHeirarchyLower(pNode->mChildren[i], GlobalTransformation, p_anim, p_render, p_aiScene);
 			else
-				ReadNodeHeirarchyUpper(pNode->mChildren[i], GlobalTransformation, p_anim, p_render, p_aiScene);
+				ReadNodeHeirarchyUpper(pNode->mChildren[i], NodeTranslate * m_upperRootRotation, p_anim, p_render, p_aiScene);
 		}
 	}
 	
@@ -202,12 +198,6 @@ namespace RootForce
 
 		if (pNodeAnim) 
 		{
-			/*
-			// Interpolate scaling and generate scaling transformation matrix
-			aiVector3D Scaling;
-			CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-			glm::mat4 ScalingM = glm::scale(glm::mat4(1.0f), glm::vec3(Scaling.x, Scaling.y, Scaling.z));*/
-			// Interpolate rotation and generate rotation transformation matrix
 			aiQuaternion RotationQ;
 			if(p_anim->UpperBodyAnim.m_blending)
 				CalcBlendedRotation(RotationQ, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->UpperBodyAnim.m_animClip)->m_startFrame, p_anim->UpperBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()], p_anim->UpperBodyAnim.m_blendTime);
@@ -250,6 +240,36 @@ namespace RootForce
 		for (unsigned int i = 0 ; i < pNode->mNumChildren ; i++) 
 		{
 			ReadNodeHeirarchyUpper(pNode->mChildren[i], GlobalTransformation, p_anim, p_render, p_aiScene);
+		}
+	}
+
+	void AnimationSystem::CalcUpperRootNodeRotation( const aiNode* pNode, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene )
+	{
+		const aiAnimation* pAnimation = p_aiScene->mAnimations[0];
+
+		const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, "Character1_Hips");
+
+		if (pNodeAnim) 
+		{
+			aiQuaternion RotationQ;
+			if(p_anim->UpperBodyAnim.m_blending)
+				CalcBlendedRotation(RotationQ, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->UpperBodyAnim.m_animClip)->m_startFrame, p_anim->UpperBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()], p_anim->UpperBodyAnim.m_blendTime);
+			else
+			{
+				CalcInterpolatedRotation(RotationQ, m_upperAnimTime, pNodeAnim, p_anim);
+				p_anim->UpperBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()] = RotationQ;
+			}
+
+			aiMatrix3x3 am3 = RotationQ.GetMatrix(); 
+			glm::mat3 gm3 = glm::mat3();
+
+			memcpy(&gm3[0][0], &am3[0][0], sizeof(aiMatrix3x3));
+
+			m_upperRootRotation = glm::mat4(glm::transpose(gm3));
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::NON_FATAL_ERROR, "Root node not found for upper body");
 		}
 	}
 

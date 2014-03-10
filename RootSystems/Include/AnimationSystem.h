@@ -93,6 +93,8 @@ namespace RootForce
 		void ReadNodeHeirarchyLower(const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
 		void ReadNodeHeirarchyUpper(const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
 
+		void CalcUpperRootNodeRotation(const aiNode* pNode, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
+
 		const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName);
 		unsigned int FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
 		unsigned int FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
@@ -110,5 +112,7 @@ namespace RootForce
 
 		float m_lowerAnimTime;
 		float m_upperAnimTime;
+
+		glm::mat4 m_upperRootRotation;
 	};
 }
