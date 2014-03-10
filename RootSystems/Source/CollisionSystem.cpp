@@ -29,12 +29,15 @@ namespace RootForce
 			Script* script = m_scripts.Get(p_entity);
 			if(script->Name.compare("AbilitySpawnPoint") == 0)
 				int i = 0;
+// 			if(script->Name.compare("Cannonball") == 0)
+// 				int i = 0;
+
 			
 			RootForce::Collision* otherCollision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>((ECS::Entity*) itr->first);
 			RootForce::CollisionResponder* otherCollisionResponder = m_world->GetEntityManager()->GetComponent<RootForce::CollisionResponder>((ECS::Entity*) itr->first);
 			RootForce::Physics* otherPhysics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>((ECS::Entity*) itr->first);
 
-			if(otherCollision != nullptr && otherPhysics != nullptr)
+			if(otherCollision != nullptr)
 			{
 				m_engineContext->m_script->SetFunction(script->Name, "OnCollide");
 				m_engineContext->m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");

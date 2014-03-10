@@ -108,7 +108,11 @@ function Cannonball.OnCollide (self, entity)
 				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Cannonball.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
-		Cannonball.Explode(self);
+
+		if type ~= PhysicsType.TYPE_ABILITYSPAWN then
+			Logging.Log(LogLevel.DEBUG_PRINT, "Type: " .. type);
+			Cannonball.Explode(self);
+		end
 	end
 end
 
