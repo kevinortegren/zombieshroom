@@ -62,22 +62,19 @@ namespace ECS
 			return component;
 		}
 
-
 		// Removes a component from an entity.
 		template<class T> 
 		void RemoveComponent(Entity* p_entity)
 		{
-			assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
-	
-			m_allocator.Free<T>((T*) m_components[Component<T>::GetTypeId()][p_entity->m_id]);
-
-			m_components[Component<T>::GetTypeId()][p_entity->m_id] = nullptr;
-
-			p_entity->m_flag ^= (1ULL << Component<T>::GetTypeId());
-
-			m_systemManager->RemoveEntityFromSystems(p_entity);
-			
+		   assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
+ 
+		   if(m_components[Component<T>::GetTypeId()][p_entity->m_id] != nullptr)
+		   {
+			    m_componentsToBeRemoved.push_back(std::pair<unsigned int, Entity*>(Component<T>::GetTypeId(), p_entity));
+		   }	
 		}
+
+		void CleanUp();
 
 		template<class T>
 		T* GetComponent(Entity* p_entity)
@@ -115,5 +112,7 @@ namespace ECS
 		std::vector<std::vector<ComponentInterface*>> m_components; // CompID, EntityId, CompType.
 
 		ComponentAllocator m_allocator;
+
+		std::vector<std::pair<unsigned int, Entity*>> m_componentsToBeRemoved;
 	};
 }

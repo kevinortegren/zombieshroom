@@ -119,3 +119,22 @@ std::vector<ECS::Entity*> ECS::EntityManager::GetAllEntities()
 
 	return result;
 }
+
+void ECS::EntityManager::CleanUp()
+{
+	for(auto itr = m_componentsToBeRemoved.begin(); itr != m_componentsToBeRemoved.end(); ++itr)
+	{
+		auto component = m_components[(*itr).first][(*itr).second->GetId()];
+
+		m_allocator.FreePtrFromList(component, (*itr).first);
+
+		m_components[(*itr).first][(*itr).second->GetId()] = nullptr;
+
+		(*itr).second->m_flag ^= (1ULL << (*itr).first);
+
+		m_systemManager->RemoveEntityFromSystems((*itr).second); 
+	}
+
+	m_componentsToBeRemoved.clear();
+}
+

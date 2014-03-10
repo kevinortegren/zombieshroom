@@ -625,6 +625,9 @@ namespace RootForce
 			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		}
 		g_engineContext.m_sound->Update();
+
+		g_world->GetEntityManager()->CleanUp();
+
 		return GameStates::Ingame;
 	}
 
