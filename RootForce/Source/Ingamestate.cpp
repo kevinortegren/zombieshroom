@@ -207,22 +207,22 @@ namespace RootForce
 	{
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
-//#ifndef _DEBUG
-//		BotanyTextures textures;
-//		textures.m_diffuse = g_world->GetStorage()->GetValueAsString("GrassDiffuse");
-//		textures.m_translucency = g_world->GetStorage()->GetValueAsString("GrassTranslucency");
-//		textures.m_billboard = g_world->GetStorage()->GetValueAsString("GrassBillboard");
-//
-//		if(textures.m_diffuse != "")
-//		{
-//			// Subdivide terrain for grass chunk rendering.
-//			m_botanySystem->Initialize(textures, 0.0f);
-//		}
-//
-//
-//		// Subdivide world.
-//		//m_sharedSystems.m_worldSystem->SubdivideTree();
-//#endif
+#ifndef _DEBUG
+		BotanyTextures textures;
+		textures.m_diffuse = g_world->GetStorage()->GetValueAsString("GrassDiffuse");
+		textures.m_translucency = g_world->GetStorage()->GetValueAsString("GrassTranslucency");
+		textures.m_billboard = g_world->GetStorage()->GetValueAsString("GrassBillboard");
+
+		if(textures.m_diffuse != "")
+		{
+			// Subdivide terrain for grass chunk rendering.
+			m_botanySystem->Initialize(textures, 0.0f);
+		}
+
+
+		// Subdivide world.
+		//m_sharedSystems.m_worldSystem->SubdivideTree();
+#endif
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);

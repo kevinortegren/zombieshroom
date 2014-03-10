@@ -8,7 +8,7 @@
 #include <memory>
 
 #define RENDER_MAX_SHADOWCASTERS 1
-#define RENDER_SHADOW_CASCADES 1
+#define RENDER_SHADOW_CASCADES 4
 
 namespace Render
 {
