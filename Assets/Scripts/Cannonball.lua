@@ -20,10 +20,13 @@ function Cannonball.OnLoad()
 	BigExplosion.OnLoad();
 end
 
+function Cannonball.ChargeStart(userId, actionId)
+end
+
 function Cannonball.ChargeDone (time, userId, actionId)
 	Cannonball.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
 function Cannonball.ChannelingDone (time, userId, actionId)
