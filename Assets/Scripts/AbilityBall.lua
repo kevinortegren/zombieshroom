@@ -5,7 +5,7 @@ AbilityBall.cooldown = 3;
 AbilityBall.charges = 0;
 AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
-AbilityBall.duration = 4;
+AbilityBall.duration = 2;
 AbilityBall.charges = -1;
 
 function AbilityBall.OnLoad()
@@ -89,7 +89,7 @@ function AbilityBall.OnCreate (userId, actionId)
 		local pointlightComp = PointLight.New(self);
 		pointlightComp:SetColor(Vec4.New(1.0, 0.5, 0.0, 1.0));
 		pointlightComp:SetRange(10.0);
-		pointlightComp:SetAttenuation(Vec3.New(1, 0.4, 0.1));
+		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
 	end
 end
 

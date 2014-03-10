@@ -89,7 +89,7 @@ function Homing.OnCreate (userId, actionId)
 		local pointlightComp = PointLight.New(self);
 		pointlightComp:SetColor(Vec4.New(0.2, 0.05, 1.0, 1.0));
 		pointlightComp:SetRange(5.0);
-		pointlightComp:SetAttenuation(Vec3.New(1, 0.4, 0.1));
+		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
 	end
 end
 

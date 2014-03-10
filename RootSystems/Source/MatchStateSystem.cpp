@@ -94,7 +94,12 @@ namespace RootForce
 		{
 			PlayerComponent* murderer = pair.first?m_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.first):nullptr;
 			PlayerComponent* victim = m_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
-			m_hud->GetView()->BufferJavascript("KillAnnouncement('" + (murderer?murderer->Name:std::string()) + "','" + victim->Name + "');");
+			m_hud->GetView()->BufferJavascript("KillAnnouncement('" + (murderer?murderer->Name:std::string()) + "','" + victim->Name + "', '" + killAnnouncement->AbilityName + "');");
+			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
+			if(pair.first == player)
+				m_hud->GetView()->BufferJavascript("Announce('You have killed " + victim->Name + "', 3);");
+			if(pair.second == player)
+				m_hud->GetView()->BufferJavascript("Announce('You have been killed" + (murderer?" by " + murderer->Name:std::string()) + "', 3);");
 		}
 		killAnnouncement->KillPair.clear();
 	}

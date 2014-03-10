@@ -101,16 +101,16 @@ img
 	position: absolute;
 	top:70px;
 	left:100%;
-  margin-left: -200px;
-	width: 200px;
+  margin-left: -300px;
+	width: 300px;
 	height: 70px;
 	text-align: right;
 	color: white;
-	font-size: 12px;
+	font-size: 18px;
 }
 #KillAnnouncementContainer img
 {
-  height: 18px;
+  height: 26px;
 }
 #KillAnnouncementContainer *
 {
@@ -173,7 +173,7 @@ img
 	left: 0;
 	top: 100%;
 	width: 100%;
-	margin: -35px 0 0 450px;
+	margin: -120px 0 0 450px;
 	height: 33px;
 }
 #healthbar div
@@ -231,10 +231,10 @@ img
 {
 	position: absolute;
 	left: 0;
-	top: 100%;
+	top: 50%;
 	width: 100%;
-	margin-top: -132px;
-	height: 132px;
+	margin-top: -96px;
+	height: 192px;
 	overflow: hidden;
 }
 #deathscreen
@@ -299,8 +299,8 @@ img
 	width: 64px;
 	height: 64px;
 	font-size: 18px;
-	margin: 64px 0 0 0;
-	display: inline-block;
+	margin: 0 0 0 0;
+	/*display: inline-block;*/
 	text-align: right;
 	position: relative;
 	background-image: url('Abilityring.png');
@@ -357,8 +357,8 @@ img
 }
 #slot2
 {
-  position: relative;
-  top: -32px;
+  /*position: relative;
+  top: -32px;*/
 }
 
 .verticaltablehax

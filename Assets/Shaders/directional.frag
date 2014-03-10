@@ -34,6 +34,7 @@ uniform sampler2DArray g_ShadowDepth;
 
 out vec4 out_Color;
 
+const int CASCADES = 4;
 const int PCF_NUM_SAMPLES = 16;
 
 vec2 poissonDisk[16] = vec2[](
@@ -94,7 +95,7 @@ vec3 FindBlocker(vec3 coord, int useCascade, float offset)
 	float numblockers = 0;
 
 	int i;
-	for(i = 0; i < 16; i++)
+	for(i = 0; i < PCF_NUM_SAMPLES; i++)
 	{
 		float shadowMapDepth = texture(g_ShadowDepth, vec3(coord.xy + poissonDisk[i] * searchWidth, useCascade));
 		if(shadowMapDepth < coord.z)
@@ -163,12 +164,12 @@ void main() {
 	colors[1] = vec3(0.0, 1.0, 0.0);
 	colors[2] = vec3(0.0, 0.0, 1.0);
 	colors[3] = vec3(0.0, 1.0, 1.0);
-	float offsets[4];
+	float offsets[CASCADES];
 	int cascade = 0;
 	float visibility = 0.0f;
 	int useCascade;
 
-	for(cascade = 0; cascade < 4; cascade++)
+	for(cascade = 0; cascade < CASCADES; cascade++)
 	{
 		shadowCoord = shadowCasterViewProjectionMatrix[cascade] * worldPosition;
 		if(cascade == 3)

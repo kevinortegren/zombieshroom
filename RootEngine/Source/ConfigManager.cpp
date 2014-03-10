@@ -72,6 +72,9 @@ namespace RootEngine
 		m_values["settings-key-Select_Ability3"] = "32";
 		m_values["settings-key-Pick_up_Ability"] = std::to_string(SDL_SCANCODE_LSHIFT);
 		m_values["settings-key-Activate_Push_Ability"] = std::to_string(RootEngine::InputManager::MouseButton::RIGHT);
+		m_values["settings-key-Switch_Ability_Forward"] = std::to_string(SDL_SCANCODE_Q);
+		m_values["settings-key-Scroll_Ability_Forward"] = std::to_string(RootEngine::InputManager::MouseButton::X1);
+		m_values["settings-key-Scroll_Ability_Backward"] = std::to_string(RootEngine::InputManager::MouseButton::X2);
 		m_values["ServerName"] = "RootForce server";
 		m_values["ServerMapfile"] = "Nyaste.world";
 		m_values["AbilityPack"] = "Standard.txt";
