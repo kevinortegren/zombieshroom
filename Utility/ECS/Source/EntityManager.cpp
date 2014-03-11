@@ -30,13 +30,10 @@ void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
 	if (p_entity->m_id != -1)
 	{
+		m_entitiesToBeRemoved.insert(p_entity->m_id);
+
 		// Delete components at cleanup stage.
 		RemoveAllComponents(p_entity);
-
-		// Recyle id.
-		m_recycledIds.push(p_entity->m_id);
-
-		p_entity->m_id = -1;
 	}
 }
 
@@ -66,7 +63,7 @@ std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManage
 
 void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 {
-	if (p_entity != nullptr && p_entity->m_id != -1)
+	if (p_entity->m_id != -1)
 	{
 		for(unsigned i = 0; i < m_components.size(); ++i)
 		{
@@ -138,5 +135,13 @@ void ECS::EntityManager::CleanUp()
 	}
 
 	m_componentsToBeRemoved.clear();
+
+	for(auto itr = m_entitiesToBeRemoved.begin(); itr != m_entitiesToBeRemoved.end(); ++itr)
+	{
+		// Recyle id.
+		m_recycledIds.push((*itr));
+	}
+
+	m_entitiesToBeRemoved.clear();
 }
 

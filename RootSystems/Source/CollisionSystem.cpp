@@ -21,13 +21,12 @@ namespace RootForce
 	void CollisionSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		CollisionResponder* cr = m_responders.Get(p_entity);
+		Script* script = m_scripts.Get(p_entity);
 
 		auto collisions = cr->m_collisions;
 
 		for(auto itr = collisions.begin(); itr != collisions.end(); ++itr)
 		{
-			Script* script = m_scripts.Get(p_entity);
-
 			RootForce::Collision* otherCollision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>((ECS::Entity*) itr->first);
 			RootForce::CollisionResponder* otherCollisionResponder = m_world->GetEntityManager()->GetComponent<RootForce::CollisionResponder>((ECS::Entity*) itr->first);
 			RootForce::Physics* otherPhysics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>((ECS::Entity*) itr->first);
