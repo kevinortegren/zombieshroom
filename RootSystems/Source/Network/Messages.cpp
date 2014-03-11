@@ -667,7 +667,7 @@ namespace RootForce
 			Network::NetworkEntityMap::const_iterator it = p_map.find(id);
 			if (it == p_map.end())
 			{
-				if (std::find(g_networkDeletedList.begin(), g_networkDeletedList.end(), id) != g_networkDeletedList.end())
+				if (std::find(g_networkDeletedList.begin(), g_networkDeletedList.end(), id) == g_networkDeletedList.end())
 				{
 					// Entity doesn't exist, use the script to create it.
 					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u, Sequence: %u) with script: %s", id.UserID, id.ActionID, id.SequenceID, scriptName.C_String());
@@ -696,6 +696,12 @@ namespace RootForce
 						p_map[id] = entity;
 						p_map.erase(p_map.find(tempId));
 					}
+				}
+				else
+				{
+					// Skip.
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Got deserialization message for deleted entity, ignoring. (User: %u, Action: %u, Sequence: %u)", id.UserID, id.ActionID, id.SequenceID);
+					return;
 				}
 			}
 			else
