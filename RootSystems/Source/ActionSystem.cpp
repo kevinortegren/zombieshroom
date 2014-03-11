@@ -427,6 +427,7 @@ namespace RootSystems
 						action->Angle.x = 0;
 						aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 						action->Angle.y = 0;
+						health->GotHit = false;
 					}
 				}
 
