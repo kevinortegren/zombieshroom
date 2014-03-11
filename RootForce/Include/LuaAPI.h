@@ -983,6 +983,7 @@ namespace RootForce
 			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
 
 			g_engineContext.m_physics->LockYOrientation((*(*rtemp)->m_handle));
+			return 0;
 		}
 		
 		//////////////////////////////////////////////////////////////////////////
