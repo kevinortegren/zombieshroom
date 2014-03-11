@@ -15,7 +15,7 @@ function Cannonball.OnLoad()
 	ResourceManager.LoadTexture("Cannonball_Specular");
 	ResourceManager.LoadTexture("Cannonball_Normal");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
-	ResourceManager.LoadParticle("SmockeochElden");
+	ResourceManager.LoadParticle("CannonballTrail");
 	ResourceManager.LoadScript("BigExplosion");
 	BigExplosion.OnLoad();
 end
