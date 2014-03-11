@@ -13,7 +13,7 @@ end
 
 function Push.ChargeStart(userId, actionId)
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChargingAnimClip(AnimClip.CHARGING1);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChargingAnimClip(AnimClip.CHARGING2);
 end
 
 function Push.ChargeDone (time, userId, actionId)
@@ -42,7 +42,7 @@ function Push.ChargeDone (time, userId, actionId)
 		end
 	end
 	
-	Logging.Log(LogLevel.DEBUG_PRINT, "Time is "..time);
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Time is "..time);
 	Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
 	Push.OnCreate(userId, actionId);
 end
