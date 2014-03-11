@@ -419,6 +419,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "DamageAndKnockback");
 			return 1;
 		}
+		static int EntityRemoveDamageAndKnockback(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::DamageAndKnockback>(*e);
+			return 0;
+		}
 		static int EntityGetStatChange(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -2827,6 +2834,7 @@ namespace RootForce
 			{"GetAnimation", EntityGetAnimation},
 			{"GetParticleEmitter", EntityGetParticleEmitter},
 			{"RemovePointLight", EntityRemovePointLight},
+			{"RemoveDamageAndKnockback", EntityRemoveDamageAndKnockback},
 			{NULL, NULL}
 		};
 

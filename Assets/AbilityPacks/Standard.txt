@@ -9,3 +9,4 @@ SlowNova
 Boost
 MachineGun
 ExplodingShroom
+AbilityTotem
