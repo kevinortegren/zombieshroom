@@ -112,7 +112,6 @@ namespace RootForce
 			else
 				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
 
-			g_world->GetEntityManager()->RemoveAllComponents(*e);
 			g_world->GetEntityManager()->RemoveEntity(*e);
 			for (auto itr = g_networkEntityMap.begin(); itr != g_networkEntityMap.end(); ++itr)
 			{
