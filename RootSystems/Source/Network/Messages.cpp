@@ -670,7 +670,7 @@ namespace RootForce
 				if (std::find(g_networkDeletedList.begin(), g_networkDeletedList.end(), id) != g_networkDeletedList.end())
 				{
 					// Entity doesn't exist, use the script to create it.
-					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u) with script: %s", id.UserID, id.ActionID, scriptName.C_String());
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u, Sequence: %u) with script: %s", id.UserID, id.ActionID, id.SequenceID, scriptName.C_String());
 					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
 					g_engineContext.m_script->AddParameterNumber(id.UserID);
 					g_engineContext.m_script->AddParameterNumber(id.ActionID);

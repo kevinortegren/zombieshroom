@@ -28,9 +28,11 @@ namespace RootForce
 	{
 		RootForce::Script* script = m_scripts.Get(p_entity);
 		
+		/*
 		g_engineContext.m_script->SetFunction(script->Name, "OnUpdate");
 		g_engineContext.m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
 		g_engineContext.m_script->ExecuteScript();
+		*/
 	}
 
 	void ScriptSystem::End()
