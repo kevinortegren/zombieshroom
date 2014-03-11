@@ -104,8 +104,7 @@ namespace RootEngine
 
 					glUniform1i(glGetUniformLocation(m_program->GetHandle(), ("tile["+std::to_string(numTexturesUsed)+"]").c_str()), numTexturesUsed);
 					glActiveTexture(GL_TEXTURE0 + numTexturesUsed);
-					tile.TextureMutex.lock();
-					glBindTexture(GL_TEXTURE_2D, tile.Texture[tile.ActiveTexture]);
+					glBindTexture(GL_TEXTURE_2D, tile.Texture);
 
 					TileData quadVertices[] = {
 						TileData(-1.f + tileTexWidth * x,     1.f - tileTexHeight * (y+1), 0.f, 1.f, numTexturesUsed),
@@ -128,10 +127,6 @@ namespace RootEngine
 						numTexturesUsed = 0;
 					}
 				}
-				
-			for(unsigned x = 0; x < tiles->size(); ++x)
-				for(unsigned y = 0; y < tiles->at(x).size(); ++y)
-					tiles->at(x).at(y).TextureMutex.unlock();
 			glBindVertexArray(0);
 		}
 

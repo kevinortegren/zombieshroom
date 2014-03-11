@@ -1429,6 +1429,7 @@ namespace Physics
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 		{
 				p_body->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+				p_body->setActivationState(DISABLE_DEACTIVATION);
 				p_body->setRestitution(0.7f);
 				p_body->setCcdMotionThreshold(3);
 				p_body->setCcdSweptSphereRadius(1.f);
@@ -1473,6 +1474,14 @@ namespace Physics
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
 		ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 		return;
+	}
+
+	void RootPhysics::LockYOrientation( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY && !(m_userPointer.at(p_objectHandle)->m_externalControlled))
+			m_dynamicObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->setAngularFactor(btVector3(0.0f, 1.0f, 0.0f));
 	}
 
 }

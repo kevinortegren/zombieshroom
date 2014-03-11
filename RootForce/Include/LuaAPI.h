@@ -976,6 +976,15 @@ namespace RootForce
 			g_engineContext.m_physics->SetGravity((*(*rtemp)->m_handle), (*v1));
 			return 0;
 		}
+
+		static int PhysicsLockYOrientation(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+
+			g_engineContext.m_physics->LockYOrientation((*(*rtemp)->m_handle));
+			return 0;
+		}
 		
 		//////////////////////////////////////////////////////////////////////////
 		//RENDERABLE
@@ -2907,6 +2916,7 @@ namespace RootForce
 			{"GetType", PhysicsGetType},
 			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
+			{"LockYOrientation", PhysicsLockYOrientation},
 			{NULL, NULL}
 		};
 
