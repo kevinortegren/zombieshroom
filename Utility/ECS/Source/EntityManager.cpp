@@ -34,8 +34,6 @@ void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 
 		// Delete components at cleanup stage.
 		RemoveAllComponents(p_entity);
-
-		p_entity->m_id = -1;
 	}
 }
 
@@ -65,7 +63,7 @@ std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManage
 
 void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 {
-	if (p_entity != nullptr && p_entity->m_id != -1)
+	if (p_entity->m_id != -1)
 	{
 		for(unsigned i = 0; i < m_components.size(); ++i)
 		{

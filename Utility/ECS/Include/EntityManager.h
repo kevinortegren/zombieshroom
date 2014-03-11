@@ -121,6 +121,7 @@ namespace ECS
 
 		ComponentAllocator m_allocator;
 
+		// Recyling sets.
 		std::set<std::pair<unsigned int, unsigned int>> m_componentsToBeRemoved;
 		std::set<int> m_entitiesToBeRemoved;
 	};
