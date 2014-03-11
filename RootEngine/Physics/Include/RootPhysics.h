@@ -122,6 +122,9 @@ namespace RootEngine
 
 			///Creates a handle
 			virtual int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled) = 0;
+
+			//Prevents object from falling over
+			virtual void LockYOrientation(int p_objectHandle) = 0;
 			
 			//Ragdoll affecting functions
 			virtual void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int>  p_nameToIndex, glm::mat4 p_boneOffset[20], glm::vec3 p_right ) = 0;
@@ -191,6 +194,9 @@ namespace RootEngine
 			void* GetPlayerAtAim(int p_objectHandle, glm::vec3 p_startPos, glm::vec3 p_direction, float p_length);
 
 			int* CreateHandle(void* p_entity, PhysicsType::PhysicsType p_physicsType, bool p_externalControlled);
+
+			//Prevents object from falling over
+			void LockYOrientation(int p_objectHandle);
 
 			void BuildRagdoll(int p_objectHandle, glm::mat4 p_bones[20], aiNode* p_rootNode, std::map<std::string, int> p_nameToIndex , glm::mat4 p_boneOffset[20], glm::vec3 p_right );
 			bool IsRagdoll(int p_objecthandle);
