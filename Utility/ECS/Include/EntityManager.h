@@ -66,10 +66,13 @@ namespace ECS
 		template<class T> 
 		void RemoveComponent(Entity* p_entity)
 		{
+		   // Make sure the entity exist within the component list.
 		   assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
  
+		   // If already removed, skip.
 		   if(m_components[Component<T>::GetTypeId()][p_entity->m_id] != nullptr)
 		   {
+			    // Push thr type of component and the given entity.
 			    m_componentsToBeRemoved.push_back(std::pair<unsigned int, Entity*>(Component<T>::GetTypeId(), p_entity));
 		   }	
 		}

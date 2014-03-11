@@ -28,15 +28,12 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 
 void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
-	//assert(p_entity->m_id != -1);
 	if (p_entity->m_id != -1)
 	{
 		m_recycledIds.push(p_entity->m_id);
 
 		p_entity->m_id = -1;
 		p_entity->m_flag = 0;
-	
-		p_entity = nullptr;
 	}
 }
 
@@ -122,16 +119,22 @@ std::vector<ECS::Entity*> ECS::EntityManager::GetAllEntities()
 
 void ECS::EntityManager::CleanUp()
 {
+	// Loop through components to remove.
 	for(auto itr = m_componentsToBeRemoved.begin(); itr != m_componentsToBeRemoved.end(); ++itr)
 	{
+		// Resolve component type.
 		auto component = m_components[(*itr).first][(*itr).second->GetId()];
 
+		// Run deconstructor and free from allocator list.
 		m_allocator.FreePtrFromList(component, (*itr).first);
 
+		// Set the component at the given slot.
 		m_components[(*itr).first][(*itr).second->GetId()] = nullptr;
 
+		// Remove the componet bit from the component flag.
 		(*itr).second->m_flag ^= (1ULL << (*itr).first);
 
+		// Remove entitis from systems.
 		m_systemManager->RemoveEntityFromSystems((*itr).second); 
 	}
 
