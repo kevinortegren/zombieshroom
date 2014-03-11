@@ -38,6 +38,10 @@ namespace RootForce
 			DOUBLEUNDERTHROW1,
 			RIGHTUNDERTHROW1,
 			CHARGING2,
+			DASH,
+			GOTHIT1,
+			GOTHIT2,
+			GOTHIT3,
 			RAGDOLL,
 			NOCLIP,
 		};

@@ -223,6 +223,23 @@ namespace RootSystems
 				}
 			}
 
+			//Play hit animation if hit
+			if(health->GotHit)
+			{
+				std::srand((int)time(NULL));
+				int random = std::rand() % 3 + 1;
+
+				if(random == 1)
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT1;
+				else if(random == 2)
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT2;
+				else if(random == 3)
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT3;
+
+				animation->UpperBodyAnim.m_locked = 1;
+				health->GotHit = false;
+			}
+
 			// Activate ability! Pew pew!
 			AbilitySwitch(p_entity);
 

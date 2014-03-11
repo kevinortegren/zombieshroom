@@ -18,6 +18,11 @@ function AbilityDash.ChargeDone(time, userId, actionId)
 end
 
 function AbilityDash.ChannelingDone(time, userId, actionId)
+
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.DASH, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetLowerAnimClip(AnimClip.DASH, true);
+
 	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
 	local aimingEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1);
 	local frontVec  = aimingEnt:GetTransformation():GetOrient():GetFront();

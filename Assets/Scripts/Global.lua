@@ -108,5 +108,9 @@ AnimClip = {
 	DOUBLEUNDERTHROW1	= 20;
 	RIGHTUNDERTHROW1	= 21;
 	CHARGING2			= 22;
-	RAGDOLL 			= 23;
+	DASH				= 23;
+	GOTHIT1				= 24;
+	GOTHIT2				= 25;
+	GOTHIT3				= 26;
+	RAGDOLL 			= 27;
 }

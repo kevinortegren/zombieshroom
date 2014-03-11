@@ -1748,6 +1748,8 @@ namespace RootForce
 			
 			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
 			
+			(*s)->GotHit = true;
+			
 			return 0;
 		}
 		static int HealthSetHealth(lua_State* p_luaState)
