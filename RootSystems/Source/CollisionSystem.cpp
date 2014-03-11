@@ -29,8 +29,8 @@ namespace RootForce
 			Script* script = m_scripts.Get(p_entity);
 			if(script->Name.compare("AbilitySpawnPoint") == 0)
 				int i = 0;
-// 			if(script->Name.compare("Cannonball") == 0)
-// 				int i = 0;
+ 			if(script->Name.compare("Player") == 0)
+				std::cout << collisions.size() << std::endl;
 
 			
 			RootForce::Collision* otherCollision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>((ECS::Entity*) itr->first);
@@ -49,10 +49,7 @@ namespace RootForce
 				return;
 		}
 
-		if((p_entity->GetFlag() & ComponentType::COLLISIONRESPONDER) == ComponentType::COLLISIONRESPONDER)
-		{
-			cr->m_collisions.clear();
-		}
+		cr->m_collisions.clear();
 	}
 
 	void CollisionSystem::End()
