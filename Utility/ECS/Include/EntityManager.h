@@ -5,6 +5,7 @@
 #include <Utility\ECS\Include\ComponentAllocator.h>
 #include <memory>
 #include <vector>
+#include <set>
 #include <stack>
 #include <iostream>
 #include <assert.h>
@@ -66,15 +67,19 @@ namespace ECS
 		template<class T> 
 		void RemoveComponent(Entity* p_entity)
 		{
-		   // Make sure the entity exist within the component list.
+		   // Make sure the entity exist within the component list range.
 		   assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
  
 		   // If already removed, skip.
 		   if(m_components[Component<T>::GetTypeId()][p_entity->m_id] != nullptr)
 		   {
-			    // Push thr type of component and the given entity.
-			    m_componentsToBeRemoved.push_back(std::pair<unsigned int, Entity*>(Component<T>::GetTypeId(), p_entity));
-		   }	
+			    // Push the type of component and the given entity.
+			   m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(Component<T>::GetTypeId(), p_entity->GetId()));
+
+			   p_entity->m_flag ^= (1ULL << Component<T>::GetTypeId());
+
+			   m_systemManager->RemoveEntityFromSystems(p_entity);
+		   }
 		}
 
 		void CleanUp();
@@ -116,6 +121,6 @@ namespace ECS
 
 		ComponentAllocator m_allocator;
 
-		std::vector<std::pair<unsigned int, Entity*>> m_componentsToBeRemoved;
+		std::set<std::pair<unsigned int, unsigned int>> m_componentsToBeRemoved;
 	};
 }

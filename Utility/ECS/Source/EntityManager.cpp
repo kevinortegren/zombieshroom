@@ -30,10 +30,13 @@ void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
 	if (p_entity->m_id != -1)
 	{
+		// Delete components at cleanup stage.
+		RemoveAllComponents(p_entity);
+
+		// Recyle id.
 		m_recycledIds.push(p_entity->m_id);
 
 		p_entity->m_id = -1;
-		p_entity->m_flag = 0;
 	}
 }
 
@@ -67,18 +70,20 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 	{
 		for(unsigned i = 0; i < m_components.size(); ++i)
 		{
-			if(p_entity->m_id > -1 && p_entity->m_id < (int)m_components[i].size())
+			if(p_entity->m_id < (int)m_components[i].size())
 			{
 				if(m_components[i][p_entity->m_id] != nullptr)
 				{
-					m_allocator.FreePtrFromList(m_components[i][p_entity->m_id], i);
-					m_components[i][p_entity->m_id] = nullptr;
+					// Push the type of component and the given entity.
+					m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(i, p_entity->GetId()));
 				}
 			}
 		}
 
 		p_entity->m_flag = 0;
-		m_systemManager->RemoveEntityFromSystems(p_entity);
+
+		// Remove components from systems belonging to the entity.
+		m_systemManager->RemoveEntityFromSystems(p_entity);	
 	}
 }
 
@@ -123,19 +128,13 @@ void ECS::EntityManager::CleanUp()
 	for(auto itr = m_componentsToBeRemoved.begin(); itr != m_componentsToBeRemoved.end(); ++itr)
 	{
 		// Resolve component type.
-		auto component = m_components[(*itr).first][(*itr).second->GetId()];
+		auto component = m_components[(*itr).first][(*itr).second];
 
 		// Run deconstructor and free from allocator list.
 		m_allocator.FreePtrFromList(component, (*itr).first);
 
-		// Set the component at the given slot.
-		m_components[(*itr).first][(*itr).second->GetId()] = nullptr;
-
-		// Remove the componet bit from the component flag.
-		(*itr).second->m_flag ^= (1ULL << (*itr).first);
-
-		// Remove entitis from systems.
-		m_systemManager->RemoveEntityFromSystems((*itr).second); 
+		// Null the component at the given slot.
+		m_components[(*itr).first][(*itr).second] = nullptr;
 	}
 
 	m_componentsToBeRemoved.clear();

@@ -13,17 +13,16 @@ void ECS::EntitySystem::Process()
 
 	Begin();
 
-	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end();)
+	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 	{
 		if((*itr)->GetId() == -1)
 		{
-			itr = m_activeEntities.erase(itr);
+			std::cout << "-1 Entity in processing loop." << std::endl;
+			return;
 		}
-		else
-		{
-			ProcessEntity((*itr));
-			itr++;
-		}
+		
+		ProcessEntity((*itr));
+
 	}
 
 	End();	
@@ -86,7 +85,11 @@ void ECS::ConcurrentSystem::Process()
 			for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 			{
 				if((*itr)->GetId() == -1)
-					continue;
+				{
+					std::cout << "-1 Entity in processing loop." << std::endl;
+					return;
+				}
+		
 				ProcessEntity((*itr));
 			}
 
