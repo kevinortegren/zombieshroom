@@ -2915,6 +2915,7 @@ namespace RootForce
 			{"GetType", PhysicsGetType},
 			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
+			{"LockYOrientation", PhysicsLockYOrientation},
 			{NULL, NULL}
 		};
 
