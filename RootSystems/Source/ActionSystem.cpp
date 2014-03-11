@@ -285,8 +285,8 @@ namespace RootSystems
 					{
 						player->AbilityState = RootForce::AbilityState::CHARGING;
 						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeStart");
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
+						g_engineContext.m_script->AddParameterNumber((double)network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber((double)abilityEvent.ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
 						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
@@ -297,9 +297,9 @@ namespace RootSystems
 						player->AbilityState = RootForce::AbilityState::CHANNELING;
 						
 						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
-						g_engineContext.m_script->AddParameterNumber(abilityEvent.Time);
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
+						g_engineContext.m_script->AddParameterNumber((double)abilityEvent.Time);
+						g_engineContext.m_script->AddParameterNumber((double)network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber((double)abilityEvent.ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
 						// DEBUG
