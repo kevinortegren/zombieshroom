@@ -7,16 +7,19 @@
 #include <RootEngine/Include/ConfigManager.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootForce/Include/Keymapper.h>
+#include <RootSystems/Include/ChatSystem.h>
 
 namespace RootForce
 {
 	class SettingsMenu
 	{
 	public:
-		SettingsMenu(RootEngine::GameSharedContext p_context, Keymapper* p_keymapper);
+		SettingsMenu(RootEngine::GameSharedContext p_context, Keymapper* p_keymapper, ChatSystem* p_chatSystem = nullptr);
 		~SettingsMenu();
 		void BindEvents(RootEngine::GUISystem::WebView* p_view);
 		void Update();
+		void SetValue(std::string p_key, std::string p_value);
+
 	private:
 		Awesomium::JSValue RequestSettingsEvent(const Awesomium::JSArray& p_array);
 		void SaveSettingsEvent(const Awesomium::JSArray& p_array);
@@ -30,5 +33,6 @@ namespace RootForce
 		int m_screenWidth;
 		int m_screenHeight;
 		Keymapper* m_keymapper;
+		ChatSystem* m_chatSystem;
 	};
 }

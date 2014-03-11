@@ -15,16 +15,14 @@ namespace RootServer
 		// Copy constructor and assignment operator needed for basic operations
 		EventData() {}
 		EventData( const EventData& other )
+			: Data(other.Data.str())
 		{
 			EventType = other.EventType;
-			Data.clear();
-			Data << other.Data.str();
 		}
 		void operator=( const EventData& other )
 		{
 			EventType = other.EventType;
-			Data.clear();
-			Data << other.Data.str();
+			Data = std::stringstream(other.Data.str());
 		}
 	};
 
