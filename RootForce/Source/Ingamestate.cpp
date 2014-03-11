@@ -273,7 +273,7 @@ namespace RootForce
 		m_sharedSystems.m_matchStateSystem->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
 
 		// Reset the ingame menu before we start the match
-		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper, m_hud->GetChatSystem().get()));
 		m_ingameMenu->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_displayIngameMenu = false;
 		m_ingameMenu->GetView()->SetActive(false);
@@ -311,6 +311,11 @@ namespace RootForce
 		m_ingameMenu->GetView()->SetActive(true);
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 		m_ingameMenu->Reset();
+
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-glow", g_engineContext.m_configManager->GetConfigValueAsString("settings-glow"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-grass", g_engineContext.m_configManager->GetConfigValueAsString("settings-grass"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-shadows", g_engineContext.m_configManager->GetConfigValueAsString("settings-shadows"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-water", g_engineContext.m_configManager->GetConfigValueAsString("settings-water"));
 	}
 
 	void IngameState::Exit()

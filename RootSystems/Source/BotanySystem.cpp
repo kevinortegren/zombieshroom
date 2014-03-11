@@ -275,19 +275,28 @@ namespace RootForce
 
 	void BotanySystem::SetGrassFactor(float p_grassFactor)
 	{
-		m_updateUniforms.m_grassFactor = p_grassFactor;
-		m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(float), &m_updateUniforms.m_grassFactor);
+		if(m_initialized)
+		{
+			m_updateUniforms.m_grassFactor = p_grassFactor;
+			m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(float), &m_updateUniforms.m_grassFactor);
+		}
 	}
 
 	void BotanySystem::SetLOD1Distance(float p_distance)
 	{
-		m_renderUniforms.m_lod1Distance = p_distance;
-		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &m_renderUniforms.m_lod1Distance);
+		if(m_initialized)
+		{
+			m_renderUniforms.m_lod1Distance = p_distance;
+			m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &m_renderUniforms.m_lod1Distance);
+		}
 	}
 
 	void BotanySystem::SetLOD2Distance(float p_distance)
 	{
-		m_renderUniforms.m_lod2Distance = p_distance;
-		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(16, sizeof(float), &m_renderUniforms.m_lod2Distance);
+		if(m_initialized)
+		{
+			m_renderUniforms.m_lod2Distance = p_distance;
+			m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(16, sizeof(float), &m_renderUniforms.m_lod2Distance);
+		}
 	}
 }

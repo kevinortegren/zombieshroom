@@ -87,7 +87,8 @@ a
   display: table-cell;
   vertical-align: middle;
 }
-.button
+.button,
+input[type="radio"] + label
 {
   width: 140px;
   height: 25px;
@@ -98,13 +99,24 @@ a
   background-size: 100% 100%;
   background-position: 50% 50%;
 }
-.button:hover
+input[type="radio"] + label
+{
+	display: inline-block;
+	text-align: center;
+  width: 40px;
+	height: auto;
+	padding: 5px 10px;
+  margin: 0;
+}
+.button:hover,
+input[type="radio"] + label:hover
 {
   background: transparent url('ButtonHover.png');
   background-size: 100% 100%;
   background-position: 50% 50%;
 }
-.button:active
+.button:active,
+input[type="radio"]:checked + label
 {
   background: transparent url('ButtonClicked.png');
   background-size: 100% 100%;
@@ -142,6 +154,11 @@ a
 {
   display: inline-block;
   width: 200px;
+}
+.inline-300px
+{
+  display: inline-block;
+  width: 300px;
 }
 #error-popup
 {
