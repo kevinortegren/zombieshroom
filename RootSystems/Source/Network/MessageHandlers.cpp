@@ -937,6 +937,7 @@ namespace RootForce
 						health->IsDead = true;
 						health->RespawnDelay = 3.0f;
 						health->LastDamageSourceID = m.LastDamageSource;
+						health->LastDamageAbilityName = m.LastDamageSourceName;
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
 					}
 
