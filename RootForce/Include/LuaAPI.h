@@ -1785,6 +1785,7 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			lua_pushboolean(p_luaState, (*s)->IsDead);
+			(*s)->GotHit = false;
 			return 1;
 		}
 		static int HealthGetWantsRespawn(lua_State* p_luaState)
