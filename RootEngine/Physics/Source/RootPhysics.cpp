@@ -1429,6 +1429,7 @@ namespace Physics
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 		{
 				p_body->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+				p_body->setActivationState(DISABLE_DEACTIVATION);
 				p_body->setRestitution(0.7f);
 				p_body->setCcdMotionThreshold(3);
 				p_body->setCcdSweptSphereRadius(1.f);
