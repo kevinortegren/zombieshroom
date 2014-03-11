@@ -1,5 +1,5 @@
 BigExplosion = {};
-BigExplosion.damage = 40;
+BigExplosion.damage = 20;
 BigExplosion.pushback = 20;
 BigExplosion.cooldown = 0;
 BigExplosion.chargeTime = 0.0;
