@@ -111,6 +111,8 @@ namespace ECS
 		int GetNumEntities() const { return m_entities.size(); }
 
 		std::vector<ECS::Entity*> GetAllEntities();
+
+		const std::set<int>& GetEntitiesToBeRemoved() const { return m_entitiesToBeRemoved; }
 	private:
 
 		EntitySystemManager* m_systemManager;

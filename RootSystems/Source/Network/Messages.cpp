@@ -21,6 +21,7 @@
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
 
 namespace RootForce
 {
@@ -666,32 +667,35 @@ namespace RootForce
 			Network::NetworkEntityMap::const_iterator it = p_map.find(id);
 			if (it == p_map.end())
 			{
-				// Entity doesn't exist, use the script to create it.	
-				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u) with script: %s", id.UserID, id.ActionID, scriptName.C_String());
-				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
-				g_engineContext.m_script->AddParameterNumber(id.UserID);
-				g_engineContext.m_script->AddParameterNumber(id.ActionID);
-				g_engineContext.m_script->ExecuteScript();
-				
-				entity = Network::FindEntity(p_map, id);
-				// If entity is not found, assume unsynched sequence ID
-				if(entity == nullptr)
+				if (std::find(g_networkDeletedList.begin(), g_networkDeletedList.end(), id) != g_networkDeletedList.end())
 				{
-					Network::NetworkEntityID tempId = id;
-					tempId.SequenceID = Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] - 1;
+					// Entity doesn't exist, use the script to create it.
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u) with script: %s", id.UserID, id.ActionID, scriptName.C_String());
+					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
+					g_engineContext.m_script->AddParameterNumber(id.UserID);
+					g_engineContext.m_script->AddParameterNumber(id.ActionID);
+					g_engineContext.m_script->ExecuteScript();
+				
+					entity = Network::FindEntity(p_map, id);
+					// If entity is not found, assume unsynched sequence ID
+					if(entity == nullptr)
+					{
+						Network::NetworkEntityID tempId = id;
+						tempId.SequenceID = Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] - 1;
 					
-					// If received sequence ID is less than that of the local next sequence id, update the local next sequence ID
-					if(id.SequenceID > tempId.SequenceID)
-						Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] = id.SequenceID + 1;
+						// If received sequence ID is less than that of the local next sequence id, update the local next sequence ID
+						if(id.SequenceID > tempId.SequenceID)
+							Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] = id.SequenceID + 1;
 
-					entity = Network::FindEntity(p_map, tempId);
-					assert(entity != nullptr);
+						entity = Network::FindEntity(p_map, tempId);
+						assert(entity != nullptr);
 
-					Network::NetworkComponent* netcomp = p_entityManager->GetComponent<Network::NetworkComponent>(entity);
-					netcomp->ID = id;
+						Network::NetworkComponent* netcomp = p_entityManager->GetComponent<Network::NetworkComponent>(entity);
+						netcomp->ID = id;
 
-					p_map[id] = entity;
-					p_map.erase(p_map.find(tempId));
+						p_map[id] = entity;
+						p_map.erase(p_map.find(tempId));
+					}
 				}
 			}
 			else
