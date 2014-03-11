@@ -58,6 +58,8 @@ namespace RootSystems
 					action->WantRespawn = false;
 					action->JumpTime = 0.0f;
 					action->JumpDir = glm::vec3(0.0f);
+					health->GotHit = false;
+					animation->UpperBodyAnim.m_locked = 0;
 				}
 
 				// Check abilities here as well, to make sure abilities are properly interrupted.
@@ -226,6 +228,7 @@ namespace RootSystems
 			//Play hit animation if hit
 			if(health->GotHit)
 			{
+				health->GotHit = false;
 				std::srand((int)time(NULL));
 				int random = std::rand() % 3 + 1;
 
@@ -237,7 +240,7 @@ namespace RootSystems
 					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT3;
 
 				animation->UpperBodyAnim.m_locked = 1;
-				health->GotHit = false;
+				
 			}
 
 			// Activate ability! Pew pew!
@@ -427,7 +430,6 @@ namespace RootSystems
 						action->Angle.x = 0;
 						aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
 						action->Angle.y = 0;
-						health->GotHit = false;
 					}
 				}
 
