@@ -9,6 +9,7 @@
 #include <RootSystems/Include/PlayerControlSystem.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
+#include <RootSystems/Include/ScriptSystem.h>
 #include <RootSystems/Include/AnimationSystem.h>
 #include <RootSystems/Include/RagdollSystem.h>
 #include <RootSystems/Include/MatchStateSystem.h>
@@ -69,6 +70,7 @@ namespace RootForce
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
 		RootForce::PhysicsTransformCorrectionSystem*	m_physicsTransformCorrectionSystem;
 		RootForce::PhysicsSystem*						m_physicsSystem;
+		RootForce::ScriptSystem*						m_scriptSystem;
 		RootForce::CollisionSystem*						m_collisionSystem;
 		RootForce::ShadowSystem*						m_shadowSystem;
 		RootForce::RenderingSystem*						m_renderingSystem;
