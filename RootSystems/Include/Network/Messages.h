@@ -359,6 +359,7 @@ namespace RootForce
 		{
 			Network::UserID_t User;
 			Network::UserID_t LastDamageSource;
+			RakNet::RakString LastDamageSourceName;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
