@@ -89,6 +89,9 @@ namespace RootForce
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem);
 
+		m_scriptSystem = new RootForce::ScriptSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem);
+
 		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem);
 
@@ -502,6 +505,10 @@ namespace RootForce
 			m_physicsTransformCorrectionSystem->Process();
 			g_engineContext.m_physics->Update(p_deltaTime);
 			m_physicsSystem->Process();
+		}
+
+		{
+			m_scriptSystem->Process();
 		}
 
 		{

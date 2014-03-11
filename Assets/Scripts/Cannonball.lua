@@ -77,7 +77,7 @@ function Cannonball.OnCreate (userId, actionId)
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
-		renderComp:SetMaterial("Cannonball");
+		renderComp:SetMaterial("Cannonballs");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_DYNAMIC);
 		renderComp:SetMaterialDiffuse("Cannonball_Diffuse");
 		renderComp:SetMaterialSpecular("Cannonball_Specular");
