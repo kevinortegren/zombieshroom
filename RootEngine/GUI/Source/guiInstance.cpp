@@ -386,7 +386,11 @@ namespace RootEngine
 				m_viewBufferMutex.lock();
 					for(auto view : m_viewBuffer )
 					{
-						((GLTextureSurface*)view->m_webView->surface())->SetShouldResize(true);
+						if (view->m_webView->surface())
+						{
+							((GLTextureSurface*)view->m_webView->surface())->SetShouldResize(true);
+						}
+
 						view->m_webView->Resize(p_width, p_height);
 					}
 				m_viewBufferMutex.unlock();

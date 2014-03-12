@@ -29,7 +29,7 @@ end
 function Cannonball.ChargeDone (time, userId, actionId)
 	Cannonball.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
 end
 
 function Cannonball.ChannelingDone (time, userId, actionId)
@@ -112,12 +112,14 @@ function Cannonball.OnCollide (self, entity)
 			local health = entity:GetHealth();
 				
 			if not health:IsDead() then
-				health:Damage(abilityOwnerId, Cannonball.damage * entity:GetStatChange():GetDamageResistance());
+				health:Damage(abilityOwnerId, Cannonball.damage * entity:GetStatChange():GetDamageResistance(), "Cannonball");
 			end
 			local hitPos = entity:GetTransformation():GetPos();
 			local selfPos = self:GetTransformation():GetPos();
 			local hitPhys = entity:GetPhysics();
-			hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Cannonball.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+			if hitPhys ~= nil then
+				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Cannonball.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+			end
 		end
 
 		if type ~= PhysicsType.TYPE_ABILITYSPAWN then
