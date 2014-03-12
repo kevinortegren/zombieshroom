@@ -1,3 +1,5 @@
+--Gustav's cannonball ability script, copy but do not edit! Make your own abilities dammit!
+
 Cannonball = {};
 Cannonball.damage = 20;
 Cannonball.knockback = 20;
@@ -87,11 +89,19 @@ function Cannonball.OnCreate (userId, actionId)
 	end
 end
 
+function Cannonball.OnUpdate (self)
+	local transform = self:GetTransformation();
+	local physics = self:GetPhysics();
+	if physics ~= nil then
+		local direction = physics:GetVelocity();
+		transform:GetOrient():LookAt(direction, Vec3.New(0.0, 1.0, 0.0));
+	end
+end
+
 function Cannonball.OnCollide (self, entity)
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
-		local type = hitPhys:GetType(hitCol);
+		local type = hitCol:GetType();
 		if type == PhysicsType.TYPE_PLAYER then
 			local targetPlayerComponent = entity:GetPlayerComponent();
 			local abilityOwnerNetwork = self:GetNetwork();
@@ -99,17 +109,14 @@ function Cannonball.OnCollide (self, entity)
 			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 			local health = entity:GetHealth();
-			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				
-				if not health:IsDead() then
-					health:Damage(abilityOwnerId, Cannonball.damage * entity:GetStatChange():GetDamageResistance());
-				end
+			if not health:IsDead() then
+				health:Damage(abilityOwnerId, Cannonball.damage * entity:GetStatChange():GetDamageResistance());
 			end
-			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-				local hitPos = entity:GetTransformation():GetPos();
-				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Cannonball.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
-			end
+			local hitPos = entity:GetTransformation():GetPos();
+			local selfPos = self:GetTransformation():GetPos();
+			local hitPhys = entity:GetPhysics();
+			hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Cannonball.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 		end
 
 		if type ~= PhysicsType.TYPE_ABILITYSPAWN then

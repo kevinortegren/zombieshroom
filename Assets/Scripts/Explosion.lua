@@ -49,8 +49,7 @@ function Explosion.OnCollide (self, entity)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
-		local type = hitPhys:GetType(hitCol);
+		local type = hitCol:GetType();
 	 	if type == PhysicsType.TYPE_PLAYER then
 		    local abilityOwnerNetwork = self:GetNetwork();
 		    local abilityOwnerId = abilityOwnerNetwork:GetUserId();
@@ -62,9 +61,10 @@ function Explosion.OnCollide (self, entity)
 			    local hitPos = entity:GetTransformation():GetPos();
 			    local selfPos = self:GetTransformation():GetPos();
 			    local health = entity:GetHealth();
-          if not health:IsDead() then
+          		if not health:IsDead() then
 				    health:Damage(abilityOwnerId, Explosion.damage * entity:GetStatChange():GetDamageResistance());
 			    end
+			    local hitPhys = entity:GetPhysics();
 			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Explosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end

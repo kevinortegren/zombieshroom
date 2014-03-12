@@ -48,8 +48,7 @@ end
 
 function AbilityRay.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
 	local network = self:GetNetwork();
 	local transComp = self:GetTransformation();
 	transComp:SetPos(self:GetCollisionResponder():GetCollisionPosition(entity));

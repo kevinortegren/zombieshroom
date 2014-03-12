@@ -52,8 +52,7 @@ function ShroomExplosion.OnCollide (self, entity)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
-		local type = hitPhys:GetType(hitCol);
+		local type = hitCol:GetType();
 	 	if type == PhysicsType.TYPE_PLAYER then
 		    local abilityOwnerNetwork = self:GetNetwork();
 		    local abilityOwnerId = abilityOwnerNetwork:GetUserId();

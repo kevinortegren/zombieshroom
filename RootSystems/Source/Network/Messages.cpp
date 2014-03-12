@@ -701,7 +701,7 @@ namespace RootForce
 				{
 					// Skip.
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Got deserialization message for deleted entity, ignoring. (User: %u, Action: %u, Sequence: %u)", id.UserID, id.ActionID, id.SequenceID);
-					return;
+					return nullptr;
 				}
 			}
 			else
