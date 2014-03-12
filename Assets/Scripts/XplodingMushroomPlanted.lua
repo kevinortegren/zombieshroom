@@ -51,7 +51,7 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 		startPos = casterEnt:GetTransformation():GetPos();
 	end
 
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 4, 1, false, false);
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 4, 1, false, true);
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
