@@ -222,12 +222,10 @@ namespace RootForce
 			m_botanySystem->Initialize(textures, 0.0f);
 		}
 
-		
+		// Subdivide world.
+		//m_sharedSystems.m_worldSystem->SubdivideTree();	
 #endif
 		
-		// Subdivide world.
-		m_sharedSystems.m_worldSystem->SubdivideTree();
-
 		g_world->GetEntityManager()->CleanUp();
 
 		// Lock the mouse
