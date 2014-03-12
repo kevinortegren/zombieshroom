@@ -9,6 +9,7 @@ Cannonball.chargeTime = 0;
 Cannonball.channelingTime = 0;
 Cannonball.duration = 4;
 Cannonball.charges = -1;
+Cannonball.crosshair = "";
 
 function Cannonball.OnLoad()
 	ResourceManager.LoadModel("Primitives/sphereTangents");

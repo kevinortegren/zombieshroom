@@ -189,6 +189,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
 			p_bs->Serialize(p_writeToBitstream, LastDamageSource);
+			p_bs->Serialize(p_writeToBitstream, LastDamageSourceName);
 		}
 
 		void PlayerTeamSelect::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
@@ -481,18 +482,29 @@ namespace RootForce
 		template <typename T>
 		T* CreateOrGetDeserializedComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, bool p_discard)
 		{
-			T* component = p_entityManager->GetComponent<T>(p_entity);
-			if (component == nullptr)
-				component = p_entityManager->CreateComponent<T>(p_entity);
+			T* component = nullptr;
 
-			if (component == nullptr)
-				return nullptr;
-			
-			T c = *component;
-			Serialize(false, p_bs, &c);
-			if (!p_discard)
+			if (p_entity != nullptr)
 			{
-				*component = c;
+				component = p_entityManager->GetComponent<T>(p_entity);
+				if (component == nullptr)
+					component = p_entityManager->CreateComponent<T>(p_entity);
+
+				if (component == nullptr)
+					return nullptr;
+			
+				T c = *component;
+				Serialize(false, p_bs, &c);
+				if (!p_discard)
+				{
+					*component = c;
+				}
+			}
+			else
+			{
+				// If we don't have an entity to deserialize on, just discard the data and move on.
+				T c;
+				Serialize(false, p_bs, &c);
 			}
 
 			return component;
@@ -667,6 +679,7 @@ namespace RootForce
 			Network::NetworkEntityMap::const_iterator it = p_map.find(id);
 			if (it == p_map.end())
 			{
+				// See if this entity has been destroyed before, in which case this is an out-dated deserialization message.
 				if (std::find(g_networkDeletedList.begin(), g_networkDeletedList.end(), id) == g_networkDeletedList.end())
 				{
 					// Entity doesn't exist, use the script to create it.
@@ -677,7 +690,7 @@ namespace RootForce
 					g_engineContext.m_script->ExecuteScript();
 				
 					entity = Network::FindEntity(p_map, id);
-					// If entity is not found, assume unsynched sequence ID
+					// If entity is not found, assume unsynched sequence ID. Correct the sequence IDs.
 					if(entity == nullptr)
 					{
 						Network::NetworkEntityID tempId = id;
@@ -699,9 +712,9 @@ namespace RootForce
 				}
 				else
 				{
-					// Skip.
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::DEBUG_PRINT, "Got deserialization message for deleted entity, ignoring. (User: %u, Action: %u, Sequence: %u)", id.UserID, id.ActionID, id.SequenceID);
-					return nullptr;
+					// Skip deserializing components.
+					entity = nullptr;
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Got deserialization message for deleted entity, discarding. (User: %u, Action: %u, Sequence: %u)", id.UserID, id.ActionID, id.SequenceID);
 				}
 			}
 			else
@@ -715,12 +728,15 @@ namespace RootForce
 			if (!p_bs->Serialize(false, count))
 				return nullptr;
 
-			// Deserialize all components
+			// Deserialize all components. If the entity is null, just discard all the component data and move on.
 			bool isSelf = (id.UserID == p_self) && (id.ActionID == Network::ReservedActionID::CONNECT);
 			for (unsigned i = 0; i < count; ++i) 
 			{
 				if (DeserializeComponent(p_bs, entity, p_entityManager, isSelf) == nullptr)
-					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to deserialize component on entity (%d)", entity->GetId());
+				{
+					// This can happen when an entity is skipped because it has been removed earlier.
+					//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to deserialize component on entity (%d)", entity->GetId());
+				}
 			}
 
 			return entity;

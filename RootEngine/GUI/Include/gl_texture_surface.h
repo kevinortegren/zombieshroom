@@ -12,37 +12,29 @@ class SurfaceTile
 {
 public:
 	std::vector<char> Buffer;
-	GLuint Texture[2];
+	GLuint Texture;
+	GLuint PBO[2];
 	bool NeedsUpdate;
 	int Bpp, Rowspan;
-	std::mutex TextureMutex;
-	int ActiveTexture;
+	int ActiveBuffer;
 	GLsync FenceID;
 
 	SurfaceTile()
-		: NeedsUpdate(false), Bpp(4), Rowspan(TILE_SIZE*4), ActiveTexture(0), FenceID(0)
+		: NeedsUpdate(false), Bpp(4), Rowspan(TILE_SIZE*4), ActiveBuffer(0), FenceID(0)
 	{
 		Buffer.resize(TILE_SIZE*Rowspan);
-		glGenTextures(2, Texture);
-		glBindTexture(GL_TEXTURE_2D, Texture[0]);
+		glGenTextures(1, &Texture);
+		glGenBuffers(2, PBO);
+		glBindTexture(GL_TEXTURE_2D, Texture);
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
-		//glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0); 
-		glBindTexture(GL_TEXTURE_2D, Texture[1]);
-		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
-		//glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0);
+		if(glClearTexImage)
+			glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-	SurfaceTile(SurfaceTile& p_other)
-	{
-		int i = 0;
 	}
 	~SurfaceTile()
 	{
-		glDeleteTextures(2, Texture);
-	}
-	void operator=(SurfaceTile& p_other)
-	{
-		int i = 0;
+		glDeleteTextures(1, &Texture);
+		glDeleteBuffers(2, PBO);
 	}
 };
 
@@ -80,6 +72,8 @@ public:
 	//int GetActiveTexture() { return m_activeTexture; }
 
 	void UpdateTexture();
+	bool GetShouldResize() const { return m_shouldResize; }
+	void SetShouldResize(bool p_shouldResize) { m_shouldResize = p_shouldResize; }
 
 protected:
 	virtual void Paint(unsigned char* src_buffer, int src_row_span, const Awesomium::Rect& src_rect, const Awesomium::Rect& dest_rect);
@@ -90,6 +84,7 @@ protected:
 	//unsigned char* buffer_;
 	std::vector<std::vector<SurfaceTile>> m_tiles;
 	int m_bpp, m_rowspan, m_width, m_height;
+	bool m_shouldResize;
 	//bool needs_update_, needs_swap;
 	//std::mutex m_needsUpdateMutex;
 };

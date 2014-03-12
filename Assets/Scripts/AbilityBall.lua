@@ -7,6 +7,7 @@ AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
 AbilityBall.duration = 2;
 AbilityBall.charges = -1;
+AbilityBall.crosshair = "";
 
 function AbilityBall.OnLoad()
 	ResourceManager.LoadModel("Primitives/sphereTangents");
@@ -25,7 +26,7 @@ end
 function AbilityBall.ChargeDone (time, userId, actionId)
 	AbilityBall.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE2, true);
 end
 
 function AbilityBall.ChannelingDone (time, userId, actionId)
@@ -107,7 +108,7 @@ function AbilityBall.OnCollide (self, entity)
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				
 				if not health:IsDead() then
-					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance());
+					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance(), "AbilityBall");
 				end
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();

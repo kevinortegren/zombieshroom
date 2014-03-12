@@ -49,11 +49,13 @@ namespace RootEngine
 
 		void ScriptManager::SetFunction(const std::string& p_abilityName, const std::string& p_functionName)
 		{
+			m_stackSize = lua_gettop(m_luaState);
 			// Execute specific function
 			if(p_abilityName.compare("MatchState") == 0 && p_functionName.compare("OnDestroy") == 0)
 				int i = 0;
 			lua_getglobal(m_luaState, p_abilityName.c_str());
 			lua_getfield(m_luaState, -1, p_functionName.c_str());
+			lua_remove(m_luaState, -2);
 		}
 
 		void ScriptManager::ExecuteScript()
@@ -62,7 +64,11 @@ namespace RootEngine
 			if(error = lua_pcall(m_luaState, m_parameterCount, 0, 0) != 0)
 			{
 				printf("Error: %s\n", lua_tostring(m_luaState, -1));
+				lua_pop(m_luaState, 1);
 			}
+
+			int newStackSize = lua_gettop(m_luaState);
+			assert(m_stackSize == newStackSize);
 
 			m_parameterCount = 0;
 		}
@@ -84,7 +90,7 @@ namespace RootEngine
 
 		void ScriptManager::AddParameterNumber(double p_double)
 		{
-			lua_pushinteger(m_luaState, (int)p_double);
+			lua_pushnumber(m_luaState, p_double);
 			m_parameterCount++;
 		}
 

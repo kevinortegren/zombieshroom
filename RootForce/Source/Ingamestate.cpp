@@ -222,10 +222,13 @@ namespace RootForce
 			m_botanySystem->Initialize(textures, 0.0f);
 		}
 
-
-		// Subdivide world.
-		//m_sharedSystems.m_worldSystem->SubdivideTree();
+		
 #endif
+		
+		// Subdivide world.
+		m_sharedSystems.m_worldSystem->SubdivideTree();
+
+		g_world->GetEntityManager()->CleanUp();
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -276,7 +279,7 @@ namespace RootForce
 		m_sharedSystems.m_matchStateSystem->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
 
 		// Reset the ingame menu before we start the match
-		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper, m_hud->GetChatSystem().get()));
 		m_ingameMenu->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_displayIngameMenu = false;
 		m_ingameMenu->GetView()->SetActive(false);
@@ -314,6 +317,11 @@ namespace RootForce
 		m_ingameMenu->GetView()->SetActive(true);
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 		m_ingameMenu->Reset();
+
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-glow", g_engineContext.m_configManager->GetConfigValueAsString("settings-glow"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-grass", g_engineContext.m_configManager->GetConfigValueAsString("settings-grass"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-shadows", g_engineContext.m_configManager->GetConfigValueAsString("settings-shadows"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-water", g_engineContext.m_configManager->GetConfigValueAsString("settings-water"));
 	}
 
 	void IngameState::Exit()
@@ -335,6 +343,7 @@ namespace RootForce
 
 		// Remove all entities.
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetEntityManager()->CleanUp();
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_world->GetSystemManager()->Clear();
@@ -822,6 +831,8 @@ namespace RootForce
 					m_hud->SetCharges(1, playerComponent->AbilityScripts[0].Charges);
 					m_hud->SetCharges(2, playerComponent->AbilityScripts[1].Charges);
 					m_hud->SetCharges(3, playerComponent->AbilityScripts[2].Charges);
+					
+					m_hud->SetCrosshair(playerComponent->AbilityScripts[playerActionComponent->SelectedAbility].Crosshair);
 
 					if(playerComponent->AbilityScripts[0].Cooldown > 0 && playerComponent->AbilityScripts[0].Name.compare("") != 0)
 						m_hud->SetCooldown(1, playerComponent->AbilityScripts[0].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[0].Name));

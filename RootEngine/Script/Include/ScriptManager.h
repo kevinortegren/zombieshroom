@@ -36,7 +36,7 @@ namespace RootEngine
 
 		private:
 			
-			
+			int m_stackSize;
 
 			std::string m_workingDir;
 			lua_State* m_luaState;

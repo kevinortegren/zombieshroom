@@ -13,17 +13,38 @@ end
 
 function Push.ChargeStart(userId, actionId)
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChargingAnimClip(AnimClip.CHARGING1);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChargingAnimClip(AnimClip.CHARGING2);
 end
 
 function Push.ChargeDone (time, userId, actionId)
-	--if time >= Push.chargeTime * 0.5 then
-		Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
-		Push.OnCreate(userId, actionId);
+
+	math.randomseed(os.time());
+	local randomNumber = math.random(1,2);	
+
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	if ((time) / Push.chargeTime) < 0.5 then
+		if randomNumber == 1 then
+			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
+		end
 		
-	--end
+		if randomNumber == 2 then
+			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
+		end
+	end
+
+	if ((time) / Push.chargeTime) >= 0.5 then
+		if randomNumber == 1 then
+			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
+		end
+
+		if randomNumber == 2 then
+			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE2, true);
+		end
+	end
+	
+	--Logging.Log(LogLevel.DEBUG_PRINT, "Time is "..time);
+	Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
+	Push.OnCreate(userId, actionId);
 end
 
 function Push.ChannelingDone (time, userId, actionId)

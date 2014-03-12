@@ -13,7 +13,7 @@ namespace RootForce
 	class IngameMenu
 	{
 	public:
-		IngameMenu(RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper);
+		IngameMenu(RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper, ChatSystem* p_chatSystem);
 		~IngameMenu();
 		RootEngine::GUISystem::WebView* GetView() { return m_view; }
 		bool GetReturn() { return m_return; }
@@ -22,6 +22,7 @@ namespace RootForce
 		void Update();
 		void SetScoreList(std::string p_score);
 		void SetClientPeerInterface(RakNet::RakPeerInterface* p_clientPeer) { m_clientPeer = p_clientPeer; }
+		SettingsMenu* GetSettingsMenu() { return m_settingsMenu; }
 
 	private:
 		void Return(const Awesomium::JSArray& p_array);

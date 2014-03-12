@@ -7,6 +7,7 @@ IceCube.chargeTime = 0;
 IceCube.channelingTime = 0;
 IceCube.duration = 5;
 IceCube.charges = -1;
+IceCube.crosshair = "";
 
 function IceCube.OnLoad()
 	ResourceManager.LoadModel("PentagonSphere");
@@ -20,7 +21,7 @@ end
 function IceCube.ChargeDone (time, userId, actionId)
 	IceCube.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.DOUBLEOVERTHROW1, true);
 end
 
 function IceCube.ChannelingDone (time, userId, actionId)
@@ -75,7 +76,7 @@ function IceCube.OnCollide (self, entity)
 			local health = entity:GetHealth();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				if not health:IsDead() then
-					health:Damage(abilityOwnerId, IceCube.damage);
+					health:Damage(abilityOwnerId, IceCube.damage, "IceCube");
 				end
 			end
 			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then

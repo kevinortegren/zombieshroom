@@ -6,6 +6,7 @@ HealCharges.chargeTime = 0;
 HealCharges.channelingTime = 0;
 HealCharges.duration = 2;
 HealCharges.charges = 1;
+HealCharges.crosshair = "";
 
 function HealCharges.OnLoad()
 	ResourceManager.LoadParticle("HealCharges");

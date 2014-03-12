@@ -192,6 +192,7 @@ function Set(p_id, p_value)
 		{
 			$("#chargebar div").stop(); // stop any ongoing animations
 			$("#chargebar div").css("display", "block"); // ensure the bar is visible
+			$("#chargebar div").css("opacity", "1"); // ensure the bar is visible
 			//$("#chargebar>div>div").animate({width: ($("#chargebar>div").width()*value)+"px"},2000,"linear",function(){$(this).parent().fadeOut(500);});
 			$("#chargebar>div>div").css("width", ($("#chargebar>div").width()*value)+"px"); // resize the charge bar
 			// If charge reaches end in either direction, start a fadeout - it'll be aborted if a channel is initiated after charge
@@ -234,6 +235,15 @@ function SetCharges(p_slot, p_charges)
     slot.html(p_charges);
   else
     slot.html("");
+}
+
+function SetCrosshair(p_name)
+{
+  var name = p_name;
+  if(name == "")
+    name = "crosshair";
+    
+  $("#crosshair").attr("src", name + ".png"); 
 }
 
 function DamageIndicator(p_damage)

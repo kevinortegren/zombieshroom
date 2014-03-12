@@ -7,6 +7,7 @@ RefractiveBall.chargeTime = 0;
 RefractiveBall.channelingTime = 5;
 RefractiveBall.duration = 0;
 RefractiveBall.charges = -1;
+RefractiveBall.crosshair = "";
 
 function RefractiveBall.OnLoad()
 	ResourceManager.LoadModel("PentagonSphere");
@@ -18,6 +19,8 @@ end
 
 function RefractiveBall.ChargeDone (time, userId, actionId)
 	RefractiveBall.OnCreate(userId, actionId);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChannelingAnimClip(AnimClip.CHANNELINGSPHERE);
 end
 
 function RefractiveBall.ChannelingDone (time, userId, actionId)

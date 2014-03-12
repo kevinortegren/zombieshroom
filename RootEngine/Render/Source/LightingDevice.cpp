@@ -34,7 +34,7 @@ namespace Render
 
 		// Light uniforms.
 		m_lights = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
-		m_lights->BufferData(1, sizeof(m_lightVars), &m_lightVars);
+		m_lights->BufferData(1, sizeof(m_lightVars), &m_lightVars, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_LIGHTS, m_lights->GetBufferId());
 
 		// Setup la-buffer.
@@ -245,7 +245,7 @@ namespace Render
 		}
 
 		BufferInterface* ssaoBuff = m_ssaoTech->GetBufferInterface();
-		ssaoBuff->BufferData((size_t)kernelSize, sizeof(glm::vec4), &m_kernel[0]);
+		ssaoBuff->BufferData((size_t)kernelSize, sizeof(glm::vec4), &m_kernel[0], GL_STATIC_DRAW);
 
 		const int noiseSize = 16;
 		glm::vec2 noise[noiseSize];

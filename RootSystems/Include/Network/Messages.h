@@ -359,6 +359,7 @@ namespace RootForce
 		{
 			Network::UserID_t User;
 			Network::UserID_t LastDamageSource;
+			RakNet::RakString LastDamageSourceName;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -414,7 +415,7 @@ namespace RootForce
 
 		/*
 			Deserialize a component. This will create a new component in the given entity manager if the component doesn't exist on the given entity.
-			Returns nullptr on error. Do not deserialize transform on our own player entity.
+			Returns nullptr on error. Do not deserialize transform on our own player entity. Do not deserialize if the entity has been removed before.
 
 			The serialized data in the bitstream is assumed to be in the following order:
 				- Type : ComponentType
@@ -443,7 +444,8 @@ namespace RootForce
 
 		/*
 			Deserialize an entity and all of its serialized components. This will create an entity in the entity manager
-			if the deserialized ID cannot be found in the given network entity map. A deserialized entity will be added to the network entity map. Do not deserialize transform on our own player entity.
+			if the deserialized ID cannot be found in the given network entity map. A deserialized entity will be added to the network entity map. 
+			Do not deserialize transform on our own player entity. Do not deserialize if the entity has been removed before.
 
 			The serialized data in the bitstream is assumed to be in the following order:
 				- ID : NetworkEntityID

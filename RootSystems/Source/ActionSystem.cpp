@@ -58,6 +58,8 @@ namespace RootSystems
 					action->WantRespawn = false;
 					action->JumpTime = 0.0f;
 					action->JumpDir = glm::vec3(0.0f);
+					health->GotHit = false;
+					animation->UpperBodyAnim.m_locked = 0;
 				}
 
 				// Check abilities here as well, to make sure abilities are properly interrupted.
@@ -223,6 +225,24 @@ namespace RootSystems
 				}
 			}
 
+			//Play hit animation if hit
+			if(health->GotHit)
+			{
+				health->GotHit = false;
+				std::srand((int)time(NULL));
+				int random = std::rand() % 3 + 1;
+
+				if(random == 1)
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT1;
+				else if(random == 2)
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT2;
+				else if(random == 3)
+					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT3;
+
+				animation->UpperBodyAnim.m_locked = 1;
+				
+			}
+
 			// Activate ability! Pew pew!
 			AbilitySwitch(p_entity);
 
@@ -285,8 +305,8 @@ namespace RootSystems
 					{
 						player->AbilityState = RootForce::AbilityState::CHARGING;
 						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeStart");
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
+						g_engineContext.m_script->AddParameterNumber((double)network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber((double)abilityEvent.ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
 						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "ACTION SYSTEM: Start charging ability %s (User: %u, Action: %u)", abilityName.c_str(), network->ID.UserID, abilityEvent.ActionID);
@@ -297,9 +317,9 @@ namespace RootSystems
 						player->AbilityState = RootForce::AbilityState::CHANNELING;
 						
 						g_engineContext.m_script->SetFunction(m_engineContext->m_resourceManager->GetScript(abilityName), "ChargeDone");
-						g_engineContext.m_script->AddParameterNumber(abilityEvent.Time);
-						g_engineContext.m_script->AddParameterNumber(network->ID.UserID);
-						g_engineContext.m_script->AddParameterNumber(abilityEvent.ActionID);
+						g_engineContext.m_script->AddParameterNumber((double)abilityEvent.Time);
+						g_engineContext.m_script->AddParameterNumber((double)network->ID.UserID);
+						g_engineContext.m_script->AddParameterNumber((double)abilityEvent.ActionID);
 						g_engineContext.m_script->ExecuteScript();
 
 						// DEBUG

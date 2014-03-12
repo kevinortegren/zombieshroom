@@ -6,6 +6,7 @@ MachineGun.charges = 99;
 MachineGun.chargeTime = 0;
 MachineGun.channelingTime = 0;
 MachineGun.duration = 5;
+MachineGun.crosshair = "";
 
 function MachineGun.OnLoad()
 	--ResourceManager.LoadParticle("MachineGun");
@@ -17,7 +18,7 @@ end
 function MachineGun.ChargeDone (time, userId, actionId)
 	MachineGun.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, false);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
 end
 
 function MachineGun.ChannelingDone (time, userId, actionId)
@@ -83,7 +84,7 @@ if entity:DoesExist() then
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				health:Damage(abilityOwnerId, dakComp:GetDamage());
+				health:Damage(abilityOwnerId, dakComp:GetDamage(), "MachineGun");
 			end
 		end
 	end
