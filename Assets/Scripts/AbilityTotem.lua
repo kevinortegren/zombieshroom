@@ -4,6 +4,7 @@ AbilityTotem.charges = 1;
 AbilityTotem.chargeTime = 0;
 AbilityTotem.channelingTime = 0;
 AbilityTotem.duration = 30;
+AbilityTotem.interval = 0.5;
 AbilityTotem.crosshair = "";
 
 function AbilityTotem.OnLoad()
@@ -43,7 +44,7 @@ function AbilityTotem.OnCreate (userId, actionId)
 	local networkComp = Network.New(self, userId, actionId);
     
     -- Setup timers
-    for i = 1, AbilityTotem.duration, 1 do
+    for i = 1, AbilityTotem.duration, AbilityTotem.interval do
         TimerEntity.StartTimer(userId, actionId, i, "AbilityTotem", "Fire", self);
     end
     

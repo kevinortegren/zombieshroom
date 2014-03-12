@@ -1,9 +1,9 @@
 TotemProjectile = {};
 TotemProjectile.direction = 0;
-TotemProjectile.duration = 2;
-TotemProjectile.damage = 10;
+TotemProjectile.duration = 1;
+TotemProjectile.damage = 20;
 TotemProjectile.knockback = 0;
-TotemProjectile.speed = 10;
+TotemProjectile.speed = 20;
 
 function TotemProjectile.OnLoad()
 	ResourceManager.LoadModel("blowdart");
