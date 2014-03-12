@@ -16,7 +16,7 @@ function Cannonball.OnLoad()
 	ResourceManager.LoadTexture("Cannonball_Specular");
 	ResourceManager.LoadTexture("Cannonball_Normal");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
-	ResourceManager.LoadParticle("SmockeochElden");
+	ResourceManager.LoadParticle("CannonballTrail");
 	ResourceManager.LoadScript("BigExplosion");
 	BigExplosion.OnLoad();
 end
@@ -78,7 +78,7 @@ function Cannonball.OnCreate (userId, actionId)
 	if Global.IsClient then
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
-		renderComp:SetMaterial("Cannonball");
+		renderComp:SetMaterial("Cannonballs");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_DYNAMIC);
 		renderComp:SetMaterialDiffuse("Cannonball_Diffuse");
 		renderComp:SetMaterialSpecular("Cannonball_Specular");
