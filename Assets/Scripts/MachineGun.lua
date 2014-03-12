@@ -24,7 +24,7 @@ end
 function MachineGun.ChannelingDone (time, userId, actionId)
 end
 
-function FireBall.Interrupted (time, userId, actionId)
+function MachineGun.Interrupted (time, userId, actionId)
 end
 
 function MachineGun.OnCreate (userId, actionId)
