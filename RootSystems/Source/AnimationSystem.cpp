@@ -41,16 +41,23 @@ namespace RootForce
 	{
 		if(p_animation->UpperBodyAnim.m_animClip != p_animation->UpperBodyAnim.m_prevAnimClip)
 		{
+			if(p_animation->UpperBodyAnim.m_blending)
+				p_animation->UpperBodyAnim.m_animClip = p_animation->UpperBodyAnim.m_prevAnimClip;
 			if(p_animation->UpperBodyAnim.m_locked == 2)
 				p_animation->UpperBodyAnim.m_animClip = p_animation->UpperBodyAnim.m_prevAnimClip;
-			else
+			else if(!p_animation->UpperBodyAnim.m_blending)
 			{
+				m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::IDENTIFY_PRINT, "Upper animation changed from %d to %d", p_animation->UpperBodyAnim.m_prevAnimClip, p_animation->UpperBodyAnim.m_animClip);
 				p_animation->UpperBodyAnim.m_animTime = 0.0f;
 				p_animation->UpperBodyAnim.m_prevAnimClip = p_animation->UpperBodyAnim.m_animClip;
 				p_animation->UpperBodyAnim.m_blending = true;
 				p_animation->UpperBodyAnim.m_blendTime = 0.0f;
 				if(p_animation->UpperBodyAnim.m_locked == 1)
 					p_animation->UpperBodyAnim.m_locked = 2;
+			}
+			else if(p_animation->UpperBodyAnim.m_locked == 1)
+			{
+				p_animation->UpperBodyAnim.m_locked = 2;
 			}
 		}
 
@@ -81,16 +88,23 @@ namespace RootForce
 	{
 		if(p_animation->LowerBodyAnim.m_animClip != p_animation->LowerBodyAnim.m_prevAnimClip)
 		{
+			if(p_animation->LowerBodyAnim.m_blending)
+				p_animation->LowerBodyAnim.m_animClip = p_animation->LowerBodyAnim.m_prevAnimClip;
 			if(p_animation->LowerBodyAnim.m_locked == 2)
 				p_animation->LowerBodyAnim.m_animClip = p_animation->LowerBodyAnim.m_prevAnimClip;
-			else
+			else if(!p_animation->LowerBodyAnim.m_blending)
 			{
+				m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::IDENTIFY_PRINT, "Lower animation changed from %d to %d", p_animation->LowerBodyAnim.m_prevAnimClip, p_animation->LowerBodyAnim.m_animClip);
 				p_animation->LowerBodyAnim.m_animTime = 0.0f;
 				p_animation->LowerBodyAnim.m_prevAnimClip = p_animation->LowerBodyAnim.m_animClip;
 				p_animation->LowerBodyAnim.m_blending = true;
 				p_animation->LowerBodyAnim.m_blendTime = 0.0f;
 				if(p_animation->LowerBodyAnim.m_locked == 1)
 					p_animation->LowerBodyAnim.m_locked = 2;
+			}
+			else if(p_animation->LowerBodyAnim.m_locked == 1)
+			{
+				p_animation->LowerBodyAnim.m_locked = 2;
 			}
 		}
 

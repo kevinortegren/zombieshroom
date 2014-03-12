@@ -57,6 +57,7 @@ namespace RootSystems
 					health->WantsRespawn = true;
 					action->WantRespawn = false;
 					action->JumpTime = 0.0f;
+					action->FallTime = 0.0f;
 					action->JumpDir = glm::vec3(0.0f);
 					health->GotHit = false;
 					animation->UpperBodyAnim.m_locked = 0;
@@ -93,79 +94,6 @@ namespace RootSystems
 
 			m_engineContext->m_physics->SetOrientation(*(collision->m_handle), transform->m_orientation.GetQuaternion());
 
-			if(state->CurrentState == RootForce::EntityState::ASCENDING)
-			{
-				animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::ASCEND;
-				animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::ASCEND;
-			}
-			else if(state->CurrentState == RootForce::EntityState::DESCENDING)
-			{
-				animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::DESCEND;
-				animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::DESCEND;
-			}
-			else if(state->CurrentState == RootForce::EntityState::LANDING)
-			{
-				animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::LANDING;
-				animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::LANDING;
-				animation->LowerBodyAnim.m_locked = 1;
-				animation->UpperBodyAnim.m_locked = 1;
-
-				state->CurrentState = RootForce::EntityState::GROUNDED;
-
-				action->JumpTime = 0.0f;
-			}
-			else
-			{
-				//if(action->StrafePower == 0 && action->MovePower == 0)
-				animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::IDLE;
-				animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::IDLE;
-
-				if(!isGameOver)
-				{
-					if(action->MovePower < 0)
-					{
-						animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::BACKWARDS;
-						animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::BACKWARDS;
-					}
-					else if(action->MovePower > 0)
-					{
-						animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::WALKING;
-						animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::WALKING;
-					}
-					if(action->StrafePower > 0)
-					{
-						animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
-						animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::STRAFE_RIGHT;
-					}
-					else if(action->StrafePower < 0)
-					{
-						animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
-						animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::STRAFE_LEFT;
-					}
-					if(action->MovePower > 0 && action->StrafePower < 0)
-					{
-						animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::LEFTFORWARD;
-						animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::LEFTFORWARD;
-					}
-					else if(action->MovePower > 0 && action->StrafePower > 0)
-					{
-						animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::RIGHTFORWARD;
-						animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::RIGHTFORWARD;
-					}
-					if(action->MovePower < 0 && action->StrafePower < 0)
-					{
-						animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::LEFTBACK;
-						animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::LEFTBACK;
-					}
-					else if(action->MovePower < 0 && action->StrafePower > 0)
-					{
-						animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::RIGHTBACK;
-						animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::RIGHTBACK;
-					}
-
-				}
-			}
-
 			// Issue a jump if applicable
 			if(!isGameOver)
 			{
@@ -182,13 +110,12 @@ namespace RootSystems
 							// Apply jump force and go into jump animation
 							m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
 
-							if((animation->UpperBodyAnim.m_animClip != RootForce::AnimationClip::ASCEND || animation->LowerBodyAnim.m_animClip != RootForce::AnimationClip::ASCEND ) && (animation->UpperBodyAnim.m_animClip != RootForce::AnimationClip::DESCEND || animation->LowerBodyAnim.m_animClip != RootForce::AnimationClip::DESCEND))
-							{
-								animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::JUMP_START;
-								animation->UpperBodyAnim.m_locked = 1;
-								animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::JUMP_START;
-								animation->LowerBodyAnim.m_locked = 1;
-							}
+							//if(state->CurrentState == RootForce::EntityState::GROUNDED)
+							//{
+								animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
+								animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
+								m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "JUMP ANIM CLIP SET");
+							//}
 						}
 						else
 						{
@@ -197,6 +124,107 @@ namespace RootSystems
 						}
 					}
 				}
+			}
+
+			if(state->CurrentState == RootForce::EntityState::ASCENDING)
+			{
+				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND, false);
+
+				if(action->StrafePower > 0)
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_RIGHT, false);
+				else if(action->StrafePower < 0)
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_LEFT, false);
+				else
+				{
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND, false);
+				}
+			}
+			else if(state->CurrentState == RootForce::EntityState::DESCENDING)
+			{
+				action->FallTime += dt;
+
+				//m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT,  "FallTime %f", action->FallTime);
+
+				if(action->FallTime > 0.2)
+				{
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
+
+					if(action->StrafePower > 0)
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_RIGHT, false);
+					else if(action->StrafePower < 0)
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_LEFT, false);
+					else
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
+					}
+				}
+
+			}
+			else if(state->CurrentState == RootForce::EntityState::LANDING)
+			{
+				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
+				animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
+
+				state->CurrentState = RootForce::EntityState::GROUNDED;
+				m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "LANDING ANIM CLIP SET");
+
+				action->JumpTime = 0.0f;
+				action->FallTime = 0.0f;
+			}
+			else
+			{
+				//if(action->StrafePower == 0 && action->MovePower == 0)
+				animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
+				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
+
+				if(!isGameOver)
+				{
+					if(action->MovePower < 0)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::BACKWARDS, false);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::BACKWARDS, false);
+					}
+					else if(action->MovePower > 0)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::WALKING, false);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::WALKING, false);
+					}
+					if(action->StrafePower > 0)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_RIGHT, false);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_RIGHT, false);
+					}
+					else if(action->StrafePower < 0)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_LEFT, false);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_LEFT, false);
+					}
+					if(action->MovePower > 0 && action->StrafePower < 0)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LEFTFORWARD, false);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::LEFTFORWARD, false);
+					}
+					else if(action->MovePower > 0 && action->StrafePower > 0)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::RIGHTFORWARD, false);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::RIGHTFORWARD, false);
+					}
+					if(action->MovePower < 0 && action->StrafePower < 0)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LEFTBACK, false);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::LEFTBACK, false);
+					}
+					else if(action->MovePower < 0 && action->StrafePower > 0)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::RIGHTBACK, false);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::RIGHTBACK, false);
+					}
+
+				}
+			}
+
+			if(!isGameOver)
+			{
 				if(player->AbilityState == RootForce::AbilityState::CHARGING)
 				{
 					if(animation->UpperBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP)
@@ -233,14 +261,11 @@ namespace RootSystems
 				int random = std::rand() % 3 + 1;
 
 				if(random == 1)
-					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT1;
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::GOTHIT1, true);
 				else if(random == 2)
-					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT2;
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::GOTHIT2, true);
 				else if(random == 3)
-					animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::GOTHIT3;
-
-				animation->UpperBodyAnim.m_locked = 1;
-				
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::GOTHIT3, true);
 			}
 
 			// Activate ability! Pew pew!

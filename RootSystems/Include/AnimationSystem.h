@@ -60,14 +60,28 @@ namespace RootForce
 		int		m_locked;
 		bool	m_blending;
 		float	m_blendTime;
+
+		void SetAnimationClip(AnimationClip::AnimationClip p_animClip, bool p_locked)
+		{
+			if(m_locked == 0) 
+			{
+				m_animClip = p_animClip;
+			}
+
+			if(p_locked)
+			{
+				m_animClip = p_animClip;
+				m_locked = 1;
+			}
+		}
 	};
 
 	struct Animation : public ECS::Component<Animation>
 	{
 		Animation(){}
 		glm::mat4 m_bones[20];
-		AnimBodyPart LowerBodyAnim;
 		AnimBodyPart UpperBodyAnim;
+		AnimBodyPart LowerBodyAnim;
 	};
 
 	struct AnimationSystem : public ECS::ConcurrentSystem
