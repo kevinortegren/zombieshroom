@@ -63,8 +63,7 @@ end
 function Identiray.OnCollide (self, entity)
 if entity:DoesExist() then
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
     
     Logging.IdentifyEntity(entity);
 end

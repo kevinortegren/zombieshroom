@@ -22,9 +22,9 @@ namespace RootEngine
 			/* This function runs a script from top to bottom and executes all code that is not contained in functions. */
 			virtual void ExecuteWholeScript(std::string p_scriptPath) = 0;
 
-
+			virtual bool IsFunctionDefined(const std::string& p_scriptName, const std::string& p_functionName) = 0;
 			/* This sets a specific script that is to be used when doing a specific function call with added parameters. */
-			virtual void SetFunction(std::string p_abilityName, std::string p_functionName) = 0;
+			virtual void SetFunction(const std::string& p_abilityName, const std::string& p_functionName) = 0;
 			
 			virtual int LoadScript(std::string p_scriptPath) = 0;
 

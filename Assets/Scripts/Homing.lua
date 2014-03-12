@@ -98,8 +98,7 @@ function Homing.OnCollide (self, entity)
 if entity:DoesExist() then
 	local dakComp = self:GetDamageAndKnockback();
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
 	if type == PhysicsType.TYPE_PLAYER then
 		local targetPlayerComponent = entity:GetPlayerComponent();
 		local abilityOwnerNetwork = self:GetNetwork();

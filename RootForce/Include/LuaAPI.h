@@ -255,7 +255,14 @@ namespace RootForce
 			RootForce::Physics **s = (RootForce::Physics **)lua_newuserdata(p_luaState, sizeof(RootForce::Physics *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::Physics>(*e);
-			luaL_setmetatable(p_luaState, "Physics");
+			if(*s == nullptr)
+			{
+				lua_pushnil(p_luaState);
+			}
+			else
+			{
+				luaL_setmetatable(p_luaState, "Physics");
+			}
 			return 1;
 		}
 
@@ -787,6 +794,15 @@ namespace RootForce
 			lua_pushnumber(p_luaState, *(*rtemp)->m_handle); 
 			return 1;
 		}
+
+		static int CollisionGetType(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
+			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
+			return 1;
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		//COLLISIONRESPONDER
 		//////////////////////////////////////////////////////////////////////////
@@ -931,6 +947,17 @@ namespace RootForce
 			g_engineContext.m_physics->SetVelocity((*(*rtemp)->m_handle), (*ptemp)->m_velocity);
 			return 0;
 		}
+
+		static int PhysicsGetVelocity(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->m_velocity);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
 		static int PhysicsKnockBack(lua_State* p_luaState)
 		{
 			NumberOfArgs(5);
@@ -954,13 +981,7 @@ namespace RootForce
 // 			g_engineContext.m_physics->CastRay((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), *((glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3")), (float)luaL_checknumber(p_luaState, 5));
 // 			return 0;
 // 		}
-		static int PhysicsGetType(lua_State* p_luaState)
-		{
-			NumberOfArgs(2);
-			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
-			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
-			return 1;
-		}
+
 		static int PhysicsGetPlayerAtAim(lua_State* p_luaState)
 		{
 			NumberOfArgs(5);
@@ -2903,6 +2924,7 @@ namespace RootForce
 			{"SetMeshHandle", CollisionSetMeshHandle},
 			{"CreateHandle", CollisionCreateHandle},
 			{"GetHandle", CollisionGetHandle},
+			{"GetType", CollisionGetType},
 			{NULL, NULL}
 		};
 
@@ -2921,10 +2943,10 @@ namespace RootForce
 			{"BindNoShape", PhysicsBindShapeNone},
 			{"SetPos", PhysicsSetPos},
 			{"SetVelocity", PhysicsSetVelocity},
+			{"GetVelocity", PhysicsGetVelocity},
 			{"KnockBack", PhysicsKnockBack},
 			{"CheckRadius", PhysicsCheckRadius},
 			//{"ShootRay", PhysicsShootRay},
-			{"GetType", PhysicsGetType},
 			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
 			{"LockYOrientation", PhysicsLockYOrientation},
