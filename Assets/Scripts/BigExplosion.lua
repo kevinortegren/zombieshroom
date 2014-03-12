@@ -1,3 +1,5 @@
+--Gustav's big explosion script, copy but do not edit! Make your own abilities dammit!
+
 BigExplosion = {};
 BigExplosion.damage = 20;
 BigExplosion.pushback = 20;
@@ -49,24 +51,23 @@ function BigExplosion.OnCollide (self, entity)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
-		local type = hitPhys:GetType(hitCol);
+		local type = hitCol:GetType();
 	 	if type == PhysicsType.TYPE_PLAYER then
 		    local abilityOwnerNetwork = self:GetNetwork();
 		    local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 		    local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 		   	local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 		   	local targetPlayerComponent = entity:GetPlayerComponent();
-		    if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-			    local network = entity:GetNetwork();
-			    local hitPos = entity:GetTransformation():GetPos();
-			    local selfPos = self:GetTransformation():GetPos();
-			    local health = entity:GetHealth();
-          if not health:IsDead() then
-				    health:Damage(abilityOwnerId, BigExplosion.damage * entity:GetStatChange():GetDamageResistance(), "Cannonball");
-			    end
-			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), BigExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
-			end
+		    
+		    local network = entity:GetNetwork();
+		    local hitPos = entity:GetTransformation():GetPos();
+		    local selfPos = self:GetTransformation():GetPos();
+		    local health = entity:GetHealth();
+      		if not health:IsDead() then
+			    health:Damage(abilityOwnerId, BigExplosion.damage * entity:GetStatChange():GetDamageResistance());
+		    end
+		    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), BigExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+		
 		end
 	end
 end

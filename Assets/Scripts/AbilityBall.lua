@@ -97,8 +97,7 @@ end
 function AbilityBall.OnCollide (self, entity)
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
-		local type = hitPhys:GetType(hitCol);
+		local type = hitCol:GetType();
 		if type == PhysicsType.TYPE_PLAYER then
 			local targetPlayerComponent = entity:GetPlayerComponent();
 			local abilityOwnerNetwork = self:GetNetwork();
@@ -111,10 +110,9 @@ function AbilityBall.OnCollide (self, entity)
 				if not health:IsDead() then
 					health:Damage(abilityOwnerId, AbilityBall.damage * entity:GetStatChange():GetDamageResistance(), "AbilityBall");
 				end
-			end
-			if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
+				local hitPhys = entity:GetPhysics();
 				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityBall.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end

@@ -81,8 +81,7 @@ end
 
 function AbilityTest.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
 	if type == PhysicsType.TYPE_PLAYER then
 		local targetPlayerComponent = entity:GetPlayerComponent();
 		local abilityOwnerNetwork = self:GetNetwork();
