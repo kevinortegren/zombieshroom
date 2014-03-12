@@ -88,6 +88,8 @@ namespace RootEngine
 
 			// Buffer quads in a buffer until max amount of texture units is filled
 			//   then issue a draw call and reset
+			if(surface->GetShouldResize())
+				m_resizeMutex.lock();
 
 			unsigned numTexturesUsed = 0;
 			float tileTexWidth = TILE_SIZE/(float)m_width*2;
@@ -128,6 +130,8 @@ namespace RootEngine
 					}
 				}
 			glBindVertexArray(0);
+			if(surface->GetShouldResize())
+				m_resizeMutex.unlock();
 		}
 
 		guiInstance* guiInstance::GetInstance()
@@ -340,7 +344,9 @@ namespace RootEngine
 								m_viewBuffer[i]->Update();
 					m_viewBufferMutex.unlock();
 
-					m_core->Update();
+					m_resizeMutex.lock();
+						m_core->Update();
+					m_resizeMutex.unlock();
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 						if(m_viewBuffer[i] && m_viewBuffer[i]->GetView() && m_viewBuffer[i]->m_isActive)
 						{
@@ -379,7 +385,10 @@ namespace RootEngine
 			m_drawMutex.lock();
 				m_viewBufferMutex.lock();
 					for(auto view : m_viewBuffer )
+					{
+						((GLTextureSurface*)view->m_webView->surface())->SetShouldResize(true);
 						view->m_webView->Resize(p_width, p_height);
+					}
 				m_viewBufferMutex.unlock();
 			m_drawMutex.unlock();
 		}

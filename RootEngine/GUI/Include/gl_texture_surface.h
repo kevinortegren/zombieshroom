@@ -17,9 +17,10 @@ public:
 	bool NeedsUpdate;
 	int Bpp, Rowspan;
 	int ActiveBuffer;
+	GLsync FenceID;
 
 	SurfaceTile()
-		: NeedsUpdate(false), Bpp(4), Rowspan(TILE_SIZE*4), ActiveBuffer(0)
+		: NeedsUpdate(false), Bpp(4), Rowspan(TILE_SIZE*4), ActiveBuffer(0), FenceID(0)
 	{
 		Buffer.resize(TILE_SIZE*Rowspan);
 		glGenTextures(1, &Texture);
@@ -71,6 +72,8 @@ public:
 	//int GetActiveTexture() { return m_activeTexture; }
 
 	void UpdateTexture();
+	bool GetShouldResize() const { return m_shouldResize; }
+	void SetShouldResize(bool p_shouldResize) { m_shouldResize = p_shouldResize; }
 
 protected:
 	virtual void Paint(unsigned char* src_buffer, int src_row_span, const Awesomium::Rect& src_rect, const Awesomium::Rect& dest_rect);
@@ -81,6 +84,7 @@ protected:
 	//unsigned char* buffer_;
 	std::vector<std::vector<SurfaceTile>> m_tiles;
 	int m_bpp, m_rowspan, m_width, m_height;
+	bool m_shouldResize;
 	//bool needs_update_, needs_swap;
 	//std::mutex m_needsUpdateMutex;
 };

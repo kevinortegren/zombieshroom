@@ -79,6 +79,8 @@ namespace RootEngine
 		m_values["settings-key-Switch_Ability_Forward"] = std::to_string(SDL_SCANCODE_Q);
 		m_values["settings-key-Scroll_Ability_Forward"] = std::to_string(RootEngine::InputManager::MouseButton::X1);
 		m_values["settings-key-Scroll_Ability_Backward"] = std::to_string(RootEngine::InputManager::MouseButton::X2);
+		m_values["settings-mouse-sensitivity"] = "0.2f";
+		m_values["settings-mouse-invert"] = "false";
 		m_values["ServerName"] = "RootForce server";
 		m_values["ServerMapfile"] = "Nyaste.world";
 		m_values["AbilityPack"] = "Standard.txt";

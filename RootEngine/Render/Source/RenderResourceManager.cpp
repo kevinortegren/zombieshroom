@@ -34,9 +34,14 @@ namespace Render
 	void RenderResourceManager::PrintResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
 	{
 		p_bufferUsage = 0;
+		int numBuffers = 0;
 		for(auto itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
 		{
-			p_bufferUsage += (*itr)->GetBufferSize();
+			if((*itr) != nullptr)
+			{
+				p_bufferUsage += (*itr)->GetBufferSize();
+				numBuffers++;
+			}
 		}
 		p_bufferUsage /= 1000;
 
@@ -55,7 +60,7 @@ namespace Render
 		}
 		p_textureUsage /= 1000;
 
-		p_numBuffers = m_buffers.size();
+		p_numBuffers = numBuffers;
 		p_numTextures = m_textures.size();
 	}
 
@@ -68,8 +73,18 @@ namespace Render
 
 	void RenderResourceManager::ReleaseBuffer(BufferInterface* p_buffer)
 	{
-		auto itr = std::find(m_buffers.begin(), m_buffers.end(), p_buffer);
-		m_buffers.erase(itr);
+		if(p_buffer != nullptr)
+		{
+			auto itr = std::find(m_buffers.begin(), m_buffers.end(), p_buffer);
+			if(itr != m_buffers.end())
+			{
+				if((*itr) != nullptr)
+				{
+					delete (*itr);
+					(*itr) = nullptr;
+				}
+			}
+		}
 	}
 
 	TextureInterface* RenderResourceManager::CreateTexture()

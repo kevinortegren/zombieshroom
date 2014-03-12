@@ -67,4 +67,9 @@ namespace RootForce
 		m_commandBuffer = m_commandBuffer + "SetCharges('" + std::to_string(p_slot) + "'," + std::to_string(p_charges) + ");";
 	}
 
+	void HUD::SetCrosshair( std::string p_name )
+	{
+		m_commandBuffer = m_commandBuffer + "SetCrosshair('" + p_name + "');";
+	}
+
 }

@@ -16,7 +16,8 @@ namespace RootEngine
 			void SetWorkingDir(std::string p_path) { m_workingDir = p_path; }
 
 			void ExecuteWholeScript(std::string p_scriptPath);
-			void SetFunction(std::string p_abilityName, std::string p_functionName);
+			bool IsFunctionDefined(const std::string& p_scriptName, const std::string& p_functionName);
+			void SetFunction(const std::string& p_abilityName, const std::string& p_functionName);
 			void ExecuteScript();
 			int LoadScript(std::string p_scriptPath);
 			void AddParameterUserData(void* p_data, size_t p_size, const std::string& p_metaTable);
@@ -35,7 +36,7 @@ namespace RootEngine
 
 		private:
 			
-			
+			int m_stackSize;
 
 			std::string m_workingDir;
 			lua_State* m_luaState;

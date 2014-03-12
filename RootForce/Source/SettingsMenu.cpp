@@ -5,6 +5,9 @@
 #include <RootEngine/GUI/Include/guiInstance.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
+#include <RootSystems/Include/PlayerSystem.h>
+
+extern ECS::World* g_world;
 namespace RootForce
 {
 
@@ -155,6 +158,7 @@ namespace RootForce
 			m_screenHeight = std::stoi(p_value.substr(splitPos+1));
 			m_shouldUpdate = true;
 		}
+
 		m_context.m_configManager->SetConfigValue(
 			RootEngine::GUISystem::PreventHTMLInjections(p_key),
 			RootEngine::GUISystem::PreventHTMLInjections(p_value)

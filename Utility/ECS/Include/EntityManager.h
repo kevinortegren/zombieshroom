@@ -5,6 +5,7 @@
 #include <Utility\ECS\Include\ComponentAllocator.h>
 #include <memory>
 #include <vector>
+#include <set>
 #include <stack>
 #include <iostream>
 #include <assert.h>
@@ -62,22 +63,26 @@ namespace ECS
 			return component;
 		}
 
-
 		// Removes a component from an entity.
 		template<class T> 
 		void RemoveComponent(Entity* p_entity)
 		{
-			assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
-	
-			m_allocator.Free<T>((T*) m_components[Component<T>::GetTypeId()][p_entity->m_id]);
+		   // Make sure the entity exist within the component list range.
+		   assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
+ 
+		   // If already removed, skip.
+		   if(m_components[Component<T>::GetTypeId()][p_entity->m_id] != nullptr)
+		   {
+			    // Push the type of component and the given entity.
+			   m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(Component<T>::GetTypeId(), p_entity->GetId()));
 
-			m_components[Component<T>::GetTypeId()][p_entity->m_id] = nullptr;
+			   p_entity->m_flag ^= (1ULL << Component<T>::GetTypeId());
 
-			p_entity->m_flag ^= (1ULL << Component<T>::GetTypeId());
-
-			m_systemManager->RemoveEntityFromSystems(p_entity);
-			
+			   m_systemManager->RemoveEntityFromSystems(p_entity);
+		   }
 		}
+
+		void CleanUp();
 
 		template<class T>
 		T* GetComponent(Entity* p_entity)
@@ -106,6 +111,8 @@ namespace ECS
 		int GetNumEntities() const { return m_entities.size(); }
 
 		std::vector<ECS::Entity*> GetAllEntities();
+
+		const std::set<int>& GetEntitiesToBeRemoved() const { return m_entitiesToBeRemoved; }
 	private:
 
 		EntitySystemManager* m_systemManager;
@@ -115,5 +122,9 @@ namespace ECS
 		std::vector<std::vector<ComponentInterface*>> m_components; // CompID, EntityId, CompType.
 
 		ComponentAllocator m_allocator;
+
+		// Recyling sets.
+		std::set<std::pair<unsigned int, unsigned int>> m_componentsToBeRemoved;
+		std::set<int> m_entitiesToBeRemoved;
 	};
 }

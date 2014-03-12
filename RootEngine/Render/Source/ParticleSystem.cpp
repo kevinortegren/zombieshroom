@@ -43,7 +43,7 @@ namespace Render
 
 			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[i]->GetTransformFeedback());
 			
-			vertexBuffer[i]->BufferData(RENDER_NUM_PARTCILES, sizeof(ParticleVertex), particles);
+			vertexBuffer[i]->BufferData(RENDER_NUM_PARTCILES, sizeof(ParticleVertex), particles, GL_STATIC_DRAW);
 			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId());
 
 			attributes[i] = p_renderer->CreateVertexAttributes();
@@ -113,13 +113,13 @@ namespace Render
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
 
 		m_perFrameBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
-		m_perFrameBuffer->BufferData(1, sizeof(m_perFrameVars), &m_perFrameVars);
+		m_perFrameBuffer->BufferData(1, sizeof(m_perFrameVars), &m_perFrameVars, GL_DYNAMIC_DRAW);
 
 		m_perObjectBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
 		char data[RENDER_PARTICLES_UNIFORM_SIZE];
 		memset(&data, 0, RENDER_PARTICLES_UNIFORM_SIZE);
 
-		m_perObjectBuffer->BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data);
+		m_perObjectBuffer->BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data, GL_DYNAMIC_DRAW);
 
 		for(int i = 0; i < RENDER_NUM_PARTICLESYSTEMS; ++i)
 		{

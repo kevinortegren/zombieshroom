@@ -103,13 +103,16 @@ namespace RootEngine
 
 		glm::ivec2 InputManager::GetGlobalMousePos()
 		{
+			if(g_context.m_configManager->GetConfigValueAsBool("settings-mouse-invert"))
+				return glm::ivec2(m_globMousePos.x, -m_globMousePos.y);
 			return m_globMousePos;
 		}
 
 		glm::ivec2 InputManager::GetDeltaMousePos()
 		{
 			glm::ivec2 temp = m_deltaMousePos;
-			//m_deltaMousePos = glm::vec2(0, 0);
+			if(g_context.m_configManager->GetConfigValueAsBool("settings-mouse-invert"))
+				temp.y = -temp.y;
 			return temp;
 		}
 

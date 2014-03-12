@@ -37,18 +37,39 @@ namespace RootEngine
 			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
 		}
 
-		void ScriptManager::SetFunction(std::string p_abilityName ,std::string p_functionName)
+		bool ScriptManager::IsFunctionDefined(const std::string& p_scriptName, const std::string& p_functionName)
 		{
+			lua_getglobal(m_luaState, p_scriptName.c_str());
+			lua_getfield(m_luaState, -1, p_functionName.c_str());
+			bool result = lua_isfunction(m_luaState, -1);
+			lua_pop(m_luaState, 2);
+
+			return result;
+		}
+
+		void ScriptManager::SetFunction(const std::string& p_abilityName, const std::string& p_functionName)
+		{
+			m_stackSize = lua_gettop(m_luaState);
 			// Execute specific function
 			if(p_abilityName.compare("MatchState") == 0 && p_functionName.compare("OnDestroy") == 0)
 				int i = 0;
 			lua_getglobal(m_luaState, p_abilityName.c_str());
 			lua_getfield(m_luaState, -1, p_functionName.c_str());
+			lua_remove(m_luaState, -2);
 		}
 
 		void ScriptManager::ExecuteScript()
 		{
-			lua_call(m_luaState, m_parameterCount, 0);
+			int error = 0;
+			if(error = lua_pcall(m_luaState, m_parameterCount, 0, 0) != 0)
+			{
+				printf("Error: %s\n", lua_tostring(m_luaState, -1));
+				lua_pop(m_luaState, 1);
+			}
+
+			int newStackSize = lua_gettop(m_luaState);
+			assert(m_stackSize == newStackSize);
+
 			m_parameterCount = 0;
 		}
 

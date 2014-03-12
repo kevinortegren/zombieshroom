@@ -51,7 +51,10 @@ $(document).ready(function() {
 				$("#controls-settings-wrapper>input:first").before('<div><div class="inline-300px">'+key.substr(key.search(prefix)+prefix.length).replace('_',' ')+'</div><input id="'+key+'" value="'+settings[key]+'" class="controls-settings-keybind"/></div>');
 			}
       else
+      {
         $("#"+key).val(settings[key]);
+        $("#"+key).trigger("change");
+      }
     }
 		
 		// Focus and unfocus events for keybindings
@@ -110,6 +113,8 @@ $(document).ready(function() {
   } );
   $("#controls-settings-save").click(function() {
     var settings = {};
+    settings["settings-mouse-invert"] = $("input[name=settings-mouse-invert]:checked").val();
+    settings["settings-mouse-sensitivity"] = $("#settings-mouse-sensitivity").val();
 		$(".controls-settings-keybind").each(function() {
 			settings[$(this).prop('id')] = $(this).val();
 		} );
@@ -123,4 +128,7 @@ $(document).ready(function() {
 	$("input[type=radio]").next("label").click(function(){
 		$(this).prev().prop("checked", true);
 	});
-} );
+  $("input[type=range]").change(function(){
+    $(this).siblings("input[type=range]+label").html(Math.floor($(this).val()*100)/100.0);
+  });
+ } );

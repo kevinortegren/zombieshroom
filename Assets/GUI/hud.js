@@ -237,6 +237,15 @@ function SetCharges(p_slot, p_charges)
     slot.html("");
 }
 
+function SetCrosshair(p_name)
+{
+  var name = p_name;
+  if(name == "")
+    name = "crosshair";
+    
+  $("#crosshair").attr("src", name + ".png"); 
+}
+
 function DamageIndicator(p_damage)
 {
   if(p_damage > 0)
