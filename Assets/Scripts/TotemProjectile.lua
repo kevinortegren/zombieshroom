@@ -79,7 +79,7 @@ function TotemProjectile.OnCollide (self, entity)
 			
             if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 				if not health:IsDead() then
-					health:Damage(abilityOwnerId, 10 * entity:GetStatChange():GetDamageResistance());
+					health:Damage(abilityOwnerId, 10 * entity:GetStatChange():GetDamageResistance(), "AbilityTotem");
 				end
                 
                 local hitPos = entity:GetTransformation():GetPos();
