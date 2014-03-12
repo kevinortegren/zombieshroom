@@ -84,7 +84,7 @@ if entity:DoesExist() then
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				health:Damage(abilityOwnerId, dakComp:GetDamage());
+				health:Damage(abilityOwnerId, dakComp:GetDamage(), "MachineGun");
 			end
 		end
 	end

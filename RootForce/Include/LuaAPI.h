@@ -1737,14 +1737,14 @@ namespace RootForce
 		}
 		static int HealthDamage(lua_State* p_luaState)
 		{
-			NumberOfArgs(3); // self, damageSourceUserId, damageAmount
+			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, damageType
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
 
 			Network::NetworkEntityID murdererId((*s)->LastDamageSourceID, Network::ReservedActionID::CONNECT, 0);
 			ECS::Entity* murderer = g_networkEntityMap[murdererId];
 			PlayerComponent* pc = g_world->GetEntityManager()->GetComponent<PlayerComponent>(murderer);
-			(*s)->LastDamageAbilityName = pc->AbilityScripts[pc->SelectedAbility].Name;
+			(*s)->LastDamageAbilityName = luaL_checkstring(p_luaState, 4);
 			
 			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
 			
