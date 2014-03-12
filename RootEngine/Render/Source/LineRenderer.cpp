@@ -34,7 +34,7 @@ namespace Render
 
 		m_debugTech->GetPrograms()[0]->Apply();
 
-		m_lineMesh.GetVertexBuffer()->BufferData(m_lines.size()*2, sizeof(Vertex1P1C), lineVertices);
+		m_lineMesh.GetVertexBuffer()->BufferData(m_lines.size()*2, sizeof(Vertex1P1C), lineVertices, GL_DYNAMIC_DRAW);
 		m_lineMesh.Bind();
 		m_lineMesh.Draw();
 		m_lineMesh.Unbind();
