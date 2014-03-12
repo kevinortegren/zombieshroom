@@ -107,6 +107,11 @@ namespace RootForce
 	struct PlayerControl : public ECS::Component<PlayerControl>
 	{
 		float m_mouseSensitivity;
+		bool m_invertMouse;
+		PlayerControl()
+			: m_mouseSensitivity(0.2f)
+			, m_invertMouse(false)
+		{}
 	};
 
 #ifndef COMPILE_LEVEL_EDITOR
@@ -140,12 +145,13 @@ namespace RootForce
 	struct AbilityInfo
 	{
 		std::string Name;
+		std::string Crosshair;
 		float Cooldown;
 		bool OnCooldown;
 		int Charges;
 
 		AbilityInfo()
-			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1)
+			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1), Crosshair("crosshair")
 		{}
 	};
 

@@ -52,8 +52,7 @@ function ShroomExplosion.OnCollide (self, entity)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
-		local type = hitPhys:GetType(hitCol);
+		local type = hitCol:GetType();
 	 	if type == PhysicsType.TYPE_PLAYER then
 		    local abilityOwnerNetwork = self:GetNetwork();
 		    local abilityOwnerId = abilityOwnerNetwork:GetUserId();
@@ -66,7 +65,7 @@ function ShroomExplosion.OnCollide (self, entity)
 			    local selfPos = self:GetTransformation():GetPos();
 			    local health = entity:GetHealth();
           if not health:IsDead() then
-				    health:Damage(abilityOwnerId, ShroomExplosion.damage * entity:GetStatChange():GetDamageResistance());
+				    health:Damage(abilityOwnerId, ShroomExplosion.damage * entity:GetStatChange():GetDamageResistance(), "ExplodingShroom");
 			    end
 			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), ShroomExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end

@@ -31,14 +31,16 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 	local self = Entity.New();
 	local casterEnt = Entity.GetEntityByNetworkID(userId, actionId, 0);
 	local networkEnt = Network.New(self, userId, actionId);
-	--Components
+	
+    --Components
 	local transformComp = Transformation.New(self);
 	local collisionComp = Collision.New(self);
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "XplodingMushroomPlanted");
 	TimerEntity.StartTimer(userId, actionId, XplodingMushroomPlanted.duration, "XplodingMushroomPlanted", "OnDestroy", self);
-	--Setting stuff
+	
+    --Setting stuff
 	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);
 	local dirVec = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 1):GetTransformation():GetOrient():GetFront();
@@ -65,8 +67,7 @@ end
 function XplodingMushroomPlanted.OnCollide (self, entity)
 if entity:DoesExist() then
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
 	if type == PhysicsType.TYPE_PLAYER then
 		local abilityOwnerNetwork = self:GetNetwork();
 		local abilityOwnerId = abilityOwnerNetwork:GetUserId();

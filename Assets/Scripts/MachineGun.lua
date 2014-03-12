@@ -6,6 +6,7 @@ MachineGun.charges = 99;
 MachineGun.chargeTime = 0;
 MachineGun.channelingTime = 0;
 MachineGun.duration = 5;
+MachineGun.crosshair = "";
 
 function MachineGun.OnLoad()
 	--ResourceManager.LoadParticle("MachineGun");
@@ -73,8 +74,7 @@ function MachineGun.OnCollide (self, entity)
 if entity:DoesExist() then
 	local dakComp = self:GetDamageAndKnockback();
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
 	if type == PhysicsType.TYPE_PLAYER then
 		local targetPlayerComponent = entity:GetPlayerComponent();
 		local abilityOwnerNetwork = self:GetNetwork();
@@ -84,7 +84,7 @@ if entity:DoesExist() then
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				health:Damage(abilityOwnerId, dakComp:GetDamage());
+				health:Damage(abilityOwnerId, dakComp:GetDamage(), "MachineGun");
 			end
 		end
 	end

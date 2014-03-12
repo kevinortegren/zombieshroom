@@ -101,6 +101,9 @@ namespace RootForce
 				m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 		}
+		PlayerControl* control = g_world->GetEntityManager()->GetComponent<PlayerControl>(g_world->GetTagManager()->GetEntityByTag("Player"));
+		control->m_mouseSensitivity = g_engineContext.m_configManager->GetConfigValueAsFloat("settings-mouse-sensitivity");
+		control->m_invertMouse = g_engineContext.m_configManager->GetConfigValueAsBool("settings-mouse-invert");
 	}
 
 	void IngameMenu::SetScoreList(std::string p_score)

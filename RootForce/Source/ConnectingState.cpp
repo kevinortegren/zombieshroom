@@ -37,6 +37,8 @@ namespace RootForce
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
 	{
 		// Render a frame of loading screen to indicate the loading state
+		if(m_loadingScreen->GetView())
+			m_loadingScreen->BufferJavascript("Shuffle();");
 		m_loadingScreen->WaitLoading();
 		m_loadingScreen->SetActive(true);
 		g_engineContext.m_renderer->Clear();

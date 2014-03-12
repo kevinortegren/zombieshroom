@@ -3,6 +3,7 @@ ExplodingShroom.cooldown = 3;
 ExplodingShroom.charges = 3;
 ExplodingShroom.chargeTime = 0;
 ExplodingShroom.channelingTime = 0;
+ExplodingShroom.crosshair = "";
 --ExplodingShroom.duration = 10;
 
 function ExplodingShroom.OnLoad()
@@ -71,8 +72,7 @@ end
 function ExplodingShroom.OnCollide (self, entity)
 if entity:DoesExist() then
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
 	if type == PhysicsType.TYPE_STATIC then
 		local network = self:GetNetwork();
 		XplodingMushroomPlanted.OnCreate(network:GetUserId(), network:GetActionId());

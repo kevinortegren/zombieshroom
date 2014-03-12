@@ -90,6 +90,7 @@ namespace RootEngine
 			int MapEventToAwesomium(SDL_Event p_event);
 			Dispatcher* m_dispatcher;
 			
+			std::mutex m_resizeMutex;
 			std::mutex m_drawMutex;
 			std::mutex m_viewBufferMutex;
 			std::vector<WebViewImpl*> m_viewBuffer;

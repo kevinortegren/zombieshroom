@@ -163,7 +163,7 @@ input[type="radio"]:checked + label
 #error-popup
 {
   width: 500px;
-  height: 300px;
+  /*height: 300px;*/
 }
 #error-info
 {

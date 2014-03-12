@@ -11,7 +11,7 @@ function Player.OnCreate(userId, actionId)
 	
 	transform:SetPos(Vec3.New(100,10,0));
 
-	playerComponent:SetAbility(3, "Push", -1);
+	playerComponent:SetAbility(3, "Push", -1, "");
 	playerComponent:SelectAbility(0);
  	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
@@ -137,12 +137,7 @@ function Player.OnTeamSelect(self, teamId)
 end
 
 function Player.OnCollide (self, entity)
- 	--local hitCol = entity:GetCollision();
- 	--local hitPhys = entity:GetPhysics();
-	--local type = hitPhys:GetType(hitCol);
-  --if  type == PhysicsType.TYPE_ABILITYSPAWN then
-  --end
-  
+
 end
 
 function Player.OnDestroy (self)

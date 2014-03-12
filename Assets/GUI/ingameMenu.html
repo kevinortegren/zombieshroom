@@ -95,7 +95,17 @@
 		
 		<div id="controls-settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
 			<div id="controls-settings-wrapper" class="windowbackground">
-				<h1 class="textcenter">Keybinding settings</h1>
+				<h1 class="textcenter">Control settings</h1>
+        <a style="display: block;">
+          <div class="inline-200px floatleft textleft"> Mouse sensitivity </div>
+          <input id="settings-mouse-sensitivity" type="range" min="0.01" max="1.0" step="0.01" />
+          <label></label>
+        </a>
+				<a class="textcenter" style="display: block;">
+					<div class="inline-200px floatleft textleft">Invert mouse</div>
+					<input type="radio" name="settings-mouse-invert" value="false"/> <label>Off</label>
+					<input type="radio" name="settings-mouse-invert" value="true"/> <label>On</label>
+				</a>
         <input id="controls-settings-back" type="submit" class="button" value="Back" />
         <input id="controls-settings-save" type="submit" class="button floatright" value="Save" />
 			</div>

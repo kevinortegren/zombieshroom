@@ -1,15 +1,18 @@
 FireBall = {};
 FireBall.knockback = 20;
-FireBall.cooldown = 0;
+FireBall.cooldown = 0.5;
 FireBall.chargeTime = 2;
 FireBall.channelingTime = 0;
 FireBall.duration = 0;
 FireBall.charges = 5;
+FireBall.damage = 1.0;
+FireBall.damageIncrease = 3.0;
+FireBall.crosshair = "";
 
 function FireBall.OnLoad()
 	ResourceManager.LoadParticle("SmockeochElden");
-	ResourceManager.LoadScript("Explosion");
-	Explosion.OnLoad();
+	ResourceManager.LoadScript("FireBallExplosion");
+	FireBallExplosion.OnLoad();
 end
 
 function FireBall.ChargeStart(userId, actionId)
@@ -18,11 +21,13 @@ function FireBall.ChargeStart(userId, actionId)
 end
 
 function FireBall.ChargeDone (time, userId, actionId)
+  FireBall.OnCreate(userId, actionId);
+  FireBall.damageIncrease = FireBall.damage * time;
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
   if(time >= FireBall.chargeTime) then
     local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
     FireBall.OnCreate(userId, actionId);
-	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
   end
 end
 
@@ -73,8 +78,7 @@ end
 function FireBall.OnCollide (self, entity)
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
-		local type = hitPhys:GetType(hitCol);
+		local type = hitCol:GetType();
 		if type == PhysicsType.TYPE_PLAYER then
 			local targetPlayerComponent = entity:GetPlayerComponent();
 			local abilityOwnerNetwork = self:GetNetwork();
@@ -83,11 +87,11 @@ function FireBall.OnCollide (self, entity)
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 			local health = entity:GetHealth();
 			if abilityOwnerNetwork:GetUserId() ~= entity:GetNetwork():GetUserId() then
-				Explosion.OnCreate(abilityOwnerNetwork:GetUserId(), abilityOwnerNetwork:GetActionId());
+				FireBallExplosion.OnCreate(abilityOwnerNetwork:GetUserId(), abilityOwnerNetwork:GetActionId(),FireBall.damageIncrease);
 				FireBall.OnDestroy(self);
 			end
 		else
-			Explosion.OnCreate(self:GetNetwork():GetUserId(), self:GetNetwork():GetActionId());
+			FireBallExplosion.OnCreate(self:GetNetwork():GetUserId(), self:GetNetwork():GetActionId(),FireBall.damageIncrease);
 			FireBall.OnDestroy(self);
 		end
 	end

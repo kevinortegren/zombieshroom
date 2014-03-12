@@ -285,7 +285,7 @@ namespace Render
 
 		// PerFrame uniforms.
 		m_cameraBuffer = CreateBuffer(GL_UNIFORM_BUFFER);
-		m_cameraBuffer->BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
+		m_cameraBuffer->BufferData(1, sizeof(m_cameraVars), &m_cameraVars, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_cameraBuffer->GetBufferId());
 
 		// PerObject uniforms.
@@ -293,7 +293,7 @@ namespace Render
 		char data[RENDER_UNIFORMS_SIZE];
 		memset(&data, 0, RENDER_UNIFORMS_SIZE);
 
-		m_uniforms->BufferData(1, RENDER_UNIFORMS_SIZE, data);
+		m_uniforms->BufferData(1, RENDER_UNIFORMS_SIZE, data, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId());
 
 		// Setup geometry buffer.
