@@ -8,5 +8,6 @@ Homing
 SlowNova
 Boost
 MachineGun
+HealCharges
 ExplodingShroom
 AbilityTotem

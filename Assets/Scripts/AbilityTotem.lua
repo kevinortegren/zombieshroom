@@ -4,6 +4,7 @@ AbilityTotem.charges = 1;
 AbilityTotem.chargeTime = 0;
 AbilityTotem.channelingTime = 0;
 AbilityTotem.duration = 30;
+AbilityTotem.crosshair = "";
 
 function AbilityTotem.OnLoad()
 	ResourceManager.LoadModel("TotemPole");

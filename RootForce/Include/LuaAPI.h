@@ -13,6 +13,7 @@
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+extern RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
 
 namespace RootForce
 {
@@ -108,11 +109,15 @@ namespace RootForce
 
 			Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*e);
 			if (network != nullptr)
-				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u).", network->ID.UserID, network->ID.ActionID);
+			{
+				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u, Sequence: %u).", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+				g_networkDeletedList.push_back(network->ID);
+			}
 			else
+			{
 				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
+			}
 
-			g_world->GetEntityManager()->RemoveAllComponents(*e);
 			g_world->GetEntityManager()->RemoveEntity(*e);
 			for (auto itr = g_networkEntityMap.begin(); itr != g_networkEntityMap.end(); ++itr)
 			{
@@ -250,7 +255,14 @@ namespace RootForce
 			RootForce::Physics **s = (RootForce::Physics **)lua_newuserdata(p_luaState, sizeof(RootForce::Physics *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			*s = g_world->GetEntityManager()->GetComponent<RootForce::Physics>(*e);
-			luaL_setmetatable(p_luaState, "Physics");
+			if(*s == nullptr)
+			{
+				lua_pushnil(p_luaState);
+			}
+			else
+			{
+				luaL_setmetatable(p_luaState, "Physics");
+			}
 			return 1;
 		}
 
@@ -789,6 +801,15 @@ namespace RootForce
 			lua_pushnumber(p_luaState, *(*rtemp)->m_handle); 
 			return 1;
 		}
+
+		static int CollisionGetType(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
+			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
+			return 1;
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		//COLLISIONRESPONDER
 		//////////////////////////////////////////////////////////////////////////
@@ -933,6 +954,17 @@ namespace RootForce
 			g_engineContext.m_physics->SetVelocity((*(*rtemp)->m_handle), (*ptemp)->m_velocity);
 			return 0;
 		}
+
+		static int PhysicsGetVelocity(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
+			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
+			*s = glm::vec3((*ptemp)->m_velocity);
+			luaL_setmetatable(p_luaState, "Vec3");
+			return 1;
+		}
+
 		static int PhysicsKnockBack(lua_State* p_luaState)
 		{
 			NumberOfArgs(5);
@@ -956,13 +988,7 @@ namespace RootForce
 // 			g_engineContext.m_physics->CastRay((int)luaL_checknumber(p_luaState, 2), *((glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), *((glm::vec3*)luaL_checkudata(p_luaState, 4, "Vec3")), (float)luaL_checknumber(p_luaState, 5));
 // 			return 0;
 // 		}
-		static int PhysicsGetType(lua_State* p_luaState)
-		{
-			NumberOfArgs(2);
-			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
-			lua_pushnumber(p_luaState, g_engineContext.m_physics->GetType((*(*rtemp)->m_handle)));
-			return 1;
-		}
+
 		static int PhysicsGetPlayerAtAim(lua_State* p_luaState)
 		{
 			NumberOfArgs(5);
@@ -1744,16 +1770,18 @@ namespace RootForce
 		}
 		static int HealthDamage(lua_State* p_luaState)
 		{
-			NumberOfArgs(3); // self, damageSourceUserId, damageAmount
+			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, damageType
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
 
 			Network::NetworkEntityID murdererId((*s)->LastDamageSourceID, Network::ReservedActionID::CONNECT, 0);
 			ECS::Entity* murderer = g_networkEntityMap[murdererId];
 			PlayerComponent* pc = g_world->GetEntityManager()->GetComponent<PlayerComponent>(murderer);
-			(*s)->LastDamageAbilityName = pc->AbilityScripts[pc->SelectedAbility].Name;
+			(*s)->LastDamageAbilityName = luaL_checkstring(p_luaState, 4);
 			
 			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
+			
+			(*s)->GotHit = true;
 			
 			return 0;
 		}
@@ -1790,6 +1818,7 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			lua_pushboolean(p_luaState, (*s)->IsDead);
+			(*s)->GotHit = false;
 			return 1;
 		}
 		static int HealthGetWantsRespawn(lua_State* p_luaState)
@@ -1827,7 +1856,7 @@ namespace RootForce
 		}
 		static int PlayerComponentSetAbility(lua_State* p_luaState)
 		{
-			NumberOfArgs(4); // self, index, name, charges
+			NumberOfArgs(5); // self, index, name, charges, crosshair
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
@@ -1836,6 +1865,9 @@ namespace RootForce
 			(*s)->AbilityScripts[index].Cooldown = 0;
 			(*s)->AbilityScripts[index].Charges = (int)luaL_checknumber(p_luaState, 4);
 			(*s)->AbilityScripts[index].Name = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
+			std::string crosshair = luaL_checkstring(p_luaState, 5);
+			if(crosshair.compare("") != 0)
+				(*s)->AbilityScripts[index].Crosshair = crosshair;
 			return 0;
 		}
 		static int PlayerComponentSelectAbility(lua_State* p_luaState)
@@ -2900,6 +2932,7 @@ namespace RootForce
 			{"SetMeshHandle", CollisionSetMeshHandle},
 			{"CreateHandle", CollisionCreateHandle},
 			{"GetHandle", CollisionGetHandle},
+			{"GetType", CollisionGetType},
 			{NULL, NULL}
 		};
 
@@ -2918,10 +2951,10 @@ namespace RootForce
 			{"BindNoShape", PhysicsBindShapeNone},
 			{"SetPos", PhysicsSetPos},
 			{"SetVelocity", PhysicsSetVelocity},
+			{"GetVelocity", PhysicsGetVelocity},
 			{"KnockBack", PhysicsKnockBack},
 			{"CheckRadius", PhysicsCheckRadius},
 			//{"ShootRay", PhysicsShootRay},
-			{"GetType", PhysicsGetType},
 			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
 			{"LockYOrientation", PhysicsLockYOrientation},

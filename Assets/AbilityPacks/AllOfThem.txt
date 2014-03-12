@@ -1,0 +1,11 @@
+AbilityDash
+AbilityBall
+FireBall
+PowerRay
+RefractiveBall
+IceCube
+Homing
+SlowNova
+Boost
+MachineGun
+ExplodingShroom

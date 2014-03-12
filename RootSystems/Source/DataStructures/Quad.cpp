@@ -195,7 +195,6 @@ namespace RootForce
 	{		
 		for(auto itr = m_entities.begin(); itr != m_entities.end(); ++itr)
 		{
-			m_world->GetEntityManager()->RemoveAllComponents((*itr));
 			m_world->GetEntityManager()->RemoveEntity((*itr));
 		}
 
@@ -208,6 +207,10 @@ namespace RootForce
 			auto a = m_world->GetGroupManager()->GetEntitiesInGroup(m_groupName);
 			for(auto b = a.first; b != a.second; ++b)
 			{
+				RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*b).second);
+
+				g_engineContext.m_resourceManager->RemoveRenderingMeshesFromModel(renderable->m_model);
+
 				m_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>((*b).second);
 			}
 		}

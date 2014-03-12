@@ -11,14 +11,14 @@ extern ECS::World* g_world;
 namespace RootForce
 {
 
-	IngameMenu::IngameMenu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper)
+	IngameMenu::IngameMenu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper, ChatSystem* p_chatSystem)
 	{
 		m_return = false;
 		m_exit = false;
 		m_changeName =false;
 
 		m_view = p_view;
-		m_settingsMenu = new SettingsMenu(p_context, p_keymapper);
+		m_settingsMenu = new SettingsMenu(p_context, p_keymapper, p_chatSystem);
 		p_keymapper->SetMenu(m_view);
 
 		m_view->RegisterJSCallback("Exit", JSDelegate1(this, &IngameMenu::Exit));
@@ -101,6 +101,9 @@ namespace RootForce
 				m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 		}
+		PlayerControl* control = g_world->GetEntityManager()->GetComponent<PlayerControl>(g_world->GetTagManager()->GetEntityByTag("Player"));
+		control->m_mouseSensitivity = g_engineContext.m_configManager->GetConfigValueAsFloat("settings-mouse-sensitivity");
+		control->m_invertMouse = g_engineContext.m_configManager->GetConfigValueAsBool("settings-mouse-invert");
 	}
 
 	void IngameMenu::SetScoreList(std::string p_score)

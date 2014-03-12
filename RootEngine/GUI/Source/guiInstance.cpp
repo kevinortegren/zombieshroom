@@ -88,6 +88,8 @@ namespace RootEngine
 
 			// Buffer quads in a buffer until max amount of texture units is filled
 			//   then issue a draw call and reset
+			if(surface->GetShouldResize())
+				m_resizeMutex.lock();
 
 			unsigned numTexturesUsed = 0;
 			float tileTexWidth = TILE_SIZE/(float)m_width*2;
@@ -104,8 +106,7 @@ namespace RootEngine
 
 					glUniform1i(glGetUniformLocation(m_program->GetHandle(), ("tile["+std::to_string(numTexturesUsed)+"]").c_str()), numTexturesUsed);
 					glActiveTexture(GL_TEXTURE0 + numTexturesUsed);
-					tile.TextureMutex.lock();
-					glBindTexture(GL_TEXTURE_2D, tile.Texture[tile.ActiveTexture]);
+					glBindTexture(GL_TEXTURE_2D, tile.Texture);
 
 					TileData quadVertices[] = {
 						TileData(-1.f + tileTexWidth * x,     1.f - tileTexHeight * (y+1), 0.f, 1.f, numTexturesUsed),
@@ -128,11 +129,9 @@ namespace RootEngine
 						numTexturesUsed = 0;
 					}
 				}
-				
-			for(unsigned x = 0; x < tiles->size(); ++x)
-				for(unsigned y = 0; y < tiles->at(x).size(); ++y)
-					tiles->at(x).at(y).TextureMutex.unlock();
 			glBindVertexArray(0);
+			if(surface->GetShouldResize())
+				m_resizeMutex.unlock();
 		}
 
 		guiInstance* guiInstance::GetInstance()
@@ -345,7 +344,9 @@ namespace RootEngine
 								m_viewBuffer[i]->Update();
 					m_viewBufferMutex.unlock();
 
-					m_core->Update();
+					m_resizeMutex.lock();
+						m_core->Update();
+					m_resizeMutex.unlock();
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 						if(m_viewBuffer[i] && m_viewBuffer[i]->GetView() && m_viewBuffer[i]->m_isActive)
 						{
@@ -384,7 +385,14 @@ namespace RootEngine
 			m_drawMutex.lock();
 				m_viewBufferMutex.lock();
 					for(auto view : m_viewBuffer )
+					{
+						if (view->m_webView->surface())
+						{
+							((GLTextureSurface*)view->m_webView->surface())->SetShouldResize(true);
+						}
+
 						view->m_webView->Resize(p_width, p_height);
+					}
 				m_viewBufferMutex.unlock();
 			m_drawMutex.unlock();
 		}

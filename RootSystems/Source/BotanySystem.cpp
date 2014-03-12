@@ -18,15 +18,14 @@ namespace RootForce
 
 		m_updateUniforms.m_grassFactor = 4.0f;
 
-
 		// Load effect.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");
 
 		// Buffer botany update uniforms.
-		m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(m_updateUniforms), &m_updateUniforms);
+		m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(m_updateUniforms), &m_updateUniforms, GL_STATIC_DRAW);
 
 		// Buffer botany rendering uniforms.
-		m_effect->GetTechniques()[2]->m_perTechniqueBuffer->BufferData(1, sizeof(m_renderUniforms), &m_renderUniforms);
+		m_effect->GetTechniques()[2]->m_perTechniqueBuffer->BufferData(1, sizeof(m_renderUniforms), &m_renderUniforms, GL_STATIC_DRAW);
 
 		// Load material.
 		m_material = m_engineContext->m_renderer->CreateMaterial("Botany");
@@ -37,32 +36,35 @@ namespace RootForce
 		m_material->m_effect = m_effect;
 	
 		m_quadTree.Initialize(m_engineContext, m_world, "Grass", "Painted_Split");
-
 		Divide();
 
-		// Allocate mesh memory.
-		char* data = new char[BOTANY_CELL_SIZE];
-		memset(data, 0, BOTANY_CELL_SIZE);
-		for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
+		if(!m_initialized)
 		{
-			m_meshes[i] = m_engineContext->m_renderer->CreateMesh();
+			// Allocate mesh memory.
+			char* data = new char[BOTANY_CELL_SIZE];
+			memset(data, 0, BOTANY_CELL_SIZE);
+			for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
+			{
+				m_meshes[i] = m_engineContext->m_renderer->CreateMesh();
 
-			m_meshes[i]->SetTransformFeedback();
-			m_meshes[i]->BindTransformFeedback();	
-			m_meshes[i]->SetVertexBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-			m_meshes[i]->GetVertexBuffer()->BufferData(1, BOTANY_CELL_SIZE, data); 
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_meshes[i]->GetVertexBuffer()->GetBufferId());
+				m_meshes[i]->SetTransformFeedback();
+				m_meshes[i]->BindTransformFeedback();	
+				m_meshes[i]->SetVertexBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+				m_meshes[i]->GetVertexBuffer()->BufferData(1, BOTANY_CELL_SIZE, data, GL_STATIC_DRAW); 
+				glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_meshes[i]->GetVertexBuffer()->GetBufferId());
 
-			m_meshes[i]->SetVertexAttribute(m_engineContext->m_renderer->CreateVertexAttributes());
-			m_meshes[i]->GetVertexAttribute()->Init(3);
-			m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 28, 0);
-			m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 28, (char*)0 + 3 * sizeof(float));
-			m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 2, 1, GL_FLOAT, GL_FALSE, 28, (char*)0 + 6 * sizeof(float));
+				m_meshes[i]->SetVertexAttribute(m_engineContext->m_renderer->CreateVertexAttributes());
+				m_meshes[i]->GetVertexAttribute()->Init(3);
+				m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 28, 0);
+				m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 28, (char*)0 + 3 * sizeof(float));
+				m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 2, 1, GL_FLOAT, GL_FALSE, 28, (char*)0 + 6 * sizeof(float));
 
-			m_meshes[i]->SetPrimitiveType(GL_POINTS);			
+				m_meshes[i]->SetPrimitiveType(GL_POINTS);			
+			}
+
+			delete[] data;
 		}
 
-		delete[] data;
 		m_meshCount = 0;
 
 		for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
@@ -275,19 +277,28 @@ namespace RootForce
 
 	void BotanySystem::SetGrassFactor(float p_grassFactor)
 	{
-		m_updateUniforms.m_grassFactor = p_grassFactor;
-		m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(float), &m_updateUniforms.m_grassFactor);
+		if(m_initialized)
+		{
+			m_updateUniforms.m_grassFactor = p_grassFactor;
+			m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(float), &m_updateUniforms.m_grassFactor);
+		}
 	}
 
 	void BotanySystem::SetLOD1Distance(float p_distance)
 	{
-		m_renderUniforms.m_lod1Distance = p_distance;
-		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &m_renderUniforms.m_lod1Distance);
+		if(m_initialized)
+		{
+			m_renderUniforms.m_lod1Distance = p_distance;
+			m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &m_renderUniforms.m_lod1Distance);
+		}
 	}
 
 	void BotanySystem::SetLOD2Distance(float p_distance)
 	{
-		m_renderUniforms.m_lod2Distance = p_distance;
-		m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(16, sizeof(float), &m_renderUniforms.m_lod2Distance);
+		if(m_initialized)
+		{
+			m_renderUniforms.m_lod2Distance = p_distance;
+			m_effect->GetTechniques()[1]->m_perTechniqueBuffer->BufferSubData(16, sizeof(float), &m_renderUniforms.m_lod2Distance);
+		}
 	}
 }

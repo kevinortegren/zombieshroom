@@ -1429,10 +1429,12 @@ namespace Physics
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 		{
 				p_body->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+				p_body->setActivationState(DISABLE_DEACTIVATION);
 				p_body->setRestitution(0.7f);
 				p_body->setCcdMotionThreshold(3);
 				p_body->setCcdSweptSphereRadius(1.f);
 		}
+		
 		
 		if(!p_collideWithWorld)
 			p_body->setCollisionFlags(p_body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
@@ -1464,11 +1466,22 @@ namespace Physics
 		
 		if(!p_collideWithWorld)
 			ghostObject->setCollisionFlags(ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
-		short collisionFilterMask = p_collidesWithStatic?    short(btBroadphaseProxy::AllFilter) :    short(btBroadphaseProxy::AllFilter ^ btBroadphaseProxy::StaticFilter);
+		
 		
 		ObjectController* controller = new ObjectController();
 		controller->Init(ghostObject, (btConvexShape*)p_collisionShape, m_dynamicWorld);
-		m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::DefaultFilter, collisionFilterMask);
+		if(!p_collidesWithStatic)
+		{
+			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::DefaultFilter, -35);
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITYSPAWN)
+		{
+			m_dynamicWorld->addCollisionObject(ghostObject, btBroadphaseProxy::DefaultFilter, -3);
+		}
+		else
+		{
+			m_dynamicWorld->addCollisionObject(ghostObject);
+		}
 		m_externallyControlled.push_back(controller);
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
 		ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));

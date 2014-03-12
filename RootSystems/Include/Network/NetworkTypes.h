@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <map>
+#include <vector>
 
 namespace ECS
 {
@@ -114,6 +115,11 @@ namespace RootForce
 		*/
 		typedef std::map<NetworkEntityID, ECS::Entity*> NetworkEntityMap;
 		ECS::Entity* FindEntity(NetworkEntityMap& p_map, const NetworkEntityID& p_id);
+
+		/*
+			Defines a list of all networked entities in the game that has been deleted before.
+		*/
+		typedef std::vector<NetworkEntityID> DeletedNetworkEntityList;
 
 		/*
 			Remove a set of entities from the network entity map and delete them.

@@ -21,6 +21,7 @@
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
 RootForce::Network::NetworkEntityMap g_networkEntityMap;
+RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
 
 namespace RootForce
 {

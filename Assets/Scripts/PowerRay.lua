@@ -8,6 +8,7 @@ PowerRay.charges = 10;
 PowerRay.chargeTime = 0;
 PowerRay.channelingTime = 0;
 PowerRay.duration = 1;
+PowerRay.crosshair = "";
 
 function PowerRay.OnLoad()
 end
@@ -70,8 +71,7 @@ function PowerRay.OnCollide (self, entity)
 if entity:DoesExist() then
 	local dakComp = self:GetDamageAndKnockback();
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
 	if type == PhysicsType.TYPE_PLAYER then
 		local targetPlayerComponent = entity:GetPlayerComponent();
 		local abilityOwnerNetwork = self:GetNetwork();
@@ -81,7 +81,7 @@ if entity:DoesExist() then
 
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), "PowerRay");
 			end
 
 			local hitPos = entity:GetTransformation():GetPos();
