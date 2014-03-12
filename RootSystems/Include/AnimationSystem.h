@@ -78,10 +78,11 @@ namespace RootForce
 
 	struct Animation : public ECS::Component<Animation>
 	{
-		Animation(){}
+		Animation() : AnimationSpeed(1.0f) {}
 		glm::mat4 m_bones[20];
 		AnimBodyPart UpperBodyAnim;
 		AnimBodyPart LowerBodyAnim;
+		float AnimationSpeed;
 	};
 
 	struct AnimationSystem : public ECS::ConcurrentSystem
@@ -92,7 +93,7 @@ namespace RootForce
 			SetUsage<Animation>();
 			SetUsage<Renderable>();
 			m_logger = nullptr;
-			m_blendTime = 0.10f;
+			m_blendTime = 0.1f;
 		}
 		void Init();
 		void Begin();

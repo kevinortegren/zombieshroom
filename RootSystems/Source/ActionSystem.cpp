@@ -142,11 +142,11 @@ namespace RootSystems
 			else if(state->CurrentState == RootForce::EntityState::DESCENDING)
 			{
 				action->FallTime += dt;
-
+				
 				//m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT,  "FallTime %f", action->FallTime);
 
-				if(action->FallTime > 0.2)
-				{
+				//if(action->FallTime > 0.2)
+				//{
 					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
 
 					if(action->StrafePower > 0)
@@ -157,7 +157,7 @@ namespace RootSystems
 					{
 						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
 					}
-				}
+				//}
 
 			}
 			else if(state->CurrentState == RootForce::EntityState::LANDING)
