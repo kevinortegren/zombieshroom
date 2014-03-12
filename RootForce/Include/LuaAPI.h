@@ -1823,7 +1823,7 @@ namespace RootForce
 		}
 		static int PlayerComponentSetAbility(lua_State* p_luaState)
 		{
-			NumberOfArgs(4); // self, index, name, charges
+			NumberOfArgs(5); // self, index, name, charges, crosshair
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
@@ -1832,6 +1832,9 @@ namespace RootForce
 			(*s)->AbilityScripts[index].Cooldown = 0;
 			(*s)->AbilityScripts[index].Charges = (int)luaL_checknumber(p_luaState, 4);
 			(*s)->AbilityScripts[index].Name = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
+			std::string crosshair = luaL_checkstring(p_luaState, 5);
+			if(crosshair.compare("") != 0)
+				(*s)->AbilityScripts[index].Crosshair = crosshair;
 			return 0;
 		}
 		static int PlayerComponentSelectAbility(lua_State* p_luaState)

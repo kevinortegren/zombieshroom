@@ -8,6 +8,7 @@ PowerRay.charges = 10;
 PowerRay.chargeTime = 0;
 PowerRay.channelingTime = 0;
 PowerRay.duration = 1;
+PowerRay.crosshair = "";
 
 function PowerRay.OnLoad()
 end

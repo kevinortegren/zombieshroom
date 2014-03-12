@@ -4,6 +4,7 @@ SlowNova.charges = 3;
 SlowNova.chargeTime = 0;
 SlowNova.channelingTime = 0;
 SlowNova.duration = 0.6;
+SlowNova.crosshair = "";
 
 function SlowNova.OnLoad()
 	ResourceManager.LoadParticle("frostBlast");

@@ -7,6 +7,7 @@ AbilityBall.chargeTime = 0;
 AbilityBall.channelingTime = 0;
 AbilityBall.duration = 2;
 AbilityBall.charges = -1;
+AbilityBall.crosshair = "";
 
 function AbilityBall.OnLoad()
 	ResourceManager.LoadModel("Primitives/sphereTangents");
