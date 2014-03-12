@@ -74,6 +74,8 @@ namespace RootForce
 		float JumpTime;
 		glm::vec3 JumpDir;
 
+		float FallTime;
+
 		uint8_t SelectedAbility;
 		std::queue<AbilityEvent> AbilityEvents;
 		AbilityEvent CurrentAbilityEvent;
@@ -87,6 +89,7 @@ namespace RootForce
 			, JumpDir(glm::vec3(0))
 			, SelectedAbility(0)
 			, WantRespawn(false)
+			, FallTime(0.0f)
 		{}
 	};
 #endif
