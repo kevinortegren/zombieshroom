@@ -1,6 +1,6 @@
 FireBall = {};
 FireBall.knockback = 20;
-FireBall.cooldown = 0;
+FireBall.cooldown = 0.5;
 FireBall.chargeTime = 2;
 FireBall.channelingTime = 0;
 FireBall.duration = 0;
@@ -20,9 +20,6 @@ function FireBall.ChargeStart(userId, actionId)
 end
 
 function FireBall.ChargeDone (time, userId, actionId)
-  --local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	--local animComp	= casterEnt:GetAnimation();
-	--animComp:SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
   FireBall.OnCreate(userId, actionId);
   FireBall.damageIncrease = FireBall.damage * time;
 	--Animation clip
