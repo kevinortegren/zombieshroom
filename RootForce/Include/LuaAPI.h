@@ -36,6 +36,20 @@ namespace RootForce
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		//GLOBAL
+		//////////////////////////////////////////////////////////////////////////
+		static int Knockback(lua_State* p_luaState)
+		{
+			NumberOfArgs(4);
+
+			//Multiply the knockback depending on the health of the target
+			float multiplier = (200 - (float)luaL_checknumber(p_luaState, 4) ) / 100;
+			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 1), (*(glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3")), (float)luaL_checknumber(p_luaState, 3) * multiplier);
+			return 0;
+		}
+
+
+		//////////////////////////////////////////////////////////////////////////
 		//LOGGING
 		//////////////////////////////////////////////////////////////////////////
 		static int Log(lua_State* p_luaState)
@@ -965,15 +979,6 @@ namespace RootForce
 			return 1;
 		}
 
-		static int PhysicsKnockBack(lua_State* p_luaState)
-		{
-			NumberOfArgs(5);
-			RootForce::Physics** ptemp = (RootForce::Physics**)luaL_checkudata(p_luaState, 1, "Physics");
-			//Multiply the knockback depending on the health of the target
-			float multiplier = (200 - (float)luaL_checknumber(p_luaState, 5) ) / 100;
-			g_engineContext.m_physics->KnockbackObject((int)luaL_checknumber(p_luaState, 2), (*(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3")), (float)luaL_checknumber(p_luaState, 4) * multiplier);
-			return 0;
-		}
 		static int PhysicsCheckRadius(lua_State* p_luaState)
 		{
 			NumberOfArgs(4);
@@ -2806,6 +2811,16 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////
+		static const struct luaL_Reg static_f [] = {
+			{"KnockBack", Knockback},
+			{NULL, NULL}
+		};
+
+		// Don't add values here.
+		static const struct luaL_Reg static_m [] = {
+			{NULL, NULL}
+		};
+
 		static const struct luaL_Reg logging_f [] = {
 			{"Log", Log},
 			{"IdentifyEntity", LogIdentifyEntity},
@@ -2952,7 +2967,6 @@ namespace RootForce
 			{"SetPos", PhysicsSetPos},
 			{"SetVelocity", PhysicsSetVelocity},
 			{"GetVelocity", PhysicsGetVelocity},
-			{"KnockBack", PhysicsKnockBack},
 			{"CheckRadius", PhysicsCheckRadius},
 			//{"ShootRay", PhysicsShootRay},
 			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
@@ -3450,6 +3464,7 @@ namespace RootForce
 
 		inline void RegisterLuaTypes(lua_State* p_luaState)
 		{
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::static_f,				RootForce::LuaAPI::static_m,				"Static");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::logging_f,				RootForce::LuaAPI::logging_m,				"Logging");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::entity_f,				RootForce::LuaAPI::entity_m,				"Entity");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::renderable_f,			RootForce::LuaAPI::renderable_m,			"Renderable");
