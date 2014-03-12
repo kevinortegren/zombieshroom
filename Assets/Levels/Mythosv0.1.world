@@ -106,51 +106,6 @@
     - 107
     - 108
     - 109
-    - 110
-    - 111
-    - 112
-    - 113
-    - 114
-    - 115
-    - 116
-    - 117
-    - 118
-    - 119
-    - 120
-    - 121
-    - 122
-    - 123
-    - 124
-    - 125
-    - 126
-    - 127
-    - 128
-    - 129
-    - 130
-    - 131
-    - 132
-    - 133
-    - 134
-    - 135
-    - 136
-    - 137
-    - 138
-    - 139
-    - 140
-    - 141
-    - 142
-    - 143
-    - 144
-    - 145
-    - 146
-    - 147
-    - 148
-    - 149
-    - 150
-    - 151
-    - 152
-    - 153
-    - 154
 - Components:
     - Type: 0
       Data:
@@ -503,495 +458,180 @@
             Diffuse: CliffWallStoneDiffuse
             Normal: CaveWallStone1Normal
         - Entity: 79
-          Model: polySurfaceShape23
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 80
-          Model: polySurfaceShape24
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 81
-          Model: polySurfaceShape25
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 82
-          Model: polySurfaceShape26
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 83
-          Model: polySurfaceShape27
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 84
-          Model: polySurfaceShape28
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 85
-          Model: polySurfaceShape29
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 86
-          Model: polySurfaceShape30
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 87
-          Model: polySurfaceShape31
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 88
-          Model: polySurfaceShape32
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 89
-          Model: polySurfaceShape33
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 90
-          Model: polySurfaceShape34
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 91
-          Model: polySurfaceShape35
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 92
-          Model: polySurfaceShape36
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 93
-          Model: polySurfaceShape37
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 94
-          Model: polySurfaceShape38
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 95
-          Model: polySurfaceShape39
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 96
-          Model: polySurfaceShape40
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 97
-          Model: polySurfaceShape41
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 98
-          Model: polySurfaceShape42
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 99
-          Model: polySurfaceShape43
+          Model: LeafsShape
           Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
+            Name: Leaftexture
+            Effect: Mesh_Normal_Trans
+            Diffuse: GreenLeafs
+            Normal: GreenLeafsNormal
         - Entity: 100
-          Model: polySurfaceShape44
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 101
-          Model: polySurfaceShape45
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 102
-          Model: polySurfaceShape46
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 103
-          Model: polySurfaceShape47
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 104
-          Model: polySurfaceShape48
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 105
-          Model: polySurfaceShape49
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 106
-          Model: polySurfaceShape50
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 107
-          Model: polySurfaceShape51
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 108
-          Model: polySurfaceShape52
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 109
-          Model: polySurfaceShape53
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 110
-          Model: polySurfaceShape54
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 111
-          Model: polySurfaceShape55
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 112
-          Model: polySurfaceShape56
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 113
-          Model: polySurfaceShape57
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 114
-          Model: polySurfaceShape58
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 115
-          Model: polySurfaceShape59
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 116
-          Model: polySurfaceShape60
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 117
-          Model: polySurfaceShape61
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 118
-          Model: polySurfaceShape62
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 119
-          Model: polySurfaceShape63
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 120
-          Model: polySurfaceShape64
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 121
-          Model: polySurfaceShape65
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 122
-          Model: polySurfaceShape66
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 123
-          Model: polySurfaceShape67
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 124
-          Model: polySurfaceShape68
-          Material:
-            Name: CliffRock
-            Effect: Mesh_NormalMap
-            Diffuse: CliffWallStoneDiffuse
-            Normal: CaveWallStone1Normal
-        - Entity: 125
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 126
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 127
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 128
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 129
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 130
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 131
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 132
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 133
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 134
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 135
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 136
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 137
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 138
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 139
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 140
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 141
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 142
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 143
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 144
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 145
-          Model: polySurfaceShape2
-          Material:
-            Name: Leaftexture
-            Effect: Mesh_Normal_Trans
-            Diffuse: GreenLeafs
-            Normal: GreenLeafsNormal
-        - Entity: 146
           Model: RCIStoneSlabsShape
           Material:
             Name: StoneSlabsMaterial
             Effect: Mesh_NormalMap
             Diffuse: TiledStone
             Normal: TiledStoneNormal
-        - Entity: 147
+        - Entity: 101
           Model: BridgeRopeShape
           Material:
             Name: Rope
             Effect: Mesh_NormalMap
             Diffuse: RopeTexture
             Normal: RopeNormal
-        - Entity: 148
+        - Entity: 102
           Model: BridgeWoodShape
           Material:
             Name: BridgeMaterial
             Effect: Mesh_NormalMap
             Diffuse: BridgeWoodDiffuse
             Normal: BridgeWoodNormal
+        - Entity: 103
+          Model: RCIMainLowBorderShape
+          Material:
+            Name: CliffRock
+            Effect: Mesh_NormalMap
+            Diffuse: CliffWallStoneDiffuse
+            Normal: CaveWallStone1Normal
     - Type: 1
       Data:
         - Entity: 0
@@ -1299,99 +939,99 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 79
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [49.6247, 12.3302, 24.3369]
+          Rotation: [0.000118384, 0.282799, -0.00032543, 0.959179]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 80
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [40.7779, 12.3311, 66.2961]
+          Rotation: [-0.00022748, -0.54341, 0.000625329, 0.839467]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 81
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-0.654796, 11.6487, 91.7157]
+          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 82
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-64.8278, 21.7532, 64.7144]
+          Rotation: [-0.000221846, -0.529951, 0.000609841, 0.848028]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 83
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [40.116, 21.752, -16.5441]
+          Rotation: [0.000258669, 0.617914, -0.000711064, 0.786245]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 84
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-4.10234, 21.7532, -50.2231]
+          Rotation: [-0.000228695, -0.546313, 0.000628669, 0.837581]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 85
-          Position: [0, 0, 0]
+          Position: [-16.2913, 84.6562, 22.444]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 86
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-49.9219, 21.753, -41.5479]
+          Rotation: [0.00067033, -0.826269, 0.000917836, -0.563274]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 87
-          Position: [5.39312, -0.392302, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [0.856792, 1, 1]
+          Position: [-77.2752, 21.7532, -4.71403]
+          Rotation: [-0.00019764, -0.472128, 0.000543301, 0.88153]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 88
-          Position: [0.452703, -1.49175, -8.1879]
-          Rotation: [0, -0.0562119, 0, 0.998419]
-          Scale: [0.859377, 1, 0.893731]
+          Position: [-92.7948, 21.752, 38.417]
+          Rotation: [0.000335275, 0.800914, -0.000921651, 0.598778]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 89
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-97.1719, 21.7493, -36.5773]
+          Rotation: [-0.000123914, -0.584762, 0.000564697, 0.811204]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 90
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [108.581, 13.5383, -8.02417]
+          Rotation: [0.000258669, 0.617914, -0.000711064, 0.786245]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 91
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [115.179, 19.7182, -65.9594]
+          Rotation: [-0.000754899, -0.926705, -5.14559e-005, 0.37579]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 92
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [70.3024, 19.7182, -90.9082]
+          Rotation: [3.68539e-005, 0.357806, -0.000755753, 0.933796]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 93
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [84.543, 14.0106, -34.0426]
+          Rotation: [-0.000504981, -0.401822, -0.000563485, 0.915718]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 94
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [99.5714, 20.2964, -88.547]
+          Rotation: [1.35811e-005, -0.294796, 0.000756529, -0.95556]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 95
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [65.6468, 19.1424, -65.9594]
+          Rotation: [-0.00075335, -0.975073, 7.06031e-005, 0.221883]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 96
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-5.81737, 11.6487, 164.328]
+          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 97
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-56.334, 15.2708, 178.139]
+          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 98
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-94.0217, 16.4048, 153.384]
+          Rotation: [-0.000257207, -0.782917, -0.000231871, 0.622126]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 99
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-79.3125, 23.5772, 114.119]
+          Rotation: [-9.22976e-005, -0.325911, -0.000333768, 0.9454]
+          Scale: [0.300076, 0.300076, 0.300076]
         - Entity: 100
           Position: [0, 0, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 101
-          Position: [0, 0, 0]
+          Position: [-22.889, -2.034, 109.7]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 102
-          Position: [0, 0, 0]
+          Position: [-22.9849, -1.192, 109.628]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 103
@@ -1399,232 +1039,52 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 104
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 105
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 106
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 107
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 108
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 109
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 110
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 111
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 112
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 113
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 114
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 115
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 116
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 117
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 118
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 119
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 120
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 121
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 122
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 123
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 124
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 125
-          Position: [49.6247, 12.3302, 24.3369]
-          Rotation: [0.000118384, 0.282799, -0.00032543, 0.959179]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 126
-          Position: [40.7779, 12.3311, 66.2961]
-          Rotation: [-0.00022748, -0.54341, 0.000625329, 0.839467]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 127
-          Position: [-0.654796, 11.6487, 91.7157]
-          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 128
-          Position: [-64.8278, 21.7532, 64.7144]
-          Rotation: [-0.000221846, -0.529951, 0.000609841, 0.848028]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 129
-          Position: [40.116, 21.752, -16.5441]
-          Rotation: [0.000258669, 0.617914, -0.000711064, 0.786245]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 130
-          Position: [-4.10234, 21.7532, -50.2231]
-          Rotation: [-0.000228695, -0.546313, 0.000628669, 0.837581]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 131
-          Position: [-16.2913, 84.6562, 22.444]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 132
-          Position: [-49.9219, 21.753, -41.5479]
-          Rotation: [0.00067033, -0.826269, 0.000917836, -0.563274]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 133
-          Position: [-77.2752, 21.7532, -4.71403]
-          Rotation: [-0.00019764, -0.472128, 0.000543301, 0.88153]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 134
-          Position: [-92.7948, 21.752, 38.417]
-          Rotation: [0.000335275, 0.800914, -0.000921651, 0.598778]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 135
-          Position: [-97.1719, 21.7493, -36.5773]
-          Rotation: [-0.000123914, -0.584762, 0.000564697, 0.811204]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 136
-          Position: [108.581, 13.5383, -8.02417]
-          Rotation: [0.000258669, 0.617914, -0.000711064, 0.786245]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 137
-          Position: [115.179, 19.7182, -65.9594]
-          Rotation: [-0.000754899, -0.926705, -5.14559e-005, 0.37579]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 138
-          Position: [70.3024, 19.7182, -90.9082]
-          Rotation: [3.68539e-005, 0.357806, -0.000755753, 0.933796]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 139
-          Position: [84.543, 14.0106, -34.0426]
-          Rotation: [-0.000504981, -0.401822, -0.000563485, 0.915718]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 140
-          Position: [99.5714, 20.2964, -88.547]
-          Rotation: [1.35811e-005, -0.294796, 0.000756529, -0.95556]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 141
-          Position: [65.6468, 19.1424, -65.9594]
-          Rotation: [-0.00075335, -0.975073, 7.06031e-005, 0.221883]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 142
-          Position: [-5.81737, 11.6487, 164.328]
-          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 143
-          Position: [-56.334, 15.2708, 178.139]
-          Rotation: [-4.37581e-005, -0.187763, -0.000343518, 0.982214]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 144
-          Position: [-94.0217, 16.4048, 153.384]
-          Rotation: [-0.000257207, -0.782917, -0.000231871, 0.622126]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 145
-          Position: [-79.3125, 23.5772, 114.119]
-          Rotation: [-9.22976e-005, -0.325911, -0.000333768, 0.9454]
-          Scale: [0.300076, 0.300076, 0.300076]
-        - Entity: 146
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 147
-          Position: [-22.889, -2.034, 109.7]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 148
-          Position: [-22.9849, -1.192, 109.628]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 149
           Position: [5.20881, -0.238422, 23.0612]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 150
+        - Entity: 105
           Position: [13.9319, 11.4018, 49.6093]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 151
+        - Entity: 106
           Position: [-59.5301, 3.52135, 11.9173]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 152
+        - Entity: 107
           Position: [-44.1257, 10.23, -21.2886]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 153
+        - Entity: 108
           Position: [109.472, 7.14073, -71.3542]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 154
+        - Entity: 109
           Position: [-88.9172, 8.69338, -37.3204]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 149
+        - Entity: 104
           Attenuation: [0, 0.180995, 0]
           Color: [0.039, 0.190165, 1, 1]
           Range: 10
-        - Entity: 150
+        - Entity: 105
           Attenuation: [0, 0.180995, 0]
           Color: [0.039, 0.190165, 1, 1]
           Range: 10
-        - Entity: 151
+        - Entity: 106
           Attenuation: [0, 0.180995, 0]
           Color: [0.039, 0.190165, 1, 1]
           Range: 10
-        - Entity: 152
+        - Entity: 107
           Attenuation: [0, 0.180995, 0]
           Color: [0.039, 0.190165, 1, 1]
           Range: 10
-        - Entity: 153
+        - Entity: 108
           Attenuation: [0, 0.180995, 0]
           Color: [0.039, 0.190165, 1, 1]
           Range: 10
-        - Entity: 154
+        - Entity: 109
           Attenuation: [0, 0.180995, 0]
           Color: [0.039, 0.190165, 1, 1]
           Range: 10
@@ -1747,145 +1207,55 @@
         - Entity: 78
           MeshHandle: RCIMainBorderShape10
         - Entity: 79
-          MeshHandle: polySurfaceShape230
+          MeshHandle: LeafsShape0
         - Entity: 80
-          MeshHandle: polySurfaceShape240
+          MeshHandle: LeafsShape0
         - Entity: 81
-          MeshHandle: polySurfaceShape250
+          MeshHandle: LeafsShape0
         - Entity: 82
-          MeshHandle: polySurfaceShape260
+          MeshHandle: LeafsShape0
         - Entity: 83
-          MeshHandle: polySurfaceShape270
+          MeshHandle: LeafsShape0
         - Entity: 84
-          MeshHandle: polySurfaceShape280
+          MeshHandle: LeafsShape0
         - Entity: 85
-          MeshHandle: polySurfaceShape290
+          MeshHandle: LeafsShape0
         - Entity: 86
-          MeshHandle: polySurfaceShape300
+          MeshHandle: LeafsShape0
         - Entity: 87
-          MeshHandle: polySurfaceShape310
+          MeshHandle: LeafsShape0
         - Entity: 88
-          MeshHandle: polySurfaceShape320
+          MeshHandle: LeafsShape0
         - Entity: 89
-          MeshHandle: polySurfaceShape330
+          MeshHandle: LeafsShape0
         - Entity: 90
-          MeshHandle: polySurfaceShape340
+          MeshHandle: LeafsShape0
         - Entity: 91
-          MeshHandle: polySurfaceShape350
+          MeshHandle: LeafsShape0
         - Entity: 92
-          MeshHandle: polySurfaceShape360
+          MeshHandle: LeafsShape0
         - Entity: 93
-          MeshHandle: polySurfaceShape370
+          MeshHandle: LeafsShape0
         - Entity: 94
-          MeshHandle: polySurfaceShape380
+          MeshHandle: LeafsShape0
         - Entity: 95
-          MeshHandle: polySurfaceShape390
+          MeshHandle: LeafsShape0
         - Entity: 96
-          MeshHandle: polySurfaceShape400
+          MeshHandle: LeafsShape0
         - Entity: 97
-          MeshHandle: polySurfaceShape410
+          MeshHandle: LeafsShape0
         - Entity: 98
-          MeshHandle: polySurfaceShape420
+          MeshHandle: LeafsShape0
         - Entity: 99
-          MeshHandle: polySurfaceShape430
+          MeshHandle: LeafsShape0
         - Entity: 100
-          MeshHandle: polySurfaceShape440
-        - Entity: 101
-          MeshHandle: polySurfaceShape450
-        - Entity: 102
-          MeshHandle: polySurfaceShape460
-        - Entity: 103
-          MeshHandle: polySurfaceShape470
-        - Entity: 104
-          MeshHandle: polySurfaceShape480
-        - Entity: 105
-          MeshHandle: polySurfaceShape490
-        - Entity: 106
-          MeshHandle: polySurfaceShape500
-        - Entity: 107
-          MeshHandle: polySurfaceShape510
-        - Entity: 108
-          MeshHandle: polySurfaceShape520
-        - Entity: 109
-          MeshHandle: polySurfaceShape530
-        - Entity: 110
-          MeshHandle: polySurfaceShape540
-        - Entity: 111
-          MeshHandle: polySurfaceShape550
-        - Entity: 112
-          MeshHandle: polySurfaceShape560
-        - Entity: 113
-          MeshHandle: polySurfaceShape570
-        - Entity: 114
-          MeshHandle: polySurfaceShape580
-        - Entity: 115
-          MeshHandle: polySurfaceShape590
-        - Entity: 116
-          MeshHandle: polySurfaceShape600
-        - Entity: 117
-          MeshHandle: polySurfaceShape610
-        - Entity: 118
-          MeshHandle: polySurfaceShape620
-        - Entity: 119
-          MeshHandle: polySurfaceShape630
-        - Entity: 120
-          MeshHandle: polySurfaceShape640
-        - Entity: 121
-          MeshHandle: polySurfaceShape650
-        - Entity: 122
-          MeshHandle: polySurfaceShape660
-        - Entity: 123
-          MeshHandle: polySurfaceShape670
-        - Entity: 124
-          MeshHandle: polySurfaceShape680
-        - Entity: 125
-          MeshHandle: polySurfaceShape20
-        - Entity: 126
-          MeshHandle: polySurfaceShape20
-        - Entity: 127
-          MeshHandle: polySurfaceShape20
-        - Entity: 128
-          MeshHandle: polySurfaceShape20
-        - Entity: 129
-          MeshHandle: polySurfaceShape20
-        - Entity: 130
-          MeshHandle: polySurfaceShape20
-        - Entity: 131
-          MeshHandle: polySurfaceShape20
-        - Entity: 132
-          MeshHandle: polySurfaceShape20
-        - Entity: 133
-          MeshHandle: polySurfaceShape20
-        - Entity: 134
-          MeshHandle: polySurfaceShape20
-        - Entity: 135
-          MeshHandle: polySurfaceShape20
-        - Entity: 136
-          MeshHandle: polySurfaceShape20
-        - Entity: 137
-          MeshHandle: polySurfaceShape20
-        - Entity: 138
-          MeshHandle: polySurfaceShape20
-        - Entity: 139
-          MeshHandle: polySurfaceShape20
-        - Entity: 140
-          MeshHandle: polySurfaceShape20
-        - Entity: 141
-          MeshHandle: polySurfaceShape20
-        - Entity: 142
-          MeshHandle: polySurfaceShape20
-        - Entity: 143
-          MeshHandle: polySurfaceShape20
-        - Entity: 144
-          MeshHandle: polySurfaceShape20
-        - Entity: 145
-          MeshHandle: polySurfaceShape20
-        - Entity: 146
           MeshHandle: RCIStoneSlabsShape0
-        - Entity: 147
+        - Entity: 101
           MeshHandle: BridgeRopeShape0
-        - Entity: 148
+        - Entity: 102
           MeshHandle: BridgeWoodShape0
+        - Entity: 103
+          MeshHandle: RCIMainLowBorderShape0
     - Type: 12
       Data:
         []
@@ -2123,6 +1493,96 @@
       Group: Painted
     - Id: 41
       Group: Painted
+    - Id: 110
+      Group: Painted_Split
+    - Id: 111
+      Group: Painted_Split
+    - Id: 112
+      Group: Painted_Split
+    - Id: 113
+      Group: Painted_Split
+    - Id: 114
+      Group: Painted_Split
+    - Id: 115
+      Group: Painted_Split
+    - Id: 116
+      Group: Painted_Split
+    - Id: 117
+      Group: Painted_Split
+    - Id: 118
+      Group: Painted_Split
+    - Id: 119
+      Group: Painted_Split
+    - Id: 120
+      Group: Painted_Split
+    - Id: 121
+      Group: Painted_Split
+    - Id: 122
+      Group: Painted_Split
+    - Id: 123
+      Group: Painted_Split
+    - Id: 124
+      Group: Painted_Split
+    - Id: 125
+      Group: Painted_Split
+    - Id: 126
+      Group: Painted_Split
+    - Id: 127
+      Group: Painted_Split
+    - Id: 128
+      Group: Painted_Split
+    - Id: 129
+      Group: Painted_Split
+    - Id: 130
+      Group: Painted_Split
+    - Id: 131
+      Group: Painted_Split
+    - Id: 132
+      Group: Painted_Split
+    - Id: 133
+      Group: Painted_Split
+    - Id: 134
+      Group: Painted_Split
+    - Id: 135
+      Group: Painted_Split
+    - Id: 136
+      Group: Painted_Split
+    - Id: 137
+      Group: Painted_Split
+    - Id: 138
+      Group: Painted_Split
+    - Id: 139
+      Group: Painted_Split
+    - Id: 140
+      Group: Painted_Split
+    - Id: 141
+      Group: Painted_Split
+    - Id: 142
+      Group: Painted_Split
+    - Id: 143
+      Group: Painted_Split
+    - Id: 144
+      Group: Painted_Split
+    - Id: 145
+      Group: Painted_Split
+    - Id: 146
+      Group: Painted_Split
+    - Id: 147
+      Group: Painted_Split
+    - Id: 148
+      Group: Painted_Split
+    - Id: 149
+      Group: Painted_Split
+    - Id: 150
+      Group: Painted_Split
+    - Id: 151
+      Group: Painted_Split
+    - Id: 152
+      Group: Painted_Split
+    - Id: 153
+      Group: Painted_Split
+    - Id: 154
+      Group: Painted_Split
     - Id: 155
       Group: Painted_Split
     - Id: 156
@@ -2265,96 +1725,6 @@
       Group: Painted_Split
     - Id: 225
       Group: Painted_Split
-    - Id: 226
-      Group: Painted_Split
-    - Id: 227
-      Group: Painted_Split
-    - Id: 228
-      Group: Painted_Split
-    - Id: 229
-      Group: Painted_Split
-    - Id: 230
-      Group: Painted_Split
-    - Id: 231
-      Group: Painted_Split
-    - Id: 232
-      Group: Painted_Split
-    - Id: 233
-      Group: Painted_Split
-    - Id: 234
-      Group: Painted_Split
-    - Id: 235
-      Group: Painted_Split
-    - Id: 236
-      Group: Painted_Split
-    - Id: 237
-      Group: Painted_Split
-    - Id: 238
-      Group: Painted_Split
-    - Id: 239
-      Group: Painted_Split
-    - Id: 240
-      Group: Painted_Split
-    - Id: 241
-      Group: Painted_Split
-    - Id: 242
-      Group: Painted_Split
-    - Id: 243
-      Group: Painted_Split
-    - Id: 244
-      Group: Painted_Split
-    - Id: 245
-      Group: Painted_Split
-    - Id: 246
-      Group: Painted_Split
-    - Id: 247
-      Group: Painted_Split
-    - Id: 248
-      Group: Painted_Split
-    - Id: 249
-      Group: Painted_Split
-    - Id: 250
-      Group: Painted_Split
-    - Id: 251
-      Group: Painted_Split
-    - Id: 252
-      Group: Painted_Split
-    - Id: 253
-      Group: Painted_Split
-    - Id: 254
-      Group: Painted_Split
-    - Id: 255
-      Group: Painted_Split
-    - Id: 256
-      Group: Painted_Split
-    - Id: 257
-      Group: Painted_Split
-    - Id: 258
-      Group: Painted_Split
-    - Id: 259
-      Group: Painted_Split
-    - Id: 260
-      Group: Painted_Split
-    - Id: 261
-      Group: Painted_Split
-    - Id: 262
-      Group: Painted_Split
-    - Id: 263
-      Group: Painted_Split
-    - Id: 264
-      Group: Painted_Split
-    - Id: 265
-      Group: Painted_Split
-    - Id: 266
-      Group: Painted_Split
-    - Id: 267
-      Group: Painted_Split
-    - Id: 268
-      Group: Painted_Split
-    - Id: 269
-      Group: Painted_Split
-    - Id: 270
-      Group: Painted_Split
     - Id: 5
       Group: SpawnPoint
     - Id: 6
@@ -2475,48 +1845,6 @@
       Group: Static
     - Id: 78
       Group: Static
-    - Id: 79
-      Group: Static
-    - Id: 80
-      Group: Static
-    - Id: 81
-      Group: Static
-    - Id: 82
-      Group: Static
-    - Id: 83
-      Group: Static
-    - Id: 84
-      Group: Static
-    - Id: 85
-      Group: Static
-    - Id: 86
-      Group: Static
-    - Id: 87
-      Group: Static
-    - Id: 88
-      Group: Static
-    - Id: 89
-      Group: Static
-    - Id: 90
-      Group: Static
-    - Id: 91
-      Group: Static
-    - Id: 92
-      Group: Static
-    - Id: 93
-      Group: Static
-    - Id: 94
-      Group: Static
-    - Id: 95
-      Group: Static
-    - Id: 96
-      Group: Static
-    - Id: 97
-      Group: Static
-    - Id: 98
-      Group: Static
-    - Id: 99
-      Group: Static
     - Id: 100
       Group: Static
     - Id: 101
@@ -2525,95 +1853,47 @@
       Group: Static
     - Id: 103
       Group: Static
-    - Id: 104
-      Group: Static
-    - Id: 105
-      Group: Static
-    - Id: 106
-      Group: Static
-    - Id: 107
-      Group: Static
-    - Id: 108
-      Group: Static
-    - Id: 109
-      Group: Static
-    - Id: 110
-      Group: Static
-    - Id: 111
-      Group: Static
-    - Id: 112
-      Group: Static
-    - Id: 113
-      Group: Static
-    - Id: 114
-      Group: Static
-    - Id: 115
-      Group: Static
-    - Id: 116
-      Group: Static
-    - Id: 117
-      Group: Static
-    - Id: 118
-      Group: Static
-    - Id: 119
-      Group: Static
-    - Id: 120
-      Group: Static
-    - Id: 121
-      Group: Static
-    - Id: 122
-      Group: Static
-    - Id: 123
-      Group: Static
-    - Id: 124
-      Group: Static
-    - Id: 146
-      Group: Static
-    - Id: 147
-      Group: Static
-    - Id: 148
-      Group: Static
-    - Id: 125
+    - Id: 79
       Group: Transparent
-    - Id: 126
+    - Id: 80
       Group: Transparent
-    - Id: 127
+    - Id: 81
       Group: Transparent
-    - Id: 128
+    - Id: 82
       Group: Transparent
-    - Id: 129
+    - Id: 83
       Group: Transparent
-    - Id: 130
+    - Id: 84
       Group: Transparent
-    - Id: 131
+    - Id: 85
       Group: Transparent
-    - Id: 132
+    - Id: 86
       Group: Transparent
-    - Id: 133
+    - Id: 87
       Group: Transparent
-    - Id: 134
+    - Id: 88
       Group: Transparent
-    - Id: 135
+    - Id: 89
       Group: Transparent
-    - Id: 136
+    - Id: 90
       Group: Transparent
-    - Id: 137
+    - Id: 91
       Group: Transparent
-    - Id: 138
+    - Id: 92
       Group: Transparent
-    - Id: 139
+    - Id: 93
       Group: Transparent
-    - Id: 140
+    - Id: 94
       Group: Transparent
-    - Id: 141
+    - Id: 95
       Group: Transparent
-    - Id: 142
+    - Id: 96
       Group: Transparent
-    - Id: 143
+    - Id: 97
       Group: Transparent
-    - Id: 144
+    - Id: 98
       Group: Transparent
-    - Id: 145
+    - Id: 99
       Group: Transparent
     - Id: 3
       Group: Water
