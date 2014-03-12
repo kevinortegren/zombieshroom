@@ -13,6 +13,7 @@
 extern RootEngine::GameSharedContext g_engineContext;
 extern ECS::World* g_world;
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
+extern RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
 
 namespace RootForce
 {
@@ -108,11 +109,15 @@ namespace RootForce
 
 			Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*e);
 			if (network != nullptr)
-				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u).", network->ID.UserID, network->ID.ActionID);
+			{
+				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u, Sequence: %u).", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+				g_networkDeletedList.push_back(network->ID);
+			}
 			else
+			{
 				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
+			}
 
-			g_world->GetEntityManager()->RemoveAllComponents(*e);
 			g_world->GetEntityManager()->RemoveEntity(*e);
 			for (auto itr = g_networkEntityMap.begin(); itr != g_networkEntityMap.end(); ++itr)
 			{
@@ -1823,7 +1828,7 @@ namespace RootForce
 		}
 		static int PlayerComponentSetAbility(lua_State* p_luaState)
 		{
-			NumberOfArgs(4); // self, index, name, charges
+			NumberOfArgs(5); // self, index, name, charges, crosshair
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
@@ -1832,6 +1837,9 @@ namespace RootForce
 			(*s)->AbilityScripts[index].Cooldown = 0;
 			(*s)->AbilityScripts[index].Charges = (int)luaL_checknumber(p_luaState, 4);
 			(*s)->AbilityScripts[index].Name = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
+			std::string crosshair = luaL_checkstring(p_luaState, 5);
+			if(crosshair.compare("") != 0)
+				(*s)->AbilityScripts[index].Crosshair = crosshair;
 			return 0;
 		}
 		static int PlayerComponentSelectAbility(lua_State* p_luaState)

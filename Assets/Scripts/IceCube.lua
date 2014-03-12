@@ -7,6 +7,7 @@ IceCube.chargeTime = 0;
 IceCube.channelingTime = 0;
 IceCube.duration = 5;
 IceCube.charges = -1;
+IceCube.crosshair = "";
 
 function IceCube.OnLoad()
 	ResourceManager.LoadModel("PentagonSphere");

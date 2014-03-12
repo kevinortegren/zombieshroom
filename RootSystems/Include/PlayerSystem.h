@@ -140,12 +140,13 @@ namespace RootForce
 	struct AbilityInfo
 	{
 		std::string Name;
+		std::string Crosshair;
 		float Cooldown;
 		bool OnCooldown;
 		int Charges;
 
 		AbilityInfo()
-			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1)
+			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1), Crosshair("crosshair")
 		{}
 	};
 

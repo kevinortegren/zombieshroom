@@ -89,6 +89,9 @@ namespace RootForce
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem);
 
+		m_scriptSystem = new RootForce::ScriptSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem);
+
 		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem);
 
@@ -510,6 +513,10 @@ namespace RootForce
 		}
 
 		{
+			m_scriptSystem->Process();
+		}
+
+		{
 			PROFILE("Follow system", g_engineContext.m_profiler);
 			m_followSystem->Process();
 		}
@@ -630,6 +637,9 @@ namespace RootForce
 			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		}
 		g_engineContext.m_sound->Update();
+
+		g_world->GetEntityManager()->CleanUp();
+
 		return GameStates::Ingame;
 	}
 
@@ -817,6 +827,8 @@ namespace RootForce
 					m_hud->SetCharges(1, playerComponent->AbilityScripts[0].Charges);
 					m_hud->SetCharges(2, playerComponent->AbilityScripts[1].Charges);
 					m_hud->SetCharges(3, playerComponent->AbilityScripts[2].Charges);
+					
+					m_hud->SetCrosshair(playerComponent->AbilityScripts[playerActionComponent->SelectedAbility].Crosshair);
 
 					if(playerComponent->AbilityScripts[0].Cooldown > 0 && playerComponent->AbilityScripts[0].Name.compare("") != 0)
 						m_hud->SetCooldown(1, playerComponent->AbilityScripts[0].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[0].Name));

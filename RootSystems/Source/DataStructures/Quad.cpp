@@ -195,7 +195,6 @@ namespace RootForce
 	{		
 		for(auto itr = m_entities.begin(); itr != m_entities.end(); ++itr)
 		{
-			m_world->GetEntityManager()->RemoveAllComponents((*itr));
 			m_world->GetEntityManager()->RemoveEntity((*itr));
 		}
 

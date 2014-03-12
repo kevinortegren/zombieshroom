@@ -48,7 +48,12 @@ namespace RootEngine
 
 		void ScriptManager::ExecuteScript()
 		{
-			lua_call(m_luaState, m_parameterCount, 0);
+			int error = 0;
+			if(error = lua_pcall(m_luaState, m_parameterCount, 0, 0) != 0)
+			{
+				printf("Error: %s\n", lua_tostring(m_luaState, -1));
+			}
+
 			m_parameterCount = 0;
 		}
 

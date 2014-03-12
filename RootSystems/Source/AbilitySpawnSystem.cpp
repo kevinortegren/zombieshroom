@@ -198,6 +198,7 @@ namespace RootForce
 			{
 				respawn->CurrentAbility.Name = respawn->AbilityReceived;
 				respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
+				respawn->CurrentAbility.Crosshair = m_engineContext->m_script->GetGlobalString("crosshair", respawn->CurrentAbility.Name);
 				respawn->CurrentAbility.OnCooldown = false;
 				respawn->Claimed = Network::ReservedUserID::NONE;
 				respawn->AbilityReceived = "";

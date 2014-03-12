@@ -7,6 +7,7 @@ RefractiveBall.chargeTime = 0;
 RefractiveBall.channelingTime = 5;
 RefractiveBall.duration = 0;
 RefractiveBall.charges = -1;
+RefractiveBall.crosshair = "";
 
 function RefractiveBall.OnLoad()
 	ResourceManager.LoadModel("PentagonSphere");
