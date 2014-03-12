@@ -9,6 +9,16 @@
         background-size: 100% 100%;
       }
     </style>
+		<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+		<script type="text/Javascript">
+			function Shuffle()
+			{
+				var num = Math.floor(Math.random()*9)+1;
+				$("body").css("background", "url('loading"+num+".png')");
+				$("body").css("background-size", "100%");
+			};
+			$(document).ready(Shuffle);
+		</script>
   </head>
   <body>
   </body>

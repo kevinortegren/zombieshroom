@@ -22,6 +22,16 @@ namespace RootForce
 
 	void MenuState::Enter(Keymapper* p_keymapper)
 	{
+		// Save client state locally to display an error message at the end of this function
+		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
+		Network::ClientState::ClientState clientState = Network::ClientState::UNCONNECTED;
+		if(clientEntity)
+		{
+			Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);
+			if(clientComponent)
+				clientState = clientComponent->State;
+		}
+
 		// Destroy any existing entities
 		Network::DeleteEntities(g_networkEntityMap, Network::NetworkEntityID(Network::ReservedUserID::ALL, Network::ReservedActionID::ALL, Network::ReservedSequenceID::ALL), g_world->GetEntityManager()); 
 		g_networkEntityMap.clear();
@@ -51,6 +61,17 @@ namespace RootForce
 
 		// Set the LAN list on the message handler
 		m_networkContext.m_clientMessageHandler->SetLanList(m_lanList.get());
+
+		if(clientState == Network::ClientState::DISCONNECTED_TIMEOUT)
+			m_menu->ShowError("Connection has timed out.", "Disconnected");
+		else if(clientState == Network::ClientState::DISCONNECTED_REFUSED)
+			m_menu->ShowError("Connection has been refused.", "Disconnected");
+		else if(clientState == Network::ClientState::DISCONNECTED_REFUSED_TOO_MANY_PLAYERS)
+			m_menu->ShowError("Connection has been refused: Too many players.", "Disconnected");
+		else if(clientState == Network::ClientState::DISCONNECTED_REFUSED_INVALID_PASSWORD)
+			m_menu->ShowError("Connection has been refused: Invalid password.", "Disconnected");
+		else if(clientState == Network::ClientState::DISCONNECTED_SERVER_SHUTDOWN)
+			m_menu->ShowError("Server was shut down.", "Disconnected");
 	}
 
 	void MenuState::Exit()

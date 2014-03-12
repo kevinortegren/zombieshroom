@@ -222,10 +222,11 @@ namespace RootForce
 			m_botanySystem->Initialize(textures, 0.0f);
 		}
 
-
 		// Subdivide world.
-		//m_sharedSystems.m_worldSystem->SubdivideTree();
+		//m_sharedSystems.m_worldSystem->SubdivideTree();	
 #endif
+		
+		g_world->GetEntityManager()->CleanUp();
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -344,6 +345,7 @@ namespace RootForce
 
 		// Remove all entities.
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetEntityManager()->CleanUp();
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_world->GetSystemManager()->Clear();
