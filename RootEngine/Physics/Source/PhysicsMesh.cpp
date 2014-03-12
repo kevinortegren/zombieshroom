@@ -1,4 +1,5 @@
 #include <RootEngine/Physics/Include/PhysicsMesh.h>
+#include <iostream>
 
 namespace RootEngine
 {
@@ -11,7 +12,8 @@ namespace Physics
 
 	PhysicsMesh::~PhysicsMesh()
 	{
-
+		delete[] m_indices;
+		delete[] m_points;
 	}
 
 	void PhysicsMesh::Init(std::vector<glm::vec3> p_pointData, int p_nrOfPoints, std::vector<unsigned int> p_indexData, int p_nrOfIndices, int p_faces)

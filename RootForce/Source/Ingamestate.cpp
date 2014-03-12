@@ -222,6 +222,7 @@ namespace RootForce
 			m_botanySystem->Initialize(textures, 0.0f);
 		}
 
+		
 #endif
 		
 		// Subdivide world.

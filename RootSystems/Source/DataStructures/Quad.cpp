@@ -209,7 +209,7 @@ namespace RootForce
 			{
 				RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*b).second);
 
-				g_engineContext.m_resourceManager->RemoveModel(renderable->m_model);
+				g_engineContext.m_resourceManager->RemoveRenderingMeshesFromModel(renderable->m_model);
 
 				m_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>((*b).second);
 			}
