@@ -319,6 +319,10 @@ namespace RootForce
 		m_ingameMenu->GetSettingsMenu()->SetValue("settings-grass", g_engineContext.m_configManager->GetConfigValueAsString("settings-grass"));
 		m_ingameMenu->GetSettingsMenu()->SetValue("settings-shadows", g_engineContext.m_configManager->GetConfigValueAsString("settings-shadows"));
 		m_ingameMenu->GetSettingsMenu()->SetValue("settings-water", g_engineContext.m_configManager->GetConfigValueAsString("settings-water"));
+
+		PlayerControl* control = g_world->GetEntityManager()->GetComponent<PlayerControl>(g_world->GetTagManager()->GetEntityByTag("Player"));
+		control->m_mouseSensitivity = g_engineContext.m_configManager->GetConfigValueAsFloat("settings-mouse-sensitivity");
+		control->m_invertMouse = g_engineContext.m_configManager->GetConfigValueAsBool("settings-mouse-invert");
 	}
 
 	void IngameState::Exit()
