@@ -120,6 +120,7 @@ namespace RootForce
 		float RespawnDelay;
 		int SpawnIndex;
 		bool SpawnPointReceived;
+		bool GotHit;
 
 		HealthComponent()
 		{
@@ -131,6 +132,7 @@ namespace RootForce
 			SpawnIndex = -1;
 			SpawnPointReceived = false;
 			LastDamageAbilityName = "Swordaxe";
+			GotHit = false;
 		}
 	};
 #endif

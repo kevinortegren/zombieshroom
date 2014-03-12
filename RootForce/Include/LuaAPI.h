@@ -976,6 +976,15 @@ namespace RootForce
 			g_engineContext.m_physics->SetGravity((*(*rtemp)->m_handle), (*v1));
 			return 0;
 		}
+
+		static int PhysicsLockYOrientation(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+
+			g_engineContext.m_physics->LockYOrientation((*(*rtemp)->m_handle));
+			return 0;
+		}
 		
 		//////////////////////////////////////////////////////////////////////////
 		//RENDERABLE
@@ -1739,6 +1748,8 @@ namespace RootForce
 			
 			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
 			
+			(*s)->GotHit = true;
+			
 			return 0;
 		}
 		static int HealthSetHealth(lua_State* p_luaState)
@@ -1774,6 +1785,7 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			lua_pushboolean(p_luaState, (*s)->IsDead);
+			(*s)->GotHit = false;
 			return 1;
 		}
 		static int HealthGetWantsRespawn(lua_State* p_luaState)
@@ -2907,6 +2919,7 @@ namespace RootForce
 			{"GetType", PhysicsGetType},
 			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
+			{"LockYOrientation", PhysicsLockYOrientation},
 			{NULL, NULL}
 		};
 

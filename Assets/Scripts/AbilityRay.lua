@@ -14,7 +14,7 @@ end
 function AbilityRay.ChannelingDone(time, userId, actionId)
 	AbilityRay.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
 end
 
 function AbilityRay.Interrupted(time, userId, actionId)

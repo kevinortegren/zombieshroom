@@ -21,7 +21,7 @@ end
 function ExplodingShroom.ChargeDone (time, userId, actionId)
 	ExplodingShroom.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.DOUBLEUNDERTHROW1, true);
 end
 
 function ExplodingShroom.ChannelingDone (time, userId, actionId)
@@ -51,7 +51,7 @@ function ExplodingShroom.OnCreate (userId, actionId)
 	transformComp:GetOrient():Pitch(-90);
 	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local tempPos = casterEnt:GetTransformation():GetPos();
-	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (2 + tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
+	local startPos = Vec3.New((tempPos.x + dirVec.x * 3), (tempPos.y + dirVec.y * 3), (tempPos.z + dirVec.z * 3));
 	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 0.25, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 20, dirVec.y * 20, dirVec.z * 20));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));

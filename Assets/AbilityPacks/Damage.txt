@@ -1,4 +1,0 @@
-AbilityBall
-FireBall
-MachineGun
-PowerRay
