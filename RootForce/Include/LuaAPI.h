@@ -431,6 +431,13 @@ namespace RootForce
 			luaL_setmetatable(p_luaState, "DamageAndKnockback");
 			return 1;
 		}
+		static int EntityRemoveDamageAndKnockback(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::DamageAndKnockback>(*e);
+			return 0;
+		}
 		static int EntityGetStatChange(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -2150,9 +2157,7 @@ namespace RootForce
 			NumberOfArgs(3);
 			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
 			int aClip = (int)luaL_checknumber(p_luaState, 2);
-			(*anim)->UpperBodyAnim.m_animClip = (RootForce::AnimationClip::AnimationClip)aClip;
-			if(lua_toboolean(p_luaState, 3) != 0)
-				(*anim)->UpperBodyAnim.m_locked = 1;				
+			(*anim)->UpperBodyAnim.SetAnimationClip((RootForce::AnimationClip::AnimationClip)aClip, lua_toboolean(p_luaState, 3) != 0);				
 			return 0;
 		}
 
@@ -2161,9 +2166,7 @@ namespace RootForce
 			NumberOfArgs(3);
 			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
 			int aClip = (int)luaL_checknumber(p_luaState, 2);
-			(*anim)->LowerBodyAnim.m_animClip = (RootForce::AnimationClip::AnimationClip)aClip;
-			if(lua_toboolean(p_luaState, 3) != 0)
-				(*anim)->LowerBodyAnim.m_locked = 1;				
+			(*anim)->LowerBodyAnim.SetAnimationClip((RootForce::AnimationClip::AnimationClip)aClip, lua_toboolean(p_luaState, 3) != 0);					
 			return 0;
 		}
 
@@ -2173,6 +2176,7 @@ namespace RootForce
 			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
 			int aClip = (int)luaL_checknumber(p_luaState, 2);
 			(*anim)->UpperBodyAnim.m_chargingClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			(*anim)->UpperBodyAnim.m_locked = 0;
 			return 0;
 		}
 
@@ -2182,6 +2186,7 @@ namespace RootForce
 			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
 			int aClip = (int)luaL_checknumber(p_luaState, 2);
 			(*anim)->LowerBodyAnim.m_chargingClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			(*anim)->UpperBodyAnim.m_locked = 0;
 			return 0;
 		}
 
@@ -2191,6 +2196,7 @@ namespace RootForce
 			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
 			int aClip = (int)luaL_checknumber(p_luaState, 2);
 			(*anim)->UpperBodyAnim.m_channelingClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			(*anim)->UpperBodyAnim.m_locked = 0;
 			return 0;
 		}
 
@@ -2200,6 +2206,7 @@ namespace RootForce
 			RootForce::Animation **anim =(RootForce::Animation**)luaL_checkudata(p_luaState, 1, "Animation");
 			int aClip = (int)luaL_checknumber(p_luaState, 2);
 			(*anim)->LowerBodyAnim.m_channelingClip = (RootForce::AnimationClip::AnimationClip)aClip;
+			(*anim)->UpperBodyAnim.m_locked = 0;
 			return 0;
 		}
 	
@@ -2859,6 +2866,7 @@ namespace RootForce
 			{"GetAnimation", EntityGetAnimation},
 			{"GetParticleEmitter", EntityGetParticleEmitter},
 			{"RemovePointLight", EntityRemovePointLight},
+			{"RemoveDamageAndKnockback", EntityRemoveDamageAndKnockback},
 			{NULL, NULL}
 		};
 
