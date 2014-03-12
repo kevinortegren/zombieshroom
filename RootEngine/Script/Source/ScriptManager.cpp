@@ -80,7 +80,7 @@ namespace RootEngine
 
 		void ScriptManager::AddParameterNumber(double p_double)
 		{
-			lua_pushinteger(m_luaState, (int)p_double);
+			lua_pushnumber(m_luaState, p_double);
 			m_parameterCount++;
 		}
 

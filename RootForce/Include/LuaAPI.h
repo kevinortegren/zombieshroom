@@ -981,6 +981,15 @@ namespace RootForce
 			g_engineContext.m_physics->SetGravity((*(*rtemp)->m_handle), (*v1));
 			return 0;
 		}
+
+		static int PhysicsLockYOrientation(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+
+			g_engineContext.m_physics->LockYOrientation((*(*rtemp)->m_handle));
+			return 0;
+		}
 		
 		//////////////////////////////////////////////////////////////////////////
 		//RENDERABLE
@@ -1733,16 +1742,18 @@ namespace RootForce
 		}
 		static int HealthDamage(lua_State* p_luaState)
 		{
-			NumberOfArgs(3); // self, damageSourceUserId, damageAmount
+			NumberOfArgs(4); // self, damageSourceUserId, damageAmount, damageType
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			(*s)->LastDamageSourceID = (Network::UserID_t) luaL_checknumber(p_luaState, 2);
 
 			Network::NetworkEntityID murdererId((*s)->LastDamageSourceID, Network::ReservedActionID::CONNECT, 0);
 			ECS::Entity* murderer = g_networkEntityMap[murdererId];
 			PlayerComponent* pc = g_world->GetEntityManager()->GetComponent<PlayerComponent>(murderer);
-			(*s)->LastDamageAbilityName = pc->AbilityScripts[pc->SelectedAbility].Name;
+			(*s)->LastDamageAbilityName = luaL_checkstring(p_luaState, 4);
 			
 			(*s)->Health -= (float) luaL_checknumber(p_luaState, 3);
+			
+			(*s)->GotHit = true;
 			
 			return 0;
 		}
@@ -1779,6 +1790,7 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::HealthComponent **s = (RootForce::HealthComponent**)luaL_checkudata(p_luaState, 1, "Health");
 			lua_pushboolean(p_luaState, (*s)->IsDead);
+			(*s)->GotHit = false;
 			return 1;
 		}
 		static int HealthGetWantsRespawn(lua_State* p_luaState)
@@ -1816,7 +1828,7 @@ namespace RootForce
 		}
 		static int PlayerComponentSetAbility(lua_State* p_luaState)
 		{
-			NumberOfArgs(4); // self, index, name, charges
+			NumberOfArgs(5); // self, index, name, charges, crosshair
 			RootForce::PlayerComponent **s = (RootForce::PlayerComponent**)luaL_checkudata(p_luaState, 1, "PlayerComponent");
 			size_t index = (size_t)luaL_checknumber(p_luaState, 2);
 			if(index >= PLAYER_NUM_ABILITIES)
@@ -1825,6 +1837,9 @@ namespace RootForce
 			(*s)->AbilityScripts[index].Cooldown = 0;
 			(*s)->AbilityScripts[index].Charges = (int)luaL_checknumber(p_luaState, 4);
 			(*s)->AbilityScripts[index].Name = g_engineContext.m_resourceManager->LoadScript(std::string(luaL_checkstring(p_luaState, 3)));
+			std::string crosshair = luaL_checkstring(p_luaState, 5);
+			if(crosshair.compare("") != 0)
+				(*s)->AbilityScripts[index].Crosshair = crosshair;
 			return 0;
 		}
 		static int PlayerComponentSelectAbility(lua_State* p_luaState)
@@ -2912,6 +2927,7 @@ namespace RootForce
 			{"GetType", PhysicsGetType},
 			{"GetPlayerAtAim", PhysicsGetPlayerAtAim},
 			{"SetGravity", PhysicsSetGravity},
+			{"LockYOrientation", PhysicsLockYOrientation},
 			{NULL, NULL}
 		};
 

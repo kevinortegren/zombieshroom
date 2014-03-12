@@ -8,6 +8,7 @@ Homing.charges = 3;
 Homing.chargeTime = 0;
 Homing.channelingTime = 0;
 Homing.duration = 60;
+Homing.crosshair = "";
 
 function Homing.OnLoad()
 	ResourceManager.LoadParticle("magic_missile_01");
@@ -20,7 +21,7 @@ end
 function Homing.ChargeDone (time, userId, actionId)
 	Homing.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
 end
 
 function Homing.ChannelingDone (time, userId, actionId)
@@ -108,7 +109,7 @@ if entity:DoesExist() then
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
-				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance());
+				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), "Homing");
 			end
 			Homing.OnDestroy(self);
 		end

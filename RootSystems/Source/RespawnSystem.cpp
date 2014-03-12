@@ -50,6 +50,7 @@ namespace RootSystems
 				RootForce::NetworkMessage::Death m;
 				m.User = network->ID.UserID;
 				m.LastDamageSource = health->LastDamageSourceID;
+				m.LastDamageSourceName = health->LastDamageAbilityName.c_str();
 
 				RakNet::BitStream bs;
 				bs.Write((RakNet::MessageID) ID_TIMESTAMP);

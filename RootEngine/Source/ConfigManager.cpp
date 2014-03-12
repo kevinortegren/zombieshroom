@@ -61,6 +61,10 @@ namespace RootEngine
 		m_values["settings-player-name"] = "Player";
 		m_values["settings-resolution"] = "1280x720";
 		m_values["settings-fullscreen"] = "false";
+		m_values["settings-glow"] = "true";
+		m_values["settings-grass"] = "high";
+		m_values["settings-shadows"] = "high";
+		m_values["settings-water"] = "high";
 		m_values["settings-key-Move_Forwards"] = "26";
 		m_values["settings-key-Move_Backwards"] = "22";
 		m_values["settings-key-Strafe_Left"] = "4";

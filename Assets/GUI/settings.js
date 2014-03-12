@@ -30,11 +30,13 @@ $(document).ready(function() {
 		
     for(var key in settings)
 		{
-			// Fullscreen checkbox/radio button processing
-      if(key == "settings-fullscreen")
-        $("input[name=settings-fullscreen]").filter("[value="+settings[key]+"]").prop("checked", true);
+			// Radio button processing
+			$("input[type='radio']").each(function(){
+				if($(this).prop("name") == key && $(this).prop("value") == settings[key])
+					$(this).prop("checked", true);
+			});
 			// Resolution list population
-      else if(key == "settings-resolution-list")
+      if(key == "settings-resolution-list")
       {
         $("#settings-resolution").empty();
         eval(settings[key]).forEach(function(resolution) {
@@ -46,7 +48,7 @@ $(document).ready(function() {
 			else if(key.search("settings-key-") > -1)
 			{
 				var prefix = "settings-key-";
-				$("#controls-settings-wrapper>input:first").before('<div><div class="inline-150px">'+key.substr(key.search(prefix)+prefix.length).replace('_',' ')+'</div><input id="'+key+'" value="'+settings[key]+'" class="controls-settings-keybind"/></div>');
+				$("#controls-settings-wrapper>input:first").before('<div><div class="inline-300px">'+key.substr(key.search(prefix)+prefix.length).replace('_',' ')+'</div><input id="'+key+'" value="'+settings[key]+'" class="controls-settings-keybind"/></div>');
 			}
       else
         $("#"+key).val(settings[key]);
@@ -88,6 +90,10 @@ $(document).ready(function() {
   } );
   $("#graphics-settings-save").click(function() {
     var settings = {};
+    settings["settings-glow"] = $("input[name=settings-glow]:checked").val();
+    settings["settings-grass"] = $("input[name=settings-grass]:checked").val();
+    settings["settings-shadows"] = $("input[name=settings-shadows]:checked").val();
+    settings["settings-water"] = $("input[name=settings-water]:checked").val();
     settings["settings-fullscreen"] = $("input[name=settings-fullscreen]:checked").val();
     settings["settings-resolution"] = $("#settings-resolution").val();
     Menu.SaveSettings(settings);
@@ -112,4 +118,9 @@ $(document).ready(function() {
     $("div#settings-menu").css("display", "table");
     $("tr#settings-menu").css("display", "table-row");
   } );
+
+	$("input[type=radio]").css('display', 'none');
+	$("input[type=radio]").next("label").click(function(){
+		$(this).prev().prop("checked", true);
+	});
 } );

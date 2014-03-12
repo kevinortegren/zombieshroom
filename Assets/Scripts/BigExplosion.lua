@@ -63,7 +63,7 @@ function BigExplosion.OnCollide (self, entity)
 			    local selfPos = self:GetTransformation():GetPos();
 			    local health = entity:GetHealth();
           if not health:IsDead() then
-				    health:Damage(abilityOwnerId, BigExplosion.damage * entity:GetStatChange():GetDamageResistance());
+				    health:Damage(abilityOwnerId, BigExplosion.damage * entity:GetStatChange():GetDamageResistance(), "Cannonball");
 			    end
 			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), BigExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
