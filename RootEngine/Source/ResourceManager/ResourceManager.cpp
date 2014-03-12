@@ -12,6 +12,7 @@ namespace RootEngine
 
 	ResourceManager::~ResourceManager()
 	{
+		// Clear models.
 		auto modelitr = m_models.begin();
 		for(; modelitr != m_models.end(); modelitr++)
 		{
@@ -20,6 +21,7 @@ namespace RootEngine
 		}
 		m_models.clear();
 
+		// Clear particles.
 		for(auto partitr = m_particles.begin(); partitr != m_particles.end(); partitr++)
 		{
 			for(auto partvec = (*partitr).second.begin(); partvec != (*partitr).second.end(); partvec++)
@@ -30,6 +32,7 @@ namespace RootEngine
 			(*partitr).second.clear();
 		}
 
+		// Clear sounds.
 		for(auto soundItr = m_soundAudios.begin(); soundItr != m_soundAudios.end(); soundItr++)
 		{
 			delete (*soundItr).second;
@@ -402,6 +405,8 @@ namespace RootEngine
 		}
 	}
 #endif
+
+
 	const std::string& ResourceManager::ResolveStringFromEffect(Render::EffectInterface* p_effect)
 	{
 		for(auto itr = m_effects.begin(); itr != m_effects.end(); ++itr)
@@ -431,5 +436,17 @@ namespace RootEngine
 	{
 		m_defaultTexture = m_context->m_renderer->CreateTexture();
 		m_defaultTexture->CreateEmptyTexture(4, 4, Render::TextureFormat::TEXTURE_RGBA);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//Remove functions
+	//////////////////////////////////////////////////////////////////////////
+	void ResourceManager::RemoveModel(Model* p_model)
+	{
+		if(p_model->m_meshes[0] != nullptr)
+		{
+			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetVertexBuffer());
+			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetElementBuffer());
+		}
 	}
 }

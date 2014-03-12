@@ -9,24 +9,26 @@ namespace Render
 	Mesh::~Mesh()
 	{
 		if(m_transformFeedback != 0)
-		glDeleteTransformFeedbacks(1, &m_transformFeedback);
+		{
+			glDeleteTransformFeedbacks(1, &m_transformFeedback);
+		}
 	}
 
 	void Mesh::CreateIndexBuffer(unsigned int* p_indices, unsigned int p_numberOfIndices)
 	{
-		m_elementBuffer->BufferData(p_numberOfIndices, sizeof(GLuint), p_indices);
+		m_elementBuffer->BufferData(p_numberOfIndices, sizeof(GLuint), p_indices, GL_STATIC_DRAW);
 	}
 
 	void Mesh::CreateVertexBuffer1P(Vertex1P* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->BufferData(p_numberOfVertices, 3 * sizeof(float), p_vertices);
+		m_vertexBuffer->BufferData(p_numberOfVertices, 3 * sizeof(float), p_vertices, GL_STATIC_DRAW);
 		m_vertexAttributes->Init(1);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	}
 
 	void Mesh::CreateVertexBuffer1P1UV(Vertex1P1UV* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->BufferData(p_numberOfVertices, 5 * sizeof(float), p_vertices);
+		m_vertexBuffer->BufferData(p_numberOfVertices, 5 * sizeof(float), p_vertices, GL_STATIC_DRAW);
 		m_vertexAttributes->Init(2);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (char*)0 + 3 * sizeof(float));
@@ -34,7 +36,7 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1N(Vertex1P1N* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->BufferData(p_numberOfVertices, 6 * sizeof(float), p_vertices);
+		m_vertexBuffer->BufferData(p_numberOfVertices, 6 * sizeof(float), p_vertices, GL_STATIC_DRAW);
 		m_vertexAttributes->Init(2);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)0 + 3 * sizeof(float));
@@ -42,7 +44,7 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1C(Vertex1P1C* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->BufferData(p_numberOfVertices, 7 * sizeof(float), p_vertices);
+		m_vertexBuffer->BufferData(p_numberOfVertices, 7 * sizeof(float), p_vertices, GL_STATIC_DRAW);
 		m_vertexAttributes->Init(2);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (char*)0 + 3 * sizeof(float));
@@ -50,7 +52,7 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1N1UV(Vertex1P1N1UV* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->BufferData(p_numberOfVertices, 8 * sizeof(float), p_vertices);
+		m_vertexBuffer->BufferData(p_numberOfVertices, 8 * sizeof(float), p_vertices, GL_STATIC_DRAW);
 		m_vertexAttributes->Init(3);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (char*)0 + 3 * sizeof(float));
@@ -59,7 +61,7 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1N1UV1T1BT(Vertex1P1N1UV1T1BT* p_vertices, unsigned int p_numberOfVertices)
 	{
-		m_vertexBuffer->BufferData(p_numberOfVertices, sizeof(Vertex1P1N1UV1T1BT), p_vertices);
+		m_vertexBuffer->BufferData(p_numberOfVertices, sizeof(Vertex1P1N1UV1T1BT), p_vertices, GL_STATIC_DRAW);
 		m_vertexAttributes->Init(5);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT), 0);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT), (char*)0 + 3 * sizeof(float));
@@ -70,7 +72,7 @@ namespace Render
 
 	void Mesh::CreateVertexBuffer1P1N1UV1T1BT1BID1W( Vertex1P1N1UV1T1BT1BID1W* p_vertices, unsigned int p_numberOfVertices )
 	{
-		m_vertexBuffer->BufferData(p_numberOfVertices, sizeof(Vertex1P1N1UV1T1BT1BID1W), p_vertices);
+		m_vertexBuffer->BufferData(p_numberOfVertices, sizeof(Vertex1P1N1UV1T1BT1BID1W), p_vertices, GL_STATIC_DRAW);
 		m_vertexAttributes->Init(7);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), 0);
 		m_vertexAttributes->SetVertexAttribPointer(m_vertexBuffer->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex1P1N1UV1T1BT1BID1W), (char*)0 + 3 * sizeof(float));

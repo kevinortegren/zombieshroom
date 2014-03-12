@@ -47,7 +47,7 @@ namespace Render
 			data.gauss[i+1] = Gaussian(i * (1.0f - blurStrength), (float)pow(blurFactor * 0.35, 2));
 		}
 
-		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data);
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data, GL_DYNAMIC_DRAW);
 
 		m_display = true;
 	}

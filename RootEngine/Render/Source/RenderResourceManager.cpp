@@ -68,8 +68,18 @@ namespace Render
 
 	void RenderResourceManager::ReleaseBuffer(BufferInterface* p_buffer)
 	{
-		auto itr = std::find(m_buffers.begin(), m_buffers.end(), p_buffer);
-		m_buffers.erase(itr);
+		if(p_buffer != nullptr)
+		{
+			auto itr = std::find(m_buffers.begin(), m_buffers.end(), p_buffer);
+			if(itr != m_buffers.end())
+			{
+				if((*itr) != nullptr)
+				{
+					delete (*itr);
+					(*itr) = nullptr;
+				}
+			}
+		}
 	}
 
 	TextureInterface* RenderResourceManager::CreateTexture()
