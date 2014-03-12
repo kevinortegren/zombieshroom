@@ -223,36 +223,6 @@ namespace RootSystems
 				}
 			}
 
-			if(!isGameOver)
-			{
-				if(player->AbilityState == RootForce::AbilityState::CHARGING)
-				{
-					if(animation->UpperBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP)
-					{
-						animation->UpperBodyAnim.m_animClip = animation->UpperBodyAnim.m_chargingClip;
-						animation->UpperBodyAnim.m_locked = 0;
-					}
-					if(animation->LowerBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE)
-					{
-						animation->LowerBodyAnim.m_animClip = animation->LowerBodyAnim.m_chargingClip;
-						animation->LowerBodyAnim.m_locked = 0;
-					}
-				}
-				else if(player->AbilityState == RootForce::AbilityState::CHANNELING)
-				{
-					if(animation->UpperBodyAnim.m_channelingClip != RootForce::AnimationClip::NOCLIP)
-					{
-						animation->UpperBodyAnim.m_animClip = animation->UpperBodyAnim.m_channelingClip;
-						animation->UpperBodyAnim.m_locked = 0;
-					}
-					if(animation->LowerBodyAnim.m_channelingClip != RootForce::AnimationClip::NOCLIP && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE)
-					{
-						animation->LowerBodyAnim.m_animClip = animation->LowerBodyAnim.m_channelingClip;
-						animation->LowerBodyAnim.m_locked = 0;
-					}
-				}
-			}
-
 			//Play hit animation if hit
 			if(health->GotHit)
 			{
@@ -267,6 +237,38 @@ namespace RootSystems
 				else if(random == 3)
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::GOTHIT3, true);
 			}
+
+			if(!isGameOver)
+			{
+				if(player->AbilityState == RootForce::AbilityState::CHARGING)
+				{
+					if(animation->UpperBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP)
+					{
+						animation->UpperBodyAnim.m_animClip = animation->UpperBodyAnim.m_chargingClip;
+						animation->UpperBodyAnim.m_locked = false;
+					}
+					if(animation->LowerBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE)
+					{
+						animation->LowerBodyAnim.m_animClip = animation->LowerBodyAnim.m_chargingClip;
+						animation->LowerBodyAnim.m_locked = false;
+					}
+				}
+				else if(player->AbilityState == RootForce::AbilityState::CHANNELING)
+				{
+					if(animation->UpperBodyAnim.m_channelingClip != RootForce::AnimationClip::NOCLIP)
+					{
+						animation->UpperBodyAnim.m_animClip = animation->UpperBodyAnim.m_channelingClip;
+						animation->UpperBodyAnim.m_locked = false;
+					}
+					if(animation->LowerBodyAnim.m_channelingClip != RootForce::AnimationClip::NOCLIP && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE)
+					{
+						animation->LowerBodyAnim.m_animClip = animation->LowerBodyAnim.m_channelingClip;
+						animation->LowerBodyAnim.m_locked = false;
+					}
+				}
+			}
+
+			
 
 			// Activate ability! Pew pew!
 			AbilitySwitch(p_entity);
