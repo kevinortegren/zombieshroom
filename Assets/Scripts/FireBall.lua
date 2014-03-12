@@ -20,13 +20,17 @@ function FireBall.ChargeStart(userId, actionId)
 end
 
 function FireBall.ChargeDone (time, userId, actionId)
-  local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-	local animComp	= casterEnt:GetAnimation();
-	animComp:SetUpperAnimClip(AnimClip.SHOOT1, true);
+  --local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	--local animComp	= casterEnt:GetAnimation();
+	--animComp:SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
   FireBall.OnCreate(userId, actionId);
   FireBall.damageIncrease = FireBall.damage * time;
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
+  if(time >= FireBall.chargeTime) then
+    local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+    FireBall.OnCreate(userId, actionId);
+  end
 end
 
 function FireBall.ChannelingDone (time, userId, actionId)

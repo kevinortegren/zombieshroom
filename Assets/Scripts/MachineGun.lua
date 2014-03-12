@@ -17,7 +17,7 @@ end
 function MachineGun.ChargeDone (time, userId, actionId)
 	MachineGun.OnCreate(userId, actionId);
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, false);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
 end
 
 function MachineGun.ChannelingDone (time, userId, actionId)

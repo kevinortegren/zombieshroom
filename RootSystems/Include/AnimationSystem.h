@@ -30,6 +30,9 @@ namespace RootForce
 			LEFTBACK,
 			RIGHTBACK,
 			CHARGING1,
+			SHOOT2,
+			SHOOT3,
+			SHOOT4,
 			RAGDOLL,
 			NOCLIP,
 		};

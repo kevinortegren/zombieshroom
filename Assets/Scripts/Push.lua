@@ -20,9 +20,27 @@ function Push.ChargeDone (time, userId, actionId)
 	--if time >= Push.chargeTime * 0.5 then
 		Push.currentKnockback = Push.knockback * ((time) / Push.chargeTime);
 		Push.OnCreate(userId, actionId);
+
+	math.randomseed(os.time());
+	local randomNumber = math.random(1,4);
+	
+
 	--Animation clip
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	if randomNumber == 1 then
+		Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT1, true);
+	end
 		
+	if randomNumber == 2 then
+		Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT2, true);
+	end
+
+	if randomNumber == 3 then
+		Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT3, true);
+	end
+
+	if randomNumber == 4 then
+		Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOT4, true);
+	end
 	--end
 end
 
