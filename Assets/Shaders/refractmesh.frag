@@ -48,5 +48,5 @@ void main()
 	//Outputs
 	////////////////////////////////////////////////////////////////////////////
 	vec3 result =  mix(refractionColor, diffuseColor, 0.05);
-    out_color = vec4(result , 1.0);
+    out_color = vec4(result,1);
 }

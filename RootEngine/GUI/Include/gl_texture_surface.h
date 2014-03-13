@@ -7,6 +7,7 @@
 #include <mutex>
 
 #define TILE_SIZE 128
+//#define NSIGHT
 
 class SurfaceTile
 {
@@ -27,8 +28,10 @@ public:
 		glGenBuffers(2, PBO);
 		glBindTexture(GL_TEXTURE_2D, Texture);
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
+#ifndef NSIGHT 
 		if(glClearTexImage)
 			glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0);
+#endif
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	~SurfaceTile()
