@@ -1,7 +1,6 @@
 #pragma once
 
 #include <RootEngine/Include/GameSharedContext.h>
-#include <RootEngine/InputManager/Include/InputManager.h>
 #include <RootSystems/Include/ControllerActions.h>
 #include <Utility/ECS/Include/World.h>
 #include <set>
@@ -14,7 +13,7 @@ namespace RootForce
 	class ControllerActionSystem : public ECS::EntitySystem
 	{
 	public:
-		ControllerActionSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
+		ControllerActionSystem(ECS::World* p_world)
 			: ECS::EntitySystem(p_world)
 		{
 

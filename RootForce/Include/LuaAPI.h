@@ -527,6 +527,41 @@ namespace RootForce
 			return 1;
 		}
 
+		static int EntityGetControllerActions(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::ControllerActions **s = (RootForce::ControllerActions **)lua_newuserdata(p_luaState, sizeof(RootForce::ControllerActions *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::ControllerActions>(*e);
+			if(*s == nullptr)
+			{
+				lua_pushnil(p_luaState);
+			}
+			else
+			{
+				luaL_setmetatable(p_luaState, "ControllerActions");
+			}
+			return 1;
+		}
+
+		static int EntityRemoveControllerActions(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::ControllerActions>(*e);
+			return 0;
+		}
+
+		static int EntityEquals(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			ECS::Entity** e1 = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			ECS::Entity** e2 = (ECS::Entity**)luaL_checkudata(p_luaState, 2, "Entity");
+
+			lua_pushboolean(p_luaState, *e1 == *e2);
+			return 1;
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		//TRANSFORMATION
 		//////////////////////////////////////////////////////////////////////////
@@ -1362,10 +1397,19 @@ namespace RootForce
 		static int Vec3Mul(lua_State* p_luaState)
 		{
 			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 1, "Vec3");
-			glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
-			glm::vec3 v3 = (*v1)*(*v2);
+			glm::vec3 result;
+			if(lua_isnumber(p_luaState, 2))
+			{
+				float scalar = (float) luaL_checknumber(p_luaState, 2);
+				result = *v1 * scalar;
+			}
+			else
+			{
+				glm::vec3* v2 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+				result = (*v1)*(*v2);
+			}
 			glm::vec3 *s = (glm::vec3 *)lua_newuserdata(p_luaState, sizeof(glm::vec3));
-			*s = glm::vec3(v3);
+			*s = result;
 			luaL_setmetatable(p_luaState, "Vec3");
 			return 1;
 		}
@@ -2809,8 +2853,49 @@ namespace RootForce
 		}
 	
 		//////////////////////////////////////////////////////////////////////////
+		//CONTROLLER ACTIONS 
+		//////////////////////////////////////////////////////////////////////////
+
+		static int ControllerActionsCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+
+			RootForce::ControllerActions **s = (RootForce::ControllerActions**)lua_newuserdata(p_luaState, sizeof(RootForce::ControllerActions*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::ControllerActions>(*e);
+
+			luaL_setmetatable(p_luaState, "ControllerActions");
+
+			return 1;
+		}
+
+		static int ControllerActionsBind(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+
+			RootForce::ControllerActions **s = (RootForce::ControllerActions**)luaL_checkudata(p_luaState, 1, "ControllerActions");
+			std::string action = luaL_checkstring(p_luaState, 2);
+			int key = (int) luaL_checknumber(p_luaState, 3);
+			(*s)->m_actions[key] = action;
+
+			return 0;
+		}
+
+		static int ControllerActionsIsActivated(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::ControllerActions **s = (RootForce::ControllerActions**)luaL_checkudata(p_luaState, 1, "ControllerActions");
+			std::string action = luaL_checkstring(p_luaState, 2);
+			bool activated = (*s)->m_activeActions.find(action) != (*s)->m_activeActions.end();
+
+			lua_pushboolean(p_luaState, activated);
+			return 1;
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+
 		static const struct luaL_Reg static_f [] = {
 			{"KnockBack", Knockback},
 			{NULL, NULL}
@@ -2882,6 +2967,9 @@ namespace RootForce
 			{"GetParticleEmitter", EntityGetParticleEmitter},
 			{"RemovePointLight", EntityRemovePointLight},
 			{"RemoveDamageAndKnockback", EntityRemoveDamageAndKnockback},
+			{"GetControllerActions", EntityGetControllerActions},
+			{"RemoveControllerActions", EntityRemoveControllerActions},
+			{"__eq",	EntityEquals},
 			{NULL, NULL}
 		};
 
@@ -3434,6 +3522,17 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg controllerActions_f [] = {
+			{"New", ControllerActionsCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg controllerActions_m [] = {
+			{"Bind", ControllerActionsBind},
+			{"IsActivated", ControllerActionsIsActivated},
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -3499,6 +3598,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::scalable_f,				RootForce::LuaAPI::scalable_m,				"Scalable");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statchange_f,			RootForce::LuaAPI::statchange_m,			"StatChange");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::resource_f,				RootForce::LuaAPI::resource_m,				"ResourceManager");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::controllerActions_f,		RootForce::LuaAPI::controllerActions_m,		"ControllerActions");
 
 			//No methods
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");

@@ -213,6 +213,7 @@ namespace RootForce
 		if(m_world->GetEntityManager()->GetComponent<Renderable>(p_entity) == nullptr)
 		{
 			Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(p_entity);
+			renderable->m_shadowTech = Render::ShadowTechnique::SHADOW_DYNAMIC;
 			renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilitySpawnPoint");
 			renderable->m_material = m_engineContext->m_renderer->CreateMaterial(respawn->CurrentAbility.Name);
 			renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);

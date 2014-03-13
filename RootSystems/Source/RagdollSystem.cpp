@@ -26,7 +26,6 @@ namespace RootForce
 		Transform* transform = m_transforms.Get(p_entity);
 		Ragdoll* ragdoll = m_world->GetEntityManager()->GetComponent<Ragdoll>(p_entity);
 		ECS::Entity* camera = m_world->GetTagManager()->GetEntityByTag("Camera");
-		ThirdPersonBehavior* cameraThird = m_world->GetEntityManager()->GetComponent<ThirdPersonBehavior>(camera);
 		
 		if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 		{
@@ -35,7 +34,13 @@ namespace RootForce
 			{	
 				//Lock the camera if the local player are the entity entering ragdoll mode
 				if(m_world->GetTagManager()->GetEntityByTag("Player") == p_entity)
-					cameraThird->m_rotateWithTarget = false;
+				{
+					ThirdPersonBehavior* cameraThird = m_world->GetEntityManager()->GetComponent<ThirdPersonBehavior>(camera);
+					if(cameraThird)
+					{
+						cameraThird->m_rotateWithTarget = false;
+					}
+				}
 
 				std::map<std::string, int>  nameToIndex ;
 				NameMapper(&nameToIndex,renderable->m_model->m_animation->GetScene()->mRootNode, renderable->m_model->m_animation, renderable->m_model->m_animation->GetScene() );
@@ -80,7 +85,13 @@ namespace RootForce
 			}
 			//Restart rotations following if the local player leaving ragdoll mode
 			if(m_world->GetTagManager()->GetEntityByTag("Player") == p_entity)
-				cameraThird->m_rotateWithTarget = true;
+			{
+				ThirdPersonBehavior* cameraThird = m_world->GetEntityManager()->GetComponent<ThirdPersonBehavior>(camera);
+				if(cameraThird)
+				{
+					cameraThird->m_rotateWithTarget = true;
+				}
+			}
 			ragdoll->m_firstTime = true;
 			return;
 		}

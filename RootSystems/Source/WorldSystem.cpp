@@ -1,6 +1,8 @@
 #include <RootSystems/Include/WorldSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/ControllerActionSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 namespace RootForce
 {

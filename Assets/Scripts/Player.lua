@@ -112,6 +112,18 @@ function Player.OnTeamSelect(self, teamId)
 		self:RemoveAnimation();
 		self:RemoveRagdoll();
 		self:RemoveWaterCollider();
+
+		local me = Entity.GetEntityByTag("Player");
+
+		if self == me then
+			Logging.Log(LogLevel.DEBUG_PRINT, "SPECTATOR!");
+			local cameraEntity = Entity.GetEntityByTag("Camera");
+			local cameraControllerActions = ControllerActions.New(cameraEntity);
+			local cameraScript = Script.New(cameraEntity, "FreeFlying");
+			cameraScript:SetName("FreeFlying");
+			FreeFlying.Setup(cameraEntity);
+		end
+
   elseif teamId ~= prevTeamId then
 		local renderable = self:GetRenderable();
 		local health = self:GetHealth();

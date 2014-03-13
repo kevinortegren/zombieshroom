@@ -21,6 +21,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ControllerActions>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(20);
@@ -80,6 +81,10 @@ namespace RootForce
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
+
+		// Initialize the controller action system
+		m_controllerActionSystem = new RootForce::ControllerActionSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ControllerActionSystem>(m_controllerActionSystem);
 
 		// Initialize physics systems.
 		m_physicsTransformCorrectionSystem = new RootForce::PhysicsTransformCorrectionSystem(g_world);
@@ -442,7 +447,7 @@ namespace RootForce
 		// Check for special keypress events.
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			m_displayGuiHUD = m_displayGuiHUD ? false : true;
+			m_displayGuiHUD = !m_displayGuiHUD;
 		}
 		
 		{
@@ -461,6 +466,11 @@ namespace RootForce
 
 			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused() || m_displayIngameMenu);
 			m_playerControlSystem->Process();
+		}
+
+		{
+			PROFILE("Controller action system", g_engineContext.m_profiler);
+			m_controllerActionSystem->Process();
 		}
 
 		if (m_networkContext.m_server != nullptr)

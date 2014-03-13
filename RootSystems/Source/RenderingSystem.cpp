@@ -87,7 +87,7 @@ namespace RootForce
 		{
 			Render::ShadowJob sjob;
 			sjob.m_technique = (Render::ShadowTechnique::ShadowTechnique)renderable->m_shadowTech;
-			sjob.m_mesh = renderable->m_model->m_meshes[1];
+			sjob.m_mesh = renderable->m_model->m_meshes[0];
 			sjob.m_params = job.m_params;
 
 			if(renderable->m_shadowTech == Render::ShadowTechnique::SHADOW_TRANSPARENT)
