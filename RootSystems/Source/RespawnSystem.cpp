@@ -257,11 +257,18 @@ namespace RootSystems
 			killerNetworkID.SequenceID = 0;
 
 			RootForce::PlayerComponent* killerPlayerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(killerEntity);
+			RootForce::PlayerComponent* deadPlayerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_deadEntity);
 			RootForce::HealthComponent* victimHealthComponent = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_deadEntity);
-
-			rules->TeamScore[killerPlayerComponent->TeamID]++;
-			killerPlayerComponent->Score++;
-
+			if(killerPlayerComponent->TeamID != deadPlayerComponent->TeamID)
+			{
+				rules->TeamScore[killerPlayerComponent->TeamID]++;
+				killerPlayerComponent->Score++;
+			}
+			else //teamkill
+			{
+				rules->TeamScore[killedPlayerComponent->TeamID]--;
+				killerPlayerComponent->Score--;
+			}
 			killAnnouncement->KillPair.push_back(RootForce::KillPairType(killerEntity, p_deadEntity));
 			killAnnouncement->AbilityName = victimHealthComponent->LastDamageAbilityName;
 		}

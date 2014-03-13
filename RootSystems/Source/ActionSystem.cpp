@@ -58,9 +58,11 @@ namespace RootSystems
 					action->WantRespawn = false;
 					action->JumpTime = 0.0f;
 					action->FallTime = 0.0f;
+					action->IdleTime = 0.0f;
 					action->JumpDir = glm::vec3(0.0f);
 					health->GotHit = false;
 					animation->UpperBodyAnim.m_locked = 0;
+					animation->LowerBodyAnim.m_locked = 0;
 				}
 
 				// Check abilities here as well, to make sure abilities are properly interrupted.
@@ -112,7 +114,7 @@ namespace RootSystems
 							// Apply jump force and go into jump animation
 							m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
 
-							animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
+							//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 							animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 						
 						}
@@ -127,14 +129,21 @@ namespace RootSystems
 
 			if(state->CurrentState == RootForce::EntityState::ASCENDING)
 			{
-				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND, false);
+				
 
 				if(action->StrafePower > 0)
-					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_RIGHT, false);
+				{
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFERIGHT, false);
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFERIGHT, false);
+				}
 				else if(action->StrafePower < 0)
-					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_LEFT, false);
+				{
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFELEFT, false);
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFELEFT, false);
+				}
 				else
 				{
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND, false);
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND, false);
 				}
 			}
@@ -142,21 +151,31 @@ namespace RootSystems
 			{
 				action->FallTime += dt;
 		
-				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
-
 				if(action->StrafePower > 0)
-					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_RIGHT, false);
+				{
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFERIGHT, false);
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFERIGHT, false);
+				}
 				else if(action->StrafePower < 0)
-					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_LEFT, false);
+				{
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFELEFT, false);
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFELEFT, false);
+				}
+				else if(action->FallTime <= 1)
+				{
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND1, false);
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND1, false);
+				}
 				else
 				{
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
 				}
 			}
 			else if(state->CurrentState == RootForce::EntityState::LANDING)
 			{
 				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
-				animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
+				//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
 
 				state->CurrentState = RootForce::EntityState::GROUNDED;
 
@@ -165,9 +184,23 @@ namespace RootSystems
 			}
 			else
 			{
-				//if(action->StrafePower == 0 && action->MovePower == 0)
-				animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
-				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
+				if(action->StrafePower == 0 && action->MovePower == 0)
+					action->IdleTime += dt;
+				else
+				{
+					action->IdleTime = 0.0f;
+				}
+
+				if(action->IdleTime >= 0.2f)
+				{
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
+				}
+				if(action->IdleTime >= 15.0f)
+				{
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DANCE1, false);
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DANCE1, false);
+				}
 
 				if(!isGameOver)
 				{
