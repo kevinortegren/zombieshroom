@@ -510,6 +510,15 @@ namespace RootForce
 			g_world->GetEntityManager()->RemoveComponent<RootForce::StateComponent>(*e);
 			return 0;
 		}
+		static int EntityGetStateComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::StateComponent **s = (RootForce::StateComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::StateComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::StateComponent>(*e);
+			luaL_setmetatable(p_luaState, "StateComponent");
+			return 1;
+		}
 		static int EntityRemovePlayerControl(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
@@ -2880,6 +2889,7 @@ namespace RootForce
 			{"RemoveAnimation", EntityRemoveAnimation},
 			{"RemoveRagdoll", EntityRemoveRagdoll},
 			{"RemoveStateComponent", EntityRemoveStateComponent},
+			{"GetStateComponent", EntityGetStateComponent},
 			{"RemovePlayerControl", EntityRemovePlayerControl},
 			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
@@ -2889,6 +2899,7 @@ namespace RootForce
 			{"GetParticleEmitter", EntityGetParticleEmitter},
 			{"RemovePointLight", EntityRemovePointLight},
 			{"RemoveDamageAndKnockback", EntityRemoveDamageAndKnockback},
+			{"GetState", EntityRemoveDamageAndKnockback},
 			{NULL, NULL}
 		};
 
@@ -3506,6 +3517,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::scalable_f,				RootForce::LuaAPI::scalable_m,				"Scalable");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statchange_f,			RootForce::LuaAPI::statchange_m,			"StatChange");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::resource_f,				RootForce::LuaAPI::resource_m,				"ResourceManager");
+
 
 			//No methods
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");
