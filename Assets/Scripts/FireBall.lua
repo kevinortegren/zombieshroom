@@ -7,7 +7,7 @@ FireBall.duration = 0;
 FireBall.charges = 5;
 FireBall.damage = 1.0;
 FireBall.damageIncrease = 3.0;
-FireBall.crosshair = "";
+FireBall.crosshair = "crosshair3";
 
 function FireBall.OnLoad()
 	ResourceManager.LoadParticle("SmockeochElden");
