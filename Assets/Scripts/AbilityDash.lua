@@ -7,7 +7,7 @@ AbilityDash.cooldown = 3;
 AbilityDash.chargeTime = 0.0;
 AbilityDash.channelingTime = 0.0;
 AbilityDash.power = 25;
-AbilityDash.crosshair = "";
+AbilityDash.crosshair = "crosshairNone";
 
 function AbilityDash.OnLoad()
 end

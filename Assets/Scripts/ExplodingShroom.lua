@@ -3,7 +3,7 @@ ExplodingShroom.cooldown = 3;
 ExplodingShroom.charges = 3;
 ExplodingShroom.chargeTime = 0;
 ExplodingShroom.channelingTime = 0;
-ExplodingShroom.crosshair = "";
+ExplodingShroom.crosshair = "crosshairNone";
 --ExplodingShroom.duration = 10;
 
 function ExplodingShroom.OnLoad()

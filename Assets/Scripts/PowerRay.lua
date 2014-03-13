@@ -8,7 +8,7 @@ PowerRay.charges = 10;
 PowerRay.chargeTime = 0;
 PowerRay.channelingTime = 0;
 PowerRay.duration = 1;
-PowerRay.crosshair = "";
+PowerRay.crosshair = "crosshairPrecision";
 
 function PowerRay.OnLoad()
 end
