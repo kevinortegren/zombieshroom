@@ -112,5 +112,9 @@ AnimClip = {
 	GOTHIT1				= 24;
 	GOTHIT2				= 25;
 	GOTHIT3				= 26;
+	AIRSTRAFELEFT		= 27;
+	AIRSTRAFERIGHT		= 28;
+	DESCEND1			= 29;
+	DANCE1				= 30;
 	RAGDOLL 			= 27;
 }
