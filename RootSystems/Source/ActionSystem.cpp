@@ -191,11 +191,11 @@ namespace RootSystems
 					action->IdleTime = 0.0f;
 				}
 
-				if(action->IdleTime >= 0.2f)
-				{
+				//if(action->IdleTime >= 0.2f)
+				//{
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
-				}
+				//}
 				if(action->IdleTime >= 15.0f)
 				{
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DANCE1, false);
