@@ -30,5 +30,7 @@ namespace RootForce
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
 
 		ECS::World*	m_world;
+
+		float m_waterHeight;
 	};
 }

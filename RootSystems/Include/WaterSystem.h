@@ -45,14 +45,8 @@ namespace RootForce
 		void Begin();
 		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
-		void CreateWater(float p_height);
+		void CreateWater();
 		void Disturb(float p_x, float p_z, float p_power, int p_radius );
-		
-		void CalculateWaterConstants();
-
-		float GetWaterHeight();
-		void SetWaterHeight(float p_height);
-
 		void ParseCommands(std::stringstream* p_data);
 
 	private:
@@ -75,6 +69,7 @@ namespace RootForce
 		float*		m_textureData;
 		glm::vec4	m_waterOptions;
 
+		void CalculateWaterConstants();
 		bool ValidValues();
 		void CreateWaterMesh();
 		glm::vec2 WorldSpaceToWaterSpace(glm::vec2 p_worldSpace);
@@ -97,6 +92,8 @@ namespace RootForce
 		void ToggleCollisionDebugDraw();
 
 		void ResetWater();
+
+		void UpdateWaterHeight();
 
 		void SaveWater();
 		void LoadWater();

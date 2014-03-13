@@ -20,7 +20,7 @@ namespace RootForce
 
 	void RenderingSystem::Begin()
 	{
-
+		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
 	}
 
 	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -74,11 +74,17 @@ namespace RootForce
 		//Put forward object above or under water
 		if((job.m_material->m_effect->GetTechniques().at(0)->m_flags & Render::TechniqueFlags::RENDER_DEFERRED1) == Render::TechniqueFlags::RENDER_DEFERRED1 || job.m_forward)
 		{
-			float waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight");
-			if(transform->m_interpolatedPosition.y > waterHeight)
-				job.m_renderPass = RenderPass::RENDERPASS_PARTICLES1;
-			else if(transform->m_interpolatedPosition.y < waterHeight)
+			if(m_world->GetStorage()->DoesKeyExist("Water"))
+			{
+				if(transform->m_interpolatedPosition.y > m_waterHeight)
+					job.m_renderPass = RenderPass::RENDERPASS_PARTICLES1;
+				else if(transform->m_interpolatedPosition.y < m_waterHeight)
+					job.m_renderPass = RenderPass::RENDERPASS_PARTICLES0;
+			}
+			else
+			{
 				job.m_renderPass = RenderPass::RENDERPASS_PARTICLES0;
+			}
 		}
 
 		m_renderer->AddRenderJob(job);
