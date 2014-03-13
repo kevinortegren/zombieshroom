@@ -14,6 +14,7 @@ function BigExplosion.OnLoad()
 end
 
 function BigExplosion.OnCreate (userId, actionId)
+
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating BigExplosion");
 	local self = Entity.New();
 	local fatherEntity = Entity.GetEntityByNetworkID(userId, actionId, 0);
@@ -68,11 +69,9 @@ function BigExplosion.OnCollide (self, entity)
                 
 			    health:Damage(abilityOwnerId, BigExplosion.damage * entity:GetStatChange():GetDamageResistance(), "Cannonball");
 		    end
-		    local hitPhys = entity:GetPhysics();
-		    if hitPhys ~= nil then
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), BigExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
-			end
-		
+		    
+			Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), BigExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+
 		end
 	end
 end

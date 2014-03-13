@@ -461,7 +461,49 @@ namespace RootForce
 		std::getline(*p_data, module, ' ');
 		std::getline(*p_data, module, ' ');
 
-		if(module == "collidedraw" || module == "cd")
+		if(module == "low")
+		{	
+			m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Set water settings to LOW");
+			//Reflections off
+			m_waterOptions.x = 1.0f;
+			//Normal map off
+			m_waterOptions.y = 1.0f;
+			//Refractions off
+			m_waterOptions.w = 1.0f;
+			//Reset water
+			ResetWater();
+			//No Compute and water collisions
+			m_pause = true;
+		}
+		else if(module == "medium")
+		{	
+			m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Set water settings to MEDIUM");
+			//Reflections off
+			m_waterOptions.x = 1.0f;
+			//Normal map on
+			m_waterOptions.y = 0.0f;
+			//Refractions on
+			m_waterOptions.w = 0.0f;
+			//Start water
+			m_pause = false;
+			//Init water
+			LoadWater();
+		}
+		else if(module == "high")
+		{	
+			m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Set water settings to HIGH");
+			//Reflections on
+			m_waterOptions.x = 0.0f;
+			//Normal map on
+			m_waterOptions.y = 0.0f;
+			//Refractions on
+			m_waterOptions.w = 0.0f;
+			//Start water
+			m_pause = false;
+			//Init water
+			LoadWater();
+		}
+		else if(module == "collidedraw" || module == "cd")
 		{	
 			ToggleCollisionDebugDraw();
 		}

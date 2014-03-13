@@ -1493,7 +1493,7 @@ namespace Physics
 		if(!DoesObjectExist(p_objectHandle))
 			return;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY && !(m_userPointer.at(p_objectHandle)->m_externalControlled))
-			m_dynamicObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->setAngularFactor(btVector3(0.0f, 1.0f, 0.0f));
+			m_dynamicObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->setAngularFactor(btVector3(0.0f, 0.0f, 0.0f));
 	}
 
 }
