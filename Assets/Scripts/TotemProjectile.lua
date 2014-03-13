@@ -103,7 +103,7 @@ function TotemProjectile.Disappear(self)
     self:RemoveDamageAndKnockback();
 
 	local emitter = self:GetParticleEmitter();
-	if emitter ~= nil:
+	if emitter ~= nil then
 		self:GetParticleEmitter():SetAlive(-1.0);
 	end
 end
