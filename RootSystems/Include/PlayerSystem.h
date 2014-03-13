@@ -154,7 +154,7 @@ namespace RootForce
 		int Charges;
 
 		AbilityInfo()
-			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1), Crosshair("crosshair")
+			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1), Crosshair("crosshairNone")
 		{}
 	};
 

@@ -8,6 +8,7 @@ Identiray.charges = 40;
 Identiray.chargeTime = 0;
 Identiray.channelingTime = 0;
 Identiray.duration = 1;
+Identiray.crosshair = "crosshairPrecision";
 
 function Identiray.ChargeStart(userId, actionId)
 end

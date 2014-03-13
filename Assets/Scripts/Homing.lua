@@ -8,7 +8,7 @@ Homing.charges = 3;
 Homing.chargeTime = 0;
 Homing.channelingTime = 0;
 Homing.duration = 60;
-Homing.crosshair = "";
+Homing.crosshair = "crosshairPrecision";
 
 function Homing.OnLoad()
 	ResourceManager.LoadParticle("magic_missile_01");
