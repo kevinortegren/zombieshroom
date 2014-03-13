@@ -134,6 +134,7 @@ namespace RootEngine
 				positions.push_back(v.m_pos);
 			}
 
+			m_boneData.clear();
 			mesh->CreateVertexBuffer1P1N1UV1T1BT1BID1W(&vertices[0], vertices.size());	
 
 		}
@@ -227,7 +228,7 @@ namespace RootEngine
 				pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
 
 				m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
-				m_model->m_physicsMeshes.push_back(pmesh.get());
+				m_model->m_physicsMeshes.push_back(pmesh);
 			}
 		}
 
@@ -288,7 +289,7 @@ namespace RootEngine
 			pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
 
 			m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
-			m_model->m_physicsMeshes.push_back(pmesh.get());
+			m_model->m_physicsMeshes.push_back(pmesh);
 		}
 	}
 

@@ -8,29 +8,31 @@ namespace RootForce
 	void WorldSystem::LoadWorld(const std::string& p_worldName)
 	{
 		// Import entities, groups, tags and storage.
-		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
+		//m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
-		BuildStaticShadowMesh();
+		//BuildStaticShadowMesh();
 
 		// Parse ambient data.
 		glm::vec4 ambient = m_world->GetStorage()->GetValueAsVec4("Ambient");
-		//glm::vec4 ambient = glm::vec4(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
-		CreateSkyBox();
+		//CreateSkyBox();
 		CreatePlayerCamera();
 
 		// Put the static entities into a spatial quad tree.
-		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split");
+		//m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split");
 
 		// Adds static entities.
-		AddStaticEntitiesToPhysics();
+		//AddStaticEntitiesToPhysics();
 	}
 #endif
 
 	void WorldSystem::BuildStaticShadowMesh()
 	{
+		if(m_staticMesh != nullptr)
+			g_engineContext.m_renderer->RemoveMesh(m_staticMesh);
+
 		ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
 
 		std::vector<Render::Vertex1P> vertices;
@@ -281,11 +283,15 @@ namespace RootForce
 
 	void WorldSystem::Process()
 	{	
-		Render::ShadowJob job;
-		job.m_technique = Render::ShadowTechnique::SHADOW_OPAQUE;
-		job.m_mesh = m_staticMesh;
+		if(m_staticMesh != nullptr)
+		{
+			Render::ShadowJob job;
+			job.m_technique = Render::ShadowTechnique::SHADOW_OPAQUE;
+			job.m_mesh = m_staticMesh;
 
-		g_engineContext.m_renderer->AddShadowJob(job);
+			g_engineContext.m_renderer->AddShadowJob(job);
+		}
+		/*
 #ifndef COMPILE_LEVEL_EDITOR
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
@@ -308,7 +314,7 @@ namespace RootForce
 
 			m_engineContext->m_renderer->AddRenderJob(job);
 		}
-#endif
+#endif*/
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)

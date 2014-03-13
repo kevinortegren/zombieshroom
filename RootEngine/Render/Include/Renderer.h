@@ -99,6 +99,10 @@ namespace Render
 		virtual DirectionalLight* GetDirectionalLight() = 0;
 
 		virtual void ParseCommands(std::stringstream* p_ss) = 0;
+		virtual void ClearJobs() = 0;
+		virtual void CleanResources(unsigned p_flag) = 0;
+		virtual void RemoveMesh(MeshInterface* p_mesh) = 0;
+		virtual void RemoveVAO(VertexAttributesInterface* p_vao) = 0;
 
 	};
 
@@ -169,6 +173,11 @@ namespace Render
 		static std::map<TextureSemantic::TextureSemantic, unsigned> s_textureSlots;
 
 		void ParseCommands(std::stringstream* p_ss);
+
+		void ClearJobs();
+		void CleanResources(unsigned p_flag);
+		void RemoveMesh(MeshInterface* p_mesh);
+		void RemoveVAO(VertexAttributesInterface* p_vao);
 
 		glm::vec3 m_camPos;
 

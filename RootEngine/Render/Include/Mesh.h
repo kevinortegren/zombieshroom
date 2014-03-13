@@ -8,6 +8,8 @@
 
 namespace Render
 {
+	class RenderResourceManager;
+
 	class MeshInterface
 	{
 	public:
@@ -43,6 +45,8 @@ namespace Render
 
 		virtual void SetWireFrame(bool p_wireFrame) = 0;
 		virtual void SetNoCulling(bool p_noCulling) = 0;
+
+		virtual void FreeBuffers(RenderResourceManager* p_resources) = 0;
 	};
 
 	class Mesh : public MeshInterface
@@ -83,6 +87,8 @@ namespace Render
 
 		void SetWireFrame(bool p_wireFrame);
 		void SetNoCulling(bool p_noCulling);
+
+		void FreeBuffers(RenderResourceManager* p_resources);
 
 	private:
 		BufferInterface* m_vertexBuffer;

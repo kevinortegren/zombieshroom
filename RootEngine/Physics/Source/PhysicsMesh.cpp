@@ -12,6 +12,7 @@ namespace Physics
 
 	PhysicsMesh::~PhysicsMesh()
 	{
+		std::cout << "Clear meshes." << std::endl;
 		delete[] m_indices;
 		delete[] m_points;
 	}

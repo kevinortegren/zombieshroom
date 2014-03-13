@@ -12,7 +12,7 @@ namespace RootEngine
 		WebViewImpl::~WebViewImpl()
 		{
 			m_webView->Stop();
-			//m_webView->Destroy();
+			m_webView->Destroy();
 		}
 
 		void WebViewImpl::BufferJavascript(std::string p_script)

@@ -209,7 +209,7 @@ namespace RootForce
 
 	void IngameState::Enter()
 	{
-		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+		//m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 #ifndef _DEBUG
 		BotanyTextures textures;
@@ -367,6 +367,9 @@ namespace RootForce
 		if(m_networkContext.m_server != nullptr)
 			m_networkContext.m_server->SetMessageHandler(nullptr);
 		m_networkContext.m_client->SetMessageHandler(nullptr);
+
+		g_engineContext.m_resourceManager->Clean();
+		g_engineContext.m_renderer->ClearJobs();
 	}
 
 	GameStates::GameStates IngameState::Update(float p_deltaTime)
@@ -573,7 +576,7 @@ namespace RootForce
 
 		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
-			m_shadowSystem->Process();
+			//m_shadowSystem->Process();
 		}
 
 		{ 

@@ -8,6 +8,20 @@
 
 namespace Render
 {
+	namespace RenderResources
+	{
+		enum RenderResources
+		{
+			RR_BUFFER,
+			RR_TEXTURE,
+			RR_MATERIAL,
+			RR_VAO,
+			RR_MESH,
+			RR_EFFECT,
+			RR_ALL = (RR_BUFFER | RR_TEXTURE | RR_MATERIAL | RR_VAO | RR_MESH | RR_EFFECT)
+		};
+	}
+
 	class RenderResourceManager
 	{
 	public:
@@ -32,6 +46,11 @@ namespace Render
 		EffectInterface* CreateEffect();
 
 		std::string GetStringFromMaterial(Material* p_material);
+
+		void RemoveMesh(MeshInterface* p_mesh);
+		void RemoveVAO(VertexAttributesInterface* p_vao);
+
+		void Clean(unsigned p_cleanFlag);
 
 	private:
 
