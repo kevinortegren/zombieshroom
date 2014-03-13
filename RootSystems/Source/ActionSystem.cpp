@@ -65,7 +65,6 @@ namespace RootSystems
 
 				// Check abilities here as well, to make sure abilities are properly interrupted.
 				AbilitySwitch(p_entity);
-				player->AbilityState = RootForce::AbilityState::OFF;
 
 				animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::RAGDOLL;
 				animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::RAGDOLL;

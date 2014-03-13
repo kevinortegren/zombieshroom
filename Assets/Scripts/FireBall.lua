@@ -7,7 +7,7 @@ FireBall.duration = 0;
 FireBall.charges = 5;
 FireBall.damage = 1.0;
 FireBall.damageIncrease = 3.0;
-FireBall.crosshair = "";
+FireBall.crosshair = "crosshair3";
 
 function FireBall.OnLoad()
 	ResourceManager.LoadParticle("SmockeochElden");
@@ -25,19 +25,9 @@ function FireBall.ChargeDone (time, userId, actionId)
   FireBall.damageIncrease = FireBall.damage * time;
 	--Animation clip
 	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
-  if(time >= FireBall.chargeTime) then
-    local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-    FireBall.OnCreate(userId, actionId);
-  end
 end
 
 function FireBall.ChannelingDone (time, userId, actionId)
-  if(time < FireBall.chargeTime) then
-    local casterEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
-    local playerComp = casterEnt:GetPlayerComponent();
-    playerComp:AddSelectedCharges(1);
-    playerComp:ResetSelectedCooldown();
-	end
 end
 
 function FireBall.Interrupted (time, userId, actionId)

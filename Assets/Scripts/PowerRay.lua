@@ -78,6 +78,7 @@ if entity:DoesExist() then
 		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
 
 			local health = entity:GetHealth();
 			if not health:IsDead() then
@@ -86,7 +87,8 @@ if entity:DoesExist() then
 
 			local hitPos = entity:GetTransformation():GetPos();
 			local selfPos = self:GetTransformation():GetPos();
-			hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+			Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+		end
 	end
 end
 end

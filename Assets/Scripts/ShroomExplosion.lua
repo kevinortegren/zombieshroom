@@ -67,7 +67,7 @@ function ShroomExplosion.OnCollide (self, entity)
           if not health:IsDead() then
 				    health:Damage(abilityOwnerId, ShroomExplosion.damage * entity:GetStatChange():GetDamageResistance(), "ExplodingShroom");
 			    end
-			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), ShroomExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+			   Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), ShroomExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

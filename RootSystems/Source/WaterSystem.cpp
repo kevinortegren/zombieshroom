@@ -467,8 +467,6 @@ namespace RootForce
 		std::getline(*p_data, module, ' ');
 		std::getline(*p_data, module, ' ');
 
-		
-
 		if(module == "low")
 		{	
 			m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Set water settings to LOW");
