@@ -1642,7 +1642,7 @@ namespace RootForce
 			NumberOfArgs(3);
 			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
 			std::string key = luaL_checkstring(p_luaState, 2);
-			float value = luaL_checknumber(p_luaState, 3);
+			float value = (float) luaL_checknumber(p_luaState, 3);
 			(*s)->InsertNumber(key, value);
 			return 0;
 		}
