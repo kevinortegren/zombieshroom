@@ -101,7 +101,11 @@ function TotemProjectile.Disappear(self)
 	self:RemoveCollision();
 	self:RemoveCollisionResponder();
     self:RemoveDamageAndKnockback();
-	self:GetParticleEmitter():SetAlive(-1.0);
+
+	local emitter = self:GetParticleEmitter();
+	if emitter ~= nil:
+		self:GetParticleEmitter():SetAlive(-1.0);
+	end
 end
 
 function TotemProjectile.OnDestroy (self)

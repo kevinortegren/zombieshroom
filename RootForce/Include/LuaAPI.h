@@ -405,10 +405,17 @@ namespace RootForce
 		static int EntityGetParticleEmitter(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::ParticleEmitter **s = (RootForce::ParticleEmitter **)lua_newuserdata(p_luaState, sizeof(RootForce::ParticleEmitter *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(*e);
-			luaL_setmetatable(p_luaState, "ParticleEmitter");
+			RootForce::ParticleEmitter* t = g_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(*e);
+			if(t == nullptr)
+			{
+				lua_pushnil(p_luaState);
+			}
+			else
+			{
+				(*(RootForce::ParticleEmitter **)lua_newuserdata(p_luaState, sizeof(RootForce::ParticleEmitter *))) = t;
+				luaL_setmetatable(p_luaState, "ParticleEmitter");
+			}
 			return 1;
 		}
 		static int EntityRemovePointLight(lua_State* p_luaState)
