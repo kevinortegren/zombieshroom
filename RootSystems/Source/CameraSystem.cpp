@@ -14,8 +14,8 @@ namespace RootForce
 #ifndef COMPILE_LEVEL_EDITOR
 		if(m_world->GetStorage()->DoesKeyExist("Water"))
 		{
-			if(transform->m_position.y <= m_world->GetStorage()->GetValueAsFloat("Water") + 2.0f)
-				transform->m_position.y = m_world->GetStorage()->GetValueAsFloat("Water") + 2.0f;
+			if(transform->m_position.y <= m_world->GetStorage()->GetValueAsFloat("Water") + 5.0f)
+				transform->m_position.y = m_world->GetStorage()->GetValueAsFloat("Water") + 5.0f;
 		}
 #endif
 		glm::mat4 translation = glm::translate(glm::mat4(1), transform->m_position);

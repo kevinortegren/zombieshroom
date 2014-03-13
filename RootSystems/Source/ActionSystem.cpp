@@ -68,6 +68,9 @@ namespace RootSystems
 
 				animation->UpperBodyAnim.m_animClip = RootForce::AnimationClip::RAGDOLL;
 				animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::RAGDOLL;
+				animation->UpperBodyAnim.m_locked = false;
+				animation->LowerBodyAnim.m_locked = false;
+				m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "RAGDOLL");
 				return;
 			}
 
@@ -109,12 +112,9 @@ namespace RootSystems
 							// Apply jump force and go into jump animation
 							m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
 
-							//if(state->CurrentState == RootForce::EntityState::GROUNDED)
-							//{
-								animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
-								animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
-								m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "JUMP ANIM CLIP SET");
-							//}
+							animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
+							animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
+						
 						}
 						else
 						{
@@ -141,23 +141,17 @@ namespace RootSystems
 			else if(state->CurrentState == RootForce::EntityState::DESCENDING)
 			{
 				action->FallTime += dt;
-				
-				//m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT,  "FallTime %f", action->FallTime);
+		
+				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
 
-				//if(action->FallTime > 0.2)
-				//{
-					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
-
-					if(action->StrafePower > 0)
-						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_RIGHT, false);
-					else if(action->StrafePower < 0)
-						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_LEFT, false);
-					else
-					{
-						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
-					}
-				//}
-
+				if(action->StrafePower > 0)
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_RIGHT, false);
+				else if(action->StrafePower < 0)
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::STRAFE_LEFT, false);
+				else
+				{
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND, false);
+				}
 			}
 			else if(state->CurrentState == RootForce::EntityState::LANDING)
 			{
@@ -165,7 +159,6 @@ namespace RootSystems
 				animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
 
 				state->CurrentState = RootForce::EntityState::GROUNDED;
-				m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "LANDING ANIM CLIP SET");
 
 				action->JumpTime = 0.0f;
 				action->FallTime = 0.0f;
