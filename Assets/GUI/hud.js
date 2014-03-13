@@ -186,15 +186,14 @@ function Set(p_id, p_value)
 	{
 		if(value == 0)
 		{
-			$("#chargebar>div").fadeOut(500); // fade out
+			$("#chargebar").fadeOut(500); // fade out
 		}
 		else
 		{
-			$("#chargebar div").stop(); // stop any ongoing animations
-			$("#chargebar div").css("display", "block"); // ensure the bar is visible
-			$("#chargebar div").css("opacity", "1"); // ensure the bar is visible
-			//$("#chargebar>div>div").animate({width: ($("#chargebar>div").width()*value)+"px"},2000,"linear",function(){$(this).parent().fadeOut(500);});
-			$("#chargebar>div>div").css("width", ($("#chargebar>div").width()*value)+"px"); // resize the charge bar
+			$("#chargebar").stop(); // stop any ongoing animations
+			$("#chargebar").css("display", "block"); // ensure the bar is visible
+			$("#chargebar").css("opacity", "1"); // ensure the bar is visible
+			$("#chargebar>div").css("-webkit-transform", "rotate("+(135-90*value)+"deg)"); // resize the charge bar
 			// If charge reaches end in either direction, start a fadeout - it'll be aborted if a channel is initiated after charge
 		}
 	}
@@ -270,7 +269,6 @@ $(document).ready(function(){
 	//UpdateScoreScreen(2,'doqunbop',[[1,'Player',2,2][2,'doqunbop',1,0]]);
   // DamageIndicator(40);
    //setTimeout("DamageIndicator(40);", 2000);
-	//Set("ChargeBarValue", 1);
 	// Announce("Waiting for players...", -1);
   //SetCharges(1,3);
 	// setTimeout("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);Announce('May the roots be with you!',3);", 3000);
@@ -278,4 +276,5 @@ $(document).ready(function(){
 	//Set('Health', 166);
   // KillAnnouncement('Bulbasaur', 'Ekans', 'AbilityBall');
   // KillAnnouncement('','Bulbasaur', '');
+	//Set("ChargeBarValue", 0.9);
 });
