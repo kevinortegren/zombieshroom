@@ -24,6 +24,7 @@ namespace RootForce
 		void InsertNumber(const std::string& p_key, float p_value);
 		void InsertString(const std::string& p_key, const std::string& p_value);
 		void InsertEntity(const std::string& p_key, ECS::Entity* p_value);
+		void InsertEntity(const std::string& p_key, const Network::NetworkEntityID& p_id);
 		float GetNumber(const std::string& p_key) const;
 		std::string GetString(const std::string& p_key) const;
 		ECS::Entity* GetEntity(const std::string& p_key) const;

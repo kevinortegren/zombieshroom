@@ -260,12 +260,70 @@ namespace RootForce
 			if (p_writeToBitstream)
 			{
 				p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->Name.c_str()) );
+				
+				// Serialize the storage
+				unsigned int s;
+
+				s = (unsigned int) p_c->StorageNumber.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageNumber)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, it.second);
+				}
+
+				s = (unsigned int) p_c->StorageString.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageString)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.second.c_str()));
+				}
+
+				s = (unsigned int) p_c->StorageEntity.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageEntity)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, it.second.SynchronizedID);
+				}
 			}
 			else
 			{
-				RakNet::RakString s;
+				RakNet::RakString t;
+				p_bs->Serialize(p_writeToBitstream, t);
+				p_c->Name = std::string(t.C_String());
+
+				unsigned int s;
 				p_bs->Serialize(p_writeToBitstream, s);
-				p_c->Name = std::string(s.C_String());
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					float value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value);
+					p_c->InsertNumber(key.C_String(), value);
+				}
+
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					RakNet::RakString value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value);
+					p_c->InsertString(key.C_String(), value.C_String());
+				}
+
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					Network::NetworkEntityID value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value.SynchronizedID);
+					p_c->InsertEntity(key.C_String(), value);
+				}
 			}
 		}
 
