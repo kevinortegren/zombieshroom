@@ -246,15 +246,16 @@ namespace RootSystems
 		RootForce::KillAnnouncement* killAnnouncement = m_world->GetEntityManager()->GetComponent<RootForce::KillAnnouncement>(matchStateEntity);
 		RootForce::PlayerComponent* killedPlayerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_deadEntity);
 		RootForce::TDMRuleSet* rules = m_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
+		ECS::Entity* killerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(p_killerID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
+
 		// Award score for killer team
-		if(p_killerID != RootForce::Network::ReservedUserID::NONE)
+		if(p_killerID != RootForce::Network::ReservedUserID::NONE && killerEntity != p_deadEntity)
 		{
 			RootForce::Network::NetworkEntityID killerNetworkID;
 			killerNetworkID.UserID = p_killerID;
 			killerNetworkID.ActionID = RootForce::Network::ReservedActionID::CONNECT;
 			killerNetworkID.SequenceID = 0;
 
-			ECS::Entity* killerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(p_killerID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
 			RootForce::PlayerComponent* killerPlayerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(killerEntity);
 			RootForce::HealthComponent* victimHealthComponent = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_deadEntity);
 

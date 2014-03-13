@@ -57,17 +57,32 @@ namespace RootForce
 		std::map<std::string, aiVector3D>	m_blendPos;
 		std::map<std::string, aiQuaternion> m_blendRot;
 		float	m_animTime;
-		int		m_locked;
+		bool	m_locked;
 		bool	m_blending;
 		float	m_blendTime;
+
+		void SetAnimationClip(AnimationClip::AnimationClip p_animClip, bool p_locked)
+		{
+			if(!m_locked && !m_blending) //If animation is not locked and not blending, set animation
+			{
+				m_animClip = p_animClip;
+			}
+
+			if(p_locked) //Override animation if it's a locked animation
+			{
+				m_animClip = p_animClip;
+				m_locked = true;
+			}
+		}
 	};
 
 	struct Animation : public ECS::Component<Animation>
 	{
-		Animation(){}
+		Animation() : AnimationSpeed(1.0f) {}
 		glm::mat4 m_bones[20];
-		AnimBodyPart LowerBodyAnim;
 		AnimBodyPart UpperBodyAnim;
+		AnimBodyPart LowerBodyAnim;
+		float AnimationSpeed;
 	};
 
 	struct AnimationSystem : public ECS::ConcurrentSystem
@@ -78,7 +93,7 @@ namespace RootForce
 			SetUsage<Animation>();
 			SetUsage<Renderable>();
 			m_logger = nullptr;
-			m_blendTime = 0.15f;
+			m_blendTime = 0.1f;
 		}
 		void Init();
 		void Begin();

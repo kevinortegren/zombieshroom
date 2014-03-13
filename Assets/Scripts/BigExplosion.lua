@@ -7,12 +7,14 @@ BigExplosion.cooldown = 0;
 BigExplosion.chargeTime = 0.0;
 BigExplosion.channelingTime = 0.0;
 BigExplosion.duration = 4.0;
+BigExplosion.fatherID = "";
 
 function BigExplosion.OnLoad()
 	ResourceManager.LoadParticle("BigExplosion");
 end
 
 function BigExplosion.OnCreate (userId, actionId)
+
 	--Logging.Log(LogLevel.DEBUG_PRINT, "Creating BigExplosion");
 	local self = Entity.New();
 	local fatherEntity = Entity.GetEntityByNetworkID(userId, actionId, 0);
@@ -58,16 +60,18 @@ function BigExplosion.OnCollide (self, entity)
 		    local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 		   	local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 		   	local targetPlayerComponent = entity:GetPlayerComponent();
-		    
+            
 		    local network = entity:GetNetwork();
 		    local hitPos = entity:GetTransformation():GetPos();
 		    local selfPos = self:GetTransformation():GetPos();
 		    local health = entity:GetHealth();
       		if not health:IsDead() then
-			    health:Damage(abilityOwnerId, BigExplosion.damage * entity:GetStatChange():GetDamageResistance());
+                
+			    health:Damage(abilityOwnerId, BigExplosion.damage * entity:GetStatChange():GetDamageResistance(), "Cannonball");
 		    end
-		    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), BigExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
-		
+		    
+			Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), BigExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+
 		end
 	end
 end

@@ -76,7 +76,7 @@ function Push.OnCreate (userId, actionId)
 	--transformComp:GetOrient():Pitch(-90);
 	rotQuat = transformComp:GetOrient():GetQuaternion();
 	local startPos = casterEnt:GetTransformation():GetPos();
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 8, 1, false, false);
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 8, 1, false, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	transformComp:SetPos(startPos);
@@ -100,7 +100,7 @@ function Push.OnCollide (self, entity)
 				local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
 				local health = entity:GetHealth();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.currentKnockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+				Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.currentKnockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end

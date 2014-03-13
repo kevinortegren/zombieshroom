@@ -138,13 +138,8 @@ namespace RootForce
 		}
 		else if(p_key.compare("settings-water") == 0)
 		{
-			float factor = 1;
-			if(p_value.compare("low") == 0)
-				factor = 0.25f;
-			else if(p_value.compare("medium") == 0)
-				factor = 0.5f;
 			if(m_chatSystem)
-				m_chatSystem->InjectEvent("water quality " + std::to_string(factor));
+				m_chatSystem->InjectEvent("water " + p_value);
 		}
 		else if(p_key.compare("settings-fullscreen") == 0)
 		{

@@ -50,8 +50,7 @@ function FireBallExplosion.OnCollide (self, entity)
 	--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
-		local hitPhys = entity:GetPhysics();
-		local type = hitPhys:GetType(hitCol);
+		local type = hitCol:GetType(hitCol);
 	 	if type == PhysicsType.TYPE_PLAYER then
 		    local abilityOwnerNetwork = self:GetNetwork();
 		    local abilityOwnerId = abilityOwnerNetwork:GetUserId();
@@ -66,7 +65,7 @@ function FireBallExplosion.OnCollide (self, entity)
           if not health:IsDead() then
 				    health:Damage(abilityOwnerId, (FireBallExplosion.damage * FireBallExplosion.damageIncrease) * entity:GetStatChange():GetDamageResistance(), "FireBall");
 			    end
-			    hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), FireBallExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+			    Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), FireBallExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
 	end
