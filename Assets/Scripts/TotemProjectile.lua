@@ -84,7 +84,7 @@ function TotemProjectile.OnCollide (self, entity)
                 
                 local hitPos = entity:GetTransformation():GetPos();
 				local selfPos = self:GetTransformation():GetPos();
-				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), 20 * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+				Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), 20 * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 			end
 		end
         
