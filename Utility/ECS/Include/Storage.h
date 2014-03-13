@@ -25,6 +25,10 @@ namespace ECS
 		glm::vec3 GetValueAsVec3(const std::string& p_key);
 		glm::vec2 GetValueAsVec2(const std::string& p_key);
 
+		bool DoesKeyExist(const std::string& p_key);
+
+		void ClearStorage();
+
 	private:
 		std::map<std::string, std::string> m_values;
 	};

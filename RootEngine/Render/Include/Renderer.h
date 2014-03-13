@@ -99,6 +99,7 @@ namespace Render
 		virtual DirectionalLight* GetDirectionalLight() = 0;
 
 		virtual void ParseCommands(std::stringstream* p_ss) = 0;
+
 	};
 
 	class GLRenderer : public RendererInterface

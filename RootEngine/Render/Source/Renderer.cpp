@@ -453,20 +453,21 @@ namespace Render
 		m_lighting.Resize(m_width, m_height);
 		m_glowDevice.Resize(m_width, m_height);
 
-		// Resize forward framebuffers.
+		// Resize forward framebuffers
 		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[0]);
-		m_forwardColors[0]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
+		m_forwardColors[0]->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[0]->GetHandle(), 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[1]);
-		m_forwardColors[1]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
-		m_forwardDepth[1]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_DEPTH_STENCIL);
+		m_forwardColors[1]->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_RGBA);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[1]->GetHandle(), 0);
+		m_forwardDepth[1]->CreateEmptyTexture(p_width, p_height, TextureFormat::TEXTURE_DEPTH_STENCIL);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[1]->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_forwardDepth[1]->GetHandle(), 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 

@@ -35,14 +35,17 @@ namespace RootForce
 
 	void WaterSystem::Begin()
 	{
-		if(m_pause)//Don't calculate if paused
+		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
 			return;
+
+		UpdateWaterHeight();
 
 		m_dt += m_world->GetDelta();
 		m_totalTime += m_world->GetDelta();
 		//Only simulate water every time step
 		if(m_dt >= m_timeStep)
 		{   	
+			
 			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
 			m_context->m_renderer->Compute(&m_computeJob);
 			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
@@ -56,13 +59,13 @@ namespace RootForce
 
 	void WaterSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
+		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
+			return;
+
 		RootForce::Transform*		transform = m_transform.Get(p_entity);
 		RootForce::WaterCollider*	waterCollider = m_waterCollider.Get(p_entity);
 		
-		if(m_pause)
-			return;
-
-		float waterHeight = GetWaterHeight();
+		float waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
 
 		if(m_showDebugDraw)
 		{
@@ -107,11 +110,12 @@ namespace RootForce
 
 	}
 
-	void WaterSystem::CreateWater(float p_height)
+	void WaterSystem::CreateWater()
 	{
-		//Don't create water if there is no water on the level
-		if(p_height == -99999.0f)
+		if(!m_world->GetStorage()->DoesKeyExist("Water"))
 			return;
+
+		float waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Pouring water into level!");
 
@@ -157,7 +161,7 @@ namespace RootForce
 		//Create water entity
 		ECS::Entity*			waterEnt	= m_world->GetEntityManager()->CreateEntity();
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
-		trans->m_position = glm::vec3(0,p_height,0); //Set Y-position to in-parameter
+		trans->m_position = glm::vec3(0,waterHeight,0); //Set Y-position to in-parameter
 		trans->m_scale = glm::vec3(m_scale,1,m_scale);
 
 		//Create a renderable component for the water
@@ -211,6 +215,7 @@ namespace RootForce
 
 	void WaterSystem::CreateWaterMesh()
 	{
+
 		if(m_context->m_resourceManager->GetModel("WaterModel"))
 		{
 			m_renderable->m_model = m_context->m_resourceManager->GetModel("WaterModel");
@@ -263,6 +268,9 @@ namespace RootForce
 
 	void WaterSystem::Disturb( float p_x, float p_z, float p_power, int p_radius )
 	{
+		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
+			return;
+
 #ifdef RENDER_USE_COMPUTE
 		glm::vec2 waterPos = WorldSpaceToWaterSpace(glm::vec2(p_x, p_z));
 		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
@@ -414,14 +422,9 @@ namespace RootForce
 		CalculateWaterConstants();
 	}
 
-	float WaterSystem::GetWaterHeight()
+	void WaterSystem::UpdateWaterHeight()
 	{
-		return m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y;
-	}
-
-	void WaterSystem::SetWaterHeight( float p_height )
-	{
-		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = p_height;
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = m_world->GetStorage()->GetValueAsFloat("Water");
 	}
 
 	bool WaterSystem::ValidValues()
@@ -454,12 +457,17 @@ namespace RootForce
 
 	void WaterSystem::ParseCommands(std::stringstream* p_data )
 	{
+		if(!m_world->GetStorage()->DoesKeyExist("Water"))
+			return;
+
 		std::string module;
 		std::string param;
 		std::string value;
 
 		std::getline(*p_data, module, ' ');
 		std::getline(*p_data, module, ' ');
+
+		
 
 		if(module == "low")
 		{	
@@ -601,7 +609,7 @@ namespace RootForce
 		{
 			std::getline(*p_data, value, ' ');
 
-			SetWaterHeight((float)atof(value.c_str()));
+			m_world->GetStorage()->SetValue("Water", (float)atof(value.c_str()));
 		}
 		else if(module == "disturb" || module == "dis")
 		{
