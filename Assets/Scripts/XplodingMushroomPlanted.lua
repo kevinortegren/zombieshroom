@@ -62,6 +62,23 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 		renderComp:SetMaterialNormal("XplodingMushroomNormal");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
 	end
+
+	-- This is a test of script storage
+	scriptComp:SetEntity("ShroomEntity", self);
+end
+
+function XplodingMushroomPlanted.OnUpdate(self)
+	-- This is a test of script storage
+	local scriptComp = self:GetScript();
+	scriptComp:SetNumber("ShroomNumber", scriptComp:GetNumber("ShroomNumber") + 1);
+	scriptComp:SetString("ShroomString", scriptComp:GetString("ShroomString") .. "a");
+	
+	Logging.Log(LogLevel.DEBUG_PRINT, "Exploding shroom number storage: " .. scriptComp:GetNumber("ShroomNumber"));
+	Logging.Log(LogLevel.DEBUG_PRINT, "Exploding shroom string storage: " .. scriptComp:GetString("ShroomString"));
+
+	local entity = scriptComp:GetEntity("ShroomEntity");
+	local network = entity:GetNetwork();
+	Logging.Log(LogLevel.DEBUG_PRINT, "Exploding shroom entity storage: (" .. network:GetUserId() .. ", " .. network:GetActionId() .. ", " .. network:GetSequenceId() .. ")");
 end
 
 function XplodingMushroomPlanted.OnCollide (self, entity)
