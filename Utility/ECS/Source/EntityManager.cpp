@@ -77,7 +77,7 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 			}
 		}
 
-		p_entity->m_flag = 0;
+		//p_entity->m_flag = 0;
 
 		// Remove components from systems belonging to the entity.
 		m_systemManager->RemoveEntityFromSystems(p_entity);	
