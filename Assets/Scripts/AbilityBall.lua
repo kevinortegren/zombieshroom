@@ -18,6 +18,9 @@ function AbilityBall.OnLoad()
 	ResourceManager.LoadTexture("fireballGlow");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("SmockeochElden");
+	ResourceManager.LoadSound("CC-BY3.0/explosion_dull.wav", 0x00400011);
+	ResourceManager.LoadSound("fireloop.wav", 0x00400012);
+
 end
 
 function AbilityBall.ChargeStart(userId, actionId)
@@ -46,6 +49,19 @@ function AbilityBall.Explode(self)
 	self:RemoveCollision();
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
+
+	self:RemoveSoundable();
+	local explosionSoundEffectEntity = Entity.New();
+	local networkComponent = Network.New(explosionSoundEffectEntity, network:GetUserId(), network:GetActionId());
+	local explosionSoundEffectTransform = Transformation.New(explosionSoundEffectEntity);
+	explosionSoundEffectTransform:SetPos(self:GetTransformation():GetPos());
+	local soundable = Soundable.New(explosionSoundEffectEntity);
+	soundable:SetSound("CC-BY3.0/explosion_dull.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	soundable:SetRange(10.0, 200.0);
+	soundable:SetVolume(1.0);
+	soundable:Play();
+
+	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "AbilityBall", "OnDestroy", explosionSoundEffectEntity);
 end
 
 function AbilityBall.OnCreate (userId, actionId)
@@ -60,10 +76,16 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
 	local networkEnt = Network.New(self, userId, actionId);
+	local soundable = Soundable.New(self);
 	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "Explode", self);
 	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration + 2, "AbilityBall", "OnDestroy", self);
 
 	--Setting stuff
+	soundable:SetSound("fireloop.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	soundable:SetRange(10.0, 100.0);
+	soundable:SetVolume(1.0);
+	soundable:Play();
+
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local tempPos = casterEnt:GetTransformation():GetPos();

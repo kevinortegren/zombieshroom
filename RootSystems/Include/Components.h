@@ -27,6 +27,7 @@
 #include <RootSystems/Include/DamageAndKnockback.h>
 #include <RootSystems/Include/ScaleSystem.h>
 #include <RootSystems/Include/StatChangeSystem.h>
+#include <RootSystems/Include/ControllerActionSystem.h>
 
 namespace RootForce
 {

@@ -46,6 +46,7 @@ namespace RootForce
 			RootForce::Scalable::SetTypeId(RootForce::ComponentType::SCALABLE);
 			RootForce::StatChange::SetTypeId(RootForce::ComponentType::STATCHANGE);
 			RootForce::KillAnnouncement::SetTypeId(RootForce::ComponentType::KILLANNOUNCEMENT);
+			RootForce::ControllerActions::SetTypeId(RootForce::ComponentType::CONTROLLERACTIONS);
 		}
 
 		void InitializeServerComponents()

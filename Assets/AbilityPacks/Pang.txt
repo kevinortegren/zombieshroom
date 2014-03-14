@@ -1,4 +1,3 @@
 Cannonball
 AbilityBall
-FireBall
-MachineGun
+PowerRay
