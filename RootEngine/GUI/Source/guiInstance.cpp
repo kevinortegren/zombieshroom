@@ -339,6 +339,7 @@ namespace RootEngine
 										m_viewBuffer.erase(itr);
 										break;
 									}
+							m_destroyList.clear();
 							m_viewBuffer.shrink_to_fit();
 						m_viewBufferMutex.unlock();
 					m_destroyListMutex.unlock();
