@@ -1162,12 +1162,15 @@ namespace Physics
 		
 	}
 
-	void RootPhysics::SetResitution( int p_objectHandle, float p_resitution )
+	void RootPhysics::SetRestitution( int p_objectHandle, float p_resitution )
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-			m_dynamicObjects.at(p_objectHandle)->setRestitution(p_resitution);
+		{
+			int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			m_dynamicObjects.at(index)->setRestitution(p_resitution);
+		}
 	}
 
 	void RootPhysics::Move( int p_objectHandle , glm::vec3 p_position, float p_dt )

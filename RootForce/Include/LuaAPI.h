@@ -900,6 +900,15 @@ namespace RootForce
 			return 0;
 		}
 
+		static int PhysicsSetRestitution(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Collision** rtemp = (RootForce::Collision**)luaL_checkudata(p_luaState, 2, "Collision");
+			float restitution = float(luaL_checknumber(p_luaState, 3));
+			g_engineContext.m_physics->SetRestitution(*(*rtemp)->m_handle, restitution );
+			return 0;
+		}
+
 		static int PhysicsSetPos(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -2985,6 +2994,7 @@ namespace RootForce
 
 		static const struct luaL_Reg physicsaccessor_m [] = {
 			{"SetMass", PhysicsSetMass},
+			{"SetRestitution", PhysicsSetRestitution},
 			{"BindSphereShape", PhysicsBindShapeSphere},
 			{"BindConeShape", PhysicsBindShapeCone},
 			{"BindCylinderShape", PhysicsBindShapeCylinder},
