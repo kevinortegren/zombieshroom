@@ -42,6 +42,10 @@ namespace RootForce
 			GOTHIT1,
 			GOTHIT2,
 			GOTHIT3,
+			AIRSTRAFELEFT,
+			AIRSTRAFERIGHT,
+			DESCEND1,
+			DANCE1,
 			RAGDOLL,
 			NOCLIP,
 		};
