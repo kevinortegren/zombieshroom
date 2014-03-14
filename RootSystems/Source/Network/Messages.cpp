@@ -22,6 +22,7 @@
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
+extern ECS::World* g_world;
 
 namespace RootForce
 {
@@ -815,11 +816,50 @@ namespace RootForce
 		}
 
 
+		bool SortEntitiesToSerialize(ECS::Entity* p_first, ECS::Entity* p_second)
+		{
+			Network::NetworkComponent* network[2] = { g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_first),
+													  g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_second)};
 
+			if (network[0]->ID.UserID < network[1]->ID.UserID)
+				return true;
+			else if (network[0]->ID.UserID > network[1]->ID.UserID)
+				return false;
+			else
+			{
+				if (network[0]->ID.ActionID < network[1]->ID.ActionID)
+					return true;
+				else if (network[0]->ID.ActionID > network[1]->ID.ActionID)
+					return false;
+				else
+				{
+					if (network[0]->ID.SequenceID < network[1]->ID.SequenceID)
+						return true;
+					else if (network[0]->ID.SequenceID > network[1]->ID.SequenceID)
+						return false;
+					else
+					{
+						// No two entities should have the same ID!
+						assert(false);
+					}
+				}
+			}
+		}
 
 		void SerializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, const Network::NetworkEntityMap& p_map)
 		{
+			// Get all the entities with network components and sort them on UserID, ActionID and SequenceID (in that order).
 			std::vector<ECS::Entity*> entities = p_world->GetEntityManager()->GetAllEntities();
+			for (size_t i = 0; i < entities.size();)
+			{
+				Network::NetworkComponent* network = p_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entities[i]);
+				if (network == nullptr)
+					entities.erase(entities.begin() + i);
+				else
+					i++;
+			}
+
+			std::sort(entities.begin(), entities.end(), SortEntitiesToSerialize);
 			
 			// Write the number of serializable entities.
 			int count = 0;
