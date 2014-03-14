@@ -1610,7 +1610,7 @@ void MayaMeshToList(MObject node, int meshIndex, bool doTrans, bool doMaterial, 
 
 						normal = normals[normalIDs[localIndex[j]]];					
 
-						SM.PmegaMeshes[meshIndex]->normal[count].x = normal.x;
+						SM.PmegaMeshes[meshIndex]->normal[count].x = (float)normal.x;
 						SM.PmegaMeshes[meshIndex]->normal[count].y = normal.y;
 						SM.PmegaMeshes[meshIndex]->normal[count].z = normal.z;
 
@@ -2105,8 +2105,8 @@ void ExtractTranslucence(MFnDependencyNode &material_node, MString &out_transluc
 	MPlug normal_plug;
 	MPlugArray connections;
 	normal_plug = material_node.findPlug("translucence", true, &status);
-	if(status == true)
-		Print("Translucence");
+	//if(status == true)
+		//Print("Translucence");
 
 	MPlugArray bv_connections;
 	normal_plug.connectedTo(bv_connections, true, false, &status);
@@ -2117,11 +2117,11 @@ void ExtractTranslucence(MFnDependencyNode &material_node, MString &out_transluc
 	{
 		if(bv_connections[j].node(&status).hasFn(MFn::kFileTexture))
 		{
-			Print("FoundTexture!");
+			//Print("FoundTexture!");
 			MFnDependencyNode test1(bv_connections[j].node(&status));
 			MPlug ftn = test1.findPlug("ftn", &status);
 			out_translucence_path = ftn.asString(MDGContext::fsNormal);
-			Print(out_translucence_path);
+			//Print(out_translucence_path);
 			found_glow = true;
 		}
 	}
@@ -2255,18 +2255,18 @@ MIntArray GetLocalIndex( MIntArray & getVertices, MIntArray & getTriangle )
 
   for ( gt = 0; gt < getTriangle.length(); gt++ )
   {
-    for ( gv = 0; gv < getVertices.length(); gv++ )
-    {
-      if ( getTriangle[gt] == getVertices[gv] )
-      {
-        localIndex.append( gv );
-        break;
-      }
-    }
+	for ( gv = 0; gv < getVertices.length(); gv++ )
+	{
+	  if ( getTriangle[gt] == getVertices[gv] )
+	  {
+		localIndex.append( gv );
+		break;
+	  }
+	}
 
-    // if nothing was added, add default "no match"
-    if ( localIndex.length() == gt )
-      localIndex.append( -1 );
+	// if nothing was added, add default "no match"
+	if ( localIndex.length() == gt )
+	  localIndex.append( -1 );
   }
 
   return localIndex;
