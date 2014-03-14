@@ -131,12 +131,12 @@ namespace RootForce
 			Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*e);
 			if (network != nullptr)
 			{
-				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u, Sequence: %u).", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+				//g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u, Sequence: %u).", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
 				g_networkDeletedList.push_back(network->ID);
 			}
 			else
 			{
-				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
+				//g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
 			}
 
 			g_world->GetEntityManager()->RemoveEntity(*e);
