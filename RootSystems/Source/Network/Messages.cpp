@@ -849,7 +849,8 @@ namespace RootForce
 					else
 					{
 						// No two entities should have the same ID!
-						assert(false);
+						//assert(false);
+						return true;
 					}
 				}
 			}
