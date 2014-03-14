@@ -116,5 +116,8 @@ AnimClip = {
 	AIRSTRAFERIGHT		= 28;
 	DESCEND1			= 29;
 	DANCE1				= 30;
-	RAGDOLL 			= 27;
+	SPAWN1				= 31;
+	IDLE2				= 32;
+	IDLE3				= 33;
+	RAGDOLL 			= 34;
 }

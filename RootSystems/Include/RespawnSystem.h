@@ -8,6 +8,7 @@
 #include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootSystems/Include/AnimationSystem.h>
 
 namespace RootSystems
 {
@@ -44,6 +45,7 @@ namespace RootSystems
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
 		ECS::ComponentMapper<RootForce::PlayerComponent> m_player;
+		ECS::ComponentMapper<RootForce::Animation> m_animation;
 
 		RakNet::RakPeerInterface* m_serverPeer;
 		RakNet::RakPeerInterface* m_clientPeer;
