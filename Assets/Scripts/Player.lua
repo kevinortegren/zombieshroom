@@ -74,6 +74,23 @@ function Player.OnTeamSelect(self, teamId)
     Collision.AddPlayerObjectToWorld(self, collision, transform, playerPhysics, collisionResponder);
     
     if Global.IsClient then
+		local me = Entity.GetEntityByTag("Player");
+
+		if self == me then
+			Logging.Log(LogLevel.DEBUG_PRINT, "NOT SPECTATOR!");
+			local cameraEntity = Entity.GetEntityByTag("Camera");
+			cameraEntity:RemoveThirdPersonBehavior();
+			cameraEntity:RemoveLookAtBehavior();
+			local cameraThirdPerson = ThirdPersonBehavior.New(cameraEntity);
+			cameraThirdPerson:SetTarget("AimingDevice");
+			cameraThirdPerson:SetDisplacement(Vec3.New(0.0, -1.0, -2.0));
+			cameraThirdPerson:SetDistance(8.0);
+			local cameraLookAt = LookAtBehavior.New(cameraEntity);
+			cameraLookAt:SetTarget("AimingDevice");
+
+			cameraEntity:RemoveControllerActions();
+			cameraEntity:RemoveScript();
+		end
       local renderable = Renderable.New(self);
       local animation = Animation.New(self);
       local ragdoll = Ragdoll.New(self);
@@ -97,7 +114,7 @@ function Player.OnTeamSelect(self, teamId)
       waterCollider:SetDisturbInterval(0.5);
       waterCollider:SetRadius(5);
     end
-  elseif teamId == 0 and prevTeamId ~= 0 then
+  elseif teamId == 0 then
 		self:RemovePlayerPhysics();
 		self:RemoveHealth();
 		self:RemovePhysics();
@@ -118,6 +135,8 @@ function Player.OnTeamSelect(self, teamId)
 		if self == me then
 			Logging.Log(LogLevel.DEBUG_PRINT, "SPECTATOR!");
 			local cameraEntity = Entity.GetEntityByTag("Camera");
+			cameraEntity:RemoveThirdPersonBehavior();
+			cameraEntity:RemoveLookAtBehavior();
 			local cameraControllerActions = ControllerActions.New(cameraEntity);
 			local cameraScript = Script.New(cameraEntity, "FreeFlying");
 			cameraScript:SetName("FreeFlying");

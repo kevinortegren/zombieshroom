@@ -552,6 +552,56 @@ namespace RootForce
 			return 0;
 		}
 
+		static int EntityGetThirdPersonBehavior(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::ThirdPersonBehavior **s = (RootForce::ThirdPersonBehavior **)lua_newuserdata(p_luaState, sizeof(RootForce::ThirdPersonBehavior *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::ThirdPersonBehavior>(*e);
+			if(*s == nullptr)
+			{
+				lua_pushnil(p_luaState);
+			}
+			else
+			{
+				luaL_setmetatable(p_luaState, "ThirdPersonBehavior");
+			}
+			return 1;
+		}
+
+		static int EntityRemoveThirdPersonBehavior(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::ThirdPersonBehavior>(*e);
+			return 0;
+		}
+
+		static int EntityGetLookAtBehavior(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::LookAtBehavior **s = (RootForce::LookAtBehavior **)lua_newuserdata(p_luaState, sizeof(RootForce::LookAtBehavior *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::LookAtBehavior>(*e);
+			if(*s == nullptr)
+			{
+				lua_pushnil(p_luaState);
+			}
+			else
+			{
+				luaL_setmetatable(p_luaState, "LookAtBehavior");
+			}
+			return 1;
+		}
+
+		static int EntityRemoveLookAtBehavior(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			g_world->GetEntityManager()->RemoveComponent<RootForce::LookAtBehavior>(*e);
+			return 0;
+		}
+
 		static int EntityEquals(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -2893,6 +2943,110 @@ namespace RootForce
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+		//THIRD PERSON BEHAVIOR (THIS IS UGLY AND IS TO BE MIGRATED TO LUA)
+		//////////////////////////////////////////////////////////////////////////
+
+		static int ThirdPersonBehaviorCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::ThirdPersonBehavior **s = (RootForce::ThirdPersonBehavior**)lua_newuserdata(p_luaState, sizeof(RootForce::ThirdPersonBehavior*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(*e);
+
+			luaL_setmetatable(p_luaState, "ThirdPersonBehavior");
+
+			return 1;
+		}
+
+		static int ThirdPersonBehaviorSetTarget(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+
+			RootForce::ThirdPersonBehavior **s = (RootForce::ThirdPersonBehavior**)luaL_checkudata(p_luaState, 1, "ThirdPersonBehavior");
+			(*s)->m_targetTag = luaL_checkstring(p_luaState, 2);
+
+			return 0;
+		}
+
+		static int ThirdPersonBehaviorSetDisplacement(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+
+			RootForce::ThirdPersonBehavior** ptemp = (RootForce::ThirdPersonBehavior**)luaL_checkudata(p_luaState, 1, "ThirdPersonBehavior");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			(*ptemp)->m_displacement = (*v1);
+
+			return 0;
+		}
+
+		static int ThirdPersonBehaviorSetDistance(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+
+			RootForce::ThirdPersonBehavior** ptemp = (RootForce::ThirdPersonBehavior**)luaL_checkudata(p_luaState, 1, "ThirdPersonBehavior");
+			(*ptemp)->m_distance = (float) luaL_checknumber(p_luaState, 2);
+
+			return 0;
+		}
+
+		static int ThirdPersonBehaviorSetRotateWithTarget(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+
+			RootForce::ThirdPersonBehavior** ptemp = (RootForce::ThirdPersonBehavior**)luaL_checkudata(p_luaState, 1, "ThirdPersonBehavior");
+			(*ptemp)->m_rotateWithTarget = lua_toboolean(p_luaState, 2) != 0;
+
+			return 0;
+		}
+
+		static int ThirdPersonBehaviorSetCheckWithRay(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+
+			RootForce::ThirdPersonBehavior** ptemp = (RootForce::ThirdPersonBehavior**)luaL_checkudata(p_luaState, 1, "ThirdPersonBehavior");
+			(*ptemp)->m_checkWithRay = lua_toboolean(p_luaState, 2) != 0;
+
+			return 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		//LOOK AT BEHAVIOR (THIS IS UGLY AND IS TO BE MIGRATED TO LUA) /GUSTAV
+		//////////////////////////////////////////////////////////////////////////
+
+		static int LookAtBehaviorCreate(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::LookAtBehavior **s = (RootForce::LookAtBehavior**)lua_newuserdata(p_luaState, sizeof(RootForce::LookAtBehavior*));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(*e);
+
+			luaL_setmetatable(p_luaState, "LookAtBehavior");
+
+			return 1;
+		}
+
+		static int LookAtBehaviorSetTarget(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+
+			RootForce::LookAtBehavior **s = (RootForce::LookAtBehavior**)luaL_checkudata(p_luaState, 1, "LookAtBehavior");
+			(*s)->m_targetTag = luaL_checkstring(p_luaState, 2);
+
+			return 0;
+		}
+
+		static int LookAtBehaviorSetDisplacement(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+
+			RootForce::LookAtBehavior** ptemp = (RootForce::LookAtBehavior**)luaL_checkudata(p_luaState, 1, "LookAtBehavior");
+			glm::vec3* v1 = (glm::vec3*)luaL_checkudata(p_luaState, 2, "Vec3");
+			(*ptemp)->m_displacement = (*v1);
+
+			return 0;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////
 
@@ -2969,6 +3123,10 @@ namespace RootForce
 			{"RemoveDamageAndKnockback", EntityRemoveDamageAndKnockback},
 			{"GetControllerActions", EntityGetControllerActions},
 			{"RemoveControllerActions", EntityRemoveControllerActions},
+			{"GetThirdPerson", EntityGetThirdPersonBehavior},
+			{"RemoveThirdPersonBehavior", EntityRemoveThirdPersonBehavior},
+			{"GetLookAt", EntityGetLookAtBehavior},
+			{"RemoveLookAtBehavior", EntityRemoveLookAtBehavior},
 			{"__eq",	EntityEquals},
 			{NULL, NULL}
 		};
@@ -3533,6 +3691,31 @@ namespace RootForce
 			{NULL, NULL}
 		};
 
+		static const struct luaL_Reg thirdpersonbehavior_f [] = {
+			{"New", ThirdPersonBehaviorCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg thirdpersonbehavior_m [] = {
+			{"SetTarget", ThirdPersonBehaviorSetTarget},
+			{"SetDisplacement", ThirdPersonBehaviorSetDisplacement},
+			{"SetDistance", ThirdPersonBehaviorSetDistance},
+			{"SetRotateWithTarget", ThirdPersonBehaviorSetRotateWithTarget},
+			{"SetCheckWithRay", ThirdPersonBehaviorSetCheckWithRay},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg lookatbehavior_f [] = {
+			{"New", LookAtBehaviorCreate},
+			{NULL, NULL}
+		};
+
+		static const struct luaL_Reg lookatbehavior_m [] = {
+			{"SetTarget", LookAtBehaviorSetTarget},
+			{"SetDisplacement", LookAtBehaviorSetDisplacement},
+			{NULL, NULL}
+		};
+
 		static int LuaSetupType(lua_State* p_luaState, const luaL_Reg* p_funcReg, const luaL_Reg* p_methodReg, std::string p_typeName)
 		{
 			luaL_newmetatable(p_luaState, p_typeName.c_str());
@@ -3599,6 +3782,9 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::statchange_f,			RootForce::LuaAPI::statchange_m,			"StatChange");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::resource_f,				RootForce::LuaAPI::resource_m,				"ResourceManager");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::controllerActions_f,		RootForce::LuaAPI::controllerActions_m,		"ControllerActions");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::lookatbehavior_f,		RootForce::LuaAPI::lookatbehavior_m,		"LookAtBehavior");
+			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::thirdpersonbehavior_f,	RootForce::LuaAPI::thirdpersonbehavior_m,	"ThirdPersonBehavior");
+
 
 			//No methods
 			RootForce::LuaAPI::LuaSetupTypeNoMethods(p_luaState, RootForce::LuaAPI::vec2_f, RootForce::LuaAPI::vec2_m, "Vec2");
