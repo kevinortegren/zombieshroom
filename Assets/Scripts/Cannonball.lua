@@ -20,6 +20,7 @@ function Cannonball.OnLoad()
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("CannonballTrail");
 	ResourceManager.LoadScript("BigExplosion");
+	ResourceManager.LoadSound("CC-BY3.0/DeathFlash.wav", 0x00200011);
 	BigExplosion.OnLoad();
 end
 
@@ -48,6 +49,11 @@ function Cannonball.Explode(self)
 	self:RemoveCollision();
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
+	local soundable = Soundable.New(self);
+	soundable:SetSound("CC-BY3.0/DeathFlash.wav", 0x00200011);
+	soundable:SetRange(0.0, 400.0);
+	soundable:SetVolume(1.0);
+	soundable:Play();
 
 	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "Cannonball", "OnDestroy", self);
 end
