@@ -941,11 +941,11 @@ namespace RootForce
 						health->LastDamageAbilityName = m.LastDamageSourceName;
 
 						RootForce::SoundComponent* soundable = m_world->GetEntityManager()->CreateComponent<RootForce::SoundComponent>(player);
-						soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00200011);
+						soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00400011);
 						soundable->m_soundChannel = g_engineContext.m_sound->CreateSoundChannel();
-						soundable->m_minDist = 0.0f;
+						soundable->m_minDist = 1.0f;
 						soundable->m_maxDist = 50.0f;
-						soundable->m_volume = 1.0f;
+						soundable->m_volume = 0.3f;
 						soundable->m_play = true;
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");

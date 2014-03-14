@@ -49,7 +49,7 @@ function PowerRay.OnCreate (userId, actionId)
 	--Setting stuff
 	soundable:SetSound("CC-BY3.0/qubodupElectricityDamage01.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	soundable:SetRange(10.0, 50.0);
-	soundable:SetVolume(1.0);
+	soundable:SetVolume(0.4);
 	soundable:Play();
 
 	collisionComp:CreateHandle(self, 1, true);
@@ -106,7 +106,7 @@ if entity:DoesExist() then
 	local soundable = Soundable.New(hitPositionEntity);
 	soundable:SetSound("CC-BY3.0/qubodupElectricityDamage01.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	soundable:SetRange(10.0, 50.0);
-	soundable:SetVolume(0.8);
+	soundable:SetVolume(0.6);
 	soundable:Play();
 	TimerEntity.StartTimer(userId, actionId, PowerRay.duration, "PowerRay", "StopHitSound", hitPositionEntity);
 end
