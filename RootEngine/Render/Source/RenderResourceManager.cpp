@@ -216,6 +216,7 @@ namespace Render
 		if((p_cleanFlag & RenderResources::RR_MATERIAL) == RenderResources::RR_MATERIAL)
 		{
 			m_materials.clear();
+			m_materialNameMap.clear();
 		}
 	}
 }

@@ -209,7 +209,7 @@ namespace RootForce
 
 	void IngameState::Enter()
 	{
-		//m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 #ifndef _DEBUG
 		BotanyTextures textures;
@@ -576,7 +576,7 @@ namespace RootForce
 
 		{
 			PROFILE("Shadow system", g_engineContext.m_profiler);
-			//m_shadowSystem->Process();
+			m_shadowSystem->Process();
 		}
 
 		{ 

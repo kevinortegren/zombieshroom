@@ -492,7 +492,8 @@ namespace RootEngine
 
 		// Clear render resource references.
 		m_meshes.clear();
-		m_effects.clear();
+
+		m_context->m_renderer->CleanResources(Render::RenderResources::RR_MATERIAL);
 
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "ResourceManager clean.");
 		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Models %d", m_models.size());
