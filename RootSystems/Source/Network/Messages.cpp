@@ -696,6 +696,13 @@ namespace RootForce
 				return false;
 			}
 
+			// Make sure the components/flag for the entity is valid.
+			if (!AssertEntityValid(p_entityManager, p_entity))
+			{
+				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Serialization error. Component/Flag mismatch. Flag: %u. (%u, %u, %u)", p_entity->GetFlag(), it->first.UserID, it->first.ActionID, it->first.SequenceID);
+				return false;
+			}
+
 			// Serialize the network entity ID
 			p_bs->Serialize(true, it->first);
 
@@ -817,7 +824,10 @@ namespace RootForce
 			#ifdef _DEBUG
 			if (entity != nullptr)
 			{
-				assert(AssertEntityValid(p_entityManager, entity));
+				if (!AssertEntityValid(p_entityManager, entity))
+				{
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Catastrophy: Entity flag component mismatch with flag: %u (%u, %u, %u)", entity->GetFlag(), id.UserID, id.ActionID, id.SequenceID);
+				}
 			}
 			#endif
 
@@ -849,7 +859,7 @@ namespace RootForce
 					else
 					{
 						// No two entities should have the same ID!
-						assert(false);
+						return p_first->GetId() < p_second->GetId();
 					}
 				}
 			}

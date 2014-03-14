@@ -90,6 +90,8 @@ namespace ECS
 		{
 			if(p_entity->m_id >= (int)m_components[Component<T>::GetTypeId()].size() || p_entity->m_id == -1)
 				return nullptr;
+			if ((p_entity->GetFlag() & (1ULL << Component<T>::GetTypeId())) == 0)
+				return nullptr;
 
 			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id]);
 		}

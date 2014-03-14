@@ -131,12 +131,12 @@ namespace RootForce
 			Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*e);
 			if (network != nullptr)
 			{
-				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u, Sequence: %u).", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+				//g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u, Sequence: %u).", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
 				g_networkDeletedList.push_back(network->ID);
 			}
 			else
 			{
-				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
+				//g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
 			}
 
 			g_world->GetEntityManager()->RemoveEntity(*e);
@@ -885,17 +885,6 @@ namespace RootForce
 			RootForce::CollisionResponder* collisionResponder = *(RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 5, "CollisionResponder");
 			collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , *entity,
 				transform->m_position, transform->m_orientation.GetQuaternion(), 1, playerPhysics->MovementSpeed, 0.0f, 0.3f, &collisionResponder->m_collisions);
-			return 0;
-		}
-
-		static int CollisionRemoveObjectFromWorld(lua_State* p_luaState)
-		{
-			NumberOfArgs(1); // entity, collision, transform, physics, playerPhysics, collisionResponder
-			RootForce::Collision* collision = *(RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
-			if (collision)
-				g_engineContext.m_physics->RemoveObject(*collision->m_handle);
-			else
-				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::WARNING, "Trying to remove non-existing CollisionObject.");
 			return 0;
 		}
 
@@ -3274,7 +3263,6 @@ namespace RootForce
 		static const struct luaL_Reg collision_f [] = {
 			{"New", CollisionCreate},
 			{"AddPlayerObjectToWorld", CollisionAddPlayerObjectToWorld},
-			{"RemoveObjectFromWorld", CollisionRemoveObjectFromWorld},
 			{NULL, NULL}
 		};
 
