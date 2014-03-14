@@ -18,6 +18,9 @@ function AbilityBall.OnLoad()
 	ResourceManager.LoadTexture("fireballGlow");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("SmockeochElden");
+	ResourceManager.LoadSound("CC-BY3.0/explosion_dull.wav", 0x00200011);
+	ResourceManager.LoadSound("fireloop.wav", 0x00200012);
+
 end
 
 function AbilityBall.ChargeStart(userId, actionId)
@@ -46,6 +49,13 @@ function AbilityBall.Explode(self)
 	self:RemoveCollision();
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
+
+	self:RemoveSoundable()
+	local soundable = Soundable.New(self);
+	soundable:SetSound("CC-BY3.0/explosion_dull.wav", 0x00200011);
+	soundable:SetRange(0.0, 100.0);
+	soundable:SetVolume(1.0);
+	soundable:Play();
 end
 
 function AbilityBall.OnCreate (userId, actionId)
@@ -60,10 +70,12 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
 	local networkEnt = Network.New(self, userId, actionId);
+	local soundable = Soundable.New(self);
 	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "Explode", self);
 	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration + 2, "AbilityBall", "OnDestroy", self);
 
 	--Setting stuff
+
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local tempPos = casterEnt:GetTransformation():GetPos();

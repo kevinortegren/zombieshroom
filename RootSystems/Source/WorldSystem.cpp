@@ -28,6 +28,9 @@ namespace RootForce
 
 		// Adds static entities.
 		AddStaticEntitiesToPhysics();
+
+		//LOL THIS IS NOT THE PLACE
+		g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00200011);
 	}
 #endif
 

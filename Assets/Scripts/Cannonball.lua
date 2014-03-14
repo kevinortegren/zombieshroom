@@ -21,6 +21,7 @@ function Cannonball.OnLoad()
 	ResourceManager.LoadParticle("CannonballTrail");
 	ResourceManager.LoadScript("BigExplosion");
 	ResourceManager.LoadSound("CC-BY3.0/DeathFlash.wav", 0x00200011);
+	ResourceManager.LoadSound("CC-BY3.0/rumble.wav", 0x00200011);
 	BigExplosion.OnLoad();
 end
 
@@ -49,6 +50,8 @@ function Cannonball.Explode(self)
 	self:RemoveCollision();
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
+
+	self:RemoveSoundable()
 	local soundable = Soundable.New(self);
 	soundable:SetSound("CC-BY3.0/DeathFlash.wav", 0x00200011);
 	soundable:SetRange(0.0, 400.0);
@@ -70,8 +73,14 @@ function Cannonball.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Cannonball");
 	local networkEnt = Network.New(self, userId, actionId);
+	local soundable = Soundable.New(self);
 
 	--Setting stuff
+	soundable:SetSound("CC-BY3.0/rumble.wav", 0x00200011);
+	soundable:SetRange(0.0, 50.0);
+	soundable:SetVolume(0.8);
+	soundable:Play();
+
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local tempPos = casterEnt:GetTransformation():GetPos();
