@@ -730,7 +730,8 @@ void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::Wor
 
 	if(transformation.flags._Water)
 	{
-		p_world->GetGroupManager()->RegisterEntity("Water", entity);
+		//NEEDS TAG?
+		//p_world->GetGroupManager()->RegisterEntity("Water", entity);
 		p_world->GetGroupManager()->RegisterEntity("NonExport", entity);
 	}
 
@@ -916,7 +917,7 @@ void UpdateLocator(int index)
 
 	if(RM.PlocatorList[index]->transformation.flags._Water)
 	{
-		m_world.GetStorage()->SetValue("WaterHeight", transform->m_position.y);
+		m_world.GetStorage()->SetValue("Water", transform->m_position.y);
 		waterSystem->SetWaterHeight(transform->m_position.y);
 	}
 }
