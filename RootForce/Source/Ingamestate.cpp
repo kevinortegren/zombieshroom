@@ -290,7 +290,7 @@ namespace RootForce
 		
 		m_animationSystem->Start();
 
-		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+		m_waterSystem->CreateWater();
 
 		if(m_networkContext.m_server != nullptr)
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
@@ -355,6 +355,7 @@ namespace RootForce
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_world->GetSystemManager()->Clear();
+		g_world->GetStorage()->ClearStorage();
 		g_engineContext.m_physics->RemoveAll();
 
 		// Set server peers to null

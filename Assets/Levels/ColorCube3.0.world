@@ -29,7 +29,7 @@
     - Type: 0
       Data:
         - Entity: 23
-          Model: colorCube1Shape
+          Model: colorCube3.0Shape
           Material:
             Name: lambert2
             Effect: Mesh
@@ -185,7 +185,7 @@
     - Type: 11
       Data:
         - Entity: 23
-          MeshHandle: colorCube1Shape0
+          MeshHandle: colorCube3.0Shape0
     - Type: 12
       Data:
         []
@@ -423,7 +423,7 @@
       Group: Static
 - Storage:
     - Key: Ambient
-      Value: 0.5 0.5 0.5 1
+      Value: 0.4 0.4 0.4 1
     - Key: GrassBillboard
       Value: grassStrawBillboard
     - Key: GrassDiffuse

@@ -79,7 +79,7 @@ namespace ECS
 	float Storage::GetValueAsFloat(const std::string& p_key)
 	{
 		if(m_values.find(p_key) == m_values.end())
-			return -99999.0f;
+			return 0.0f;
 
 		float r;
 		std::stringstream ss( m_values[p_key] );
@@ -126,6 +126,19 @@ namespace ECS
 		ss >> std::defaultfloat >> vec.x >> vec.y;
 		return vec;
 	}
+
+	bool Storage::DoesKeyExist( const std::string& p_key )
+	{
+		if(m_values.find(p_key) == m_values.end())
+			return false;
+		return true;
+	}
+
+	void Storage::ClearStorage()
+	{
+		m_values.clear();
+	}
+
 }
 
 	

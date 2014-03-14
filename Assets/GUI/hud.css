@@ -189,7 +189,6 @@ img
 	padding: 0;
 	height: 33px;
   width: 0;
-	/*width: 304px;*/
 	background: center url('healthBackground.gif');
 	margin: auto;
 }
@@ -198,34 +197,30 @@ img
 	padding: 0;
 	height: 33px;
   width: 0;
-	/*width: 304px;*/
 	background: center url('healthOverflowBackground.gif');
+	margin: auto;
+}
+#chargebar,
+#chargebar>div
+{
+	overflow: hidden;
+	position: absolute;
+	width: 400px;
+	height: 400px;
+	clip: rect(0px,400px,400px,200px);
+	-webkit-transform: rotate(-45deg);
 	margin: auto;
 }
 #chargebar
 {
-	position: absolute;
-	left: 0;
-	top: 100%;
-	width: 100%;
-	margin: -100px 0 0 0;
-	height: 12px;
-}
-#chargebar div
-{
 	display: none;
-	width: 345px;
-	height: 12px;
-	background-color: rgba(0,0,0,0.2);
-	margin: auto;
-	border: 1px solid rgba(1,1,1,0.6);
 }
-#chargebar div div
+#chargebar>div
 {
-	height: 12px;
-	width: 100px;
-	background-color: rgba(255,0,0,0.8);
-	margin: auto;
+	-webkit-transform: rotate(90deg);
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-image: url('chargebar.png');
 }
 #abilitybar
 {
@@ -270,6 +265,10 @@ img
   opacity: 0;
   background-image: url('damageTaken.png');
   background-size: 100% 100%;
+}
+#scorescreen
+{
+	display: none;
 }
 #scorescreen-wrapper
 {

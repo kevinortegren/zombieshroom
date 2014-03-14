@@ -405,10 +405,17 @@ namespace RootForce
 		static int EntityGetParticleEmitter(lua_State* p_luaState)
 		{
 			NumberOfArgs(1);
-			RootForce::ParticleEmitter **s = (RootForce::ParticleEmitter **)lua_newuserdata(p_luaState, sizeof(RootForce::ParticleEmitter *));
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
-			*s = g_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(*e);
-			luaL_setmetatable(p_luaState, "ParticleEmitter");
+			RootForce::ParticleEmitter* t = g_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(*e);
+			if(t == nullptr)
+			{
+				lua_pushnil(p_luaState);
+			}
+			else
+			{
+				(*(RootForce::ParticleEmitter **)lua_newuserdata(p_luaState, sizeof(RootForce::ParticleEmitter *))) = t;
+				luaL_setmetatable(p_luaState, "ParticleEmitter");
+			}
 			return 1;
 		}
 		static int EntityRemovePointLight(lua_State* p_luaState)
@@ -502,6 +509,15 @@ namespace RootForce
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			g_world->GetEntityManager()->RemoveComponent<RootForce::StateComponent>(*e);
 			return 0;
+		}
+		static int EntityGetStateComponent(lua_State* p_luaState)
+		{
+			NumberOfArgs(1);
+			RootForce::StateComponent **s = (RootForce::StateComponent **)lua_newuserdata(p_luaState, sizeof(RootForce::StateComponent *));
+			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
+			*s = g_world->GetEntityManager()->GetComponent<RootForce::StateComponent>(*e);
+			luaL_setmetatable(p_luaState, "StateComponent");
+			return 1;
 		}
 		static int EntityRemovePlayerControl(lua_State* p_luaState)
 		{
@@ -3112,6 +3128,7 @@ namespace RootForce
 			{"RemoveAnimation", EntityRemoveAnimation},
 			{"RemoveRagdoll", EntityRemoveRagdoll},
 			{"RemoveStateComponent", EntityRemoveStateComponent},
+			{"GetStateComponent", EntityGetStateComponent},
 			{"RemovePlayerControl", EntityRemovePlayerControl},
 			{"RemoveWaterCollider", EntityRemoveWaterCollider},
 			{"GetDamageAndKnockback", EntityGetDamageAndKnockback},
@@ -3128,6 +3145,7 @@ namespace RootForce
 			{"GetLookAt", EntityGetLookAtBehavior},
 			{"RemoveLookAtBehavior", EntityRemoveLookAtBehavior},
 			{"__eq",	EntityEquals},
+			{"GetState", EntityRemoveDamageAndKnockback},
 			{NULL, NULL}
 		};
 
@@ -3784,6 +3802,7 @@ namespace RootForce
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::controllerActions_f,		RootForce::LuaAPI::controllerActions_m,		"ControllerActions");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::lookatbehavior_f,		RootForce::LuaAPI::lookatbehavior_m,		"LookAtBehavior");
 			RootForce::LuaAPI::LuaSetupType(p_luaState, RootForce::LuaAPI::thirdpersonbehavior_f,	RootForce::LuaAPI::thirdpersonbehavior_m,	"ThirdPersonBehavior");
+
 
 
 			//No methods

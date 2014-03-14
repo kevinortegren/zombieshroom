@@ -7,7 +7,7 @@ AbilityDash.cooldown = 3;
 AbilityDash.chargeTime = 0.0;
 AbilityDash.channelingTime = 0.0;
 AbilityDash.power = 25;
-AbilityDash.crosshair = "";
+AbilityDash.crosshair = "crosshairNone";
 
 function AbilityDash.OnLoad()
 end
@@ -30,7 +30,7 @@ function AbilityDash.ChannelingDone(time, userId, actionId)
 
 	local handle = playerEnt:GetCollision():GetHandle();
 	
-    playerEnt:GetPhysics():KnockBack(handle, Vec3.New(0,0.4,0)+frontVec, AbilityDash.power, 100);
+    Static.KnockBack(handle, Vec3.New(0,0.4,0)+frontVec, AbilityDash.power, 100);
 end
 
 function AbilityDash.Interrupted(time, userId, actionId)

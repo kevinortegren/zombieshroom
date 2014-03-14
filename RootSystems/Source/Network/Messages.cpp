@@ -682,13 +682,26 @@ namespace RootForce
 				// See if this entity has been destroyed before, in which case this is an out-dated deserialization message.
 				if (std::find(g_networkDeletedList.begin(), g_networkDeletedList.end(), id) == g_networkDeletedList.end())
 				{
+					// Store the next sequence ID, and set the sequence ID for the next entity to be created to the sent sequence ID.
+					Network::UserActionKey_t userActionKey = Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID);
+					Network::SequenceID_t nextSequenceId = Network::NetworkComponent::s_sequenceIDMap[userActionKey];
+					Network::NetworkComponent::s_sequenceIDMap[userActionKey] = id.SequenceID;
+
 					// Entity doesn't exist, use the script to create it.
-					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u, Sequence: %u) with script: %s", id.UserID, id.ActionID, id.SequenceID, scriptName.C_String());
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u, Sequence: %u) with script: \"%s\". Stored next sequence ID: %u.", id.UserID, id.ActionID, id.SequenceID, scriptName.C_String(), nextSequenceId);
 					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
 					g_engineContext.m_script->AddParameterNumber(id.UserID);
 					g_engineContext.m_script->AddParameterNumber(id.ActionID);
 					g_engineContext.m_script->ExecuteScript();
-				
+
+					// Reset the sequence ID map to the highest sequence ID currently used.
+					Network::NetworkComponent::s_sequenceIDMap[userActionKey] = std::max(nextSequenceId, Network::NetworkComponent::s_sequenceIDMap[userActionKey]);
+
+					// Get the entity.
+					entity = Network::FindEntity(p_map, id);
+					assert(entity != nullptr);
+
+					/*
 					entity = Network::FindEntity(p_map, id);
 					// If entity is not found, assume unsynched sequence ID. Correct the sequence IDs.
 					if(entity == nullptr)
@@ -709,6 +722,7 @@ namespace RootForce
 						p_map[id] = entity;
 						p_map.erase(p_map.find(tempId));
 					}
+					*/
 				}
 				else
 				{

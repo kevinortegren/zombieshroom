@@ -11,10 +11,13 @@ namespace RootForce
 		Orientation tempOrientation = transform->m_orientation;
 		tempOrientation.Yaw(180.0f);
 		glm::mat4 tempWorldMatrix;
-		#ifndef COMPILE_LEVEL_EDITOR
-		if(transform->m_position.y <= m_world->GetStorage()->GetValueAsFloat("WaterHeight"))
-			transform->m_position.y = m_world->GetStorage()->GetValueAsFloat("WaterHeight");
-		#endif
+#ifndef COMPILE_LEVEL_EDITOR
+		if(m_world->GetStorage()->DoesKeyExist("Water"))
+		{
+			if(transform->m_position.y <= m_world->GetStorage()->GetValueAsFloat("Water") + 5.0f)
+				transform->m_position.y = m_world->GetStorage()->GetValueAsFloat("Water") + 5.0f;
+		}
+#endif
 		glm::mat4 translation = glm::translate(glm::mat4(1), transform->m_position);
 		glm::mat4 rotation = glm::rotate(translation, tempOrientation.GetAngle(), tempOrientation.GetAxis());
 		glm::mat4 viewMatrix = glm::inverse(rotation);

@@ -8,7 +8,7 @@ Homing.charges = 3;
 Homing.chargeTime = 0;
 Homing.channelingTime = 0;
 Homing.duration = 60;
-Homing.crosshair = "";
+Homing.crosshair = "crosshairPrecision";
 
 function Homing.OnLoad()
 	ResourceManager.LoadParticle("magic_missile_01");
@@ -65,7 +65,7 @@ function Homing.OnCreate (userId, actionId)
 	rayComp = Ray.New(self, collisionComp:GetHandle(), facePos, rayComp:GetHitPos() - facePos, 10000, false, false);
 	local entityAtAim = rayComp:GetHitEntity();
 	if entityAtAim:DoesExist() then
-		local type = entityAtAim:GetPhysics():GetType(entityAtAim:GetCollision());
+		local type = entityAtAim:GetCollision():GetType(entityAtAim:GetCollision());
 		if type == PhysicsType.TYPE_PLAYER then
 			local abilityOwnerNetwork = self:GetNetwork();
 			local abilityOwnerId = abilityOwnerNetwork:GetUserId();

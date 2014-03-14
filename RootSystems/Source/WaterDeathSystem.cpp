@@ -28,20 +28,21 @@ namespace RootForce
 
 	void WaterDeathSystem::Begin()
 	{
+		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("Water") - 5.0f;
 	}
 
 	void WaterDeathSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
+		if(!m_world->GetStorage()->DoesKeyExist("Water"))
+			return;
+
 		RootForce::Transform*		transform		= m_transform.Get(p_entity);
 		RootForce::WaterCollider*	waterCollider	= m_waterCollider.Get(p_entity);
 		RootForce::HealthComponent* health			= m_health.Get(p_entity);
 		PlayerComponent* playercomp = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_entity);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_entity);
 		
-
-		float waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight") - 5.0f;
-
-		if(transform->m_position.y < waterHeight && health->Health > 0)
+		if(transform->m_position.y < m_waterHeight && health->Health > 0)
 		{
 			health->Health = 0;
 		}

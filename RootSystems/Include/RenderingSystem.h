@@ -67,6 +67,7 @@ namespace RootForce
 	private:
 		Render::RendererInterface* m_renderer;
 		Logging::LoggingInterface* m_logger;
+		float m_waterHeight;
 		int a;
 	};
 }

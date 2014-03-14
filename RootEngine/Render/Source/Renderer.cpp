@@ -429,6 +429,8 @@ namespace Render
 
 	void GLRenderer::SetResolution(bool p_fullscreen, int p_width, int p_height)
 	{
+		SDL_SetWindowFullscreen(m_window, false);
+
 		m_width = p_width;
 		m_height = p_height;
 
@@ -437,15 +439,15 @@ namespace Render
 			SDL_DisplayMode nativeMode;
 			SDL_GetDesktopDisplayMode(0, &nativeMode);
 
-			m_width = nativeMode.w;
-			m_height = nativeMode.h;
+			//m_width = nativeMode.w;
+			//m_height = nativeMode.h;
 
-			SDL_SetWindowDisplayMode(m_window, &nativeMode);
+			//SDL_SetWindowDisplayMode(m_window, &nativeMode);
 		}
 
 		SDL_SetWindowSize(m_window, m_width, m_height);
 		SDL_SetWindowFullscreen(m_window, p_fullscreen);
-		SDL_SetWindowSize(m_window, m_width, m_height);
+		//SDL_SetWindowSize(m_window, m_width, m_height);
 
 		glViewport(0, 0, m_width, m_height);
 
@@ -453,7 +455,7 @@ namespace Render
 		m_lighting.Resize(m_width, m_height);
 		m_glowDevice.Resize(m_width, m_height);
 
-		// Resize forward framebuffers.
+		// Resize forward framebuffers
 		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[0]);
 		m_forwardColors[0]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[0]->GetHandle(), 0);
@@ -461,12 +463,13 @@ namespace Render
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[1]);
 		m_forwardColors[1]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[1]->GetHandle(), 0);
 		m_forwardDepth[1]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_DEPTH_STENCIL);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[1]->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_forwardDepth[1]->GetHandle(), 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -904,8 +907,17 @@ namespace Render
 	void GLRenderer::CopyDepthAndColor()
 	{
 		m_forwardDepth[m_activeForwardFramebuffer]->Bind(0);
-	//	glBindTexture(GL_TEXTURE_2D, m_forwardDepth[m_activeForwardFramebuffer]->GetHandle());
-		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_width, m_height );
+
+		int halfWidth = m_width / 2;
+		int halfHeight = m_height / 2;
+
+		//glBindTexture(GL_TEXTURE_2D, m_forwardDepth[m_activeForwardFramebuffer]->GetHandle());
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, halfWidth, halfHeight );
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, halfHeight, 0, halfHeight, halfWidth, halfHeight);
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, halfWidth, 0, halfWidth, 0, halfWidth, halfHeight );
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, halfWidth, halfHeight, halfWidth, halfHeight, halfWidth, halfHeight);
+
+		//glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, 0, 0, m_width, m_height, 0);
 		//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, 0, 0, m_width, m_height, 0);
 
 		//glReadBuffer(GL_COLOR_ATTACHMENT0);

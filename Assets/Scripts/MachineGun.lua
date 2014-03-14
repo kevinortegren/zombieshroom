@@ -6,7 +6,7 @@ MachineGun.charges = 99;
 MachineGun.chargeTime = 0;
 MachineGun.channelingTime = 0;
 MachineGun.duration = 5;
-MachineGun.crosshair = "";
+MachineGun.crosshair = "crosshairPrecision";
 
 function MachineGun.OnLoad()
 	--ResourceManager.LoadParticle("MachineGun");

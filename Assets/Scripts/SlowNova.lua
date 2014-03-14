@@ -4,7 +4,7 @@ SlowNova.charges = 3;
 SlowNova.chargeTime = 0;
 SlowNova.channelingTime = 0;
 SlowNova.duration = 0.6;
-SlowNova.crosshair = "";
+SlowNova.crosshair = "crosshairNone";
 
 function SlowNova.OnLoad()
 	ResourceManager.LoadParticle("frostBlast");
@@ -43,7 +43,7 @@ function SlowNova.OnCreate (userId, actionId)
 	local rotQuat = Quat.New(0,0,0,1);
 	local startPos = casterEnt:GetTransformation():GetPos();
 	transformComp:SetPos(startPos);
-	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 15, 1, false, false);
+	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 15, 1, false, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 0, dirVec.y * 0, dirVec.z * 0));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 
