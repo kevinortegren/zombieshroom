@@ -12,6 +12,7 @@ function AbilityTotem.OnLoad()
 	ResourceManager.LoadTexture("TotemPoleDiffuse");
 	ResourceManager.LoadTexture("TotemPoleNormal");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
+	TotemProjectile.OnLoad();
 end
 
 function AbilityTotem.ChargeStart(userId, actionId)
