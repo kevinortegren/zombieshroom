@@ -22,6 +22,7 @@ namespace RootSystems
 		m_transform.Init(m_world->GetEntityManager());
 		m_network.Init(m_world->GetEntityManager());
 		m_player.Init(m_world->GetEntityManager());
+		m_animation.Init(m_world->GetEntityManager());
 	}
 
 
@@ -213,6 +214,7 @@ namespace RootSystems
 		RootForce::Transform* transform = m_transform.Get(p_player);
 		RootForce::Network::NetworkComponent* network = m_network.Get(p_player);
 		RootForce::PlayerComponent* player = m_player.Get(p_player);
+		RootForce::Animation* animation = m_animation.Get(p_player);
 
 		// Set the spawn position
 		RootForce::Transform* spawnpoint = GetSpawnpointTransform(index);
@@ -233,7 +235,9 @@ namespace RootSystems
 		health->RespawnDelay = 0.0f;
 		health->IsDead = false;
 		g_engineContext.m_physics->DeactivateRagdoll(*(collision->m_handle));
-		
+
+		animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::SPAWN1, true);
+		animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::SPAWN1, true);
 
 		player->AbilityScripts[0] = RootForce::AbilityInfo();
 		player->AbilityScripts[1] = RootForce::AbilityInfo();
