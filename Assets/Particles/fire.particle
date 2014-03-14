@@ -15,9 +15,11 @@
   ORBITSPEED: 0.0
   ORBITRADIUS: 0.0
   TEMPLATE: 0
-  TEXTURE: smoke
-  EFFECT: Particle/Particle
+  TEXTURE: Particles/smoke
+  EFFECT: Particle/ParticleAdditive
   NAME: Fire
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0
 - POSITION: [0, 2.4, 0]
   LIFETIMEMIN: 2
   LIFETIMEMAX: 5
@@ -35,6 +37,8 @@
   ORBITSPEED: 0.0
   ORBITRADIUS: 0.0
   TEMPLATE: 0
-  TEXTURE: smoke
-  EFFECT: Particle/Particle
+  TEXTURE: Particles/smoke
+  EFFECT: Particle/ParticleAdditive
   NAME: Smoke
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0

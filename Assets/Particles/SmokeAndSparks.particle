@@ -15,8 +15,8 @@
   ORBITSPEED: 0.0
   ORBITRADIUS: 0.0
   TEMPLATE: 0
-  TEXTURE: smoke
-  EFFECT: Particle/Particle
+  TEXTURE: Particles/smoke
+  EFFECT: Particle/ParticleAlphaBlend
   NAME: FireSpark
 - POSITION: [0, 0, 0]
   LIFETIMEMIN: 5
@@ -35,6 +35,8 @@
   ORBITSPEED: 0.0
   ORBITRADIUS: 0.0
   TEMPLATE: 0
-  TEXTURE: smoke
-  EFFECT: Particle/Particle
+  TEXTURE: Particles/smoke
+  EFFECT: Particle/ParticleAlphaBlend
   NAME: Smoke
+  ROTATIONSPEEDMIN: 0.0
+  ROTATIONSPEEDMAX: 0.0

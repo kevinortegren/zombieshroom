@@ -9,7 +9,7 @@ const int g_maxMeshes = 400;
 const int g_maxCameras = 15;
 const int g_maxLights = 40;
 
-const int g_maxVerticesPerMesh = 30000;
+const int g_maxVerticesPerMesh = 50000;
 const int g_maxNameLength = 30;
 const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 150;
@@ -35,7 +35,7 @@ const int g_maxPaintTextures = 10;
 const int g_maxMegaMeshes = 2;
 const int g_maxVerticesPerMegaMesh = 100000;
 
-const string g_GrassDiffuse = "Grass";
+const string g_GrassDiffuse = "GrassStraw";
 const string g_GrassTranslucency = "grass_translucency";
 const string g_GrassBillboard = "grassStrawBillboard";
 const float g_Ambient = 0.0f;
