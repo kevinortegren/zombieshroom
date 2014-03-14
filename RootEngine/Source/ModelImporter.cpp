@@ -254,7 +254,6 @@ namespace RootEngine
 
 	void ModelImporter::InitPhysicsMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
 	{
-		return;
 		if(m_context->m_physics)
 		{
 			std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
@@ -298,7 +297,6 @@ namespace RootEngine
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
 	{
-		return;
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load %d materials to model", p_scene->mNumMaterials);
 		// Initialize the materials
 		for (unsigned int i = 0 ; i < p_scene->mNumMaterials ; i++) 

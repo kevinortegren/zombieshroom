@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 #endif
 	{
 		RootForce::Main m(path);
-		//m.Start();
+		m.Start();
 	}
 #ifndef _DEBUG
 	catch (std::exception& e) 
@@ -109,8 +109,6 @@ namespace RootForce
 		m_world.GetEntityImporter()->SetImporter(Importer);
 		m_world.GetEntityExporter()->SetExporter(Exporter);
 
-
-
 		// Initialize GUI
 		g_engineContext.m_gui->Initialize(g_engineContext.m_renderer->GetWidth(), g_engineContext.m_renderer->GetHeight(), m_window.get(), guiContext);
 
@@ -131,28 +129,8 @@ namespace RootForce
 		m_sharedSystems.m_respawnSystem = new RootSystems::RespawnSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_sharedSystems.m_respawnSystem);
 
-
-
 		m_currentState = GameStates::Menu;
-		for(int i = 0; i < 25; ++i)
-		{
-			
-			m_sharedSystems.m_worldSystem->LoadWorld("Mythosv0.1");
-			RootEngine::MemInfo* pealre = g_engineContext.m_memTracker->GetProcessMemInfo();
-			std::cout << "Level loaded: " << pealre->m_workingSetMiB << "," << pealre->m_workingSetKiB << " MB" << std::endl;
-			// Remove all entities.
-			g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
-			g_world->GetEntityManager()->CleanUp();
-			g_world->GetTagManager()->UnregisterAll();
-			g_world->GetGroupManager()->UnregisterAll();
-			g_world->GetSystemManager()->Clear();
-			g_world->GetStorage()->ClearStorage();
-			g_engineContext.m_physics->RemoveAll();
-			g_engineContext.m_resourceManager->Clean();
-			g_engineContext.m_renderer->ClearJobs();
-			pealre = g_engineContext.m_memTracker->GetProcessMemInfo();
-			std::cout << "Lev unloaded: " << pealre->m_workingSetMiB << "," << pealre->m_workingSetKiB << " MB" << std::endl;
-		}
+
 	}
 
 	Main::~Main() 
