@@ -852,8 +852,7 @@ namespace RootForce
 					else
 					{
 						// No two entities should have the same ID!
-						//assert(false);
-						return true;
+						return p_first->GetId() < p_second->GetId();
 					}
 				}
 			}
