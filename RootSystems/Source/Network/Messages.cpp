@@ -18,6 +18,7 @@
 #include <RootSystems/Include/HomingSystem.h>
 #include <RootSystems/Include/DamageAndKnockback.h>
 #include <RootSystems/Include/StatChangeSystem.h>
+#include <RootSystems/Include/Components.h>
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -723,6 +724,7 @@ namespace RootForce
 			return true;
 		}
 
+		
 
 		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self)
 		{
@@ -811,6 +813,13 @@ namespace RootForce
 					//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to deserialize component on entity (%d)", entity->GetId());
 				}
 			}
+
+			#ifdef _DEBUG
+			if (entity != nullptr)
+			{
+				assert(AssertEntityValid(p_entityManager, entity));
+			}
+			#endif
 
 			return entity;
 		}
