@@ -20,9 +20,10 @@ namespace RootEngine
 
 	Model* ModelImporter::LoadModel(const std::string p_fileName, bool p_noRender)
 	{
+		
 		m_noRender = p_noRender;
 		m_model = new Model(); //Owned by ResourceManager
-
+		
 		std::shared_ptr<Assimp::Importer> m_importer = std::shared_ptr<Assimp::Importer>(new Assimp::Importer);
 		const aiScene* aiscene = m_importer->ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 		if(!aiscene)
@@ -50,7 +51,7 @@ namespace RootEngine
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation is played at  %f tick per second", (float)aiscene->mAnimations[0]->mTicksPerSecond);
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "[ANIMATION] Animation duration is %f",(float)aiscene->mAnimations[0]->mDuration);
 		}
-
+		
 		return m_model;
 	}
 
@@ -93,6 +94,7 @@ namespace RootEngine
 
 	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
 	{
+		
 		static const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
 		std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
@@ -252,6 +254,7 @@ namespace RootEngine
 
 	void ModelImporter::InitPhysicsMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
 	{
+		return;
 		if(m_context->m_physics)
 		{
 			std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
@@ -295,6 +298,7 @@ namespace RootEngine
 
 	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
 	{
+		return;
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load %d materials to model", p_scene->mNumMaterials);
 		// Initialize the materials
 		for (unsigned int i = 0 ; i < p_scene->mNumMaterials ; i++) 

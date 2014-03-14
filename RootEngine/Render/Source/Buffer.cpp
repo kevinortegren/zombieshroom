@@ -11,7 +11,7 @@ Render::Buffer::Buffer(GLenum p_type)
 Render::Buffer::~Buffer()
 {
 	glDeleteBuffers(1, &m_id);
-	std::cout << "Buffer delete. " << std::endl;
+	//std::cout << "Buffer delete. " << std::endl;
 }
 
 void Render::Buffer::BufferData(size_t p_elementCount, size_t p_elementSize, void* p_data, GLuint p_usage)

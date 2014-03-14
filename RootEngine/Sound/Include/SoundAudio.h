@@ -49,6 +49,7 @@ namespace RootEngine
 			virtual bool LoadSound(std::string p_name, unsigned p_flags) = 0;
 			virtual FMOD::Sound* GetFmodSound() = 0;
 			virtual bool Is3D() = 0;
+			virtual ~SoundAudioInterface(){};
 		};
 
 		class SoundAudio : public SoundAudioInterface

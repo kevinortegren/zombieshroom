@@ -47,6 +47,8 @@ namespace Render
 		virtual void SetNoCulling(bool p_noCulling) = 0;
 
 		virtual void FreeBuffers(RenderResourceManager* p_resources) = 0;
+
+		virtual ~MeshInterface(){};
 	};
 
 	class Mesh : public MeshInterface

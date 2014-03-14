@@ -483,7 +483,7 @@ namespace RootEngine
 	
 		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
 		{
-			std::cout << (*itr).first << std::endl;
+			//std::cout << (*itr).first << std::endl;
 			m_context->m_renderer->ReleaseTexture((*itr).second);
 		}
 		m_textures.clear();

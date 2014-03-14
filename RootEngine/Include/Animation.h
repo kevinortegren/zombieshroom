@@ -50,6 +50,7 @@ namespace RootEngine
 				virtual glm::mat4x4 GetBoneOffset(unsigned int p_index) = 0;
 				virtual void SplitAnimation() = 0;
 				virtual AnimClip* GetAnimClip(unsigned int p_index) = 0;
+				virtual ~AnimationInterface(){};
 			};
 
 			class Animation : public AnimationInterface

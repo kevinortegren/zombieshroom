@@ -65,6 +65,8 @@ public:
 		virtual void ParseCommand( std::stringstream* p_data ) = 0;
 		//Dummy methods to identify functions from other parts of the system
 		void LogText(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...){};
+
+		virtual ~LoggingInterface(){};
 };
 
 class Logging : public LoggingInterface

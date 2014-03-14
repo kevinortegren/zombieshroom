@@ -35,6 +35,7 @@ namespace Render
 		virtual GLuint GetHandle() = 0;
 		virtual void BindUniformBuffer(const std::string& bufferName, unsigned int slot) = 0;
 		virtual void BindTexture(const std::string& textureName, unsigned int slot) = 0;
+		virtual ~ProgramInterface(){};
 	};
 
 	//TODO: Store in resource manager.
@@ -94,12 +95,14 @@ namespace Render
 		virtual void AddUniformParam(Semantic::Semantic p_sem, unsigned int p_offset) = 0;
 		virtual void Apply() = 0;
 		virtual BufferInterface* GetBufferInterface() = 0;
+		virtual ~TechniqueInterface(){};
 	};
 
 	class Technique : public TechniqueInterface
 	{
 	public:
 		Technique();
+		~Technique();
 		std::shared_ptr<Program> CreateProgram();
 		std::vector<std::shared_ptr<Program>>& GetPrograms();
 
@@ -120,11 +123,14 @@ namespace Render
 	public:
 		virtual std::shared_ptr<Technique> CreateTechnique(RendererInterface* p_renderer) = 0;
 		virtual std::vector<std::shared_ptr<Technique>>& GetTechniques() = 0;
+		virtual ~EffectInterface(){};
 	};
 
 	class Effect : public EffectInterface
 	{
 	public:
+		Effect();
+		~Effect();
 		std::shared_ptr<Technique> CreateTechnique(RendererInterface* p_renderer);
 		std::vector<std::shared_ptr<Technique>>& GetTechniques();
 

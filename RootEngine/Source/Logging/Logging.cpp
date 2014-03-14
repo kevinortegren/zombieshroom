@@ -40,6 +40,8 @@ Logging::Logging() : m_enableLogging(true)
 	m_levelInfo[LogLevel::NOLEVEL]			= TagLevelInfo("NOLEVEL    ", true);
 	m_levelInfo[LogLevel::HELP_PRINT]		= TagLevelInfo("HELP_PRINT ", true);
 	m_levelInfo[LogLevel::IDENTIFY_PRINT]   = TagLevelInfo("IDENTIFY   ", true);
+
+	m_enableLogging = false;
 #endif // _DEBUG
 }
 

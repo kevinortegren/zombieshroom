@@ -25,7 +25,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					renderable->m_pass = RootForce::RenderPass::RENDERPASS_DEFAULT;
 
 				}
-
+				
 				const YAML::Node* materialNode = p_node.FindValue("Material");
 				if(materialNode != nullptr)
 				{

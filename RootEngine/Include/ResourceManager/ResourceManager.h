@@ -64,6 +64,8 @@ namespace RootEngine
 		virtual void Clean() = 0;
 		virtual void RemoveModel(Model* p_model) = 0;
 		virtual void RemoveRenderingMeshesFromModel(Model* p_model) = 0;
+
+		virtual ~ResourceManagerInterface(){};
 	};
 
 	class ResourceManager : public ResourceManagerInterface

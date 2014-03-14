@@ -18,6 +18,7 @@ namespace RootEngine
 			virtual void SetPaused(bool p_paused) = 0;
 			virtual void SetMinMaxDistance(float p_min, float p_max) = 0;
 			virtual void SetPosition(glm::vec3 p_position) = 0;
+			virtual ~SoundChannelInterface(){};
 		};
 
 		class SoundChannel : public SoundChannelInterface
