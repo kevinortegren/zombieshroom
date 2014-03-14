@@ -151,8 +151,8 @@ namespace RootSystems
 				}
 				else
 				{
-					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND, false);
-					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND, false);
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND2, false);
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::ASCEND2, false);
 				}
 			}
 			else if(state->CurrentState == RootForce::EntityState::DESCENDING)
@@ -170,10 +170,10 @@ namespace RootSystems
 					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFELEFT, false);
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFELEFT, false);
 				}
-				else if(action->FallTime <= 1)
+				else if(action->FallTime < 1)
 				{
-					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND1, false);
-					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND1, false);
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND3_STRECTH, false);
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DESCEND3_STRECTH, false);
 				}
 				else
 				{
