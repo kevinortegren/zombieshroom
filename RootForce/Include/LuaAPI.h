@@ -48,6 +48,13 @@ namespace RootForce
 			return 0;
 		}
 
+		static int GetDeltaTime(lua_State* p_luaState)
+		{
+			NumberOfArgs(0);
+			lua_pushnumber(p_luaState, g_world->GetDelta());
+			return 1;
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		//LOGGING
@@ -2838,6 +2845,7 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static const struct luaL_Reg static_f [] = {
 			{"KnockBack", Knockback},
+			{"GetDeltaTime", GetDeltaTime},
 			{NULL, NULL}
 		};
 

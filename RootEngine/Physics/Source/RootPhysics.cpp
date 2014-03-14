@@ -1069,15 +1069,15 @@ namespace Physics
 		}
 		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
-			float x,y,z, w;
+			float x,y,z,w;
 			btRigidBody* body = m_dynamicObjects.at(index);
-		
+			
 			x = p_objectOrientation[0];
 			y = p_objectOrientation[1];
 			z = p_objectOrientation[2];
 			w = p_objectOrientation[3];
-			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
-			
+			body->setWorldTransform(btTransform(btQuaternion(x,y,z,w), body->getWorldTransform().getOrigin()));
+			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Values: %f, %f, %f, %f", x, y, z, w);
 		}
 		else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
 		{
