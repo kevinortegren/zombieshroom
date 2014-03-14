@@ -21,7 +21,7 @@ select
 }
 #main-body
 {
-  background-image: url('menubackground.jpg');
+  background-image: url('menubackground.png');
   background-position: 50% 50%;
   background-size: 100% 100%;
 }
@@ -87,7 +87,8 @@ a
   display: table-cell;
   vertical-align: middle;
 }
-.button
+.button,
+input[type="radio"] + label
 {
   width: 140px;
   height: 25px;
@@ -98,13 +99,24 @@ a
   background-size: 100% 100%;
   background-position: 50% 50%;
 }
-.button:hover
+input[type="radio"] + label
+{
+	display: inline-block;
+	text-align: center;
+  width: 40px;
+	height: auto;
+	padding: 5px 10px;
+  margin: 0;
+}
+.button:hover,
+input[type="radio"] + label:hover
 {
   background: transparent url('ButtonHover.png');
   background-size: 100% 100%;
   background-position: 50% 50%;
 }
-.button:active
+.button:active,
+input[type="radio"]:checked + label
 {
   background: transparent url('ButtonClicked.png');
   background-size: 100% 100%;
@@ -143,10 +155,15 @@ a
   display: inline-block;
   width: 200px;
 }
+.inline-300px
+{
+  display: inline-block;
+  width: 300px;
+}
 #error-popup
 {
   width: 500px;
-  height: 300px;
+  /*height: 300px;*/
 }
 #error-info
 {
@@ -336,17 +353,23 @@ a
 }
 #team-select-wrapper
 {
-	width: 1000px;
-	height: 650px;
-	margin: auto;
-	background-color: rgba(0,0,0,0.1);
+  width: 1068px;
+  height: 650px;
+  overflow: hidden;
+  margin: auto;
+  z-index: 0;
+  position: relative;
 }
-#team-select-blue,
-#team-select-red
+#team-select-border
 {
-	width: 491px;
-	height: 350px;
-	margin: 6px;
+  position: absolute;
+  top: 50px;
+  z-index: 0;
+  width: 1068px;
+  height: 555px;
+  background: url('TeamSelectBorder.png');
+  background-position: center;
+	background-repeat: no-repeat;
 }
 #team-select-blue,
 #team-select-red,
@@ -354,37 +377,101 @@ a
 {
 	text-align: center;
 	font-size: 36px;
-	opacity: 0.6;
 	overflow: auto;
+  position: absolute;
+  z-index: -1;
+  opacity: 0.6;
 }
-#team-select-blue thead,
-#team-select-red thead,
 #team-select-spectate thead
 {
 	font-size: 36px;
 }
-#team-select-blue:hover,
-#team-select-red:hover,
-#team-select-spectate:hover
-{
-	opacity: 1;
-}
 #team-select-red
 {
+  top: 75px;
+  left: 30px;
+	width: 500px;
+  height: 350px;
 	float: left;
-	margin-right: 0;
-	background-color: rgba(255,0,0,0.5);
+	background-color: rgba(255,0,0,0.3);
 }
 #team-select-blue
 {
+  top: 75px;
+	left: 530px; 
+  width: 500px;
+  height: 350px;
 	float: right;
-	background-color: rgba(0,0,255,0.5);
+	background-color: rgba(0,0,255,0.3);
 }
 #team-select-spectate
 {
-	background-color: rgba(127,127,127,0.5);
+  top: 425px;
+  left: 290px;
+	clear: both;
+	background-color: rgba(127,127,127,0.3);
+	width: 500px;
+	height: 160px;
+	margin: 10px auto 12px auto;
+}
+#team-select-blueChar,
+#team-select-redChar,
+#team-select-spectateHover
+{
+  position: absolute;
+  top: 200px;
+  z-index: 1;
+  opacity: 0.6;
+}
+#team-select-redChar:hover,
+#team-select-spectateHover:hover
+{
+  background-position: 10% 50%;
+  opacity: 1;
+}
+#team-select-blueChar:hover
+{
+  background-position: 90% 50%;
+  opacity: 1;
+}
+#team-select-blueChar:hover ~ #team-select-blue,
+#team-select-redChar:hover ~ #team-select-red,
+#team-select-spectateHover:hover ~ #team-select-spectate
+{
+  opacity: 1;
+}
+#team-select-blueChar
+{
+  top: 75px;
+	left: 530px;
+  width: 500px;
+  height: 350px;
+  background: url('TeamSelectBlueChar.png');
+  background-repeat: no-repeat;
+  background-position: 90% 50%;
+}
+#team-select-redChar
+{
+  top: 75px;
+  left: 30px;
+  width: 500px;
+  height: 350px;
+  background: url('TeamSelectRedChar.png');
+  background-repeat: no-repeat;
+  background-position: 10% 50%;
+}
+#team-select-spectateHover
+{
+  top: 425px;
+  left: 290px;
 	width: 500px;
 	height: 160px;
 	margin: 0 auto 12px auto;
-	clear: both;
+}
+#team-select-back
+{
+  top: 610px;
+  left: 465px;
+	margin: 0 auto 12px auto;
+  position:absolute;
 }

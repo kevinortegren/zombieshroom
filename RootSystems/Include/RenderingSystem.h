@@ -6,9 +6,6 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/Transform.h>
 
-#include <RootEngine/Include/GameSharedContext.h>
-extern RootEngine::GameSharedContext g_engineContext;
-
 namespace RootForce
 {
 	namespace RenderPass
@@ -70,6 +67,7 @@ namespace RootForce
 	private:
 		Render::RendererInterface* m_renderer;
 		Logging::LoggingInterface* m_logger;
+		float m_waterHeight;
 		int a;
 	};
 }

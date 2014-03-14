@@ -1,4 +1,5 @@
 #include <Utility\ECS\Include\EntitySystemManager.h>
+#include <algorithm>
 
 void ECS::EntitySystemManager::Clear()
 {
@@ -15,8 +16,18 @@ void ECS::EntitySystemManager::AddEntityToSystems(Entity* p_entity)
 	{
 		if(((*itr)->m_flag & p_entity->m_flag) == (*itr)->m_flag)
 		{
+			// Add it to the active entities.
 			(*itr)->m_activeEntities.insert(p_entity);
-			//(*itr)->Init();
+
+			//TODO: Probely not needed.
+
+			// If it still exists in the remove list, remove it from that as well.
+			auto it = std::find((*itr)->m_entitiesToRemove.begin(), (*itr)->m_entitiesToRemove.end(), p_entity);
+			while (it != (*itr)->m_entitiesToRemove.end())
+			{
+				(*itr)->m_entitiesToRemove.erase(it);
+				it = std::find((*itr)->m_entitiesToRemove.begin(), (*itr)->m_entitiesToRemove.end(), p_entity);
+			}
 		}
 	}
 }
@@ -29,10 +40,7 @@ void ECS::EntitySystemManager::RemoveEntityFromSystems(Entity* p_entity)
 		{
 			if(((*itr)->m_flag & p_entity->m_flag) != (*itr)->m_flag)
 			{
-				(*itr)->m_entitiesToRemove.push_back(p_entity);
-
-				//(*itr)->m_activeEntities.erase(p_entity);
-				//(*itr)->Init();
+				(*itr)->m_entitiesToRemove.insert(p_entity);
 			}
 		}
 	}

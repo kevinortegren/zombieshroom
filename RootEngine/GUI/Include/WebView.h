@@ -69,11 +69,16 @@ namespace RootEngine
 
 			virtual Awesomium::WebView* GetView() = 0;
 
+			virtual void SetActive(bool p_active) = 0;
+
 			virtual void InjectKeyboardEvent(Awesomium::WebKeyboardEvent p_event) = 0;
 			virtual void InjectMouseDown(Awesomium::MouseButton p_mousebutton) = 0;
 			virtual void InjectMouseUp(Awesomium::MouseButton p_mousebutton) = 0;
 			virtual void InjectMouseMove(int p_x, int p_y) = 0;
 			virtual void InjectMouseWheel(int p_x, int p_y) = 0;
+
+			virtual bool GetShouldResize() const = 0;
+			virtual void SetShouldResize(bool p_shouldResize) = 0;
 		};
 
 		// Used by the guiSystem to establish communications between Awesomium::WebView and the program
@@ -82,15 +87,17 @@ namespace RootEngine
 		{
 			// This class is closely related to guiInstance, therefore give full access to it
 			friend class guiInstance;
-		private:
+		public:
 			WebViewImpl(std::string p_callbackObjectName, GUISystem::DispatcherInterface* p_dispatcher)
 				: m_webView(nullptr),
 				m_callbackObject(nullptr),
 				m_dispatcher(p_dispatcher),
-				m_callbackObjectName(p_callbackObjectName)
-			{}
+				m_callbackObjectName(p_callbackObjectName),
+				m_shouldResize(false)
+			{
+				m_isActive = true;
+			}
 			~WebViewImpl();
-		public:
 
 			// Buffer a Javascript to be executed on the next view update
 			void BufferJavascript(std::string p_script);
@@ -108,6 +115,14 @@ namespace RootEngine
 			{
 				return m_webView;
 			}
+
+			void SetActive(bool p_active)
+			{
+				m_isActive = p_active;
+			}
+
+			bool GetShouldResize() const { return m_shouldResize; }
+			void SetShouldResize(bool p_shouldResize) { m_shouldResize = p_shouldResize; }
 
 		private:
 			void Update();
@@ -136,6 +151,8 @@ namespace RootEngine
 			std::vector<Awesomium::MouseButton> m_injectMouseUp;
 			std::vector<std::pair<int,int>> m_injectMouseMove;
 			std::vector<std::pair<int,int>> m_injectMouseWheel;
+			bool m_isActive;
+			bool m_shouldResize;
 		};
 	}
 }

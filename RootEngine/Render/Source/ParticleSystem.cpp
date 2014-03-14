@@ -24,6 +24,7 @@ namespace Render
 		particles[0].m_color		= glm::vec4(0.0f);
 		particles[0].m_accel		= glm::vec3(0.0f);
 		particles[0].m_rot			= 0.0f;
+		particles[0].m_rotSpeed		= 0.0f;
 		
 		m_meshes[0] = p_renderer->CreateMesh();
 		m_meshes[0]->SetPrimitiveType(GL_POINTS);
@@ -42,11 +43,11 @@ namespace Render
 
 			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[i]->GetTransformFeedback());
 			
-			vertexBuffer[i]->BufferData(RENDER_NUM_PARTCILES, sizeof(ParticleVertex), particles);
+			vertexBuffer[i]->BufferData(RENDER_NUM_PARTCILES, sizeof(ParticleVertex), particles, GL_STATIC_DRAW);
 			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId());
 
 			attributes[i] = p_renderer->CreateVertexAttributes();
-			attributes[i]->Init(8);
+			attributes[i]->Init(9);
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), 0);
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 3 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 2, 2, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 6 * sizeof(float));
@@ -55,6 +56,7 @@ namespace Render
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 5, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 10 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 14 * sizeof(float));
 			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 17 * sizeof(float));
+			attributes[i]->SetVertexAttribPointer(vertexBuffer[i]->GetBufferId(), 8, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (char*)0 + 18 * sizeof(float));
 		
 			m_meshes[i]->SetVertexBuffer(vertexBuffer[i]);
 			m_meshes[i]->SetVertexAttribute(attributes[i]);
@@ -111,13 +113,13 @@ namespace Render
 		glBindTexture(GL_TEXTURE_1D, m_randomTexture);
 
 		m_perFrameBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
-		m_perFrameBuffer->BufferData(1, sizeof(m_perFrameVars), &m_perFrameVars);
+		m_perFrameBuffer->BufferData(1, sizeof(m_perFrameVars), &m_perFrameVars, GL_DYNAMIC_DRAW);
 
 		m_perObjectBuffer = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
 		char data[RENDER_PARTICLES_UNIFORM_SIZE];
 		memset(&data, 0, RENDER_PARTICLES_UNIFORM_SIZE);
 
-		m_perObjectBuffer->BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data);
+		m_perObjectBuffer->BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data, GL_DYNAMIC_DRAW);
 
 		for(int i = 0; i < RENDER_NUM_PARTICLESYSTEMS; ++i)
 		{

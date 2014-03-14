@@ -329,10 +329,6 @@ void HandleEvents()
 
 					RM.UnlockMutex("IdMutex");
 				}
-				if(event.key.keysym.scancode == SDL_SCANCODE_T)
-				{
-					waterSystem->InitDisturb();
-				}
 			}
 			break;
 			//default:
@@ -918,7 +914,6 @@ void UpdateLocator(int index)
 	if(RM.PlocatorList[index]->transformation.flags._Water)
 	{
 		m_world.GetStorage()->SetValue("Water", transform->m_position.y);
-		waterSystem->SetWaterHeight(transform->m_position.y);
 	}
 }
 
@@ -1003,8 +998,8 @@ void LoadLocators()
 		if(RM.PlocatorList[i]->transformation.flags._Water)
 		{
 			locatorEntities.push_back(CreateTransformEntity(&m_world, i));
-			m_world.GetStorage()->SetValue("WaterHeight", RM.PlocatorList[i]->transformation.position.y);
-			waterSystem->CreateWater(RM.PlocatorList[i]->transformation.position.y);
+			m_world.GetStorage()->SetValue("Water", RM.PlocatorList[i]->transformation.position.y);
+			waterSystem->CreateWater();
 			//waterSystem->ToggleWireFrame();
 		}
 

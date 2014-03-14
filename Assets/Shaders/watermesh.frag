@@ -29,8 +29,13 @@ layout(std140) uniform PerObject
 	vec3 gEyeWorldPos;
 	float gTime;
 	vec4 gOptions;
+	vec4 SunColor;
+	vec3 SunDirection;
+	float dx2; //Length between height values
 };    
 
+//vec4 LightColor;
+//vec3 LightDirection;
 vec3 GetVSPositionFromDepth(float z, vec2 screenCoord)
 { 
 	z = z * 2 - 1;
@@ -64,32 +69,31 @@ float linearizeDepth(in float depth) {
 
 void main()
 {
-	float time = gTime/40.0;
+	float time = gTime/6.0;
 
 	////////////////////////////////////////////////////////////////////////////
-	//Normal mapping
+	//Normal mapping 2.0
 	////////////////////////////////////////////////////////////////////////////
-    vec3 normalMap			= texture(g_Normal, TexCoord_FS_in).rgb;
-	normalMap				= normalize(normalMap.xyz*2-1); 
+	vec2 calcNorm		= texture(g_Normal, TexCoord_FS_in).xy; //RG16F from compute shader
+	vec3 normalMap		= normalize(vec3(calcNorm.x, dx2*2, calcNorm.y));
 	if(gOptions.y == 0.0)
 	{
-		vec3 normal1 			= texture(g_NormalMap, TexCoord_FS_in * 64.0 + vec2(sin(time - 1.0) , time) ).xyz;
-		vec3 normal2 			= texture(g_NormalMap, -TexCoord_FS_in * 32.0 + vec2(sin(time*0.5)+1.0 , time*0.5) ).xyz;
+		vec3 normal1 			= normalize(texture(g_NormalMap,  TexCoord_FS_in * 256.0 + 								vec2(sin(time * 0.89) , time * 0.95)) * 2.0 - 1.0).xyz;
+		vec3 normal2 			= normalize(texture(g_NormalMap, vec2(-TexCoord_FS_in.x, TexCoord_FS_in.y ) * 128.0 + 	vec2(cos(-time*0.45), time * 0.56))       * 2.0 - 1.0).xyz;
 		vec3 normalT 			= mix(normal1, normal2, 0.5);
 		normalT 				= normalize(normalT);
-		vec3 tangent			= cross(vec3(0,1,0), normalMap);
-		vec3 bitangent			= cross(tangent, normalMap);
+		vec3 tangent			= normalize(vec3(dx2, 0, calcNorm.x));
+		vec3 bitangent			= normalize(vec3(0, dx2, -calcNorm.y));
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
-		normalMap 				= TBN * normalT;
+		normalMap 				= mix(TBN * normalT, normalMap, 0.85); //Smooth the normal from the normal map
 	}
-	vec3 viewNormal			= normalize(viewMatrix*vec4(normalMap,0.0f)).rgb;
-
+	vec3 viewNormal			= normalize(viewMatrix * vec4(normalMap,0.0f)).rgb;
 	////////////////////////////////////////////////////////////////////////////
 	//Calculate transparent color and refraction
 	////////////////////////////////////////////////////////////////////////////
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
 	ivec2 screenAbsCoord	= ivec2(gl_FragCoord.xy);
-	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(normalMap.xz * 100.0f), ivec2(0), textureSize(g_LA, 0));
+	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(normalMap.xz * 80.0), ivec2(0), textureSize(g_LA, 0)); //Want to use view space normals, but it doesn't seem to work
 	float refractionDepth	= texelFetch(g_Depth, refractedUV, 0).r;
 	vec3 refractionColor;
 	//Check if refracted vector is hitting an object in the foreground
@@ -102,13 +106,15 @@ void main()
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	//Cubemap reflections
+	//Cubemap reflections WIP - Should reflect skyshader when complete
 	////////////////////////////////////////////////////////////////////////////
  	vec3 incidentW			= WorldPos_FS_in - gEyeWorldPos;
 	vec3 refW				= reflect(incidentW, normalMap);
 	refW.z = -refW.z;
 
 	vec3 finalResult =  vec3(0.2, 0.4, 0.47);//texture(g_CubeMap, refW).rgb;
+
+	vec3 viewSpacePosition = GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord);
 
 	////////////////////////////////////////////////////////////////////////////
 	//Real-time Local Reflections using ray marching
@@ -119,7 +125,7 @@ void main()
 	float initialStepAmount = 0.01;
 
 	//Water fragment view space position
-	vec3 posV 		= GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord);
+	vec3 posV 		= viewSpacePosition;
 	vec3 viewVec	= normalize(posV);
 	//Viewspace vector reflected on the water normal
 	vec3 refV		= normalize(reflect(viewVec, viewNormal));
@@ -224,7 +230,7 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Lerp water color and refraction color
 	////////////////////////////////////////////////////////////////////////////
-	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - GetVSPositionFromDepth(gl_FragCoord.z, screenTexCoord).z);
+	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - viewSpacePosition.z);
 	float distFac = clamp(gOptions.z*vdist, 0.0f, 1.0f);
 	
 	vec3 waterColor	= mix(refractionColor, vec3(0f, 0.15f, 0.115f), distFac);
@@ -237,13 +243,27 @@ void main()
 	//waterColor = mix(foamWaterColor, waterColor, foamDistFac);
 
 	////////////////////////////////////////////////////////////////////////////
-	//Calculate result color
+	//Calculate result diffuse color
 	////////////////////////////////////////////////////////////////////////////
-	vec4 result				= vec4(mix(waterColor, reflectionColor, fresnel), 1.0f);
+	vec4 result = vec4(mix(waterColor, reflectionColor, fresnel), 1.0f);
+
+	////////////////////////////////////////////////////////////////////////////
+	//Lighting
+	////////////////////////////////////////////////////////////////////////////
+	//Temp stuff
+	vec4 viewLightDir 	= viewMatrix * vec4(SunDirection, 0.0);
+	vec3 LightDirection = viewLightDir.xyz;
+
+	vec3 lightVec 	    = -normalize(LightDirection );
+	vec3 viewDir 		= -normalize(viewSpacePosition);
+	vec3 halfVector 	= normalize(viewDir + lightVec);
+    
+	vec3 specularColor 	= SunColor.xyz * 0.5 * pow(clamp(dot(viewNormal, halfVector), 0.0, 1.0), 128.0);
+
 
 	////////////////////////////////////////////////////////////////////////////
 	//Outputs
 	////////////////////////////////////////////////////////////////////////////
 
-    out_color = result;
+    out_color =  vec4(result.xyz + specularColor, 1.0);
 }

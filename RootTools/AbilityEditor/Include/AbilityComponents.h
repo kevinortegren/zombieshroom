@@ -25,7 +25,7 @@ namespace AbilityEditorNameSpace
 			enum ComponentType
 			{
 				STARTPOS, //done
-				TARGPOS, //Needs system
+				TARGPOS, //done
 				VELOCITY, //done
 				ABILITYMODEL, //done
 				COLLISIONSHAPE, //done
@@ -38,6 +38,7 @@ namespace AbilityEditorNameSpace
 				CHARGEVARIABLES, //done
 				WATER, //done
 				SOUND, //done
+				FOLLOW, //done
 				END_OF_ENUM //TODO : EntityChange
 			};
 		}
@@ -47,19 +48,20 @@ namespace AbilityEditorNameSpace
 			ComponentNameList()
 			{
 				m_compNames.append("Start Position");
-				m_compNames.append("Target Position [WIP]");
+				m_compNames.append("Homing");
 				m_compNames.append("Velocity");
 				m_compNames.append("Ability Model");
 				m_compNames.append("Collision Shape");
 				m_compNames.append("Ability Particle");
 				m_compNames.append("Damage");
 				m_compNames.append("Knockback");
-				m_compNames.append("Stat Change (Caster) [WIP]");
-				m_compNames.append("Stat Change (Target) [WIP]");
+				m_compNames.append("Stat Change (Caster)");
+				m_compNames.append("Stat Change (Target)");
 				m_compNames.append("Physics");
+				m_compNames.append("Charge Variables"); 
 				m_compNames.append("Water Disturb");
 				m_compNames.append("Sound");
-				m_compNames.append("Charge Variables"); 
+				m_compNames.append("Follow");
 			}
 		} static g_componentNameList;
 		//All components should inherit from the MainComponent struct
@@ -171,17 +173,20 @@ namespace AbilityEditorNameSpace
 			std::map<pos, QString> m_enumToText;
 			pos m_targPos;
 			QVector3D m_absolutePos;
-			TargetPos(pos p_pos = pos::ENEMYPLAYER, QVector3D p_targPos = QVector3D(0,0,0)): MainComponent(ComponentType::TARGPOS)
+			float m_controllability, m_speed;
+			TargetPos(pos p_pos = pos::ENEMYPLAYER, QVector3D p_targPos = QVector3D(0,0,0), float p_control = 0.1f, float p_speed = 10.0f): MainComponent(ComponentType::TARGPOS)
 			{
 				m_enumToText[ENEMYPLAYER] = "Enemy Player";
 				m_enumToText[FRIENDLYPLAYER] = "Friendly Player";
 				m_enumToText[ONAIM] = "On Aim";
 				m_enumToText[ABSOLUTE] = "Absolute";
 				m_absolutePos = p_targPos;
+				m_controllability = p_control;
+				m_speed = p_speed;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory) 
 			{
-				QtVariantProperty* position, *x, *y, *z; 
+				QtVariantProperty* position, *x, *y, *z, *control, *speed; 
 				QList<QtProperty*> list;
 				QString combinedValue;
 
@@ -193,7 +198,7 @@ namespace AbilityEditorNameSpace
 				{
 					enumTypes << m_enumToText[(pos)i];
 				}
-				enumPos = enumMan->addProperty("Target position");
+				enumPos = enumMan->addProperty("Target");
 				enumMan->setEnumNames(enumPos,enumTypes);
 				enumMan->setValue(enumPos, m_targPos);
 
@@ -211,11 +216,19 @@ namespace AbilityEditorNameSpace
 				combinedValue = "(" + list.at(0)->valueText() + ", " + list.at(1)->valueText() + ", " + list.at(2)->valueText() + ")";
 				p_propMan->setValue(position,combinedValue);
 
+				control = p_propMan->addProperty(QVariant::Double, "Homing Strength");
+				p_propMan->setValue(control, m_controllability);
+
+				speed = p_propMan->addProperty(QVariant::Double, "Speed");
+				p_propMan->setValue(speed, m_speed);
+
 				//Add to browser widget
 				p_propBrows->setFactoryForManager(enumMan, enumFac);
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
 				p_propBrows->addProperty(enumPos);
 				p_propBrows->addProperty(position);
+				p_propBrows->addProperty(control);
+				p_propBrows->addProperty(speed);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -234,6 +247,9 @@ namespace AbilityEditorNameSpace
 				{
 					m_absolutePos[i] = p_propMan->variantProperty(subprops.at(i))->value().toFloat();
 				}
+
+				m_speed = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				m_controllability = p_propMan->variantProperty(props.at(3))->value().toFloat();
 			}
 		};
 
@@ -378,7 +394,7 @@ namespace AbilityEditorNameSpace
 			float m_radius;
 			float m_height;
 			std::string m_collisionModelShapeName;
-			CollisionShape(shape p_collisionShape = shape::CONE, float p_radius = 0.0f, float p_height = 0.0f, std::string p_collisionModelShapeName = "") : MainComponent(ComponentType::COLLISIONSHAPE)
+			CollisionShape(shape p_collisionShape = shape::CONE, float p_radius = 1.0f, float p_height = 1.0f, std::string p_collisionModelShapeName = "") : MainComponent(ComponentType::COLLISIONSHAPE)
 			{
 				m_CollisionShape = p_collisionShape;
 				m_radius = p_radius;
@@ -593,75 +609,195 @@ namespace AbilityEditorNameSpace
 
 		struct StatChangeCaster : MainComponent
 		{
-			float m_speed, m_jumpHeight, m_knockbackResistance;
-			StatChangeCaster(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f) : MainComponent(ComponentType::STATCHANGECASTER)
+			float m_speed, m_jumpHeight, m_knockbackResistance, m_damageResistance, 
+				m_speedTime, m_jumpTime, m_kbResTime, m_dmgResTime;
+			StatChangeCaster(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f, float p_damageResistance = 1.0f, 
+							float p_speedTime = 1.0f, float p_jumpTime = 1.0f, float p_knResTime = 1.0f, float p_dmgResTime = 1.0f) : MainComponent(ComponentType::STATCHANGECASTER)
 			{
 				m_speed = p_speed;
 				m_jumpHeight = p_jumpHeight;
 				m_knockbackResistance = p_knockbackResistance;
+				m_damageResistance = p_damageResistance;
+				m_speedTime = p_speedTime;
+				m_jumpTime = p_jumpTime;
+				m_kbResTime = p_knResTime;
+				m_dmgResTime = p_dmgResTime;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* speed, *jumpHeight, *knockbackResistance;
-
-				speed = p_propMan->addProperty(QVariant::Double, "Speed" );
-				p_propMan->setValue(speed, m_speed);
-
-				jumpHeight = p_propMan->addProperty(QVariant::Double, "JumpHeight" );
-				p_propMan->setValue(jumpHeight, m_jumpHeight);
-
-				knockbackResistance = p_propMan->addProperty(QVariant::Double, "Knockback Resistance" );
-				p_propMan->setValue(knockbackResistance, m_knockbackResistance);
+				QtVariantProperty* speed, *jumpHeight, *knockbackResistance, *dmgResistance, 
+								*speedFrac, *jumpFrac, *knResFrac, *dmgResFrac,
+								*speedTime, *jumpTime, *knResTime, *dmgResTime;
+				QList<QtProperty*> list;
+				QString combinedValue;
 
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+
+				//Speed stuff
+				speed = p_propMan->addProperty(QVariant::String, "Speed" );
+				speedFrac = p_propMan->addProperty(QVariant::Double, "Fraction" );
+				speedTime = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(speedFrac, m_speed);
+				p_propMan->setValue(speedTime, m_speedTime);
+				speed->addSubProperty(speedFrac);
+				speed->addSubProperty(speedTime);
+				list = speed->subProperties();
+				combinedValue = "";//Fraction: " + list.at(0)->valueText() + " Time: " + list.at(1)->valueText();
+				p_propMan->setValue(speed, combinedValue);
 				p_propBrows->addProperty(speed);
+
+				//Jump stuff
+				jumpHeight = p_propMan->addProperty(QVariant::String, "JumpHeight" );
+				jumpFrac = p_propMan->addProperty(QVariant::Double, "Fraction" );
+				jumpTime = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(jumpFrac, m_jumpHeight);
+				p_propMan->setValue(jumpTime, m_jumpTime);
+				jumpHeight->addSubProperty(jumpFrac);
+				jumpHeight->addSubProperty(jumpTime);
+				list = jumpHeight->subProperties();
+				combinedValue = "";//Fraction: " + list.at(0)->valueText() + " Time: " + list.at(1)->valueText();
+				p_propMan->setValue(jumpHeight, combinedValue);
 				p_propBrows->addProperty(jumpHeight);
+
+				//Knockback stuff
+				knockbackResistance = p_propMan->addProperty(QVariant::String, "Knockback Resistance" );
+				knResFrac = p_propMan->addProperty(QVariant::Double, "Fraction" );
+				knResTime = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(knResFrac, m_knockbackResistance);
+				p_propMan->setValue(knResTime, m_kbResTime);
+				knockbackResistance->addSubProperty(knResFrac);
+				knockbackResistance->addSubProperty(knResTime);
+				list = knockbackResistance->subProperties();
+				combinedValue = "";//Fraction: " + list.at(0)->valueText() + " Time: " + list.at(1)->valueText();
+				p_propMan->setValue(knockbackResistance, combinedValue);
 				p_propBrows->addProperty(knockbackResistance);
+
+				//Damage stuff
+				dmgResistance = p_propMan->addProperty(QVariant::String, "Damage Resistance" );
+				dmgResFrac = p_propMan->addProperty(QVariant::Double, "Fraction" );
+				dmgResTime = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(dmgResFrac, m_damageResistance);
+				p_propMan->setValue(dmgResTime, m_dmgResTime);
+				dmgResistance->addSubProperty(dmgResFrac);
+				dmgResistance->addSubProperty(dmgResTime);
+				list = dmgResistance->subProperties();
+				combinedValue = "";//Fraction: " + list.at(0)->valueText() + " Time: " + list.at(1)->valueText();
+				p_propMan->setValue(dmgResistance, combinedValue);
+				p_propBrows->addProperty(dmgResistance);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_speed = p_propMan->variantProperty(props.at(0))->value().toFloat();
-				m_jumpHeight = p_propMan->variantProperty(props.at(1))->value().toFloat();
-				m_knockbackResistance = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				subprops = props.at(0)->subProperties();
+					m_speed = p_propMan->variantProperty(subprops.at(0))->value().toFloat();
+					m_speedTime = p_propMan->variantProperty(subprops.at(1))->value().toFloat();
+				subprops = props.at(1)->subProperties();
+					m_jumpHeight = p_propMan->variantProperty(subprops.at(0))->value().toFloat();
+					m_jumpTime = p_propMan->variantProperty(subprops.at(1))->value().toFloat();
+				subprops = props.at(2)->subProperties();
+					m_knockbackResistance = p_propMan->variantProperty(subprops.at(0))->value().toFloat();
+					m_kbResTime = p_propMan->variantProperty(subprops.at(1))->value().toFloat();
+				subprops = props.at(3)->subProperties();
+					m_damageResistance = p_propMan->variantProperty(subprops.at(0))->value().toFloat();
+					m_dmgResTime = p_propMan->variantProperty(subprops.at(1))->value().toFloat();
 			}
 		};
 
 		struct StatChangeTarget : MainComponent
 		{
-			float m_speed, m_jumpHeight, m_knockbackResistance;
-			StatChangeTarget(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f) : MainComponent(ComponentType::STATCHANGETARGET)
+			float m_speed, m_jumpHeight, m_knockbackResistance, m_damageResistance, 
+				m_speedTime, m_jumpTime, m_kbResTime, m_dmgResTime;
+			StatChangeTarget(float p_speed = 1.0f, float p_jumpHeight = 1.0f, float p_knockbackResistance = 1.0f, float p_damageResistance = 1.0f, 
+				float p_speedTime = 1.0f, float p_jumpTime = 1.0f, float p_knResTime = 1.0f, float p_dmgResTime = 1.0f) : MainComponent(ComponentType::STATCHANGETARGET)
 			{
 				m_speed = p_speed;
 				m_jumpHeight = p_jumpHeight;
 				m_knockbackResistance = p_knockbackResistance;
+				m_damageResistance = p_damageResistance;
+				m_speedTime = p_speedTime;
+				m_jumpTime = p_jumpTime;
+				m_kbResTime = p_knResTime;
+				m_dmgResTime = p_dmgResTime;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty* speed, *jumpHeight, *knockbackResistance;
-
-				speed = p_propMan->addProperty(QVariant::Double, "Speed" );
-				p_propMan->setValue(speed, m_speed);
-
-				jumpHeight = p_propMan->addProperty(QVariant::Double, "JumpHeight" );
-				p_propMan->setValue(jumpHeight, m_jumpHeight);
-
-				knockbackResistance = p_propMan->addProperty(QVariant::Double, "Knockback Resistance" );
-				p_propMan->setValue(knockbackResistance, m_knockbackResistance);
+				QtVariantProperty* speed, *jumpHeight, *knockbackResistance, *dmgResistance, 
+					*speedFrac, *jumpFrac, *knResFrac, *dmgResFrac,
+					*speedTime, *jumpTime, *knResTime, *dmgResTime;
+				QList<QtProperty*> list;
+				QString combinedValue;
 
 				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+
+				//Speed stuff
+				speed = p_propMan->addProperty(QVariant::String, "Speed" );
+				speedFrac = p_propMan->addProperty(QVariant::Double, "Fraction" );
+				speedTime = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(speedFrac, m_speed);
+				p_propMan->setValue(speedTime, m_speedTime);
+				speed->addSubProperty(speedFrac);
+				speed->addSubProperty(speedTime);
+				list = speed->subProperties();
+				combinedValue = "";//Fraction: " + list.at(0)->valueText() + " Time: " + list.at(1)->valueText();
+				p_propMan->setValue(speed, combinedValue);
 				p_propBrows->addProperty(speed);
+
+				//Jump stuff
+				jumpHeight = p_propMan->addProperty(QVariant::String, "JumpHeight" );
+				jumpFrac = p_propMan->addProperty(QVariant::Double, "Fraction" );
+				jumpTime = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(jumpFrac, m_jumpHeight);
+				p_propMan->setValue(jumpTime, m_jumpTime);
+				jumpHeight->addSubProperty(jumpFrac);
+				jumpHeight->addSubProperty(jumpTime);
+				list = jumpHeight->subProperties();
+				combinedValue = "";//Fraction: " + list.at(0)->valueText() + " Time: " + list.at(1)->valueText();
+				p_propMan->setValue(jumpHeight, combinedValue);
 				p_propBrows->addProperty(jumpHeight);
+
+				//Knockback stuff
+				knockbackResistance = p_propMan->addProperty(QVariant::String, "Knockback Resistance" );
+				knResFrac = p_propMan->addProperty(QVariant::Double, "Fraction" );
+				knResTime = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(knResFrac, m_knockbackResistance);
+				p_propMan->setValue(knResTime, m_kbResTime);
+				knockbackResistance->addSubProperty(knResFrac);
+				knockbackResistance->addSubProperty(knResTime);
+				list = knockbackResistance->subProperties();
+				combinedValue = "";//Fraction: " + list.at(0)->valueText() + " Time: " + list.at(1)->valueText();
+				p_propMan->setValue(knockbackResistance, combinedValue);
 				p_propBrows->addProperty(knockbackResistance);
+
+				//Damage stuff
+				dmgResistance = p_propMan->addProperty(QVariant::String, "Damage Resistance" );
+				dmgResFrac = p_propMan->addProperty(QVariant::Double, "Fraction" );
+				dmgResTime = p_propMan->addProperty(QVariant::Double, "Time" );
+				p_propMan->setValue(dmgResFrac, m_damageResistance);
+				p_propMan->setValue(dmgResTime, m_dmgResTime);
+				dmgResistance->addSubProperty(dmgResFrac);
+				dmgResistance->addSubProperty(dmgResTime);
+				list = dmgResistance->subProperties();
+				combinedValue = "";//Fraction: " + list.at(0)->valueText() + " Time: " + list.at(1)->valueText();
+				p_propMan->setValue(dmgResistance, combinedValue);
+				p_propBrows->addProperty(dmgResistance);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
 				QList<QtProperty*> props, subprops;
 				props = p_propBrows->properties();
-				m_speed = p_propMan->variantProperty(props.at(0))->value().toFloat();
-				m_jumpHeight = p_propMan->variantProperty(props.at(1))->value().toFloat();
-				m_knockbackResistance = p_propMan->variantProperty(props.at(2))->value().toFloat();
+				subprops = props.at(0)->subProperties();
+				m_speed = p_propMan->variantProperty(subprops.at(0))->value().toFloat();
+				m_speedTime = p_propMan->variantProperty(subprops.at(1))->value().toFloat();
+				subprops = props.at(1)->subProperties();
+				m_jumpHeight = p_propMan->variantProperty(subprops.at(0))->value().toFloat();
+				m_jumpTime = p_propMan->variantProperty(subprops.at(1))->value().toFloat();
+				subprops = props.at(2)->subProperties();
+				m_knockbackResistance = p_propMan->variantProperty(subprops.at(0))->value().toFloat();
+				m_kbResTime = p_propMan->variantProperty(subprops.at(1))->value().toFloat();
+				subprops = props.at(3)->subProperties();
+				m_damageResistance = p_propMan->variantProperty(subprops.at(0))->value().toFloat();
+				m_dmgResTime = p_propMan->variantProperty(subprops.at(1))->value().toFloat();
 			}
 		};
 
@@ -670,15 +806,19 @@ namespace AbilityEditorNameSpace
 			float m_mass;
 			QVector3D m_gravity;
 			bool m_collide;
-			Physics(float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f), bool p_collide = true) : MainComponent(ComponentType::PHYSICS)
+			bool m_colWStatic;
+			bool m_externally;
+			Physics(float p_mass = 1.0f, QVector3D p_gravity = QVector3D(0.0f, -9.82f, 0.0f), bool p_collide = true, bool p_colWStatic = true, bool p_externally = false) : MainComponent(ComponentType::PHYSICS)
 			{
 				m_mass = p_mass;
 				m_gravity =	p_gravity;
 				m_collide = p_collide;
+				m_colWStatic = p_colWStatic;
+				m_externally = p_externally;
 			}
 			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
-				QtVariantProperty *mass, *gravity, *x, *y, *z, *collide;
+				QtVariantProperty *mass, *gravity, *x, *y, *z, *collide, *colWStatic, *external;
 				QList<QtProperty*> list;
 				QString combinedValue;
 				mass = p_propMan->addProperty(QVariant::Double, "Mass");
@@ -705,6 +845,14 @@ namespace AbilityEditorNameSpace
 				collide = p_propMan->addProperty(QVariant::Bool, "Collide with world");
 				p_propMan->setValue(collide, m_collide);
 				p_propBrows->addProperty(collide);
+
+				colWStatic = p_propMan->addProperty(QVariant::Bool, "Collide with static");
+				p_propMan->setValue(colWStatic, m_colWStatic);
+				p_propBrows->addProperty(colWStatic);
+
+				external = p_propMan->addProperty(QVariant::Bool, "Externally controlled");
+				p_propMan->setValue(external, m_externally);
+				p_propBrows->addProperty(external);
 			}
 			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
 			{
@@ -712,7 +860,7 @@ namespace AbilityEditorNameSpace
 
 				props = p_propBrows->properties();
 				m_mass = p_propMan->variantProperty(props.at(0))->value().toFloat();
-				
+
 				subprops = props.at(1)->subProperties();
 				for(int i = 0; i < subprops.size(); i++)
 				{
@@ -720,6 +868,8 @@ namespace AbilityEditorNameSpace
 				}
 
 				m_collide = p_propMan->variantProperty(props.at(2))->value().toBool();
+				m_colWStatic = p_propMan->variantProperty(props.at(3))->value().toBool();
+				m_externally = p_propMan->variantProperty(props.at(4))->value().toBool();
 			}
 		};
 
@@ -834,6 +984,32 @@ namespace AbilityEditorNameSpace
 				m_rangeMin = p_propMan->variantProperty(props.at(2))->value().toFloat();
 				m_rangeMax = p_propMan->variantProperty(props.at(3))->value().toFloat();
 				m_loop = p_propMan->variantProperty(props.at(4))->value().toBool();
+			}
+		};
+
+		struct Follow : MainComponent
+		{
+			float m_offset;
+			Follow(float p_offset = 0.0f) : MainComponent(ComponentType::FOLLOW)
+			{
+				m_offset = p_offset;
+			}
+			void ViewData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QtVariantProperty* offset;
+
+				offset = p_propMan->addProperty(QVariant::Double, "Offset");
+				p_propMan->setValue(offset, m_offset);
+				offset->setToolTip("Offset from followee");
+
+				p_propBrows->setFactoryForManager(p_propMan,p_factory);
+				p_propBrows->addProperty(offset);
+			}
+			void SaveData(QtVariantPropertyManager* p_propMan, QtTreePropertyBrowser* p_propBrows, QtVariantEditorFactory* p_factory)
+			{
+				QList<QtProperty*> props;
+				props = p_propBrows->properties();
+				m_offset = p_propMan->variantProperty(props.at(0))->value().toFloat();
 			}
 		};
 	}

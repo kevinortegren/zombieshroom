@@ -9,8 +9,12 @@ namespace RootForce
 {
 	struct TimerComponent : ECS::Component<TimerComponent> 
 	{
+		RakNet::RakString ScriptName;
+		RakNet::RakString FunctionName;
+		Network::NetworkEntityID Target;
 		float TimeLeft;
 		bool TimeUp;
+
 		TimerComponent()
 		{
 			TimeLeft = 0.0f;
@@ -26,7 +30,6 @@ namespace RootForce
 		{
 			SetUsage<TimerComponent>();
 			SetUsage<Network::NetworkComponent>();
-			SetUsage<Script>();
 		}
 
 		void Init();
@@ -37,7 +40,6 @@ namespace RootForce
 	private:
 		ECS::ComponentMapper<TimerComponent> m_timers;
 		ECS::ComponentMapper<Network::NetworkComponent> m_networks;
-		ECS::ComponentMapper<Script> m_scripts;
 
 		RakNet::RakPeerInterface* m_serverPeer;
 	};

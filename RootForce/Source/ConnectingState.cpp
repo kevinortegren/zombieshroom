@@ -37,7 +37,10 @@ namespace RootForce
 	void ConnectingState::Enter(const GameStates::PlayData& p_playData)
 	{
 		// Render a frame of loading screen to indicate the loading state
+		if(m_loadingScreen->GetView())
+			m_loadingScreen->BufferJavascript("Shuffle();");
 		m_loadingScreen->WaitLoading();
+		m_loadingScreen->SetActive(true);
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_gui->Render(m_loadingScreen);
 		g_engineContext.m_renderer->Swap();
@@ -104,12 +107,15 @@ namespace RootForce
 		// Setup the client
 		m_networkContext.m_clientMessageHandler->SetWorldSystem(m_sharedSystems.m_worldSystem.get());
 		m_networkContext.m_clientMessageHandler->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
+		m_networkContext.m_clientMessageHandler->SetDeserializationSystem(m_sharedSystems.m_deserializationSystem.get());
+
 		// Always set the client peer on the respawning system (this will only not be set for a dedicated server).
 		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 	}
 
 	void ConnectingState::Exit()
 	{
+		m_loadingScreen->SetActive(false);
 	}
 
 	GameStates::GameStates ConnectingState::Update()
@@ -119,6 +125,7 @@ namespace RootForce
 		m_networkContext.m_client->Update();
 
 		m_sharedSystems.m_respawnSystem->Process();
+		m_sharedSystems.m_deserializationSystem->Process();
 
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
 		Network::ClientComponent* clientComponent = g_world->GetEntityManager()->GetComponent<Network::ClientComponent>(clientEntity);

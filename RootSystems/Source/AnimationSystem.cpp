@@ -20,55 +20,169 @@ namespace RootForce
 		{
 			Renderable* renderable = m_renderables.Get(p_entity);
 			Animation* animation = m_animations.Get(p_entity);
-			if(animation->m_animClip == AnimationClip::RAGDOLL)
-				return;
-			if(animation->m_animClip != animation->m_prevAnimClip)
-			{
-				if(animation->m_locked == 2)
-					animation->m_animClip = animation->m_prevAnimClip;
-				else
-				{
-					animation->m_animTime = 0.0f;
-					animation->m_prevAnimClip = animation->m_animClip;
-					animation->m_blending = true;
-					animation->m_blendTime = 0.0f;
-					if(animation->m_locked == 1)
-						animation->m_locked = 2;
-				}
-			}
 
+			if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+				return;
 			const aiScene* tempScene = renderable->m_model->m_animation->GetScene();
-			glm::mat4 Identity = glm::mat4(1.0);
 
 			float TicksPerSecond = (float)(tempScene->mAnimations[0]->mTicksPerSecond != 0 ? tempScene->mAnimations[0]->mTicksPerSecond : 25.0f);
 
-			if(!animation->m_blending)
-			{
-				animation->m_animTime += m_world->GetDelta();
-				if(animation->m_locked == 2 && animation->m_animTime*TicksPerSecond >= (float)renderable->m_model->m_animation->GetAnimClip(animation->m_animClip)->m_duration)
-				{
-					animation->m_locked = 0;
-					return;
-				}
-			}
-			else
-			{
-				animation->m_blendTime += m_world->GetDelta();
-				if (animation->m_blendTime >= m_blendTime)
-				{
-					animation->m_blending = false;
-				}
-			}
-			
-			float TimeInTicks		= animation->m_animTime * TicksPerSecond;
-			float AnimationTime		= ((float)renderable->m_model->m_animation->GetAnimClip(animation->m_animClip)->m_startTime) + fmod(TimeInTicks, (float)renderable->m_model->m_animation->GetAnimClip(animation->m_animClip)->m_duration);
-			
-			ReadNodeHeirarchy(AnimationTime, tempScene->mRootNode, Identity, animation, renderable, tempScene);
+			UpdateUpperBodyAnimation(renderable, animation, TicksPerSecond);
+			UpdateLowerBodyAnimation(renderable, animation, TicksPerSecond);
+			//Calc upper root node rotation
+			CalcUpperRootNodeRotation(tempScene->mRootNode, animation, renderable, tempScene);
+			//Begin with lower body, which includes the hips(root node in animation)
+			ReadNodeHeirarchyLower(tempScene->mRootNode, glm::mat4(1.0), animation, renderable, tempScene);
 		}
 	}
 
-	void AnimationSystem::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene)
+	//UPPER
+	void AnimationSystem::UpdateUpperBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond )
+	{
+		//If animation switched, start new clip
+		if(p_animation->UpperBodyAnim.m_animClip != p_animation->UpperBodyAnim.m_prevAnimClip)
+		{
+			//m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::IDENTIFY_PRINT, "Upper animation changed from %d to %d", p_animation->UpperBodyAnim.m_prevAnimClip, p_animation->UpperBodyAnim.m_animClip);
+			p_animation->UpperBodyAnim.m_animTime = 0.0f;
+			p_animation->UpperBodyAnim.m_prevAnimClip = p_animation->UpperBodyAnim.m_animClip;
+			p_animation->UpperBodyAnim.m_blending = true;
+			p_animation->UpperBodyAnim.m_blendTime = 0.0f;
+		}
+
+		if(!p_animation->UpperBodyAnim.m_blending)
+		{
+			//If not blending, add animTime as normal
+			p_animation->UpperBodyAnim.m_animTime += m_world->GetDelta() * p_animation->AnimationSpeed;
+			//Check if animation need to unlock
+			if(p_animation->UpperBodyAnim.m_locked && p_animation->UpperBodyAnim.m_animTime * p_ticksPerSecond >= (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_duration)
+			{
+				//m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::IDENTIFY_PRINT, "Unlocked");
+
+				p_animation->UpperBodyAnim.m_locked = false;
+				return;
+			}
+		}
+		else
+		{
+			//If blending, update blendtime and unlock blending if blending time is up
+			p_animation->UpperBodyAnim.m_blendTime += m_world->GetDelta() * p_animation->AnimationSpeed;
+			if (p_animation->UpperBodyAnim.m_blendTime >= m_blendTime)
+			{
+				p_animation->UpperBodyAnim.m_blending = false;
+			}
+		}
+
+		float TimeInTicks		= p_animation->UpperBodyAnim.m_animTime * p_ticksPerSecond;
+		m_upperAnimTime			= ((float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_startTime) + fmod(TimeInTicks, (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_duration);
+	}
+
+	//LOWER
+	void AnimationSystem::UpdateLowerBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond )
+	{
+		//If animation switched, start new clip
+		if(p_animation->LowerBodyAnim.m_animClip != p_animation->LowerBodyAnim.m_prevAnimClip)
+		{
+			//m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::IDENTIFY_PRINT, "Lower animation changed from %d to %d", p_animation->LowerBodyAnim.m_prevAnimClip, p_animation->LowerBodyAnim.m_animClip);
+			p_animation->LowerBodyAnim.m_animTime = 0.0f;
+			p_animation->LowerBodyAnim.m_prevAnimClip = p_animation->LowerBodyAnim.m_animClip;
+			p_animation->LowerBodyAnim.m_blending = true;
+			p_animation->LowerBodyAnim.m_blendTime = 0.0f;
+		}
+
+		if(!p_animation->LowerBodyAnim.m_blending)
+		{
+			//If not blending, add animTime as normal
+			p_animation->LowerBodyAnim.m_animTime += m_world->GetDelta() * p_animation->AnimationSpeed;
+			//Check if animation need to unlock
+			if(p_animation->LowerBodyAnim.m_locked && p_animation->LowerBodyAnim.m_animTime * p_ticksPerSecond >= (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_duration)
+			{
+				p_animation->LowerBodyAnim.m_locked = false;
+				return;
+			}
+		}
+		else
+		{
+			//If blending, update blendtime and unlock blending if blending time is up
+			p_animation->LowerBodyAnim.m_blendTime += m_world->GetDelta() * p_animation->AnimationSpeed;
+			if (p_animation->LowerBodyAnim.m_blendTime >= m_blendTime)
+			{
+				p_animation->LowerBodyAnim.m_blending = false;
+			}
+		}
+
+		float TimeInTicks		= p_animation->LowerBodyAnim.m_animTime * p_ticksPerSecond;
+		m_lowerAnimTime			= ((float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_startTime) + fmod(TimeInTicks, (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_duration);
+	}
+
+	
+
+	void AnimationSystem::ReadNodeHeirarchyLower(const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene)
 	{    
+		std::string NodeName(pNode->mName.data);
+
+		const aiAnimation* pAnimation = p_aiScene->mAnimations[0];
+
+		aiMatrix4x4 am = pNode->mTransformation;
+		glm::mat4x4 gm = glm::mat4x4();
+		memcpy(&gm[0][0], &am[0][0], sizeof(aiMatrix4x4));
+		glm::mat4 NodeTransformation(glm::transpose(gm));
+		glm::mat4 NodeTranslate;
+		const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+
+		if (pNodeAnim) 
+		{
+			aiQuaternion RotationQ;
+			if(p_anim->LowerBodyAnim.m_blending)
+				CalcBlendedRotation(RotationQ, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->LowerBodyAnim.m_animClip)->m_startFrame, p_anim->LowerBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()], p_anim->LowerBodyAnim.m_blendTime );
+			else
+			{
+				CalcInterpolatedRotation(RotationQ, m_lowerAnimTime, pNodeAnim, p_anim);
+				p_anim->LowerBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()] = RotationQ;
+			}
+			
+			aiMatrix3x3 am3 = RotationQ.GetMatrix(); 
+			glm::mat3 gm3 = glm::mat3();
+			
+			memcpy(&gm3[0][0], &am3[0][0], sizeof(aiMatrix3x3));
+
+			glm::mat4 RotationM = glm::mat4(glm::transpose(gm3));
+
+			// Interpolate translation and generate translation transformation matrix
+			aiVector3D Translation;
+			if(p_anim->LowerBodyAnim.m_blending)
+				CalcBlendedPosition(Translation, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->LowerBodyAnim.m_animClip)->m_startFrame, p_anim->LowerBodyAnim.m_blendPos[pNodeAnim->mNodeName.C_Str()], p_anim->LowerBodyAnim.m_blendTime);
+			else
+			{
+				CalcInterpolatedPosition(Translation, m_lowerAnimTime, pNodeAnim, p_anim);
+				p_anim->LowerBodyAnim.m_blendPos[pNodeAnim->mNodeName.C_Str()] = Translation;
+			}
+			
+			glm::mat4 TranslationM = glm::translate(glm::mat4(1.0f), glm::vec3(Translation.x, Translation.y, Translation.z));
+
+			// Combine the above transformations
+			NodeTransformation =  TranslationM * RotationM;
+			NodeTranslate = TranslationM;
+		}
+		glm::mat4 GlobalTransformation = ParentTransform * NodeTransformation;
+
+		if (p_render->m_model->m_animation->BoneExists(NodeName)) 
+		{
+			unsigned int BoneIndex = p_render->m_model->m_animation->GetIndexFromBoneName(NodeName);
+			p_anim->m_bones[BoneIndex] = /*p_render->m_model->m_animation->GetGlobalInverseTransform() * */  GlobalTransformation * p_render->m_model->m_animation->GetBoneOffset(BoneIndex);
+		}
+
+		for (unsigned int i = 0 ; i < pNode->mNumChildren ; i++) 
+		{
+			if(i != 2)
+				ReadNodeHeirarchyLower(pNode->mChildren[i], GlobalTransformation, p_anim, p_render, p_aiScene);
+			else
+				ReadNodeHeirarchyUpper(pNode->mChildren[i], NodeTranslate * m_upperRootRotation, p_anim, p_render, p_aiScene);
+		}
+	}
+	
+	//Calc upper animation bones
+	void AnimationSystem::ReadNodeHeirarchyUpper(const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene )
+	{
 		std::string NodeName(pNode->mName.data);
 
 		const aiAnimation* pAnimation = p_aiScene->mAnimations[0];
@@ -82,19 +196,13 @@ namespace RootForce
 
 		if (pNodeAnim) 
 		{
-			/*
-			// Interpolate scaling and generate scaling transformation matrix
-			aiVector3D Scaling;
-			CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-			glm::mat4 ScalingM = glm::scale(glm::mat4(1.0f), glm::vec3(Scaling.x, Scaling.y, Scaling.z));*/
-			// Interpolate rotation and generate rotation transformation matrix
 			aiQuaternion RotationQ;
-			if(p_anim->m_blending)
-				CalcBlendedRotation(RotationQ, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->m_animClip)->m_startFrame);
+			if(p_anim->UpperBodyAnim.m_blending)
+				CalcBlendedRotation(RotationQ, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->UpperBodyAnim.m_animClip)->m_startFrame, p_anim->UpperBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()], p_anim->UpperBodyAnim.m_blendTime);
 			else
 			{
-				CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim, p_anim);
-				p_anim->m_blendRot[pNodeAnim->mNodeName.C_Str()] = RotationQ;
+				CalcInterpolatedRotation(RotationQ, m_upperAnimTime, pNodeAnim, p_anim);
+				p_anim->UpperBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()] = RotationQ;
 			}
 			
 			aiMatrix3x3 am3 = RotationQ.GetMatrix(); 
@@ -106,12 +214,12 @@ namespace RootForce
 
 			// Interpolate translation and generate translation transformation matrix
 			aiVector3D Translation;
-			if(p_anim->m_blending)
-				CalcBlendedPosition(Translation, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->m_animClip)->m_startFrame);
+			if(p_anim->UpperBodyAnim.m_blending)
+				CalcBlendedPosition(Translation, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->UpperBodyAnim.m_animClip)->m_startFrame, p_anim->UpperBodyAnim.m_blendPos[pNodeAnim->mNodeName.C_Str()], p_anim->UpperBodyAnim.m_blendTime);
 			else
 			{
-				CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim, p_anim);
-				p_anim->m_blendPos[pNodeAnim->mNodeName.C_Str()] = Translation;
+				CalcInterpolatedPosition(Translation, m_upperAnimTime, pNodeAnim, p_anim);
+				p_anim->UpperBodyAnim.m_blendPos[pNodeAnim->mNodeName.C_Str()] = Translation;
 			}
 			
 			glm::mat4 TranslationM = glm::translate(glm::mat4(1.0f), glm::vec3(Translation.x, Translation.y, Translation.z));
@@ -129,7 +237,37 @@ namespace RootForce
 
 		for (unsigned int i = 0 ; i < pNode->mNumChildren ; i++) 
 		{
-			ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation, p_anim, p_render, p_aiScene);
+			ReadNodeHeirarchyUpper(pNode->mChildren[i], GlobalTransformation, p_anim, p_render, p_aiScene);
+		}
+	}
+
+	void AnimationSystem::CalcUpperRootNodeRotation( const aiNode* pNode, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene )
+	{
+		const aiAnimation* pAnimation = p_aiScene->mAnimations[0];
+
+		const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, "Character1_Hips");
+
+		if (pNodeAnim) 
+		{
+			aiQuaternion RotationQ;
+			if(p_anim->UpperBodyAnim.m_blending)
+				CalcBlendedRotation(RotationQ, p_anim, pNodeAnim, p_render->m_model->m_animation->GetAnimClip(p_anim->UpperBodyAnim.m_animClip)->m_startFrame, p_anim->UpperBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()], p_anim->UpperBodyAnim.m_blendTime);
+			else
+			{
+				CalcInterpolatedRotation(RotationQ, m_upperAnimTime, pNodeAnim, p_anim);
+				p_anim->UpperBodyAnim.m_blendRot[pNodeAnim->mNodeName.C_Str()] = RotationQ;
+			}
+
+			aiMatrix3x3 am3 = RotationQ.GetMatrix(); 
+			glm::mat3 gm3 = glm::mat3();
+
+			memcpy(&gm3[0][0], &am3[0][0], sizeof(aiMatrix3x3));
+
+			m_upperRootRotation = glm::mat4(glm::transpose(gm3));
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::NON_FATAL_ERROR, "Root node not found for upper body");
 		}
 	}
 
@@ -165,25 +303,6 @@ namespace RootForce
 
 		return 0;
 	}
-
-
-	unsigned int AnimationSystem::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
-	{
-		assert(pNodeAnim->mNumScalingKeys > 0);
-
-		for (unsigned int i = 0 ; i < pNodeAnim->mNumScalingKeys - 1 ; i++)
-		{
-			if (AnimationTime < (float)pNodeAnim->mScalingKeys[i + 1].mTime) 
-			{
-				return i;
-			}
-		}
-
-		assert(0);
-
-		return 0;
-	}
-
 
 	void AnimationSystem::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim, Animation* p_anim)
 	{
@@ -227,26 +346,6 @@ namespace RootForce
 		Out = Out.Normalize();
 	}
 
-
-	void AnimationSystem::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
-	{
-		if (pNodeAnim->mNumScalingKeys == 1) 
-		{
-			Out = pNodeAnim->mScalingKeys[0].mValue;
-			return;
-		}
-
-		unsigned int ScalingIndex = FindScaling(AnimationTime, pNodeAnim);
-		unsigned int NextScalingIndex = (ScalingIndex + 1);
-		assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
-		float DeltaTime = (float)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
-		float Factor = (AnimationTime - (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
-		assert(Factor >= 0.0f && Factor <= 1.0f);
-		const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
-		const aiVector3D& End   = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
-		aiVector3D Delta = End - Start;
-		Out = Start + Factor * Delta;
-	}
 	const aiNodeAnim* AnimationSystem::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
 	{
 		for (unsigned int i = 0 ; i < pAnimation->mNumChannels ; i++) 
@@ -276,25 +375,26 @@ namespace RootForce
 		m_context = p_context;
 	}
 
-	void AnimationSystem::CalcBlendedPosition( aiVector3D& Out, Animation* p_anim, const aiNodeAnim* pNodeAnim, unsigned int p_toKeyFrame )
+	void AnimationSystem::CalcBlendedPosition( aiVector3D& Out, Animation* p_anim, const aiNodeAnim* pNodeAnim, unsigned int p_toKeyFrame, const aiVector3D& p_startPosInNewPose, float p_animBlendTime )
 	{
-		float Factor = p_anim->m_blendTime / m_blendTime;
+		float Factor = p_animBlendTime / m_blendTime;
 		assert(Factor >= 0.0f && Factor <= 1.0f);
-		const aiVector3D& Start = p_anim->m_blendPos[pNodeAnim->mNodeName.C_Str()];
+		const aiVector3D& Start = p_startPosInNewPose;
 		const aiVector3D& End = pNodeAnim->mPositionKeys[p_toKeyFrame].mValue;
 		aiVector3D Delta = End - Start;
 		Out = Start + Factor * Delta;
 	}
 
-	void AnimationSystem::CalcBlendedRotation( aiQuaternion& Out, Animation* p_anim, const aiNodeAnim* pNodeAnim, unsigned int p_toKeyFrame )
+	void AnimationSystem::CalcBlendedRotation( aiQuaternion& Out, Animation* p_anim, const aiNodeAnim* pNodeAnim, unsigned int p_toKeyFrame, const  aiQuaternion& p_startRotInNewPose, float p_animBlendTime )
 	{
-		float Factor = p_anim->m_blendTime / m_blendTime;
+		float Factor = p_animBlendTime / m_blendTime;
 		assert(Factor >= 0.0f && Factor <= 1.0f);
-		const aiQuaternion& StartRotationQ = p_anim->m_blendRot[pNodeAnim->mNodeName.C_Str()];
+		const aiQuaternion& StartRotationQ = p_startRotInNewPose;
 		const aiQuaternion& EndRotationQ   = pNodeAnim->mRotationKeys[p_toKeyFrame].mValue;    
 		aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
 		Out = Out.Normalize();
 	}
+
 
 }
 #endif

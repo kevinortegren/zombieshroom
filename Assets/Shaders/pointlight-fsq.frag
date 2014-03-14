@@ -24,6 +24,7 @@ layout(std140) uniform PerFrame
 uniform sampler2D g_Diffuse;
 uniform sampler2D g_Normals;
 uniform sampler2D g_Depth;
+uniform sampler2D g_GlowTrans;
 
 out vec4 out_Color;
 
@@ -45,9 +46,21 @@ vec3 GetVSPositionFromDepth(vec2 texcoord)
 	return (sPos.xyz / sPos.w);
 }
 
-void main() {
+vec3 GetDecodedNormal(vec2 TexCoord)
+{
+	vec2 vert_normal = texture(g_Normals, TexCoord).xy;	    
+    vec2 fenc = vert_normal*4-2;
+    float f = dot(fenc,fenc);
+    float g = sqrt(1-f/4);
+    vec3 normal;
+    normal.xy = fenc*g;
+    normal.z = 1-f/2;
+    return normal;
+}
 
-    vec2 TexCoord = gl_FragCoord.xy / vec2(1280,720);
+void main() {
+    vec2 TexCoord = vec2(gl_FragCoord.st)/textureSize(g_Diffuse, 0);
+	float translucency = texture(g_GlowTrans, TexCoord).a;
 
     // Position.
     vec3 position = GetVSPositionFromDepth(TexCoord);
@@ -59,10 +72,7 @@ void main() {
 	vec3 light = vec3(0.0);
 	
 	// Normal.
-	vec2 vert_normal = texture(g_Normals, TexCoord).xy;	
-	vec3 normal;
-	normal.xy = vert_normal.xy;
-	normal.z = sqrt(1-dot(normal.xy, normal.xy));
+	vec3 normal = GetDecodedNormal(TexCoord);
   
 	// Materials.
 	vec4 rt0 = texture(g_Diffuse, TexCoord);
@@ -74,8 +84,15 @@ void main() {
 	vec3 viewDir = -normalize(position);
 	vec3 halfVector = normalize(viewDir + vert_lightVec);
 
-	vec3 spec_color = vec3(specTerm) * pow(clamp(dot(normal, halfVector), 0.0f, 1.0f), 128.0f);
-	vec3 diffuse_color = diffuse * max( 0.0f, dot( normalize( vert_lightVec ), normal ) ) * ex_Light.Color.xyz;
+	//Translucency
+	float EdotL = max(0.0, dot(-viewDir, vert_lightVec)); // 1 if facing the light.
+    float LdotN = max(0.0, dot( vert_lightVec, -normal)); // 1 if inverse normal facing the light.  
+
+    float transFactor = clamp(EdotL * LdotN, 0.0, 1.0) * translucency;
+    float diffuseFactor = max(0.0, dot( normalize( vert_lightVec ), normal ));
+    
+	vec3 spec_color = ex_Light.Color.xyz * specTerm * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0f);
+	vec3 diffuse_color = clamp(diffuseFactor + transFactor, 0.0, 1.0) * diffuse * ex_Light.Color.xyz;
 
 	light = diffuse_color + spec_color;
 	light = light / dot(ex_Light.Attenuation, vec3(1, dist, dist*dist));     

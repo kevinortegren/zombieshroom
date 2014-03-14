@@ -11,18 +11,20 @@ extern ECS::World* g_world;
 namespace RootForce
 {
 
-	IngameMenu::IngameMenu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper )
+	IngameMenu::IngameMenu( RootEngine::GUISystem::WebView* p_view, RootEngine::GameSharedContext p_context, Keymapper* p_keymapper, ChatSystem* p_chatSystem)
 	{
 		m_return = false;
 		m_exit = false;
+		m_changeName =false;
 
 		m_view = p_view;
-		m_settingsMenu = new SettingsMenu(p_context, p_keymapper);
+		m_settingsMenu = new SettingsMenu(p_context, p_keymapper, p_chatSystem);
 		p_keymapper->SetMenu(m_view);
 
 		m_view->RegisterJSCallback("Exit", JSDelegate1(this, &IngameMenu::Exit));
 		m_view->RegisterJSCallback("Return", JSDelegate1(this, &IngameMenu::Return));
 		m_view->RegisterJSCallback("SelectTeam", JSDelegate1(this, &IngameMenu::ChangeTeam));
+		m_view->RegisterJSCallback("ChangeName", JSDelegate1(this, &IngameMenu::ChangeName));
 
 		m_settingsMenu->BindEvents(m_view);
 		m_view->Focus();
@@ -47,6 +49,7 @@ namespace RootForce
 		if(p_array[0].IsInteger())
 		{
 			m_changeTeam = p_array[0].ToInteger();
+			m_return = true;
 		}
 	}
 
@@ -75,12 +78,32 @@ namespace RootForce
 				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerTeamSelect);
 				m.Serialize(true, &bs);
 
-				m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+				m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 			}
 
-			m_return = true;
 			m_changeTeam = -1;
 		}
+		if(m_changeName)
+		{
+			if(m_clientPeer != nullptr)
+			{
+				Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(g_world->GetTagManager()->GetEntityByTag("Player"));
+				RootForce::NetworkMessage::PlayerNameChange m;
+
+				m.Name = RakNet::RakString(g_engineContext.m_configManager->GetConfigValueAsString("settings-player-name").c_str());
+				m.UserID = network->ID.UserID;
+				RakNet::BitStream bs;
+				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
+				bs.Write(RakNet::GetTime());
+				bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::PlayerNameChange);
+				m.Serialize(true, &bs);
+
+				m_clientPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
+			}
+		}
+		PlayerControl* control = g_world->GetEntityManager()->GetComponent<PlayerControl>(g_world->GetTagManager()->GetEntityByTag("Player"));
+		control->m_mouseSensitivity = g_engineContext.m_configManager->GetConfigValueAsFloat("settings-mouse-sensitivity");
+		control->m_invertMouse = g_engineContext.m_configManager->GetConfigValueAsBool("settings-mouse-invert");
 	}
 
 	void IngameMenu::SetScoreList(std::string p_score)
@@ -89,6 +112,15 @@ namespace RootForce
 		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 
 		m_view->BufferJavascript("UpdateScoreScreen(" + std::to_string(playerComponent->TeamID) + ",'" + RootEngine::GUISystem::PreventHTMLInjections(playerComponent->Name) + "'," + p_score + ");");
+	}
+
+	void IngameMenu::ChangeName( const Awesomium::JSArray& p_array )
+	{
+		if(p_array[0].IsBoolean())
+		{
+			m_changeName= p_array[0].ToBoolean();
+			m_return = true;
+		}
 	}
 
 }

@@ -9,7 +9,7 @@ namespace RootForce
 {
 
 	WaterSystem::WaterSystem( ECS::World* p_world, RootEngine::GameSharedContext* p_context ) 
-		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f, 0.0f, 0.01f, 0.0f)), m_playerWaterDeath(true)
+		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f, 0.0f, 0.01f, 0.0f)), m_playerWaterDeath(true), m_showDebugDraw(false)
 	{
 		SetUsage<RootForce::Transform>();
 		SetUsage<RootForce::WaterCollider>();
@@ -35,14 +35,17 @@ namespace RootForce
 
 	void WaterSystem::Begin()
 	{
-		if(m_pause)//Don't calculate if paused
+		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
 			return;
+
+		UpdateWaterHeight();
 
 		m_dt += m_world->GetDelta();
 		m_totalTime += m_world->GetDelta();
 		//Only simulate water every time step
 		if(m_dt >= m_timeStep)
 		{   	
+			
 			//Compute shader dispatch. New heights are calculated and stored in Texture0 and normals+previous height are calculated and stored in Texture1(Render texture);
 			m_context->m_renderer->Compute(&m_computeJob);
 			//Bind previous texture(Texture1) to render material. This will render the water 1 frame behind the simulation, but increases performance as there are no needs for memoryBarriers in the compute shader.
@@ -56,14 +59,20 @@ namespace RootForce
 
 	void WaterSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
-		RootForce::Transform*		transform = m_transform.Get(p_entity);
-		RootForce::WaterCollider*	waterCollider = m_waterCollider.Get(p_entity);
-
-		if(m_pause)
+		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
 			return;
 
-		float waterHeight = GetWaterHeight();
+		RootForce::Transform*		transform = m_transform.Get(p_entity);
+		RootForce::WaterCollider*	waterCollider = m_waterCollider.Get(p_entity);
+		
+		float waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
 
+		if(m_showDebugDraw)
+		{
+			m_context->m_renderer->AddLine(glm::vec3(transform->m_position.x, transform->m_position.y - waterCollider->m_radius/2.0f,  transform->m_position.z), glm::vec3(transform->m_position.x,  transform->m_position.y + waterCollider->m_radius/2.0f,  transform->m_position.z) ,glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+			m_context->m_renderer->AddLine(glm::vec3(transform->m_position.x-500.0f, waterHeight,  transform->m_position.z) , glm::vec3(transform->m_position.x+500.0f, waterHeight,  transform->m_position.z) ,glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+			m_context->m_renderer->AddLine(glm::vec3(transform->m_position.x, waterHeight,  transform->m_position.z-500.0f) , glm::vec3(transform->m_position.x, waterHeight,  transform->m_position.z+500.0f) ,glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
 		//If over water, set edge time to 0 and return
 		if(transform->m_position.y > waterHeight + waterCollider->m_radius/2.0f)
 		{
@@ -80,22 +89,13 @@ namespace RootForce
 		else //if by the edge of the water, start disturbing at given interval
 			
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
-		{	
-
-#ifndef COMPILE_LEVEL_EDITOR
-			//Check if player and kill
-			if(m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity) && m_playerWaterDeath)
-			{
-				m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_entity)->Health = 0.0f;
-			}
-#endif
-		
+		{					
 			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
 			else if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::UNDER_WATER)
 				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower, waterCollider->m_radius);
-			else
+			else//if previous water state was EDGE_WATER we disturb 1/3 of the power
 				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower/3.0f, waterCollider->m_radius);
 			waterCollider->m_prevPos = transform->m_position;
 			waterCollider->m_edgeWaterTime = waterCollider->m_disturbInterval;
@@ -110,11 +110,12 @@ namespace RootForce
 
 	}
 
-	void WaterSystem::CreateWater(float p_height)
+	void WaterSystem::CreateWater()
 	{
-		//Don't create water if there is no water on the level
-		if(p_height == 0)
+		if(!m_world->GetStorage()->DoesKeyExist("Water"))
 			return;
+
+		float waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Pouring water into level!");
 
@@ -126,8 +127,12 @@ namespace RootForce
 		m_texture[1]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_R32 );
 		m_texture[1]->SetAccess(GL_READ_WRITE);
 		m_texture[2] = m_context->m_resourceManager->CreateTexture("computeTex3");
-		m_texture[2]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_RGBA8 );
+		m_texture[2]->CreateEmptyTexture(m_texSize, m_texSize, Render::TextureFormat::TextureFormat::TEXTURE_RG16 );
 		m_texture[2]->SetAccess(GL_READ_WRITE);
+
+		//std::vector<glm::u8vec4> emptyData(m_texSize * m_texSize, glm::u8vec4(127,255,127,0));
+		
+		//m_texture[2]->BufferData(&emptyData[0]);
 
 		//Create compute effect
 		m_effect = m_context->m_resourceManager->LoadEffect("WaterCompute");
@@ -145,7 +150,7 @@ namespace RootForce
 		m_computeJob.m_params[Render::Semantic::XMAX]	= &m_texSize;
 
 		//Set standard values
-		m_speed		= 11.0f;
+		m_speed		= 13.0f;
 		m_dx		= (m_scale*64.0f) / m_texSize;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
@@ -156,7 +161,7 @@ namespace RootForce
 		//Create water entity
 		ECS::Entity*			waterEnt	= m_world->GetEntityManager()->CreateEntity();
 		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
-		trans->m_position = glm::vec3(0,p_height,0); //Set Y-position to in-parameter
+		trans->m_position = glm::vec3(0,waterHeight,0); //Set Y-position to in-parameter
 		trans->m_scale = glm::vec3(m_scale,1,m_scale);
 
 		//Create a renderable component for the water
@@ -179,8 +184,15 @@ namespace RootForce
 		//Total running time
 		m_renderable->m_params[Render::Semantic::LIFETIMEMIN] = &m_totalTime;
 
+		//DX
+		m_renderable->m_params[Render::Semantic::LIFETIMEMAX] = &m_dx;
+
 		//Water options
 		m_renderable->m_params[Render::Semantic::COLOR] = &m_waterOptions;
+
+		//Directional light
+		m_renderable->m_params[Render::Semantic::COLOREND] = &m_context->m_renderer->GetDirectionalLight()->m_color;
+		m_renderable->m_params[Render::Semantic::DIRECTION] = &m_context->m_renderer->GetDirectionalLight()->m_direction;
 
 		//Camera position in world space
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 
@@ -194,12 +206,16 @@ namespace RootForce
 		//Start with some init disturbs
 		LoadWater();
 
+#ifndef RENDER_USE_COMPUTE
+		ResetWater();
+#endif
 		//Run water simulation
 		m_pause = false;
 	}
 
 	void WaterSystem::CreateWaterMesh()
 	{
+
 		if(m_context->m_resourceManager->GetModel("WaterModel"))
 		{
 			m_renderable->m_model = m_context->m_resourceManager->GetModel("WaterModel");
@@ -252,6 +268,10 @@ namespace RootForce
 
 	void WaterSystem::Disturb( float p_x, float p_z, float p_power, int p_radius )
 	{
+		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
+			return;
+
+#ifdef RENDER_USE_COMPUTE
 		glm::vec2 waterPos = WorldSpaceToWaterSpace(glm::vec2(p_x, p_z));
 		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb position: x: %f, z: %f", waterPos.x, waterPos.y);
 
@@ -294,26 +314,7 @@ namespace RootForce
 		m_computeJob.m_textures[1]->Unbind(0);
 
 		//g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Disturb samples %d", plumsPos.size());
-	}
-
-	void WaterSystem::InitDisturb()
-	{
-		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Starting earthquake to create water movement");
-		for(int i = 0; i < 50; ++i)
-		{ 
-			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
-			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
-
-			Disturb((float)x, (float)z, 0.5f, 20);
-		}
-		for(int i = 0; i < 50; ++i)
-		{ 
-			int x = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
-			int z = (3 + rand() % ((m_gridSize-4)*(int)m_scale)) - (m_gridSize/2)*(int)m_scale;
-
-			Disturb((float)x, (float)z, -0.5f, 20);
-		}
-		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is now moving");
+#endif
 	}
 
 	void WaterSystem::CalculateWaterConstants()
@@ -369,6 +370,12 @@ namespace RootForce
 		m_playerWaterDeath = m_playerWaterDeath ? false : true;
 	}
 
+	void WaterSystem::ToggleCollisionDebugDraw()
+	{
+		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water collision draw toggled!");
+		m_showDebugDraw = m_showDebugDraw ? false : true;
+	}
+
 	void WaterSystem::IncreaseSpeed()
 	{
 		m_speed += 2.0f;
@@ -415,14 +422,9 @@ namespace RootForce
 		CalculateWaterConstants();
 	}
 
-	float WaterSystem::GetWaterHeight()
+	void WaterSystem::UpdateWaterHeight()
 	{
-		return m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y;
-	}
-
-	void WaterSystem::SetWaterHeight( float p_height )
-	{
-		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = p_height;
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = m_world->GetStorage()->GetValueAsFloat("Water");
 	}
 
 	bool WaterSystem::ValidValues()
@@ -455,6 +457,9 @@ namespace RootForce
 
 	void WaterSystem::ParseCommands(std::stringstream* p_data )
 	{
+		if(!m_world->GetStorage()->DoesKeyExist("Water"))
+			return;
+
 		std::string module;
 		std::string param;
 		std::string value;
@@ -462,7 +467,53 @@ namespace RootForce
 		std::getline(*p_data, module, ' ');
 		std::getline(*p_data, module, ' ');
 
-		if(module == "collide" || module == "c")
+		if(module == "low")
+		{	
+			m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Set water settings to LOW");
+			//Reflections off
+			m_waterOptions.x = 1.0f;
+			//Normal map off
+			m_waterOptions.y = 1.0f;
+			//Refractions off
+			m_waterOptions.w = 1.0f;
+			//Reset water
+			ResetWater();
+			//No Compute and water collisions
+			m_pause = true;
+		}
+		else if(module == "medium")
+		{	
+			m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Set water settings to MEDIUM");
+			//Reflections off
+			m_waterOptions.x = 1.0f;
+			//Normal map on
+			m_waterOptions.y = 0.0f;
+			//Refractions on
+			m_waterOptions.w = 0.0f;
+			//Start water
+			m_pause = false;
+			//Init water
+			LoadWater();
+		}
+		else if(module == "high")
+		{	
+			m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Set water settings to HIGH");
+			//Reflections on
+			m_waterOptions.x = 0.0f;
+			//Normal map on
+			m_waterOptions.y = 0.0f;
+			//Refractions on
+			m_waterOptions.w = 0.0f;
+			//Start water
+			m_pause = false;
+			//Init water
+			LoadWater();
+		}
+		else if(module == "collidedraw" || module == "cd")
+		{	
+			ToggleCollisionDebugDraw();
+		}
+		else if(module == "collide" || module == "c")
 		{	
 			ToggleCollideDeath();
 		}
@@ -556,13 +607,19 @@ namespace RootForce
 		{
 			std::getline(*p_data, value, ' ');
 
-			SetWaterHeight((float)atof(value.c_str()));
+			m_world->GetStorage()->SetValue("Water", (float)atof(value.c_str()));
 		}
 		else if(module == "disturb" || module == "dis")
 		{
+			std::string param;
+			std::string value;
+
+			std::getline(*p_data, param, ' ');
+			std::getline(*p_data, value, ' ');
+
 			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
 			RootForce::Transform* trans =  m_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
-			Disturb(trans->m_position.x, trans->m_position.z, -2.0f, 20);
+			Disturb(trans->m_position.x, trans->m_position.z, (float)atof(param.c_str()), (int)atoi(value.c_str()));
 		}
 		else if(module == "help")
 		{
@@ -573,10 +630,11 @@ namespace RootForce
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w refr - Toggle refractions");
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w norm - Toggle normal maps");
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w c - Toggle water death collide");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w cd - Toggle water collision debug draw");
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w depth [float]	- Set water depth factor X(float)");
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w r - Reset the water simulation");
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w init - Init water movement with default values");
-			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w dis - Disturb water at player position");
+			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w dis [float] [int] - Disturb water at player position by power(float) and radius(int)");
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w h [float] - Set water height to X(float)");
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w d - Damping settings");
 			m_context->m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/w s - Speed settings");

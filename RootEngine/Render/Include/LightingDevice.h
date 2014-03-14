@@ -15,7 +15,7 @@ namespace Render
 	{
 		enum BackgroundBlend
 		{
-			ADDATIVE,
+			ADDITIVE,
 			ALPHABLEND
 		};
 	}
@@ -31,6 +31,7 @@ namespace Render
 		void SetAmbientLight(const glm::vec4& p_color);
 		void AddDirectionalLight(const DirectionalLight& p_light, int index);
 		void AddPointLight(const PointLight& p_light, int index);
+		DirectionalLight* GetDirectionalLight();
 
 		void SSAO();
 		void Clear();
@@ -95,7 +96,7 @@ namespace Render
 		std::shared_ptr<ProgramInterface> m_pointLightFullScreen;
 		std::shared_ptr<ProgramInterface> m_pointLightStencil;
 		std::shared_ptr<ProgramInterface> m_pointLight;
-		std::shared_ptr<ProgramInterface> m_backgroundAddative;
+		std::shared_ptr<ProgramInterface> m_backgroundAdditive;
 		std::shared_ptr<ProgramInterface> m_backgroundAlphaBlend;
 		std::shared_ptr<ProgramInterface> m_pointLightFSQ;
 

@@ -4,12 +4,21 @@ AbilityRay.pushback = 0;
 AbilityRay.cooldown = 5;
 AbilityRay.chargeTime = 0.0;
 AbilityRay.channelingTime = 0.0;
+AbilityRay.crosshair = "crosshairPrecision";
+
+function AbilityRay.ChargeStart(userId, actionId)
+end
 
 function AbilityRay.ChargeDone(time, userId, actionId)
 end
 
 function AbilityRay.ChannelingDone(time, userId, actionId)
 	AbilityRay.OnCreate(userId, actionId);
+	--Animation clip
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
+end
+
+function AbilityRay.Interrupted(time, userId, actionId)
 end
 
 function AbilityRay.OnCreate (userId, actionId)
@@ -40,8 +49,7 @@ end
 
 function AbilityRay.OnCollide (self, entity)
 	local hitCol = entity:GetCollision();
-	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
+	local type = hitCol:GetType();
 	local network = self:GetNetwork();
 	local transComp = self:GetTransformation();
 	transComp:SetPos(self:GetCollisionResponder():GetCollisionPosition(entity));

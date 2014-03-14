@@ -82,13 +82,15 @@ namespace RootEngine
 			GLuint m_texture;
 			std::shared_ptr<Render::ProgramInterface> m_program;
 			GLuint m_vertexArrayBuffer;
+			GLuint m_vertexBufferObject;
 			GLTextureSurfaceFactory* m_glTexSurfaceFactory;
 
-			void SurfaceToTexture(GLTextureSurface* p_surface);
+			GLuint SurfaceToTexture(GLTextureSurface* p_surface);
 			int MapToAwesomium(SDL_Keycode p_key);
 			int MapEventToAwesomium(SDL_Event p_event);
 			Dispatcher* m_dispatcher;
 			
+			std::mutex m_resizeMutex;
 			std::mutex m_drawMutex;
 			std::mutex m_viewBufferMutex;
 			std::vector<WebViewImpl*> m_viewBuffer;

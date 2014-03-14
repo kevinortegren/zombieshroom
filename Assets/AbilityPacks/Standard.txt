@@ -1,3 +1,14 @@
 AbilityDash
 AbilityBall
 FireBall
+PowerRay
+RefractiveBall
+IceCube
+Homing
+SlowNova
+Boost
+MachineGun
+HealCharges
+ExplodingShroom
+AbilityTotem
+Cannonball

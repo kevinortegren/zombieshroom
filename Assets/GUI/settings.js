@@ -26,15 +26,17 @@ $(document).ready(function() {
 	// Request setting data from the program and parse it
   JSGlobal.LoadSettings = function () {
     var settings = Menu.RequestSettings();
-		$("#controls-settings-wrapper > DIV").remove();
+		$("#controls-settings-wrapper>DIV").remove();
 		
     for(var key in settings)
 		{
-			// Fullscreen checkbox/radio button processing
-      if(key == "settings-fullscreen")
-        $("input[name=settings-fullscreen]").filter("[value="+settings[key]+"]").prop("checked", true);
+			// Radio button processing
+			$("input[type='radio']").each(function(){
+				if($(this).prop("name") == key && $(this).prop("value") == settings[key])
+					$(this).prop("checked", true);
+			});
 			// Resolution list population
-      else if(key == "settings-resolution-list")
+      if(key == "settings-resolution-list")
       {
         $("#settings-resolution").empty();
         eval(settings[key]).forEach(function(resolution) {
@@ -46,10 +48,13 @@ $(document).ready(function() {
 			else if(key.search("settings-key-") > -1)
 			{
 				var prefix = "settings-key-";
-				$("#controls-settings-wrapper > input:first").before('<div><div class="inline-150px">'+key.substr(key.search(prefix)+prefix.length).replace('_',' ')+'</div><input id="'+key+'" value="'+settings[key]+'" class="controls-settings-keybind"/></div>');
+				$("#controls-settings-wrapper>input:first").before('<div><div class="inline-300px">'+key.substr(key.search(prefix)+prefix.length).replace('_',' ')+'</div><input id="'+key+'" value="'+settings[key]+'" class="controls-settings-keybind"/></div>');
 			}
       else
+      {
         $("#"+key).val(settings[key]);
+        $("#"+key).trigger("change");
+      }
     }
 		
 		// Focus and unfocus events for keybindings
@@ -77,6 +82,7 @@ $(document).ready(function() {
     $("#player-settings-menu").css("display", "none");
     $("div#settings-menu").css("display", "table");
     $("tr#settings-menu").css("display", "table-row");
+    Menu.ChangeName(true);
   } );
   // Graphics settings
   $("#graphics-settings-back").click(function() {
@@ -87,6 +93,10 @@ $(document).ready(function() {
   } );
   $("#graphics-settings-save").click(function() {
     var settings = {};
+    settings["settings-glow"] = $("input[name=settings-glow]:checked").val();
+    settings["settings-grass"] = $("input[name=settings-grass]:checked").val();
+    settings["settings-shadows"] = $("input[name=settings-shadows]:checked").val();
+    settings["settings-water"] = $("input[name=settings-water]:checked").val();
     settings["settings-fullscreen"] = $("input[name=settings-fullscreen]:checked").val();
     settings["settings-resolution"] = $("#settings-resolution").val();
     Menu.SaveSettings(settings);
@@ -103,6 +113,8 @@ $(document).ready(function() {
   } );
   $("#controls-settings-save").click(function() {
     var settings = {};
+    settings["settings-mouse-invert"] = $("input[name=settings-mouse-invert]:checked").val();
+    settings["settings-mouse-sensitivity"] = $("#settings-mouse-sensitivity").val();
 		$(".controls-settings-keybind").each(function() {
 			settings[$(this).prop('id')] = $(this).val();
 		} );
@@ -111,4 +123,12 @@ $(document).ready(function() {
     $("div#settings-menu").css("display", "table");
     $("tr#settings-menu").css("display", "table-row");
   } );
-} );
+
+	$("input[type=radio]").css('display', 'none');
+	$("input[type=radio]").next("label").click(function(){
+		$(this).prev().prop("checked", true);
+	});
+  $("input[type=range]").change(function(){
+    $(this).siblings("input[type=range]+label").html(Math.floor($(this).val()*100)/100.0);
+  });
+ } );

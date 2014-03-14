@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootSystems/Include/TransformInterpolationSystem.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootEngine/Include/GameSharedContext.h>
@@ -56,3 +58,5 @@ namespace RootForce
 		
 	}
 }
+
+#endif

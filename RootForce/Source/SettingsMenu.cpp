@@ -3,14 +3,21 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
+#include <RootSystems/Include/Network/NetworkComponents.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
+#include <RootSystems/Include/PlayerSystem.h>
+
+extern ECS::World* g_world;
 namespace RootForce
 {
 
 
-	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context, Keymapper* p_keymapper )
+	SettingsMenu::SettingsMenu( RootEngine::GameSharedContext p_context, Keymapper* p_keymapper, ChatSystem* p_chatSystem)
 		: m_keymapper(p_keymapper)
+		, m_chatSystem(p_chatSystem)
 	{
 		m_context = p_context;
+		m_workingDir = m_context.m_resourceManager->GetWorkingDirectory();
 		m_fullscreen = m_context.m_configManager->GetConfigValueAsBool("settings-fullscreen");
 		std::string resolutionString = m_context.m_configManager->GetConfigValueAsString("settings-resolution");
 		int splitPos = resolutionString.find('x');
@@ -27,7 +34,7 @@ namespace RootForce
 	Awesomium::JSValue SettingsMenu::RequestSettingsEvent( const Awesomium::JSArray& p_array )
 	{
 		// Reload config
-		m_context.m_configManager->LoadConfig("config.yaml");
+		m_context.m_configManager->LoadConfig( m_workingDir + "config.yaml");
 		// Update keybinding manager
 		auto map = m_context.m_configManager->GetConfigValuePairs();
 		for(auto pair : map)
@@ -66,26 +73,10 @@ namespace RootForce
 		Awesomium::JSArray keys = map.GetPropertyNames();
 		for(unsigned i = 0; i < keys.size(); i++)
 		{
-			if(Awesomium::ToString(keys[i].ToString()).compare("settings-fullscreen") == 0)
-			{
-				m_fullscreen = Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString()).compare("true") == 0 ? true : false;
-				m_shouldUpdate = true;
-			}
-			if(Awesomium::ToString(keys[i].ToString()).compare("settings-resolution") == 0)
-			{
-				std::string resolutionString = Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString());
-				int splitPos = resolutionString.find('x');
-				m_screenWidth = std::stoi(resolutionString.substr(0, splitPos));
-				m_screenHeight = std::stoi(resolutionString.substr(splitPos+1));
-				m_shouldUpdate = true;
-			}
-			m_context.m_configManager->SetConfigValue(
-				RootEngine::GUISystem::PreventHTMLInjections(Awesomium::ToString(keys[i].ToString())),
-				RootEngine::GUISystem::PreventHTMLInjections(Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString()))
-			);
+			SetValue(Awesomium::ToString(keys[i].ToString()), Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString()));
 		}
 
-		m_context.m_configManager->StoreConfig("config.yaml"); // Hardcoding config file is not nice
+		m_context.m_configManager->StoreConfig(m_workingDir + "config.yaml"); // Hardcoding config file is not nice
 	}
 
 	void SettingsMenu::FocusBindEvent(const Awesomium::JSArray& p_array)
@@ -118,4 +109,54 @@ namespace RootForce
 		}
 	}
 
+	void SettingsMenu::SetValue(std::string p_key, std::string p_value)
+	{
+		if(p_key.compare("settings-glow") == 0)
+		{
+			if(m_chatSystem)
+				m_chatSystem->InjectEvent("render glow display " + std::to_string(p_value.compare("true")==0));
+		}
+		else if(p_key.compare("settings-grass") == 0)
+		{
+			float factor = 1;
+			if(p_value.compare("low") == 0)
+				factor = 0.25f;
+			else if(p_value.compare("medium") == 0)
+				factor = 0.5f;
+			if(m_chatSystem)
+				m_chatSystem->InjectEvent("botany factor " + std::to_string(factor));
+		}
+		else if(p_key.compare("settings-shadows") == 0)
+		{
+			float factor = 1;
+			if(p_value.compare("low") == 0)
+				factor = 0.25f;
+			else if(p_value.compare("medium") == 0)
+				factor = 0.5f;
+			if(m_chatSystem)
+				m_chatSystem->InjectEvent("render shadow " + std::to_string(factor==1));
+		}
+		else if(p_key.compare("settings-water") == 0)
+		{
+			if(m_chatSystem)
+				m_chatSystem->InjectEvent("water " + p_value);
+		}
+		else if(p_key.compare("settings-fullscreen") == 0)
+		{
+			m_fullscreen = p_value.compare("true") == 0 ? true : false;
+			m_shouldUpdate = true;
+		}
+		else if(p_key.compare("settings-resolution") == 0)
+		{
+			int splitPos = p_value.find('x');
+			m_screenWidth = std::stoi(p_value.substr(0, splitPos));
+			m_screenHeight = std::stoi(p_value.substr(splitPos+1));
+			m_shouldUpdate = true;
+		}
+
+		m_context.m_configManager->SetConfigValue(
+			RootEngine::GUISystem::PreventHTMLInjections(p_key),
+			RootEngine::GUISystem::PreventHTMLInjections(p_value)
+		);
+	}
 }

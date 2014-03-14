@@ -5,6 +5,9 @@
 #include <glm/gtx/transform.hpp>
 #include <RootSystems/Include/Shapes/OBB.h>
 
+#include <RootEngine/Include/GameSharedContext.h>
+extern RootEngine::GameSharedContext g_engineContext;
+
 namespace RootForce
 {
 	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName)
@@ -31,8 +34,20 @@ namespace RootForce
 			auto material = renderable->m_material;
 			auto mesh = renderable->m_model->m_meshes[0];
 
-			unsigned materialIndex = m_materials.size();
-			m_materials.push_back(material);
+			unsigned materialIndex = 0;
+
+			auto materialItr = std::find(m_materials.begin(), m_materials.end(), material);
+
+			if(materialItr == m_materials.end())
+			{
+				materialIndex = m_materials.size();
+				m_materials.push_back(material);
+			}
+			else
+			{
+				materialIndex = materialItr - m_materials.begin();
+			}
+			
 			m_sizes.push_back(mesh->GetVertexBuffer()->GetElementSize());
 
 			RootForce::Transform* transform = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(entity);
@@ -180,7 +195,6 @@ namespace RootForce
 	{		
 		for(auto itr = m_entities.begin(); itr != m_entities.end(); ++itr)
 		{
-			m_world->GetEntityManager()->RemoveAllComponents((*itr));
 			m_world->GetEntityManager()->RemoveEntity((*itr));
 		}
 
@@ -193,6 +207,10 @@ namespace RootForce
 			auto a = m_world->GetGroupManager()->GetEntitiesInGroup(m_groupName);
 			for(auto b = a.first; b != a.second; ++b)
 			{
+				RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>((*b).second);
+
+				g_engineContext.m_resourceManager->RemoveRenderingMeshesFromModel(renderable->m_model);
+
 				m_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>((*b).second);
 			}
 		}

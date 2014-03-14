@@ -20,13 +20,17 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 	RootForce::StateComponent* state = m_state.Get(p_entity);
 	RootForce::Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<RootForce::Network::NetworkComponent>(p_entity);
 
-	
 	if(m_engineContext->m_physics->IsOnGround(*(collision->m_handle))
 		&& (state->CurrentState == RootForce::EntityState::DESCENDING
 			|| state->CurrentState == RootForce::EntityState::ASCENDING)
 		&& state->CurrentState != RootForce::EntityState::GROUNDED)
 	{
+		/*if (state->CurrentState != RootForce::EntityState::LANDING)
+		{
+			g_engineContext.m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "(User %u): Switched to LANDING (%d) from %d", network->ID.UserID, RootForce::EntityState::LANDING, state->CurrentState);
+		}*/
 		state->CurrentState = RootForce::EntityState::LANDING;
+		
 	}
 	else if(!m_engineContext->m_physics->IsOnGround(*(collision->m_handle)))
 	{
@@ -34,19 +38,23 @@ void RootSystems::StateSystem::ProcessEntity( ECS::Entity* p_entity )
 
 		if (verticalVelocity > 0.0f)
 		{
-			if (state->CurrentState != RootForce::EntityState::ASCENDING)
+			
+			/*if (state->CurrentState != RootForce::EntityState::ASCENDING)
 			{
 				g_engineContext.m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "(User %u): Switched to ASCENDING (%d) from %d", network->ID.UserID, RootForce::EntityState::ASCENDING, state->CurrentState);
-			}
+			}*/
+			
 
 			state->CurrentState = RootForce::EntityState::ASCENDING;
 		}
 		else if (verticalVelocity < 0.0f)
 		{
-			if (state->CurrentState != RootForce::EntityState::DESCENDING)
+			
+			/*if (state->CurrentState != RootForce::EntityState::DESCENDING)
 			{
 				g_engineContext.m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "(User %u): Switched to DESCENDING (%d) from %d", network->ID.UserID, RootForce::EntityState::DESCENDING, state->CurrentState);
-			}
+			}*/
+			
 
 			state->CurrentState = RootForce::EntityState::DESCENDING;
 		}

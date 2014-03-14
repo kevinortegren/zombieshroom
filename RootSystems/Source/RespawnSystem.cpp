@@ -6,6 +6,7 @@
 #include <RootSystems/Include/Network/Messages.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
+#include <RootSystems/Include/MatchStateSystem.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
@@ -39,12 +40,17 @@ namespace RootSystems
 		{
 			if(m_serverPeer != nullptr)
 			{
-				health->IsDead = true;
-				health->RespawnDelay = 3.0f;
+				if(m_clientPeer == nullptr)
+				{
+					health->IsDead = true;
+					health->RespawnDelay = 3.0f;
+				}
 
 				//Broadcast death
 				RootForce::NetworkMessage::Death m;
 				m.User = network->ID.UserID;
+				m.LastDamageSource = health->LastDamageSourceID;
+				m.LastDamageSourceName = health->LastDamageAbilityName.c_str();
 
 				RakNet::BitStream bs;
 				bs.Write((RakNet::MessageID) ID_TIMESTAMP);
@@ -71,6 +77,12 @@ namespace RootSystems
 			{
 				clientComponent->State = RootForce::Network::ClientState::CONNECTED;
 			}
+		}
+
+		// The respawn delay will be equal to 3 only at the first frame of your death
+		if(health->IsDead && health->RespawnDelay == 3)
+		{
+			AwardKill(health->LastDamageSourceID, p_entity);
 		}
 
 		// Check if the player wants to respawn, only allow him to respawn after a 3 second delay.
@@ -132,7 +144,9 @@ namespace RootSystems
 			
 			health->WantsRespawn = false;
 		}
-
+		
+		if(g_engineContext.m_physics->IsOnGround(*collision->m_handle))
+			health->LastDamageSourceID = RootForce::Network::ReservedUserID::NONE;
 		if(health->IsDead)
 			health->RespawnDelay -= dt;
 		if(health->Health > 200.0f)
@@ -225,5 +239,49 @@ namespace RootSystems
 		player->AbilityScripts[1] = RootForce::AbilityInfo();
 		player->AbilityScripts[2] = RootForce::AbilityInfo();
 	}
+
+	void RespawnSystem::AwardKill(RootForce::Network::UserID_t p_killerID, ECS::Entity* p_deadEntity)
+	{
+		ECS::Entity* matchStateEntity = m_world->GetTagManager()->GetEntityByTag("MatchState");
+		RootForce::KillAnnouncement* killAnnouncement = m_world->GetEntityManager()->GetComponent<RootForce::KillAnnouncement>(matchStateEntity);
+		RootForce::PlayerComponent* killedPlayerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_deadEntity);
+		RootForce::TDMRuleSet* rules = m_world->GetEntityManager()->GetComponent<RootForce::TDMRuleSet>(matchStateEntity);
+		ECS::Entity* killerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(p_killerID, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
+
+		// Award score for killer team
+		if(p_killerID != RootForce::Network::ReservedUserID::NONE && killerEntity != p_deadEntity)
+		{
+			RootForce::Network::NetworkEntityID killerNetworkID;
+			killerNetworkID.UserID = p_killerID;
+			killerNetworkID.ActionID = RootForce::Network::ReservedActionID::CONNECT;
+			killerNetworkID.SequenceID = 0;
+
+			RootForce::PlayerComponent* killerPlayerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(killerEntity);
+			RootForce::PlayerComponent* deadPlayerComponent = m_world->GetEntityManager()->GetComponent<RootForce::PlayerComponent>(p_deadEntity);
+			RootForce::HealthComponent* victimHealthComponent = m_world->GetEntityManager()->GetComponent<RootForce::HealthComponent>(p_deadEntity);
+			if(killerPlayerComponent->TeamID != deadPlayerComponent->TeamID)
+			{
+				rules->TeamScore[killerPlayerComponent->TeamID]++;
+				killerPlayerComponent->Score++;
+			}
+			else //teamkill
+			{
+				rules->TeamScore[killedPlayerComponent->TeamID]--;
+				killerPlayerComponent->Score--;
+			}
+			killAnnouncement->KillPair.push_back(RootForce::KillPairType(killerEntity, p_deadEntity));
+			killAnnouncement->AbilityName = victimHealthComponent->LastDamageAbilityName;
+		}
+		else //Give minus in score if the kill was a suicide
+		{
+			killedPlayerComponent->Score --;
+			rules->TeamScore[killedPlayerComponent->TeamID]--;
+
+			killAnnouncement->KillPair.push_back(RootForce::KillPairType(nullptr, p_deadEntity));
+			killAnnouncement->AbilityName = "RIP";
+		}
+		killedPlayerComponent->Deaths ++;
+	}
+
 }
 #endif

@@ -114,9 +114,7 @@ namespace RootForce
 
 	void WorldSystem::SubdivideTree()
 	{
-#ifndef _DEBUG
 		m_quadTree.BeginDivide(2500, true, true);
-#endif
 	}
 
 	void WorldSystem::SetAmbientLight(glm::vec4 p_ambient)
@@ -214,7 +212,7 @@ namespace RootForce
 		sundata.direction = glm::vec4(-sunTransform->m_orientation.GetFront(), 0.0f);
 		sundata.color = sunLight->m_color;
 
-		r->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(sundata), &sundata);
+		r->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(sundata), &sundata, GL_STATIC_DRAW);
 
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);

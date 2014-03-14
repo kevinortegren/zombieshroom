@@ -33,7 +33,11 @@ namespace Render
 			XMAX,
 			YMAX,
 			EYEWORLDPOS,
-			DX
+			DX,
+			ROTATIONSPEEDMIN,
+			ROTATIONSPEEDMAX,
+			MAXPERFRAME,
+			ALIVE,
 		};
 	}
 

@@ -572,22 +572,10 @@ bool BulletCharacter::recoverFromPenetration ( btCollisionWorld* collisionWorld)
 	//	printf("m_touchingNormal = %f,%f,%f\n",m_touchingNormal[0],m_touchingNormal[1],m_touchingNormal[2]);
 	return penetration;
 }
-float BulletCharacter::test( const btVector3& p_start,const btVector3& p_end, btCollisionWorld* world )
-{
-	btTransform start, end;
-	start.setIdentity ();
-	end.setIdentity ();
-	start.setOrigin (p_start);
-	end.setOrigin (p_end);
-	btKinematicClosestNotMeConvexResultCallback callback(m_ghostObject, -getUpAxisDirections()[m_upAxis], btScalar(0.7071));
-	callback.m_collisionFilterGroup = getGhostObject()->getBroadphaseHandle()->m_collisionFilterGroup;
-	callback.m_collisionFilterMask = getGhostObject()->getBroadphaseHandle()->m_collisionFilterMask;
-	m_ghostObject->convexSweepTest (m_convexShape, start, end, callback, world->getDispatchInfo().m_allowedCcdPenetration);
-	return callback.m_closestHitFraction;
-}
 
 void BulletCharacter::StopKnockback()
 {
+	m_verticalVelocity = 0;
 	m_knockbackVelocity.setZero();
 	m_hasBeenKnockbacked = false;
 }
@@ -595,4 +583,13 @@ void BulletCharacter::StopKnockback()
 void BulletCharacter::JumpBoost( float p_boostPower )
 {
 	m_verticalVelocity += p_boostPower;
+}
+
+void BulletCharacter::Jump( float p_jumpPower )
+{
+	if (!canJump())
+		return;
+
+	m_verticalVelocity = p_jumpPower;
+	m_wasJumping = true;
 }

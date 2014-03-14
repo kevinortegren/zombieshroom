@@ -18,7 +18,7 @@ namespace Render
 		m_pointLight = lightingEffect->GetTechniques()[0]->GetPrograms()[2];
 		m_pointLightStencil = lightingEffect->GetTechniques()[0]->GetPrograms()[3];
 		m_backgroundAlphaBlend = lightingEffect->GetTechniques()[0]->GetPrograms()[4];
-		m_backgroundAddative = lightingEffect->GetTechniques()[0]->GetPrograms()[5];
+		m_backgroundAdditive = lightingEffect->GetTechniques()[0]->GetPrograms()[5];
 		m_pointLightFSQ = lightingEffect->GetTechniques()[0]->GetPrograms()[6];
 
 		Render::EffectInterface* ssaoEffect = g_context.m_resourceManager->LoadEffect("Renderer/SSAO");
@@ -27,13 +27,14 @@ namespace Render
 		m_fullscreenQuad = p_fullscreenQuad;
 
 		// Load unit sphere mesh.
-		//m_unitSphere = g_context.m_resourceManager->LoadCollada("Primitives/sphere")->m_meshes[0];
-
+#ifndef COMPILE_LEVEL_EDITOR
+		m_unitSphere = g_context.m_resourceManager->LoadCollada("Primitives/sphere")->m_meshes[0];
+#endif
 		// TODO: Init triangle.
 
 		// Light uniforms.
 		m_lights = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
-		m_lights->BufferData(1, sizeof(m_lightVars), &m_lightVars);
+		m_lights->BufferData(1, sizeof(m_lightVars), &m_lightVars, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_LIGHTS, m_lights->GetBufferId());
 
 		// Setup la-buffer.
@@ -93,11 +94,11 @@ namespace Render
 
 	void LightingDevice::SSAO()
 	{
+		BeginSSAO();
+
 		if(m_showSSAO)
 		{
 			m_fullscreenQuad->Bind();
-			//SSAO
-			BeginSSAO();
 			glDisable(GL_STENCIL_TEST);
 			auto ssao = m_ssaoTech->GetPrograms()[0];
 			m_noiseSSAOTex->Bind(GLRenderer::s_textureSlots[TextureSemantic::SSAO]);
@@ -178,7 +179,12 @@ namespace Render
 	{
 		if(m_showPointlights)
 		{
+#ifndef COMPILE_LEVEL_EDITOR
+			PointLightStencil();
+			PointLightRender();
+#else
 			PointLightFSQ();
+#endif
 		}
 	}
 
@@ -200,8 +206,8 @@ namespace Render
 		
 			switch(p_mode)
 			{
-			case BackgroundBlend::ADDATIVE:
-				m_backgroundAddative->Apply();
+			case BackgroundBlend::ADDITIVE:
+				m_backgroundAdditive->Apply();
 				break;
 			case BackgroundBlend::ALPHABLEND:
 			default:
@@ -239,7 +245,7 @@ namespace Render
 		}
 
 		BufferInterface* ssaoBuff = m_ssaoTech->GetBufferInterface();
-		ssaoBuff->BufferData((size_t)kernelSize, sizeof(glm::vec4), &m_kernel[0]);
+		ssaoBuff->BufferData((size_t)kernelSize, sizeof(glm::vec4), &m_kernel[0], GL_STATIC_DRAW);
 
 		const int noiseSize = 16;
 		glm::vec2 noise[noiseSize];
@@ -332,4 +338,10 @@ namespace Render
 	{
 		m_showBackgroundBlend = p_value;
 	}
+
+	DirectionalLight* LightingDevice::GetDirectionalLight()
+	{
+		return &m_lightVars.m_dlights[0];
+	}
+
 }

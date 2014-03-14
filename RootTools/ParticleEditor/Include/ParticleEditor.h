@@ -42,6 +42,7 @@ public:
 	float CheckRayVsAABB(glm::vec3 p_rayDir, glm::vec3 p_rayOrigin, glm::vec3 p_bound1, glm::vec3 p_bound2);
 	void DragEmitter(int p_axis, glm::ivec2 p_mousePos, glm::vec3 p_camPos, glm::mat4 p_viewMatrix);
 	glm::vec3 GetSelectedPosition();
+	void OpenParticleFile(std::string p_filePath);
 	//MEMBERS
 	Ui::ParticleEditorClass ui;
 private:
@@ -74,7 +75,8 @@ private:
 	void ResetTemplates();
 	float GetDragOffset(float p_pointOnAxis, float p_pointOfEmitter);
 	PointOnPlane GetPointOnPlane(glm::vec3 p_camPos, glm::vec3 p_worldCamPos, glm::vec3 p_rayDir);
-	
+	bool CalculateMaxParticles();
+	void OpenParticleFileQ(QString p_filePath);
 	QMessageBox::StandardButton SaveWarningDialog();
 
 	//MEMBERS
@@ -127,8 +129,11 @@ private slots:
 	void MenuViewColorTriangle();
 	void MenuViewColorEndTriangle();
 	void NewEmitter();
+	void OpenNewEmitterWidget();
+	void OpenNewRenameWidget();
 	void DeleteEmitter();
 	void RenameEmitter();
+	void DuplicateEmitter();
 	void EmitterSelected(QListWidgetItem*);
 	void PositionXChanged(double p_x);
 	void PositionYChanged(double p_y);
@@ -155,7 +160,8 @@ private slots:
 	void GridSizeChanged(double p_val);
 	void colorAlphaSliderChanged(int p_val);
 	void endColorAlphaSliderChanged(int p_val);
-	void TemplateChanged(int p_val);
+	void BlendingChanged(int p_val);
+	void RelativeChanged(int p_val);
 	void OrbitRadiusChanged(double p_val);
 	void OrbitSpeedChanged(double p_val);
 	void SpreadSliderChanged(int p_val);
@@ -163,5 +169,9 @@ private slots:
 	void ModelTexDoubleClicked(const QModelIndex& p_index);
 	void BackgroundColorChanged(int p_value);
 	void RemoveObjectButton();
+	void RotationSpeedMinChanged(double p_val);
+	void RotationSpeedMaxChanged(double p_val);
+	void MaxPerFrameChanged(double p_val);
+	void ResetParticleSystem();
 };
 

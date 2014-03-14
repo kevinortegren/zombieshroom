@@ -14,6 +14,7 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/AnimationSystem.h>
+#include <RootSystems/Include/StatChangeSystem.h>
 
 #include <glm/glm.hpp>
 
@@ -43,6 +44,7 @@ namespace RootSystems
 			SetUsage<RootForce::PlayerPhysics>();
 			SetUsage<RootForce::PlayerComponent>();
 			SetUsage<RootForce::HealthComponent>();
+			SetUsage<RootForce::StatChange>();
 
 		}
 		void Init();
@@ -67,6 +69,7 @@ namespace RootSystems
 		ECS::ComponentMapper<RootForce::PlayerPhysics> m_physic;
 		ECS::ComponentMapper<RootForce::PlayerComponent> m_player;
 		ECS::ComponentMapper<RootForce::HealthComponent> m_health;
+		ECS::ComponentMapper<RootForce::StatChange> m_statChange;
 
 		void AbilitySwitch(ECS::Entity* p_entity);
 	};

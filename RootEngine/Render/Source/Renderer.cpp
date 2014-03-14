@@ -285,7 +285,7 @@ namespace Render
 
 		// PerFrame uniforms.
 		m_cameraBuffer = CreateBuffer(GL_UNIFORM_BUFFER);
-		m_cameraBuffer->BufferData(1, sizeof(m_cameraVars), &m_cameraVars);
+		m_cameraBuffer->BufferData(1, sizeof(m_cameraVars), &m_cameraVars, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_cameraBuffer->GetBufferId());
 
 		// PerObject uniforms.
@@ -293,7 +293,7 @@ namespace Render
 		char data[RENDER_UNIFORMS_SIZE];
 		memset(&data, 0, RENDER_UNIFORMS_SIZE);
 
-		m_uniforms->BufferData(1, RENDER_UNIFORMS_SIZE, data);
+		m_uniforms->BufferData(1, RENDER_UNIFORMS_SIZE, data, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId());
 
 		// Setup geometry buffer.
@@ -354,32 +354,36 @@ namespace Render
 	void GLRenderer::InitializeSemanticSizes()
 	{
 		// Sizes for common semantics for use in render jobs uniform params.
-		s_sizes[Semantic::MODEL]		= sizeof(glm::mat4);
-		s_sizes[Semantic::NORMAL]		= sizeof(glm::mat4);
-		s_sizes[Semantic::BONES]		= 20 * sizeof(glm::mat4);
-		s_sizes[Semantic::SHADOW]		= sizeof(glm::mat4);
-		s_sizes[Semantic::POSITION]		= sizeof(glm::vec3);
-		s_sizes[Semantic::LIFETIMEMIN]	= sizeof(float);
-		s_sizes[Semantic::LIFETIMEMAX]	= sizeof(float);
-		s_sizes[Semantic::SPEEDMIN]		= sizeof(float);
-		s_sizes[Semantic::SPEEDMAX]		= sizeof(float);
-		s_sizes[Semantic::SIZEMIN]		= sizeof(glm::vec2);
-		s_sizes[Semantic::SIZEMAX]		= sizeof(glm::vec2);
-		s_sizes[Semantic::SIZEEND]		= sizeof(glm::vec2);
-		s_sizes[Semantic::COLOR]		= sizeof(glm::vec4);
-		s_sizes[Semantic::COLOREND]		= sizeof(glm::vec4);
-		s_sizes[Semantic::GRAVITY]		= sizeof(glm::vec3);
-		s_sizes[Semantic::DIRECTION]	= sizeof(glm::vec3);
-		s_sizes[Semantic::SPREAD]		= sizeof(float);
-		s_sizes[Semantic::SPAWNTIME]	= sizeof(float);
-		s_sizes[Semantic::TRANSPOSITION]= sizeof(glm::vec3);
-		s_sizes[Semantic::ORBITSPEED]	= sizeof(float);
-		s_sizes[Semantic::ORBITRADIUS]	= sizeof(float);
-		s_sizes[Semantic::MK1]			= sizeof(float);
-		s_sizes[Semantic::MK2]			= sizeof(float);
-		s_sizes[Semantic::MK3]			= sizeof(float);
-		s_sizes[Semantic::EYEWORLDPOS]	= sizeof(glm::vec3);
-		s_sizes[Semantic::DX]			= sizeof(float);
+		s_sizes[Semantic::MODEL]			= sizeof(glm::mat4);
+		s_sizes[Semantic::NORMAL]			= sizeof(glm::mat4);
+		s_sizes[Semantic::BONES]			= 20 * sizeof(glm::mat4);
+		s_sizes[Semantic::SHADOW]			= sizeof(glm::mat4);
+		s_sizes[Semantic::POSITION]			= sizeof(glm::vec3);
+		s_sizes[Semantic::LIFETIMEMIN]		= sizeof(float);
+		s_sizes[Semantic::LIFETIMEMAX]		= sizeof(float);
+		s_sizes[Semantic::SPEEDMIN]			= sizeof(float);
+		s_sizes[Semantic::SPEEDMAX]			= sizeof(float);
+		s_sizes[Semantic::SIZEMIN]			= sizeof(glm::vec2);
+		s_sizes[Semantic::SIZEMAX]			= sizeof(glm::vec2);
+		s_sizes[Semantic::SIZEEND]			= sizeof(glm::vec2);
+		s_sizes[Semantic::COLOR]			= sizeof(glm::vec4);
+		s_sizes[Semantic::COLOREND]			= sizeof(glm::vec4);
+		s_sizes[Semantic::GRAVITY]			= sizeof(glm::vec3);
+		s_sizes[Semantic::DIRECTION]		= sizeof(glm::vec3);
+		s_sizes[Semantic::SPREAD]			= sizeof(float);
+		s_sizes[Semantic::SPAWNTIME]		= sizeof(float);
+		s_sizes[Semantic::TRANSPOSITION]	= sizeof(glm::vec3);
+		s_sizes[Semantic::ORBITSPEED]		= sizeof(float);
+		s_sizes[Semantic::ORBITRADIUS]		= sizeof(float);
+		s_sizes[Semantic::MK1]				= sizeof(float);
+		s_sizes[Semantic::MK2]				= sizeof(float);
+		s_sizes[Semantic::MK3]				= sizeof(float);
+		s_sizes[Semantic::EYEWORLDPOS]		= sizeof(glm::vec3);
+		s_sizes[Semantic::DX]				= sizeof(float);
+		s_sizes[Semantic::ROTATIONSPEEDMIN] = sizeof(float);
+		s_sizes[Semantic::ROTATIONSPEEDMAX] = sizeof(float);
+		s_sizes[Semantic::MAXPERFRAME]		= sizeof(float);
+		s_sizes[Semantic::ALIVE]			= sizeof(float);
 
 		// Slots reserved for geometry buffer and lighting.
 		s_textureSlots[TextureSemantic::GBUFFER_DIFFUSE_SPECULAR]	= 0;
@@ -425,6 +429,8 @@ namespace Render
 
 	void GLRenderer::SetResolution(bool p_fullscreen, int p_width, int p_height)
 	{
+		SDL_SetWindowFullscreen(m_window, false);
+
 		m_width = p_width;
 		m_height = p_height;
 
@@ -433,15 +439,15 @@ namespace Render
 			SDL_DisplayMode nativeMode;
 			SDL_GetDesktopDisplayMode(0, &nativeMode);
 
-			m_width = nativeMode.w;
-			m_height = nativeMode.h;
+			//m_width = nativeMode.w;
+			//m_height = nativeMode.h;
 
-			SDL_SetWindowDisplayMode(m_window, &nativeMode);
+			//SDL_SetWindowDisplayMode(m_window, &nativeMode);
 		}
 
 		SDL_SetWindowSize(m_window, m_width, m_height);
 		SDL_SetWindowFullscreen(m_window, p_fullscreen);
-		SDL_SetWindowSize(m_window, m_width, m_height);
+		//SDL_SetWindowSize(m_window, m_width, m_height);
 
 		glViewport(0, 0, m_width, m_height);
 
@@ -449,7 +455,7 @@ namespace Render
 		m_lighting.Resize(m_width, m_height);
 		m_glowDevice.Resize(m_width, m_height);
 
-		// Resize forward framebuffers.
+		// Resize forward framebuffers
 		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[0]);
 		m_forwardColors[0]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[0]->GetHandle(), 0);
@@ -457,12 +463,13 @@ namespace Render
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_forwardFramebuffers[1]);
 		m_forwardColors[1]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_RGBA);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[1]->GetHandle(), 0);
 		m_forwardDepth[1]->CreateEmptyTexture(m_width, m_height, TextureFormat::TEXTURE_DEPTH_STENCIL);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		m_forwardDepth[1]->SetParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_forwardColors[1]->GetHandle(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_forwardDepth[1]->GetHandle(), 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -476,7 +483,10 @@ namespace Render
 		RenderJob* job = new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job);
 
 		if((job->m_material->m_effect->GetTechniques().at(0)->m_flags & TechniqueFlags::RENDER_DEFERRED1) == TechniqueFlags::RENDER_DEFERRED1 || job->m_forward)
+		{
+			
 			m_forwardJobs.push_back(job);
+		}
 		else
 			m_jobs.push_back(job);
 	}
@@ -601,10 +611,47 @@ namespace Render
 		return false;
 	};
 
+	static bool FindWaterJob(RenderJob* a)
+	{
+		if( a->m_renderPass == 3 ) return true;
+		return false;
+	};
+
 	void GLRenderer::Sorting()
 	{	
+		//Sort deferred jobs based on material
 		std::sort(m_jobs.begin(), m_jobs.end(), SortRenderJobs);
+
+		//Sort forward jobs base on height compared to the water level
 		std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortForwardRenderJobs);
+
+		if(m_forwardJobs.size() > 1)
+		{
+			//Look for water job
+			auto waterItr = std::find_if(m_forwardJobs.begin(), m_forwardJobs.end(), FindWaterJob);
+			
+			//If no water, sort all jobs by distance to camera as normal
+			if(waterItr == m_forwardJobs.end()) 
+			{
+				std::sort(m_forwardJobs.begin(), m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+				return;
+			}
+			//If there is a water job, check to see if it's the first or last job(Either everything is above or everything is beneath)
+			if( waterItr == m_forwardJobs.begin() ) //First job(everything is over)
+			{
+				std::sort(m_forwardJobs.begin() + 1 , m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+			}
+			else if( waterItr == m_forwardJobs.end() - 1 ) //Last job(everything is under)
+			{
+				std::sort(m_forwardJobs.begin(), m_forwardJobs.end() - 1, SortOnDistanceFunctor(*this));
+			}
+			else
+			{
+				//There are object both under and above the water, sort each side individually
+				std::sort(m_forwardJobs.begin(), waterItr - 1, SortOnDistanceFunctor(*this));
+				std::sort(waterItr + 1, m_forwardJobs.end(), SortOnDistanceFunctor(*this));
+			}
+		}
 	}
 
 	void GLRenderer::ShadowPass()
@@ -714,7 +761,7 @@ namespace Render
 		m_lighting.Ambient();
 		m_lighting.Directional();
 		m_lighting.Point();
-		m_lighting.BackgroundBlend(BackgroundBlend::ADDATIVE);
+		m_lighting.BackgroundBlend(BackgroundBlend::ADDITIVE);
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
@@ -859,8 +906,18 @@ namespace Render
 
 	void GLRenderer::CopyDepthAndColor()
 	{
-		glBindTexture(GL_TEXTURE_2D, m_forwardDepth[m_activeForwardFramebuffer]->GetHandle());
-		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_width, m_height );
+		m_forwardDepth[m_activeForwardFramebuffer]->Bind(0);
+
+		int halfWidth = m_width / 2;
+		int halfHeight = m_height / 2;
+
+		//glBindTexture(GL_TEXTURE_2D, m_forwardDepth[m_activeForwardFramebuffer]->GetHandle());
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, halfWidth, halfHeight );
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, halfHeight, 0, halfHeight, halfWidth, halfHeight);
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, halfWidth, 0, halfWidth, 0, halfWidth, halfHeight );
+		glCopyTexSubImage2D( GL_TEXTURE_2D, 0, halfWidth, halfHeight, halfWidth, halfHeight, halfWidth, halfHeight);
+
+		//glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, 0, 0, m_width, m_height, 0);
 		//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, 0, 0, m_width, m_height, 0);
 
 		//glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -913,6 +970,11 @@ namespace Render
 	{
 		m_cameraVars.m_projection = p_projectionMatrix;
 		m_cameraVars.m_invProj = glm::inverse(p_projectionMatrix);
+	}
+
+	void GLRenderer::SetCameraPosition( glm::vec3 p_camPos )
+	{
+		m_camPos = p_camPos;
 	}
 
 	void GLRenderer::GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
@@ -1033,6 +1095,12 @@ namespace Render
 	{
 		m_particles.Free((ParticleSystem*)p_particleSys);
 	}
+
+	DirectionalLight* GLRenderer::GetDirectionalLight()
+	{
+		return m_lighting.GetDirectionalLight();
+	}
+
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

@@ -6,6 +6,7 @@
 #include <RootEngine/GUI/Include/Dispatcher.h>
 #include <RootSystems/Include/Network/ServerEvents.h>
 #include <vector>
+#include <mutex>
 namespace RootForce
 {
 	class ChatSystem
@@ -21,6 +22,8 @@ namespace RootForce
 		std::string PollMessage(); //Returns the last message from the internal buffer
 		RootServer::EventData PollEvent(); //Returns the last server command from the internal buffer
 
+		void InjectEvent(std::string& p_event);
+
 	private:
 		void SetFocus(const Awesomium::JSArray& p_array);
 		void ProcessMessage(const Awesomium::JSArray& p_array);
@@ -28,6 +31,7 @@ namespace RootForce
 		RootEngine::GUISystem::WebView* m_view;
 		std::vector<std::string> m_messageBuffer;
 		std::vector<RootServer::EventData> m_eventBuffer;
+		std::mutex m_eventBufferMutex;
 		bool m_hasFocus;
 		RootEngine::GameSharedContext* m_engineContext;
 	};

@@ -13,9 +13,15 @@
 #include <RootSystems/Include/MatchStateSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootSystems/Include/AbilitySpawnSystem.h>
+#include <RootSystems/Include/TimerSystem.h>
+#include <RootSystems/Include/FollowSystem.h>
+#include <RootSystems/Include/HomingSystem.h>
+#include <RootSystems/Include/DamageAndKnockback.h>
+#include <RootSystems/Include/StatChangeSystem.h>
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
 
 namespace RootForce
 {
@@ -49,14 +55,13 @@ namespace RootForce
 		void PlayerCommand::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action.ActionID);
-			p_bs->Serialize(p_writeToBitstream, Action.MovePower);
-			p_bs->Serialize(p_writeToBitstream, Action.StrafePower);
+			
+			p_bs->Serialize(p_writeToBitstream, MovePower);
+			p_bs->Serialize(p_writeToBitstream, StrafePower);
 			for (int i = 0; i < 2; ++i)
-				p_bs->Serialize(p_writeToBitstream, Action.Angle[i]);
-			p_bs->Serialize(p_writeToBitstream, Action.JumpTime);
-			p_bs->Serialize(p_writeToBitstream, Action.AbilityTime);
-			p_bs->Serialize(p_writeToBitstream, Action.SelectedAbility);
+				p_bs->Serialize(p_writeToBitstream, Angle[i]);
+			p_bs->Serialize(p_writeToBitstream, JumpTime);
+			p_bs->Serialize(p_writeToBitstream, SelectedAbility);
 
 			for (int i = 0; i < 3; ++i)
 				p_bs->Serialize(p_writeToBitstream, Position[i]);
@@ -77,32 +82,14 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, Time);
 		}
 
-		void AbilityChargeStart::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
+		void AbilityEvent::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action);
-			p_bs->Serialize(p_writeToBitstream, IsPush);
-		}
-
-		void AbilityChargeDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
-		{
-			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action);
-			p_bs->Serialize(p_writeToBitstream, Time);
-		}
-
-		void AbilityChannelingDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
-		{
-			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action);
-			p_bs->Serialize(p_writeToBitstream, Time);
-		}
-
-		void AbilityChargeAndChannelingDone::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
-		{
-			p_bs->Serialize(p_writeToBitstream, User);
-			p_bs->Serialize(p_writeToBitstream, Action);
-			p_bs->Serialize(p_writeToBitstream, Time);
+			p_bs->Serialize(p_writeToBitstream, Event.ActionID);
+			p_bs->Serialize(p_writeToBitstream, Event.Type);
+			p_bs->Serialize(p_writeToBitstream, Event.ActiveAbility);
+			p_bs->Serialize(p_writeToBitstream, Event.ActiveAbilityScript);
+			p_bs->Serialize(p_writeToBitstream, Event.Time);
 		}
 
 		void AbilityCooldownOff::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
@@ -191,6 +178,7 @@ namespace RootForce
 		{
 			p_bs->Serialize(p_writeToBitstream, ID.SynchronizedID);
 		}
+
 		void AbilitySpawn::Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs)
 		{
 			p_bs->Serialize(p_writeToBitstream, ID);
@@ -200,12 +188,20 @@ namespace RootForce
 		void Death::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
 		{
 			p_bs->Serialize(p_writeToBitstream, User);
+			p_bs->Serialize(p_writeToBitstream, LastDamageSource);
+			p_bs->Serialize(p_writeToBitstream, LastDamageSourceName);
 		}
 
 		void PlayerTeamSelect::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
 		{
 			p_bs->Serialize(p_writeToBitstream, UserID);
 			p_bs->Serialize(p_writeToBitstream, TeamID);
+		}
+
+		void PlayerNameChange::Serialize( bool p_writeToBitstream, RakNet::BitStream* p_bs )
+		{
+			p_bs->Serialize(p_writeToBitstream, Name);
+			p_bs->Serialize(p_writeToBitstream, UserID);
 		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, Transform* p_c)
@@ -317,6 +313,9 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, p_c->ScoreLimit);
 			for (int i = 0; i < 3; ++i)
 				p_bs->Serialize(p_writeToBitstream, p_c->TeamScore[i]);
+			p_bs->Serialize(p_writeToBitstream, p_c->MinPlayers);
+			p_bs->Serialize(p_writeToBitstream, p_c->CountDown);
+			p_bs->Serialize(p_writeToBitstream, p_c->CurrentState);
 		}
 
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c)
@@ -345,6 +344,44 @@ namespace RootForce
 			p_bs->Serialize(p_writeToBitstream, p_c->Timer);
 		}
 
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TimerComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->ScriptName);
+			p_bs->Serialize(p_writeToBitstream, p_c->FunctionName);
+			p_bs->Serialize(p_writeToBitstream, p_c->Target);
+			p_bs->Serialize(p_writeToBitstream, p_c->TimeLeft);
+			p_bs->Serialize(p_writeToBitstream, p_c->TimeUp);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, FollowComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->Offset);
+			p_bs->Serialize(p_writeToBitstream, p_c->TargetID.SynchronizedID);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, HomingComponent* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->Controllability);
+			p_bs->Serialize(p_writeToBitstream, p_c->Speed);
+			p_bs->Serialize(p_writeToBitstream, p_c->TargetID.SynchronizedID);
+			
+			for (int i = 0; i < 3; ++i)
+				p_bs->Serialize(p_writeToBitstream, p_c->TargetPosition[i]);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, DamageAndKnockback* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->Damage);
+			p_bs->Serialize(p_writeToBitstream, p_c->Knockback);
+		}
+
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, StatChange* p_c)
+		{
+			p_bs->Serialize(p_writeToBitstream, p_c->DamageResistance);
+			p_bs->Serialize(p_writeToBitstream, p_c->JumpHeightChange);
+			p_bs->Serialize(p_writeToBitstream, p_c->KnockbackResistance);
+			p_bs->Serialize(p_writeToBitstream, p_c->SpeedChange);
+		}
 
 		bool CanSerializeComponent(ComponentType::ComponentType p_type)
 		{
@@ -360,6 +397,11 @@ namespace RootForce
 				case ComponentType::TDMRULES:
 				case ComponentType::PLAYERPHYSICS:
 				case ComponentType::ABILITYSPAWN:
+				case ComponentType::TIMER:
+				case ComponentType::FOLLOW:
+				case ComponentType::HOMING:
+				case ComponentType::DAMAGEANDKNOCKBACK:
+				case ComponentType::STATCHANGE:
 					return true;
 				default:
 					return false;
@@ -412,6 +454,26 @@ namespace RootForce
 				case ComponentType::ABILITYSPAWN:
 					Serialize(true, p_bs, (RootForce::AbilitySpawnComponent*) p_component);
 				return true;
+
+				case ComponentType::TIMER:
+					Serialize(true, p_bs, (RootForce::TimerComponent*) p_component);
+				return true;
+
+				case ComponentType::FOLLOW:
+					Serialize(true, p_bs, (RootForce::FollowComponent*) p_component);
+				return true;
+
+				case ComponentType::HOMING:
+					Serialize(true, p_bs, (RootForce::HomingComponent*) p_component);
+				return true;
+
+				case ComponentType::DAMAGEANDKNOCKBACK:
+					Serialize(true, p_bs, (RootForce::DamageAndKnockback*) p_component);
+				return true;
+
+				case ComponentType::STATCHANGE:
+					Serialize(true, p_bs, (RootForce::StatChange*) p_component);
+				return true;
 			}
 
 			return false;
@@ -420,18 +482,29 @@ namespace RootForce
 		template <typename T>
 		T* CreateOrGetDeserializedComponent(RakNet::BitStream* p_bs, ECS::Entity* p_entity, ECS::EntityManager* p_entityManager, bool p_discard)
 		{
-			T* component = p_entityManager->GetComponent<T>(p_entity);
-			if (component == nullptr)
-				component = p_entityManager->CreateComponent<T>(p_entity);
+			T* component = nullptr;
 
-			if (component == nullptr)
-				return nullptr;
-			
-			T c = *component;
-			Serialize(false, p_bs, &c);
-			if (!p_discard)
+			if (p_entity != nullptr)
 			{
-				*component = c;
+				component = p_entityManager->GetComponent<T>(p_entity);
+				if (component == nullptr)
+					component = p_entityManager->CreateComponent<T>(p_entity);
+
+				if (component == nullptr)
+					return nullptr;
+			
+				T c = *component;
+				Serialize(false, p_bs, &c);
+				if (!p_discard)
+				{
+					*component = c;
+				}
+			}
+			else
+			{
+				// If we don't have an entity to deserialize on, just discard the data and move on.
+				T c;
+				Serialize(false, p_bs, &c);
 			}
 
 			return component;
@@ -485,6 +558,26 @@ namespace RootForce
 
 				case ComponentType::ABILITYSPAWN:
 					component = CreateOrGetDeserializedComponent<RootForce::AbilitySpawnComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::TIMER:
+					component = CreateOrGetDeserializedComponent<RootForce::TimerComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::FOLLOW:
+					component = CreateOrGetDeserializedComponent<RootForce::FollowComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::HOMING:
+					component = CreateOrGetDeserializedComponent<RootForce::HomingComponent>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::DAMAGEANDKNOCKBACK:
+					component = CreateOrGetDeserializedComponent<RootForce::DamageAndKnockback>(p_bs, p_entity, p_entityManager, false);
+				break;
+
+				case ComponentType::STATCHANGE:
+					component = CreateOrGetDeserializedComponent<RootForce::StatChange>(p_bs, p_entity, p_entityManager, false);
 				break;
 				
 				default:
@@ -586,32 +679,56 @@ namespace RootForce
 			Network::NetworkEntityMap::const_iterator it = p_map.find(id);
 			if (it == p_map.end())
 			{
-				// Entity doesn't exist, use the script to create it.	
-				g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u) with script: %s", id.UserID, id.ActionID, scriptName.C_String());
-				g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
-				g_engineContext.m_script->AddParameterNumber(id.UserID);
-				g_engineContext.m_script->AddParameterNumber(id.ActionID);
-				g_engineContext.m_script->ExecuteScript();
-				
-				entity = Network::FindEntity(p_map, id);
-				// If entity is not found, assume unsynched sequence ID
-				if(entity == nullptr)
+				// See if this entity has been destroyed before, in which case this is an out-dated deserialization message.
+				if (std::find(g_networkDeletedList.begin(), g_networkDeletedList.end(), id) == g_networkDeletedList.end())
 				{
-					Network::NetworkEntityID tempId = id;
-					tempId.SequenceID = Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] - 1;
-					
-					// If received sequence ID is less than that of the local next sequence id, update the local next sequence ID
-					if(id.SequenceID > tempId.SequenceID)
-						Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] = id.SequenceID + 1;
+					// Store the next sequence ID, and set the sequence ID for the next entity to be created to the sent sequence ID.
+					Network::UserActionKey_t userActionKey = Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID);
+					Network::SequenceID_t nextSequenceId = Network::NetworkComponent::s_sequenceIDMap[userActionKey];
+					Network::NetworkComponent::s_sequenceIDMap[userActionKey] = id.SequenceID;
 
-					entity = Network::FindEntity(p_map, tempId);
+					// Entity doesn't exist, use the script to create it.
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u, Sequence: %u) with script: \"%s\". Stored next sequence ID: %u.", id.UserID, id.ActionID, id.SequenceID, scriptName.C_String(), nextSequenceId);
+					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
+					g_engineContext.m_script->AddParameterNumber(id.UserID);
+					g_engineContext.m_script->AddParameterNumber(id.ActionID);
+					g_engineContext.m_script->ExecuteScript();
+
+					// Reset the sequence ID map to the highest sequence ID currently used.
+					Network::NetworkComponent::s_sequenceIDMap[userActionKey] = std::max(nextSequenceId, Network::NetworkComponent::s_sequenceIDMap[userActionKey]);
+
+					// Get the entity.
+					entity = Network::FindEntity(p_map, id);
 					assert(entity != nullptr);
 
-					Network::NetworkComponent* netcomp = p_entityManager->GetComponent<Network::NetworkComponent>(entity);
-					netcomp->ID = id;
+					/*
+					entity = Network::FindEntity(p_map, id);
+					// If entity is not found, assume unsynched sequence ID. Correct the sequence IDs.
+					if(entity == nullptr)
+					{
+						Network::NetworkEntityID tempId = id;
+						tempId.SequenceID = Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] - 1;
+					
+						// If received sequence ID is less than that of the local next sequence id, update the local next sequence ID
+						if(id.SequenceID > tempId.SequenceID)
+							Network::NetworkComponent::s_sequenceIDMap[Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID)] = id.SequenceID + 1;
 
-					p_map[id] = entity;
-					p_map.erase(p_map.find(tempId));
+						entity = Network::FindEntity(p_map, tempId);
+						assert(entity != nullptr);
+
+						Network::NetworkComponent* netcomp = p_entityManager->GetComponent<Network::NetworkComponent>(entity);
+						netcomp->ID = id;
+
+						p_map[id] = entity;
+						p_map.erase(p_map.find(tempId));
+					}
+					*/
+				}
+				else
+				{
+					// Skip deserializing components.
+					entity = nullptr;
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Got deserialization message for deleted entity, discarding. (User: %u, Action: %u, Sequence: %u)", id.UserID, id.ActionID, id.SequenceID);
 				}
 			}
 			else
@@ -625,12 +742,15 @@ namespace RootForce
 			if (!p_bs->Serialize(false, count))
 				return nullptr;
 
-			// Deserialize all components
+			// Deserialize all components. If the entity is null, just discard all the component data and move on.
 			bool isSelf = (id.UserID == p_self) && (id.ActionID == Network::ReservedActionID::CONNECT);
 			for (unsigned i = 0; i < count; ++i) 
 			{
 				if (DeserializeComponent(p_bs, entity, p_entityManager, isSelf) == nullptr)
-					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to deserialize component on entity (%d)", entity->GetId());
+				{
+					// This can happen when an entity is skipped because it has been removed earlier.
+					//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::NON_FATAL_ERROR, "Failed to deserialize component on entity (%d)", entity->GetId());
+				}
 			}
 
 			return entity;

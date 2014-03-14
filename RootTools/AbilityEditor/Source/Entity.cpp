@@ -109,6 +109,24 @@ namespace AbilityEditorNameSpace
 				AddComponent(temp);
 			}
 			break;
+		case AbilityComponents::ComponentType::WATER:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Water();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::SOUND:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Sound();
+				AddComponent(temp);
+			}
+			break;
+		case AbilityComponents::ComponentType::FOLLOW:
+			{
+				AbilityComponents::MainComponent* temp = new AbilityComponents::Follow();
+				AddComponent(temp);
+			}
+			break;
 		default:
 			break; 
 		}

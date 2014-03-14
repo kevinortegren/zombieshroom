@@ -53,11 +53,11 @@ namespace RootForce
 			}
 			
 			//Give the ability to the correct player
-			RootForce::Network::NetworkEntityID id;
-			id.UserID = respawn->Claimed;
-			id.ActionID = RootForce::Network::ReservedActionID::CONNECT;
-			id.SequenceID = 0;
-			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(RootForce::Network::FindEntity(g_networkEntityMap, id));
+			ECS::Entity* playerEntity = RootForce::Network::FindEntity(g_networkEntityMap, RootForce::Network::NetworkEntityID(respawn->Claimed, RootForce::Network::ReservedActionID::CONNECT, RootForce::Network::SEQUENCE_PLAYER_ENTITY));
+			PlayerComponent* player = m_world->GetEntityManager()->GetComponent<PlayerComponent>(playerEntity);
+			PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(playerEntity);
+
+			// Switch the ability.
 			player->AbilityScripts[player->SelectedAbility] = respawn->CurrentAbility;
 
 			//Remove the collision and renderable component as well as clean out the current ability
@@ -96,6 +96,8 @@ namespace RootForce
 			{
 				m_levelAbilities.push_back(temp);
 				m_engineContext->m_resourceManager->LoadScript(temp);
+				m_engineContext->m_script->SetFunction(temp, "OnLoad");
+				m_engineContext->m_script->ExecuteScript();
 			}
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Succesfully loaded the ability pack");
 		}
@@ -118,6 +120,10 @@ namespace RootForce
 			Script* script = m_world->GetEntityManager()->GetComponent<Script>(itr->second);
 			script->Name = "AbilitySpawnPoint";
 
+			PointLight* pl = m_world->GetEntityManager()->CreateComponent<PointLight>(itr->second);
+			pl->m_color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+			pl->m_attenuation = glm::vec3(1.0f, 0.3f, 0.05f);
+
 		}
 	}
 
@@ -128,14 +134,17 @@ namespace RootForce
 		respawn->CurrentAbility = AbilityInfo(); //Make an empty abilityInfo
 
 		Collision* collision = m_world->GetEntityManager()->GetComponent<Collision>(p_entity);
-
+		Renderable* render = m_world->GetEntityManager()->GetComponent<Renderable>(p_entity);
+		CollisionResponder* cr = m_world->GetEntityManager()->GetComponent<CollisionResponder>(p_entity);
 		//m_engineContext->m_physics->RemoveObject(*collision->m_handle); //Remove the object from the physics
 
 		//Remove all components used for rendering and collision
-		m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity);
-		m_world->GetEntityManager()->RemoveComponent<PointLight>(p_entity);
-		m_world->GetEntityManager()->RemoveComponent<CollisionResponder>(p_entity);
-		m_world->GetEntityManager()->RemoveComponent<Collision>(p_entity);
+		if(render != nullptr)
+			m_world->GetEntityManager()->RemoveComponent<Renderable>(p_entity);
+		if(cr != nullptr)
+			m_world->GetEntityManager()->RemoveComponent<CollisionResponder>(p_entity);
+		if(collision != nullptr)
+			m_world->GetEntityManager()->RemoveComponent<Collision>(p_entity);
 
 		respawn->Timer = 30.0f; //30 second timer until a new ability respawns
 		respawn->Claimed = Network::ReservedUserID::NONE; //no current claimiant
@@ -185,12 +194,15 @@ namespace RootForce
 		if(m_clientPeer != nullptr)
 		{
 			AbilitySpawnComponent* respawn = m_respawn.Get(p_entity);
-
-			respawn->CurrentAbility.Name = respawn->AbilityReceived;
-			respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
-			respawn->CurrentAbility.OnCooldown = false;
-			respawn->Claimed = Network::ReservedUserID::NONE;
-			respawn->AbilityReceived = "";
+			if(respawn->CurrentAbility.Name.compare("") == 0)
+			{
+				respawn->CurrentAbility.Name = respawn->AbilityReceived;
+				respawn->CurrentAbility.Charges = (int) m_engineContext->m_script->GetGlobalNumber("charges", respawn->CurrentAbility.Name);
+				respawn->CurrentAbility.Crosshair = m_engineContext->m_script->GetGlobalString("crosshair", respawn->CurrentAbility.Name);
+				respawn->CurrentAbility.OnCooldown = false;
+				respawn->Claimed = Network::ReservedUserID::NONE;
+				respawn->AbilityReceived = "";
+			}
 		}
 	}
 
@@ -198,17 +210,18 @@ namespace RootForce
 	void AbilitySpawnSystem::CreateRenderComponent(ECS::Entity* p_entity)
 	{
 		AbilitySpawnComponent* respawn = m_respawn.Get(p_entity);
+		if(m_world->GetEntityManager()->GetComponent<Renderable>(p_entity) == nullptr)
+		{
+			Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(p_entity);
+			renderable->m_shadowTech = Render::ShadowTechnique::SHADOW_DYNAMIC;
+			renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilitySpawnPoint");
+			renderable->m_material = m_engineContext->m_renderer->CreateMaterial(respawn->CurrentAbility.Name);
+			renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);
+			renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture("AbilityBackground", Render::TextureType::TEXTURE_2D);
+			renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh");
 
-		Renderable* renderable = m_world->GetEntityManager()->CreateComponent<Renderable>(p_entity);
-		renderable->m_model = m_engineContext->m_resourceManager->LoadCollada("AbilitySpawnPoint");
-		renderable->m_material = m_engineContext->m_renderer->CreateMaterial(respawn->CurrentAbility.Name);
-		renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = m_engineContext->m_resourceManager->LoadTexture(respawn->CurrentAbility.Name, Render::TextureType::TEXTURE_2D);
-		renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture("AbilityBackground", Render::TextureType::TEXTURE_2D);
-		renderable->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Mesh");
-
-		PointLight* pl = m_world->GetEntityManager()->CreateComponent<PointLight>(p_entity);
-		pl->m_color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-		pl->m_attenuation = glm::vec3(0.0f, 0.3f, 0.0f);
+			g_engineContext.m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Creating an ability spawn point render component with material/glow texture %s", respawn->CurrentAbility.Name.c_str());
+		}
 
 	}
 
@@ -216,12 +229,15 @@ namespace RootForce
 	{
 		Transform* transform = m_transform.Get(p_entity);
 
-		CollisionResponder* collisionResp = m_world->GetEntityManager()->CreateComponent<CollisionResponder>(p_entity);
-		Collision* collision = m_world->GetEntityManager()->CreateComponent<Collision>(p_entity);
-		collision->m_handle = m_engineContext->m_physics->CreateHandle((void*)p_entity, RootEngine::Physics::PhysicsType::TYPE_ABILITYSPAWN, true);
-		collision->m_meshHandle = "AbilitySpawnPoint";
-		m_engineContext->m_physics->BindSphereShape(*collision->m_handle, transform->m_position , glm::quat(0,0,0,1), 1.0f, 1.0f, false);
-		m_engineContext->m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
+		if(m_world->GetEntityManager()->GetComponent<Collision>(p_entity) == nullptr)
+		{
+			CollisionResponder* collisionResp = m_world->GetEntityManager()->CreateComponent<CollisionResponder>(p_entity);
+			Collision* collision = m_world->GetEntityManager()->CreateComponent<Collision>(p_entity);
+			collision->m_handle = m_engineContext->m_physics->CreateHandle((void*)p_entity, RootEngine::Physics::PhysicsType::TYPE_ABILITYSPAWN, true);
+			collision->m_meshHandle = "AbilitySpawnPoint";
+			m_engineContext->m_physics->BindSphereShape(*collision->m_handle, transform->m_position , glm::quat(0,0,0,1), 3.0f, 1.0f, false);
+			m_engineContext->m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
+		}
 	}
 
 	void AbilitySpawnSystem::CreateParticleEmitter( ECS::Entity* p_entity )
@@ -232,6 +248,19 @@ namespace RootForce
 
 		for(unsigned i = 0; i < emitter->m_particleSystems.size(); i++)
 			emitter->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
+	
+	}
+
+	void AbilitySpawnSystem::ResetAllPoints()
+	{
+		ECS::GroupManager::GroupRange points = m_world->GetGroupManager()->GetEntitiesInGroup("AbilitySpawnPoint"); //Get all the entities that are Ability spawn points
+		
+		for(std::multimap<std::string, ECS::Entity*>::iterator itr = points.first; itr != points.second; ++itr)
+		{
+			NewServerAbility(itr->second);
+			AbilitySpawnComponent* component = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(itr->second);
+			component->Timer = 0.0f;
+		}
 	}
 
 }

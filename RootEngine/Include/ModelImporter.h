@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 
+
+
 namespace RootEngine
 {
 	struct GameSharedContext;
@@ -34,7 +36,7 @@ namespace RootEngine
 		std::string m_textureHandles[3];
 		glm::mat4x4 m_transform;
 
-		Model::Model()
+		Model()
 #ifndef COMPILE_LEVEL_EDITOR
 			: m_animation(nullptr)
 #endif

@@ -12,6 +12,7 @@
 #include <RootSystems/Include/Components.h>
 #include <RootEngine/InputManager/Include/KeyStateMouseEnum.h>
 #include <RootEngine/Render/Include/Texture.h>
+#include <QtWidgets/QStyleFactory>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
@@ -19,7 +20,7 @@ ECS::World* g_world;
 class MainParticle
 {
 public:
-	MainParticle(std::string p_workingDirectory, ParticleEditor* p_particleEdtiorQt);
+	MainParticle(std::string p_workingDirectory, ParticleEditor* p_particleEdtiorQt, std::string p_loadFile );
 	~MainParticle();
 	void HandleEvents();
 	void Update(float p_delta);
@@ -44,6 +45,7 @@ private:
 
 	ECS::Entity*							m_cameraEntity;
 	ECS::Entity*							m_aimingDevice;
+	ECS::Entity*							m_skyBox;
 
 	bool m_focusInterpolation;
 	int m_dragging;

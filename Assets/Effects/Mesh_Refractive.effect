@@ -12,8 +12,11 @@
           - sem: NORMAL
             offset: 64
       textures:
+
           - name: g_LA
             slot: 5
+          - name: g_Diffuse
+            slot: 6
           - name: g_Depth
             slot: 10
       flags:
@@ -34,7 +37,7 @@
           
           # Depth settings.
           depth:
-            write: 0
+            write: 1
             test: 1
            
 

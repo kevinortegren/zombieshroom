@@ -18,7 +18,7 @@ public:
 	void Activate();
 	//Assumes the float* is a float[3]
 	void Walk(glm::vec3 p_dir, float p_dt);
-	void Jump();
+	void Jump(float p_jumpPower);
 	void JumpBoost(float p_boostPower);
 	void Knockback(const btVector3& p_velocity, float p_dt);
 	void Update(float p_dt);

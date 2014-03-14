@@ -119,8 +119,9 @@ add_definitions(-DWIN32_LEAN_AND_MEAN)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 add_definitions(/wd4005)    # Disable macro redefinition warning
 add_definitions(/MP)        # Multicore compiling
-#add_definitions(/WX)        # Treat all warnings as errors >:)
-
+if (NOT COMPILE_LEVEL_EDITOR)
+	add_definitions(/WX)
+endif()
 # Add sub projects and dependencies.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 

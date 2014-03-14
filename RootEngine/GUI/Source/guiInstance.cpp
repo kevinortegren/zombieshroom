@@ -3,6 +3,7 @@
 #include <Awesomium/STLHelpers.h>
 #include <GL/glew.h>
 #include <GL/GL.h>
+#include <exception>
 #include "guiInstance.h"
 #include "Logging/Logging.h"
 
@@ -44,23 +45,25 @@ namespace RootEngine
 			g_context.m_resourceManager->LoadEffect("2D_GUI");
 			m_program = g_context.m_resourceManager->GetEffect("2D_GUI")->GetTechniques()[0]->GetPrograms()[0];
 
+			m_program->Apply();
+			glUniform1i(glGetUniformLocation(m_program->GetHandle(), "outputWidth"), p_width);
+			glUniform1i(glGetUniformLocation(m_program->GetHandle(), "outputHeight"), p_height);
+			glUniform1i(glGetUniformLocation(m_program->GetHandle(), "tileSize"), TILE_SIZE);
+
 			// Prepare a quad for texture output
 			glGenVertexArrays(1, &m_vertexArrayBuffer);
 			glBindVertexArray(m_vertexArrayBuffer);
-			GLuint vertexBufferObject;
-			glGenBuffers(1, &vertexBufferObject);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			float quadVertices[] = {
-				-1.f, 1.f, 0.f, 0.f,
-				-1.f, -1.f, 0.f, 1.f,
-				1.f, 1.f, 1.f, 0.f,
-				1.f, -1.f, 1.f, 1.f
-			};
-			glBufferData(GL_ARRAY_BUFFER, 4*4*sizeof(float), quadVertices, GL_STATIC_DRAW);
+			
+			glGenBuffers(1, &m_vertexBufferObject);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject);
+			glBufferData(GL_ARRAY_BUFFER, GL_MAX_TEXTURE_UNITS*6*sizeof(TileData), 0, GL_DYNAMIC_DRAW);
+
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL);
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(TileData), (char*)NULL);
 			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (char*)NULL+2*sizeof(float));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(TileData), (char*)NULL+2*sizeof(float));
+			glEnableVertexAttribArray(2);
+			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(TileData), (char*)NULL+4*sizeof(float));
 			// Done, unbind VAO
 			glBindVertexArray(0);
 			
@@ -75,17 +78,59 @@ namespace RootEngine
 
 		void guiInstance::Render(WebView* p_view)
 		{
-			m_program->Apply();
+			WebViewImpl* view = (WebViewImpl*)p_view;
+			if(!view->m_isActive)
+				return;
+			if(view->GetShouldResize())
+				m_resizeMutex.lock();
 
+			GLTextureSurface* surface = (GLTextureSurface*)view->GetView()->surface();
+			if(!surface)
+				return;
+
+			// Buffer quads in a buffer until max amount of texture units is filled
+			//   then issue a draw call and reset
+			unsigned numTexturesUsed = 0;
+			float tileTexWidth = TILE_SIZE/(float)m_width*2;
+			float tileTexHeight = TILE_SIZE/(float)m_height*2;
+
+			m_program->Apply();
 			glBindVertexArray(m_vertexArrayBuffer);
-			m_drawMutex.lock();
-			glActiveTexture(GL_TEXTURE0);
-			SurfaceToTexture((GLTextureSurface*)((WebViewImpl*)p_view)->m_webView->surface());
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-			glBindTexture(GL_TEXTURE_2D, 0);
-			m_drawMutex.unlock();
-			
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject);
+			auto tiles = surface->GetTiles();
+			for(unsigned x = 0; x < tiles->size(); ++x)
+				for(unsigned y = 0; y < tiles->at(x).size(); ++y)
+				{
+					SurfaceTile& tile = tiles->at(x).at(y);
+
+					glUniform1i(glGetUniformLocation(m_program->GetHandle(), ("tile["+std::to_string(numTexturesUsed)+"]").c_str()), numTexturesUsed);
+					glActiveTexture(GL_TEXTURE0 + numTexturesUsed);
+					glBindTexture(GL_TEXTURE_2D, tile.Texture);
+
+					TileData quadVertices[] = {
+						TileData(-1.f + tileTexWidth * x,     1.f - tileTexHeight * (y+1), 0.f, 1.f, numTexturesUsed),
+						TileData(-1.f + tileTexWidth * (x+1), 1.f - tileTexHeight * (y+1), 1.f, 1.f, numTexturesUsed),
+						TileData(-1.f + tileTexWidth * x,     1.f - tileTexHeight * y,     0.f, 0.f, numTexturesUsed),
+						TileData(-1.f + tileTexWidth * x,     1.f - tileTexHeight * y,     0.f, 0.f, numTexturesUsed),
+						TileData(-1.f + tileTexWidth * (x+1), 1.f - tileTexHeight * (y+1), 1.f, 1.f, numTexturesUsed),
+						TileData(-1.f + tileTexWidth * (x+1), 1.f - tileTexHeight * y,     1.f, 0.f, numTexturesUsed),
+					};
+
+					glBufferSubData(GL_ARRAY_BUFFER, numTexturesUsed*6*sizeof(TileData), 6*sizeof(TileData), quadVertices);
+					
+					numTexturesUsed++;
+
+					// If max textures used or last tile, do the rendering and restart the texture usage
+					if(numTexturesUsed >= (unsigned)std::min(GL_MAX_TEXTURE_UNITS, 32) || (x + 1 == tiles->size() && y + 1 == tiles->at(x).size()))
+					{
+						glDrawArrays(GL_TRIANGLES, 0, numTexturesUsed*6);
+
+						numTexturesUsed = 0;
+					}
+				}
 			glBindVertexArray(0);
+			if(view->GetShouldResize())
+				m_resizeMutex.unlock();
 		}
 
 		guiInstance* guiInstance::GetInstance()
@@ -122,14 +167,6 @@ namespace RootEngine
 					m_viewBuffer.erase(m_viewBuffer.begin() + i--);
 			m_viewBuffer.shrink_to_fit();
 			m_viewBufferMutex.unlock();
-		}
-
-		void guiInstance::SurfaceToTexture(GLTextureSurface* p_surface)
-		{
-			SDL_GLContext tmp = SDL_GL_GetCurrentContext();
-			GLuint texture = p_surface->GetTexture();
-			if(p_surface)
-				glBindTexture(GL_TEXTURE_2D, texture);
 		}
 
 		void guiInstance::HandleEvents( SDL_Event p_event )
@@ -192,26 +229,31 @@ namespace RootEngine
 						tempEvent.type = Awesomium::WebKeyboardEvent::kTypeKeyUp;
 						
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectKeyboardEvent(tempEvent);
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectKeyboardEvent(tempEvent);
 
 				} break;
 
 				case SDL_MOUSEBUTTONDOWN:
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectMouseDown((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;
 				case SDL_MOUSEBUTTONUP:
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectMouseUp((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectMouseUp((Awesomium::MouseButton)MapToAwesomium(p_event.button.button - SDL_BUTTON_LEFT + InputManager::MouseButton::LEFT));
 					break;
 				case SDL_MOUSEMOTION:
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectMouseMove(p_event.motion.x, p_event.motion.y);
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectMouseMove(p_event.motion.x, p_event.motion.y);
 					break;
 					
 				case SDL_MOUSEWHEEL:
 					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-						m_viewBuffer.at(i)->InjectMouseWheel(p_event.wheel.x, p_event.wheel.y);
+						if(m_viewBuffer.at(i)->m_isActive)
+							m_viewBuffer.at(i)->InjectMouseWheel(p_event.wheel.x, p_event.wheel.y);
 					break;
 				default:
 					g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type); 
@@ -297,32 +339,25 @@ namespace RootEngine
 
 					m_viewBufferMutex.lock();
 						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-							if(m_viewBuffer[i])
+							if(m_viewBuffer[i] && m_viewBuffer[i]->m_isActive)
 								m_viewBuffer[i]->Update();
 					m_viewBufferMutex.unlock();
 
-					m_drawMutex.lock();
+					m_resizeMutex.lock();
 						m_core->Update();
-						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-							if(m_viewBuffer[i] && m_viewBuffer[i]->GetView())
-							{
-								GLRAMTextureSurface* surface = (GLRAMTextureSurface*)m_viewBuffer[i]->GetView()->surface();
-								if(surface)
-									surface->UpdateTexture(); // Force a texture update
-							}
-						// Wait until texture updates are complete before releasing the lock
-						GLsync fenceId = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ); 
-						GLenum result; 
-						while(true) 
-						{ 
-							result = glClientWaitSync(fenceId, GL_SYNC_FLUSH_COMMANDS_BIT, GLuint64(5000000000)); //5 Second timeout 
-							if(result != GL_TIMEOUT_EXPIRED) break; //we ignore timeouts and wait until all OpenGL commands are processed! 
-						} 
-					m_drawMutex.unlock();
+					m_resizeMutex.unlock();
+					for(unsigned i = 0; i < m_viewBuffer.size(); i++)
+						if(m_viewBuffer[i] && m_viewBuffer[i]->GetView() && m_viewBuffer[i]->m_isActive)
+						{
+							GLTextureSurface* surface = (GLTextureSurface*)m_viewBuffer[i]->GetView()->surface();
+							if(surface)
+								surface->UpdateTexture(); // Update textures if necessary
+						}
 				
 					uint64_t newTime = SDL_GetPerformanceCounter();
 					float dt = (newTime - oldTime) / (float)SDL_GetPerformanceFrequency();
 					oldTime = newTime;
+
 					if(dt < 0.032f)
 					{
 						long time = (long)floorf((0.032f-dt)*1000);
@@ -330,6 +365,10 @@ namespace RootEngine
 					}
 				}
 				SDL_GL_DeleteContext(m_glContext);
+			}
+			catch(std::exception e)
+			{
+				g_context.m_logger->LogText(LogTag::GUI, LogLevel::FATAL_ERROR, "Awesomium update thread has crashed due to interference in the Force! %s", e.what());
 			}
 			catch(...)
 			{
@@ -345,7 +384,10 @@ namespace RootEngine
 			m_drawMutex.lock();
 				m_viewBufferMutex.lock();
 					for(auto view : m_viewBuffer )
+					{
+						view->SetShouldResize(true);
 						view->m_webView->Resize(p_width, p_height);
+					}
 				m_viewBufferMutex.unlock();
 			m_drawMutex.unlock();
 		}

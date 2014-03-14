@@ -7,10 +7,11 @@ function Player.OnCreate(userId, actionId)
 	local playerComponent = PlayerComponent.New(player);
  	local network = Network.New(player, userId, actionId);
 	local transform = Transformation.New(player);
+	local script = Script.New(player, "Player");
 	
 	transform:SetPos(Vec3.New(100,10,0));
 
-	playerComponent:SetAbility(3, "Push", -1);
+	playerComponent:SetAbility(3, "Push", -1, "");
 	playerComponent:SelectAbility(0);
  	playerComponent:SetDeaths(0);
 	playerComponent:SetScore(0);
@@ -44,7 +45,7 @@ function Player.OnTeamSelect(self, teamId)
     local physics = Physics.New(self);
     local collision = Collision.New(self);
     local collisionResponder = CollisionResponder.New(self);
-    local script = Script.New(self, "Player");
+    local statComp = StatChange.New(self);
     local playerAction = PlayerAction.New(self);
     local stateComponent = StateComponent.New(self);
     local tryPickup = TryPickupComponent.New(self);
@@ -63,17 +64,14 @@ function Player.OnTeamSelect(self, teamId)
     playerAction:SetAngle(Vec2.New(0, 0));
     playerAction:SetAbilityTime(0.0);
     playerAction:SelectAbility(0);
+		playerAction:SetWantRespawn(true);
 
     playerPhysics:SetMovementSpeed(25);
     playerPhysics:SetJumpForce(10); --Do not fucking change without good reason or I will hunt you down //Kim
-    playerPhysics:SetJumpBoostForce(0.9); --See comment above //Kim
+    playerPhysics:SetJumpBoostForce(30); --See comment above //Kim I do what i want //Wingly
 
     collision:SetMeshHandle("testchar0");
     Collision.AddPlayerObjectToWorld(self, collision, transform, playerPhysics, collisionResponder);
-
-    health:SetHealth(100);
-    health:SetIsDead(false);
-    health:SetWantsRespawn(true);
     
     if Global.IsClient then
       local renderable = Renderable.New(self);
@@ -139,14 +137,11 @@ function Player.OnTeamSelect(self, teamId)
 end
 
 function Player.OnCollide (self, entity)
- 	local hitCol = entity:GetCollision();
- 	local hitPhys = entity:GetPhysics();
-	local type = hitPhys:GetType(hitCol);
-  if  type == PhysicsType.TYPE_ABILITYSPAWN then
-  end
-  
+
 end
 
 function Player.OnDestroy (self)
+	local network = self:GetNetwork();
+	Logging.Log(LogLevel.DEBUG_PRINT, "Destroying player (userId: "..tostring(network:GetUserId())..", actionId: "..tostring(network:GetActionId())..")");
 	Entity.Remove(self);
 end

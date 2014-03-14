@@ -1,3 +1,4 @@
+#include <Windows.h>
 #include <Utility\ECS\Include\EntitySystem.h>
 #include <Utility\ECS\Include\World.h>
 #include <vector>
@@ -13,7 +14,16 @@ void ECS::EntitySystem::Process()
 	Begin();
 
 	for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
+	{
+		if((*itr)->GetId() == -1)
+		{
+			std::cout << "-1 Entity in processing loop." << std::endl;
+			continue;
+		}
+		
 		ProcessEntity((*itr));
+
+	}
 
 	End();	
 }
@@ -38,12 +48,21 @@ void ECS::IntervalEntitySystem::Process()
 {
 	while(CheckProcessing())
 	{
+		for(auto itr = m_entitiesToRemove.begin(); itr != m_entitiesToRemove.end(); ++itr)
+		{
+			m_activeEntities.erase((*itr));
+		}
+		m_entitiesToRemove.clear();
+
 		Begin();
 
 		for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 		{
 			if((*itr)->GetId() == -1)
+			{
+				std::cout << "-1 Entity in processing loop." << std::endl;
 				continue;
+			}
 			ProcessEntity((*itr));
 		}	
 
@@ -75,13 +94,21 @@ void ECS::ConcurrentSystem::Process()
 			for(auto itr = m_activeEntities.begin(); itr != m_activeEntities.end(); ++itr)
 			{
 				if((*itr)->GetId() == -1)
+				{
+					std::cout << "-1 Entity in processing loop." << std::endl;
 					continue;
+				}
+		
 				ProcessEntity((*itr));
 			}
 
 			End();
 
 			m_run = false;
+		}
+		else
+		{
+			Sleep(10);
 		}
 	}
 }

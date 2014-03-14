@@ -13,7 +13,7 @@ CustomCompListWidget::CustomCompListWidget( QWidget* parent /*= 0*/ ) : QListWid
 void CustomCompListWidget::dropEvent( QDropEvent* event )
 {
 	//Om objektet man släpper är en component
-	if(event->mimeData()->objectName().compare("Components") == 0) //Kanske S
+	if(event->mimeData()->objectName().compare("Components") == 0)
 	{
 		//QString asdf = event->mimeData()->text();
 		if(!m_entity->DoesComponentExist(event->mimeData()->text()))

@@ -23,8 +23,8 @@ namespace RootForce
 	void ParticleSystem::Begin()
 	{
 		g_engineContext.m_renderer->BeginTransform(m_world->GetDelta());
-
-		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("WaterHeight");
+		
+		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
 	}
 
 	void ParticleSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -35,6 +35,7 @@ namespace RootForce
 		for(unsigned i = 0; i < emitter->m_particleSystems.size(); i++)
 		{
 			emitter->m_particleSystems[i]->m_params[Render::Semantic::TRANSPOSITION] = &trans->m_position;
+			emitter->m_particleSystems[i]->m_params[Render::Semantic::ALIVE] = &emitter->m_alive;
 
 			auto updateTechnique = emitter->m_particleSystems[i]->m_material->m_effect->GetTechniques()[0];
 
@@ -51,10 +52,17 @@ namespace RootForce
 
 			// Simple sort of particle based on water height.
 			unsigned pass = 0;
-			if(trans->m_position.y > m_waterHeight)
-				pass = RenderPass::RENDERPASS_PARTICLES1;
+			if(m_world->GetStorage()->DoesKeyExist("Water"))
+			{
+				if(trans->m_position.y > m_waterHeight)
+					pass = RenderPass::RENDERPASS_PARTICLES1;
+				else
+					pass = RenderPass::RENDERPASS_PARTICLES0;
+			}
 			else
-				pass = RenderPass::RENDERPASS_PARTICLES0;
+			{
+				pass = RenderPass::RENDERPASS_PARTICLES1;
+			}
 
 
 			Render::RenderJob job;
@@ -62,6 +70,8 @@ namespace RootForce
 			job.m_material = emitter->m_particleSystems[i]->m_material;
 			job.m_renderPass = pass;
 			job.m_forward = true;
+			job.m_params[Render::Semantic::POSITION] = &trans->m_position;
+			job.m_position = trans->m_position;
 
 			g_engineContext.m_renderer->AddRenderJob(job);
 		}

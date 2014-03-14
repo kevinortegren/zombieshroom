@@ -299,10 +299,20 @@ namespace AbilityEditorNameSpace
 				AbilityComponents::StatChangeCaster* tempcomp = new AbilityComponents::StatChangeCaster();
 				if(p_node.FindValue("CasterSpeed"))
 					p_node["CasterSpeed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("CasterSpeedTime"))
+					p_node["CasterSpeedTime"] >> tempcomp->m_speedTime;
 				if(p_node.FindValue("CasterJumpHeight"))
 					p_node["CasterJumpHeight"] >> tempcomp->m_jumpHeight;
+				if(p_node.FindValue("CasterJumpTime"))
+					p_node["CasterJumpTime"] >> tempcomp->m_jumpTime;
 				if(p_node.FindValue("CasterKnockbackResistance"))
 					p_node["CasterKnockbackResistance"] >> tempcomp->m_knockbackResistance;
+				if(p_node.FindValue("CasterKnockbackTime"))
+					p_node["CasterKnockbackTime"] >> tempcomp->m_kbResTime;
+				if(p_node.FindValue("CasterDamageResistance"))
+					p_node["CasterDamageResistance"] >> tempcomp->m_damageResistance;
+				if(p_node.FindValue("CasterDamageTime"))
+					p_node["CasterDamageTime"] >> tempcomp->m_dmgResTime;
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
@@ -311,10 +321,20 @@ namespace AbilityEditorNameSpace
 				AbilityComponents::StatChangeTarget* tempcomp = new AbilityComponents::StatChangeTarget();
 				if(p_node.FindValue("TargetSpeed"))
 					p_node["TargetSpeed"] >> tempcomp->m_speed;
+				if(p_node.FindValue("TargetSpeedTime"))
+					p_node["TargetSpeedTime"] >> tempcomp->m_speedTime;
 				if(p_node.FindValue("TargetJumpHeight"))
 					p_node["TargetJumpHeight"] >> tempcomp->m_jumpHeight;
+				if(p_node.FindValue("TargetJumpTime"))
+					p_node["TargetJumpTime"] >> tempcomp->m_jumpTime;
 				if(p_node.FindValue("TargetKnockbackResistance"))
 					p_node["TargetKnockbackResistance"] >> tempcomp->m_knockbackResistance;
+				if(p_node.FindValue("TargetKnockbackTime"))
+					p_node["TargetKnockbackTime"] >> tempcomp->m_kbResTime;
+				if(p_node.FindValue("TargetDamageResistance"))
+					p_node["TargetDamageResistance"] >> tempcomp->m_damageResistance;
+				if(p_node.FindValue("TargetDamageTime"))
+					p_node["TargetDamageTime"] >> tempcomp->m_dmgResTime;
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
 			break;
@@ -333,6 +353,10 @@ namespace AbilityEditorNameSpace
 				}
 				if(p_node.FindValue("PhysicsCollide"))
 					p_node["PhysicsCollide"] >> tempcomp->m_collide;
+				if(p_node.FindValue("PhysicsCollideStatic"))
+					p_node["PhysicsCollideStatic"] >> tempcomp->m_colWStatic;
+				if(p_node.FindValue("PhysicsExternally"))
+					p_node["PhysicsExternally"] >> tempcomp->m_externally;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}
@@ -374,6 +398,15 @@ namespace AbilityEditorNameSpace
 					p_node["SoundRangeMax"] >> tempcomp->m_rangeMax;
 				if(p_node.FindValue("SoundLoop"))
 					p_node["SoundLoop"] >> tempcomp->m_loop;
+
+				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
+			}
+			break;
+		case AbilityComponents::ComponentType::FOLLOW:
+			{
+				AbilityComponents::Follow* tempcomp = new AbilityComponents::Follow();
+				if(p_node.FindValue("FollowOffset"))
+					p_node["FollowOffset"] >> tempcomp->m_offset;
 
 				return static_cast<AbilityComponents::MainComponent*>(tempcomp);
 			}

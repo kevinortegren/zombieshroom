@@ -8,6 +8,7 @@ project(${PROJECT_NAME})
 # Set the files used in the target
 file(GLOB_RECURSE SOURCES Source/*.cpp)
 file(GLOB_RECURSE HEADERS Include/*.h)
+file(GLOB_RECURSE RESOURCE_FILES *.rc)
 set(LIBRARIES ${EXTERNAL_LIBRARIES} DynamicLoader ECS RootSystems)
 
 #message("${SOURCES}")
@@ -17,5 +18,5 @@ set(LIBRARIES ${EXTERNAL_LIBRARIES} DynamicLoader ECS RootSystems)
 include_directories(Include)
 
 # Add the target
-add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
+add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${RESOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})

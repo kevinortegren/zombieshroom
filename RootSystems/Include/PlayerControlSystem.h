@@ -43,6 +43,9 @@ namespace RootForce
 			ACTIVATE_PUSH_ABILITY_PRESSED,
 			ACTIVATE_PUSH_ABILITY_RELEASED,
 			PICK_UP_ABILITY,
+			SCROLL_ABILITY_FORWARD,
+			SCROLL_ABILITY_BACKWARD,
+			SWITCH_ABILITY_FORWARD,
 		};
 	}
 
@@ -74,7 +77,7 @@ namespace RootForce
 		void Process();
 		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
 	private:
-		void HandleAbilityPressed(float dt);
+		void HandleAbilityPressed(float p_dt, bool p_push);
 		void HandleAbilityReleased();
 
 		static Network::ActionID_t s_nextActionID;

@@ -12,16 +12,16 @@ void RootForce::TimerSystem::Init()
 {
 	m_timers.Init(m_world->GetEntityManager());
 	m_networks.Init(m_world->GetEntityManager());
-	m_scripts.Init(m_world->GetEntityManager());
 }
 
 void RootForce::TimerSystem::ProcessEntity( ECS::Entity* p_entity )
 {
 	TimerComponent* timer = m_timers.Get(p_entity);
 	Network::NetworkComponent* network = m_networks.Get(p_entity);
-	Script* script = m_scripts.Get(p_entity);
 
 	timer->TimeLeft -= m_world->GetDelta();
+
+	//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "TimerSystem (User: %u, Action: %u, Sequence: %u)", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
 
 	if (timer->TimeLeft <= 0)
 	{
@@ -43,13 +43,21 @@ void RootForce::TimerSystem::ProcessEntity( ECS::Entity* p_entity )
 
 	if (timer->TimeUp)
 	{
-		//g_engineContext.m_script->SetFunction(script->Name, "OnDestroy");
-		//g_engineContext.m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
-		//g_engineContext.m_script->ExecuteScript();
+		g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::PINK_PRINT, "Time up (User: %u, Action: %u, Sequence: %u)", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+
+		ECS::Entity* target = Network::FindEntity(g_networkEntityMap, timer->Target);
+		if (target != nullptr)
+		{
+			g_engineContext.m_script->SetFunction(timer->ScriptName.C_String(), timer->FunctionName.C_String());
+			g_engineContext.m_script->AddParameterUserData(target, sizeof(ECS::Entity*), "Entity");
+			g_engineContext.m_script->ExecuteScript();
+		}
+		//else
+		//{
+		//	g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "No existing entity associated with timer entity.");
+		//}
 
 		Network::DeleteEntities(g_networkEntityMap, network->ID, m_world->GetEntityManager());
-		//m_world->GetEntityManager()->RemoveAllComponents(p_entity);
-		//m_world->GetEntityManager()->RemoveEntity(p_entity);
 	}
 }
 

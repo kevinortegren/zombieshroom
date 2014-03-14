@@ -51,7 +51,6 @@ public:
     CustomCompListWidget *listAbilityComponents;
     QTabWidget *toolBoxWidget;
     QWidget *tabComponents;
-    QVBoxLayout *verticalLayout_5;
     CustomListWidget *listComponents;
     QWidget *tabEntities;
     QVBoxLayout *verticalLayout_4;
@@ -116,7 +115,7 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         layoutWidget = new QWidget(centralWidget);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 69, 771, 631));
+        layoutWidget->setGeometry(QRect(10, 69, 771, 621));
         mainLayout = new QGridLayout(layoutWidget);
         mainLayout->setSpacing(6);
         mainLayout->setContentsMargins(11, 11, 11, 11);
@@ -131,15 +130,9 @@ public:
         toolBoxWidget->setObjectName(QStringLiteral("toolBoxWidget"));
         tabComponents = new QWidget();
         tabComponents->setObjectName(QStringLiteral("tabComponents"));
-        verticalLayout_5 = new QVBoxLayout(tabComponents);
-        verticalLayout_5->setSpacing(6);
-        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
         listComponents = new CustomListWidget(tabComponents);
         listComponents->setObjectName(QStringLiteral("listComponents"));
-
-        verticalLayout_5->addWidget(listComponents);
-
+        listComponents->setGeometry(QRect(9, 9, 361, 271));
         toolBoxWidget->addTab(tabComponents, QString());
         tabEntities = new QWidget();
         tabEntities->setObjectName(QStringLiteral("tabEntities"));
@@ -211,6 +204,7 @@ public:
 
         propertyWidget = new QWidget(layoutWidget);
         propertyWidget->setObjectName(QStringLiteral("propertyWidget"));
+        listComponents->raise();
 
         mainLayout->addWidget(propertyWidget, 1, 1, 1, 1);
 

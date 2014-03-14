@@ -17,6 +17,13 @@ namespace RootForce
 		std::vector<Render::ParticleSystemInterface*> m_systems;
 		std::string m_name;
 
+		float m_alive;
+
+		ParticleEmitter()
+		{
+			m_alive = 1.0f;
+		}
+
 		~ParticleEmitter()
 		{
 			for(auto itr = m_systems.begin(); itr != m_systems.end(); itr++)

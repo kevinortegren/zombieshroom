@@ -7,6 +7,7 @@ in vec3 vert_bitangent;
 
 out vec4 out_color;
 
+uniform sampler2D g_Diffuse;
 uniform sampler2D g_LA;
 uniform sampler2D g_Depth;
 
@@ -28,25 +29,24 @@ layout(std140) uniform PerObject
 void main()
 {
 	////////////////////////////////////////////////////////////////////////////
-	//Calculate transparent color and refraction
+	//Calculate transparent color and refraction - Need more accuracy when refracting using view space normals
 	////////////////////////////////////////////////////////////////////////////
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
 	ivec2 screenAbsCoord	= ivec2(gl_FragCoord.xy);
-	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(vert_normal.xy * 30.0f), ivec2(0), textureSize(g_LA, 0));
+	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(vec2(vert_normal.x, vert_normal.y) * 30.0f), ivec2(0), textureSize(g_LA, 0));
 	float refractionDepth	= texelFetch(g_Depth, refractedUV, 0).r;
+
 	vec3 refractionColor;
 	//Check if refracted vector is hitting an object in the foreground
 	if(refractionDepth > gl_FragCoord.z)
 		refractionColor	= texelFetch(g_LA, refractedUV, 0).rgb;
 	else
-	{
 		refractionColor	= texelFetch(g_LA, ivec2(gl_FragCoord.xy), 0).rgb;
-	}
 
-
+	vec3 diffuseColor = texture(g_Diffuse, vert_texcoord).rgb;
 	////////////////////////////////////////////////////////////////////////////
 	//Outputs
 	////////////////////////////////////////////////////////////////////////////
-	vec3 result = mix(refractionColor, vec3(0.2, 0.4, 0.47), 0.3);
-    out_color = vec4(result, 1.0);
+	vec3 result =  mix(refractionColor, diffuseColor, 0.05);
+    out_color = vec4(result,1);
 }

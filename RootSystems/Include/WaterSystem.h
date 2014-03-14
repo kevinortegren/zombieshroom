@@ -14,6 +14,7 @@
 
 namespace RootForce
 {
+
 	namespace WaterState
 	{
 		enum WaterState
@@ -44,15 +45,8 @@ namespace RootForce
 		void Begin();
 		void ProcessEntity(ECS::Entity* p_entity);
 		void End();
-		void CreateWater(float p_height);
+		void CreateWater();
 		void Disturb(float p_x, float p_z, float p_power, int p_radius );
-		void InitDisturb();
-		
-		void CalculateWaterConstants();
-
-		float GetWaterHeight();
-		void SetWaterHeight(float p_height);
-
 		void ParseCommands(std::stringstream* p_data);
 
 	private:
@@ -69,12 +63,13 @@ namespace RootForce
 		Logging::LoggingInterface*		m_logger;
 		RootEngine::GameSharedContext*	m_context;
 
-		bool		m_wireFrame, m_pause, m_playerWaterDeath;
+		bool		m_wireFrame, m_pause, m_playerWaterDeath, m_showDebugDraw;
 		int			m_texSize, m_gridSize;	
 		float		m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale, m_totalTime;;	
 		float*		m_textureData;
 		glm::vec4	m_waterOptions;
 
+		void CalculateWaterConstants();
 		bool ValidValues();
 		void CreateWaterMesh();
 		glm::vec2 WorldSpaceToWaterSpace(glm::vec2 p_worldSpace);
@@ -94,8 +89,11 @@ namespace RootForce
 		void ToggleRefractions();
 		void ToggleNormalMaps();
 		void ToggleCollideDeath();
+		void ToggleCollisionDebugDraw();
 
 		void ResetWater();
+
+		void UpdateWaterHeight();
 
 		void SaveWater();
 		void LoadWater();

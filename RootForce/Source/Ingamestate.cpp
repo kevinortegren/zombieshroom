@@ -15,22 +15,22 @@ namespace RootForce
 	{	
 		ComponentType::Initialize();
 
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(20);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ThirdPersonBehavior>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Script>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Collision>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::CollisionResponder>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Animation>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ParticleEmitter>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TDMRuleSet>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerActionComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerPhysics>(12);
@@ -40,12 +40,18 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ClientComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::ServerInformationComponent>(1);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Ragdoll>(100);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::WaterCollider>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::AbilitySpawnComponent>(100);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TryPickupComponent>(12);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(100000);
-		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(100000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::SoundComponent>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::TimerComponent>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::FollowComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HomingComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::RayComponent>(1000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::DamageAndKnockback>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Scalable>(5000);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::StatChange>(500);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::KillAnnouncement>(1);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
 	}
@@ -55,14 +61,18 @@ namespace RootForce
 		// Bind c++ functions and members to Lua.
 		LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 		
+		//Do not add scripts for abilities that are included in the abilitypacks. They will be loaded automatically
 		g_engineContext.m_resourceManager->LoadScript("Global");
+		g_engineContext.m_resourceManager->LoadScript("TimerEntity");
 		g_engineContext.m_resourceManager->LoadScript("Push");
+		g_engineContext.m_resourceManager->LoadScript("Identiray");
 		//g_engineContext.m_resourceManager->LoadScript("CompileChecker");
 		g_engineContext.m_resourceManager->LoadScript("Player");
 		g_engineContext.m_resourceManager->LoadScript("Explosion");
 		g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
-		g_engineContext.m_resourceManager->LoadScript("ExplodingShroom");
-		g_engineContext.m_resourceManager->LoadScript("RefractiveBall");
+		g_engineContext.m_resourceManager->LoadScript("XplodingMushroomPlanted");
+		g_engineContext.m_resourceManager->LoadScript("ShroomExplosion");
+		g_engineContext.m_resourceManager->LoadScript("TotemProjectile");
 
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
@@ -79,6 +89,9 @@ namespace RootForce
 		m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
 		m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
 		g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem);
+
+		m_scriptSystem = new RootForce::ScriptSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem);
 
 		m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem);
@@ -99,10 +112,10 @@ namespace RootForce
 		m_directionlLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
 		g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionlLightSystem);
 
-        // Initialize the interpolation system
+		// Initialize the interpolation system
 		m_transformInterpolationSystem = new RootForce::TransformInterpolationSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::TransformInterpolationSystem>(m_transformInterpolationSystem);
-        
+		
 		// Initialize anim system.
 		m_animationSystem = new RootForce::AnimationSystem(g_world);
 		m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -159,14 +172,39 @@ namespace RootForce
 		m_followSystem = new RootForce::FollowSystem(g_world);
 		g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
 
+		// Initialize the network debug system.
+		m_networkDebugSystem = new RootForce::Network::NetworkDebugSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::Network::NetworkDebugSystem>(m_networkDebugSystem);
+
+		// Initialize the homing system.
+		m_homingSystem = new RootForce::HomingSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::HomingSystem>(m_homingSystem);
+
+		// Initialize the ray system.
+		m_raySystem = new RootForce::RaySystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::RaySystem>(m_raySystem);
+
+		//Initialize water death system.
+		m_waterDeathSystem = new RootForce::WaterDeathSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::WaterDeathSystem>(m_waterDeathSystem);
+
+		//Initialize scale system.
+		m_scaleSystem = new RootForce::ScaleSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ScaleSystem>(m_scaleSystem);
+
+		// Initialize the deserialization system.
+		m_sharedSystems.m_deserializationSystem = std::shared_ptr<RootForce::DeserializationSystem>(new RootForce::DeserializationSystem(g_world));
 
 		// Set debug visualization flags.
 		m_displayPhysicsDebug = false;
 		m_displayNormals = false;
 		m_displayWorldDebug = false;		
-		m_displayWorldDebug = false;
 		m_displayDebugHUD = true;
 		m_displayGuiHUD = true;
+
+#ifndef _DEBUG
+		m_displayDebugHUD = false;
+#endif
 	}
 
 	void IngameState::Enter()
@@ -175,17 +213,21 @@ namespace RootForce
 
 #ifndef _DEBUG
 		BotanyTextures textures;
-		textures.m_diffuse = "ugotaflatgrass2";
-		textures.m_translucency = "grass_translucency";
-		textures.m_billboard = "grass_billboard";
-		textures.m_terrainTexture = "grass";
+		textures.m_diffuse = g_world->GetStorage()->GetValueAsString("GrassDiffuse");
+		textures.m_translucency = g_world->GetStorage()->GetValueAsString("GrassTranslucency");
+		textures.m_billboard = g_world->GetStorage()->GetValueAsString("GrassBillboard");
 
-		// Subdivide terrain for grass chunk rendering.
-		m_botanySystem->Initialize(textures);
+		if(textures.m_diffuse != "")
+		{
+			// Subdivide terrain for grass chunk rendering.
+			m_botanySystem->Initialize(textures, 0.0f);
+		}
 
 		// Subdivide world.
-		m_sharedSystems.m_worldSystem->SubdivideTree();
+		//m_sharedSystems.m_worldSystem->SubdivideTree();	
 #endif
+		
+		g_world->GetEntityManager()->CleanUp();
 
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -194,19 +236,36 @@ namespace RootForce
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 		
-		// Set network peer interfaces on the systems that needs to send messages.
+		// Set server peers to null
+		/*
+		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
+		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
+		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
+		m_playerControlSystem->SetClientPeer(nullptr);
+		m_actionSystem->SetServerPeerInterface(nullptr);
+		m_actionSystem->SetClientPeerInterface(nullptr);
+		m_timerSystem->SetServerPeer(nullptr);
+		*/
+
+		// Set the network client peer interfaces.
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
+		m_sharedSystems.m_respawnSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
 		m_playerControlSystem->SetClientPeer(m_networkContext.m_client->GetPeerInterface());
-		m_playerControlSystem->SetHUD(m_hud.get());
 		m_actionSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_sharedSystems.m_matchStateSystem->SetNetworkContext(&m_networkContext);
-		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 
-		// Set the server peer to the action and abilityspawn system, if we are a server.
+		// Set the network server peer interfaces if we are a server.
 		if (m_networkContext.m_server != nullptr)
 		{
-			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
 			m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
-		}	
+			m_sharedSystems.m_respawnSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+			m_actionSystem->SetServerPeerInterface(m_networkContext.m_server->GetPeerInterface());
+			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
+		}
+
+		// Give the player control system access to the HUD.
+		m_playerControlSystem->SetHUD(m_hud.get());
 
 		// Initialize the debug, setting the html view
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
@@ -215,24 +274,57 @@ namespace RootForce
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
 
+		m_sharedSystems.m_matchStateSystem->SetHUD(m_hud.get());
+		m_sharedSystems.m_matchStateSystem->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
+
 		// Reset the ingame menu before we start the match
-		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper));
+		m_ingameMenu = std::shared_ptr<RootForce::IngameMenu>(new IngameMenu(g_engineContext.m_gui->LoadURL("Menu", "ingameMenu.html"), g_engineContext, m_keymapper, m_hud->GetChatSystem().get()));
 		m_ingameMenu->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
 		m_displayIngameMenu = false;
+		m_ingameMenu->GetView()->SetActive(false);
 		
 		m_animationSystem->Start();
 
-		m_waterSystem->CreateWater(g_world->GetStorage()->GetValueAsFloat("WaterHeight"));
+		m_waterSystem->CreateWater();
 
 		if(m_networkContext.m_server != nullptr)
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 
+		//Ray stuff
+		g_engineContext.m_resourceManager->LoadEffect("Ray");
+		RootEngine::Model* rayModel = g_engineContext.m_resourceManager->CreateModel("rayModel");
+		
+		Render::Vertex1P rayVertices;
+		rayVertices.m_pos = glm::vec3(0.0f);
+		
+		// Create 1P mesh for shadows.
+		Render::MeshInterface* mesh1P = g_engineContext.m_renderer->CreateMesh();
+		mesh1P->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
+		mesh1P->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+		mesh1P->CreateVertexBuffer1P((Render::Vertex1P*)(&rayVertices), 1);
+		mesh1P->SetPrimitiveType(GL_POINTS);
+
+		rayModel->m_meshes[0] = mesh1P;
+		
+		//Team selection stuff
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
-		m_displayIngameMenu = !m_displayIngameMenu;
-		g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+		m_displayIngameMenu = true;
+		g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+		g_engineContext.m_inputSys->LockMouseToCenter(false);
+		m_ingameMenu->GetView()->SetActive(true);
+		g_engineContext.m_inputSys->LockMouseToCenter(false);
 		m_ingameMenu->Reset();
+
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-glow", g_engineContext.m_configManager->GetConfigValueAsString("settings-glow"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-grass", g_engineContext.m_configManager->GetConfigValueAsString("settings-grass"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-shadows", g_engineContext.m_configManager->GetConfigValueAsString("settings-shadows"));
+		m_ingameMenu->GetSettingsMenu()->SetValue("settings-water", g_engineContext.m_configManager->GetConfigValueAsString("settings-water"));
+
+		PlayerControl* control = g_world->GetEntityManager()->GetComponent<PlayerControl>(g_world->GetTagManager()->GetEntityByTag("Player"));
+		control->m_mouseSensitivity = g_engineContext.m_configManager->GetConfigValueAsFloat("settings-mouse-sensitivity");
+		control->m_invertMouse = g_engineContext.m_configManager->GetConfigValueAsBool("settings-mouse-invert");
 	}
 
 	void IngameState::Exit()
@@ -254,14 +346,21 @@ namespace RootForce
 
 		// Remove all entities.
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
+		g_world->GetEntityManager()->CleanUp();
 		g_world->GetTagManager()->UnregisterAll();
 		g_world->GetGroupManager()->UnregisterAll();
 		g_world->GetSystemManager()->Clear();
+		g_world->GetStorage()->ClearStorage();
 		g_engineContext.m_physics->RemoveAll();
-
 
 		// Set server peers to null
 		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
+		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
+		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
+		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
+		m_playerControlSystem->SetClientPeer(nullptr);
+		m_actionSystem->SetServerPeerInterface(nullptr);
+		m_actionSystem->SetClientPeerInterface(nullptr);
 		m_timerSystem->SetServerPeer(nullptr);
 
 		// Disable the message handlers while resetting the server (to avoid null entities etc.)
@@ -279,26 +378,35 @@ namespace RootForce
 		g_engineContext.m_profiler->Update(p_deltaTime);
 		g_engineContext.m_debugOverlay->RenderOverlay();
 		{
-			PROFILE("GUI", g_engineContext.m_profiler);
-
 			g_engineContext.m_gui->Update();
+			//Update Menu to make sure Setting changes are made in the main thread
+			m_ingameMenu->Update();
 			if (m_displayIngameMenu)
 			{
 				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
 				m_ingameMenu->GetView()->Focus();
 
-				//Update Menu to make sure Setting changes are made in the main thread
-				m_ingameMenu->Update();
+				
 			}
 			else
 			{
-				if(m_displayGuiHUD)
-				g_engineContext.m_gui->Render(m_hud->GetView());
-				if(m_displayDebugHUD)
-				g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				{
+					PROFILE("GUI HUD", g_engineContext.m_profiler);
+
+					m_hud->GetView()->SetActive(m_displayGuiHUD);
+					m_hud->GetView()->Focus();
+					if(m_displayGuiHUD)
+						g_engineContext.m_gui->Render(m_hud->GetView());
+				}
+				{
+					PROFILE("GUI Debug", g_engineContext.m_profiler);
+
+					g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
+					if(m_displayDebugHUD)
+						g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+				}
 			}
 		}
-
 
 		// Check for disconnection from the server
 		ECS::Entity* clientEntity = g_world->GetTagManager()->GetEntityByTag("Client");
@@ -341,6 +449,7 @@ namespace RootForce
 		{
 			PROFILE("Water system", g_engineContext.m_profiler);
 			m_waterSystem->Process();
+			m_waterDeathSystem->Process();
 		}
 
 		{
@@ -364,6 +473,10 @@ namespace RootForce
 		{
 			PROFILE("Client", g_engineContext.m_profiler);
 			m_networkContext.m_client->Update();
+		}
+
+		{
+			m_networkDebugSystem->Process();
 		}
 
 		{
@@ -399,8 +512,6 @@ namespace RootForce
 			m_sharedSystems.m_abilitySpawnSystem->Process();
 		}
 
-		
-
 		{
 			PROFILE("Physics", g_engineContext.m_profiler);
 
@@ -410,8 +521,22 @@ namespace RootForce
 		}
 
 		{
+			m_scriptSystem->Process();
+		}
+
+		{
 			PROFILE("Follow system", g_engineContext.m_profiler);
 			m_followSystem->Process();
+		}
+
+		{
+			PROFILE("Homing system", g_engineContext.m_profiler);
+			m_homingSystem->Process();
+		}
+
+		{
+			PROFILE("Ray system", g_engineContext.m_profiler);
+			m_raySystem->Process();
 		}
 		
 		{
@@ -422,6 +547,11 @@ namespace RootForce
 		{
 			PROFILE("StateSystem", g_engineContext.m_profiler);
 			m_stateSystem->Process();
+		}
+
+		{
+			PROFILE("DeserializationSystem", g_engineContext.m_profiler);
+			m_sharedSystems.m_deserializationSystem->Process();
 		}
 	
 		{
@@ -463,6 +593,7 @@ namespace RootForce
 
 		{
 			PROFILE("RenderingSystem", g_engineContext.m_profiler);
+			m_scaleSystem->Process();
 			m_directionlLightSystem->Process();
 			m_pointLightSystem->Process();
 			m_renderingSystem->Process();
@@ -485,19 +616,38 @@ namespace RootForce
 		//Check status for the display of the ingame menu
 		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			m_displayIngameMenu = !m_displayIngameMenu;
-			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
+			m_displayIngameMenu = true;
+			m_hud->GetView()->SetActive(false);
+			g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+			m_ingameMenu->GetView()->SetActive(true);
+			g_engineContext.m_inputSys->LockMouseToCenter(false);
+			m_ingameMenu->Reset();
+		}
+		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
+			m_displayIngameMenu = true;
+			m_hud->GetView()->SetActive(false);
+			g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+			m_ingameMenu->GetView()->SetActive(true);
+			g_engineContext.m_inputSys->LockMouseToCenter(false);
 			m_ingameMenu->Reset();
 		}
 		if (m_ingameMenu->GetReturn())
 		{
 			m_displayIngameMenu = false;
+			m_ingameMenu->GetView()->SetActive(false);
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
+			m_hud->GetView()->SetActive(m_displayGuiHUD);
+			g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
 			m_ingameMenu->Reset();
 			// Update keybindings when returning to game
 			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		}
 		g_engineContext.m_sound->Update();
+
+		g_world->GetEntityManager()->CleanUp();
+
 		return GameStates::Ingame;
 	}
 
@@ -581,6 +731,38 @@ namespace RootForce
 			return GameStates::Menu;
 		}
 
+		if(RootServer::MatchAny(event.EventType, 1, "KICK"))
+		{
+			if(m_networkContext.m_server != nullptr)
+			{
+				RootForce::Network::UserID_t userID = Network::ReservedUserID::NONE;
+				std::string name;
+				event.Data >> name;
+				event.Data >> name;
+				for(auto pair : g_networkEntityMap)
+				{
+					if(pair.first.ActionID != Network::ReservedActionID::CONNECT || pair.first.SequenceID != RootForce::Network::SEQUENCE_PLAYER_ENTITY || !pair.second)
+						continue;
+					PlayerComponent* playerComp = g_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
+					Network::NetworkComponent* networkComp = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(pair.second);
+					if(playerComp->Name.compare(name) == 0)
+					{
+						userID = networkComp->ID.UserID;
+						break;
+					}
+				}
+				if(userID != Network::ReservedUserID::NONE)
+				{
+					RakNet::SystemAddress sysAddress = m_networkContext.m_server->GetPeerInterface()->GetSystemAddressFromIndex(userID);
+					m_networkContext.m_server->GetPeerInterface()->CloseConnection(sysAddress, true);
+				}
+				else
+				{
+					m_hud->GetChatSystem()->JSAddMessage("Player not found, check your speeling!");
+				}
+			}
+		}
+
 		else if(RootServer::MatchAny(event.EventType, 2, "KILL","SUICIDE"))
 		{
 			// Kill ourselves.
@@ -588,9 +770,7 @@ namespace RootForce
 
 			g_world->GetEntityManager()->GetComponent<HealthComponent>(player)->Health = 0;
 			PlayerComponent* playerComp =  g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
-			playerComp->Score --;
 			playerComp->Deaths ++;
-			g_world->GetEntityManager()->GetComponent<TDMRuleSet>(g_world->GetTagManager()->GetEntityByTag("MatchState"))->TeamScore[playerComp->TeamID] --;
 
 			// Notify the server of our suicide.
 			NetworkMessage::Suicide m;
@@ -604,6 +784,7 @@ namespace RootForce
 
 			m_networkContext.m_client->GetPeerInterface()->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 		}
+
 
 		return GameStates::Ingame;
 	}
@@ -624,13 +805,6 @@ namespace RootForce
 		{
 			m_hud->SetValue("ShowScore", "false" );
 		}
-		if (!m_sharedSystems.m_matchStateSystem->IsMatchOver() && g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_M) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
-			m_displayIngameMenu = !m_displayIngameMenu;
-			g_engineContext.m_inputSys->LockMouseToCenter(!m_displayIngameMenu);
-			m_ingameMenu->Reset();
-		}
 		if(m_displayIngameMenu)
 		{
 			m_ingameMenu->SetScoreList(m_sharedSystems.m_matchStateSystem->GetScoreList());
@@ -647,20 +821,35 @@ namespace RootForce
 				//Update all the data that is displayed in the HUD
 				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
 				m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-				m_hud->SetValue("TeamScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 2 : 1)) );
-				m_hud->SetValue("EnemyScore",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(playerComponent->TeamID == 2 ? 1 : 2)) );
+				m_hud->SetValue("Team1Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) );
+				m_hud->SetValue("Team2Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
 				if(healthComponent && playerActionComponent)
 				{
 					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );
+					m_hud->SetValue("IsDead", healthComponent->IsDead?"true":"false" );
+
 					m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
 					m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
 					m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
-					if(playerComponent->AbilityScripts[0].Cooldown > 0)
-						m_hud->StartCooldown(1, playerComponent->AbilityScripts[0].Cooldown);
-					if(playerComponent->AbilityScripts[1].Cooldown > 0)
-						m_hud->StartCooldown(2, playerComponent->AbilityScripts[1].Cooldown);
-					if(playerComponent->AbilityScripts[2].Cooldown > 0)
-						m_hud->StartCooldown(3, playerComponent->AbilityScripts[2].Cooldown);
+
+					m_hud->SetCharges(1, playerComponent->AbilityScripts[0].Charges);
+					m_hud->SetCharges(2, playerComponent->AbilityScripts[1].Charges);
+					m_hud->SetCharges(3, playerComponent->AbilityScripts[2].Charges);
+					
+					m_hud->SetCrosshair(playerComponent->AbilityScripts[playerActionComponent->SelectedAbility].Crosshair);
+
+					if(playerComponent->AbilityScripts[0].Cooldown > 0 && playerComponent->AbilityScripts[0].Name.compare("") != 0)
+						m_hud->SetCooldown(1, playerComponent->AbilityScripts[0].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[0].Name));
+					else
+						m_hud->SetCooldown(1, 0);
+					if(playerComponent->AbilityScripts[1].Cooldown > 0 && playerComponent->AbilityScripts[1].Name.compare("") != 0)
+						m_hud->SetCooldown(2, playerComponent->AbilityScripts[1].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[1].Name));
+					else
+						m_hud->SetCooldown(2, 0);
+					if(playerComponent->AbilityScripts[2].Cooldown > 0 && playerComponent->AbilityScripts[2].Name.compare("") != 0)
+						m_hud->SetCooldown(3, playerComponent->AbilityScripts[2].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[2].Name));
+					else
+						m_hud->SetCooldown(3, 0);
 					m_hud->SetSelectedAbility(playerActionComponent->SelectedAbility + 1);
 				}
 			}

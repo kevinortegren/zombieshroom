@@ -30,6 +30,11 @@ namespace RootForce
 	struct TDMRuleSet;
 	struct PlayerPhysics;
 	struct AbilitySpawnComponent;
+	struct TimerComponent;
+	struct FollowComponent;
+	struct HomingComponent;
+	struct DamageAndKnockback;
+	struct StatChange;
 
 	namespace Network
 	{
@@ -51,10 +56,7 @@ namespace RootForce
 				PlayerCommand,
 				JumpStart,
 				JumpStop,
-				AbilityChargeStart,
-				AbilityChargeDone,
-				AbilityChannelingDone,
-				AbilityChargeAndChannelingDone,
+				AbilityEvent,
 				AbilityCooldownOff,
 				AbilityTryClaim,
 				AbilityClaimedBy,
@@ -73,6 +75,7 @@ namespace RootForce
 				AbilitySpawn,
 				Death,
 				PlayerTeamSelect,
+				PlayerNameChange,
 			};
 		}
 
@@ -132,7 +135,13 @@ namespace RootForce
 		struct PlayerCommand
 		{
 			Network::UserID_t User;
-			PlayerActionComponent Action;
+
+			float MovePower;
+			float StrafePower;
+			glm::vec2 Angle;
+			float JumpTime;
+			uint8_t SelectedAbility;
+
 			glm::vec3 Position;
 			glm::quat Orientation;
 			glm::quat AimingDeviceOrientation;
@@ -162,53 +171,15 @@ namespace RootForce
 		};
 
 		/*
-			Sent by a client when an ability is activated and the charging starts. Forwarded by the server.
+			Sent by a client when an ability event is done. Forwarded by the server.
 		*/
-		struct AbilityChargeStart
+		struct AbilityEvent
 		{
 			Network::UserID_t User;
-			Network::ActionID_t Action;
-			bool IsPush;
+			RootForce::AbilityEvent Event;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
-
-		/*
-			Sent by a client when the ability charge is done or interrupted. Forwarded by the server.
-		*/
-		struct AbilityChargeDone
-		{
-			Network::UserID_t User;
-			Network::ActionID_t Action;
-			float Time;
-
-			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-		};
-
-		/*
-			Sent by a client when the ability channeling is done or interrupted. Forwarded by the server.
-		*/
-		struct AbilityChannelingDone
-		{
-			Network::UserID_t User;
-			Network::ActionID_t Action;
-			float Time;
-
-			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-		};
-
-		/*
-			Sent by a client when the ability charging is interrupted. Forwarded by the server.
-		*/
-		struct AbilityChargeAndChannelingDone
-		{
-			Network::UserID_t User;
-			Network::ActionID_t Action;
-			float Time;
-
-			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
-		};
-
 
 		/*
 			Sent to the client whenever the cooldown for a certain ability on the server reaches zero.
@@ -375,6 +346,7 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
 		struct AbilitySpawn
 		{
 			Network::NetworkEntityID ID;
@@ -382,16 +354,28 @@ namespace RootForce
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
 		struct Death
 		{
 			Network::UserID_t User;
+			Network::UserID_t LastDamageSource;
+			RakNet::RakString LastDamageSourceName;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
+
 		struct PlayerTeamSelect
 		{
 			Network::NetworkEntityID UserID;
 			uint8_t TeamID;
+
+			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
+		};
+
+		struct PlayerNameChange
+		{
+			RakNet::RakString Name;
+			Network::UserID_t UserID;
 
 			void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs);
 		};
@@ -408,7 +392,11 @@ namespace RootForce
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TDMRuleSet* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, PlayerPhysics* p_c);
 		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, AbilitySpawnComponent* p_c);
-
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, TimerComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, FollowComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, HomingComponent* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, DamageAndKnockback* p_c);
+		void Serialize(bool p_writeToBitstream, RakNet::BitStream* p_bs, StatChange* p_c);
 
 		/*
 			Returns true if the specified component can be serialized. False otherwise.
@@ -427,7 +415,7 @@ namespace RootForce
 
 		/*
 			Deserialize a component. This will create a new component in the given entity manager if the component doesn't exist on the given entity.
-			Returns nullptr on error. Do not deserialize transform on our own player entity.
+			Returns nullptr on error. Do not deserialize transform on our own player entity. Do not deserialize if the entity has been removed before.
 
 			The serialized data in the bitstream is assumed to be in the following order:
 				- Type : ComponentType
@@ -456,7 +444,8 @@ namespace RootForce
 
 		/*
 			Deserialize an entity and all of its serialized components. This will create an entity in the entity manager
-			if the deserialized ID cannot be found in the given network entity map. A deserialized entity will be added to the network entity map. Do not deserialize transform on our own player entity.
+			if the deserialized ID cannot be found in the given network entity map. A deserialized entity will be added to the network entity map. 
+			Do not deserialize transform on our own player entity. Do not deserialize if the entity has been removed before.
 
 			The serialized data in the bitstream is assumed to be in the following order:
 				- ID : NetworkEntityID

@@ -17,6 +17,12 @@
             offset: 140
           - sem: COLOR
             offset: 144
+          - sem: COLOREND
+            offset: 160
+          - sem: DIRECTION
+            offset: 176
+          - sem: LIFETIMEMAX
+            offset: 188
       textures:
           - name: g_SceneNormals
             slot: 1
@@ -54,7 +60,7 @@
           
           # Depth settings.
           depth:
-            write: 0
+            write: 1
             test: 1
            
 

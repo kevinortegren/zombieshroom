@@ -17,8 +17,9 @@ AbilityEditor::AbilityEditor(QWidget *parent)
 		m_compNames.append(AbilityEditorNameSpace::AbilityComponents::g_componentNameList.m_compNames.at(i));
 	}
 	
-	m_conditions.push_back(new AbilityEditorNameSpace::Condition("if collide with enemy player", "if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then"));
-	m_conditions.push_back(new AbilityEditorNameSpace::Condition("if collide with friendly player", "if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then"));
+	m_conditions.push_back(new AbilityEditorNameSpace::Condition("Always", ""));
+	//m_conditions.push_back(new AbilityEditorNameSpace::Condition("if collide with enemy player", "if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then"));
+	//m_conditions.push_back(new AbilityEditorNameSpace::Condition("if collide with friendly player", "if type == PhysicsType.TYPE_PLAYER and abilityOwnerPlayerComponent:GetTeamId() == targetPlayerComponent:GetTeamId() then"));
 }
 
 AbilityEditor::~AbilityEditor()
@@ -191,11 +192,13 @@ bool AbilityEditor::event( QEvent* event )
 
 void AbilityEditor::GenerateScript()
 {
-	QFileDialog dial(this);
-	dial.setFileMode(QFileDialog::AnyFile);
-	dial.setAcceptMode(QFileDialog::AcceptSave);
-	dial.setNameFilter("*.lua");
-	QString path = dial.getSaveFileName();
+	//QFileDialog dial(this);
+	//dial.setFileMode(QFileDialog::AnyFile);
+	//dial.setAcceptMode(QFileDialog::AcceptSave);
+	//dial.setNameFilter("*.lua");
+	//QString path = dial.getSaveFileName();
+	QString path = QFileDialog::getSaveFileName(this, tr("Generate file"), "", tr("LUA-file (*.lua)"));
+	path.chop(4);
 	if(path.compare("") != 0)
 	{
 		QString name = &(path.toStdString().at(path.lastIndexOf("/")+1));
@@ -205,10 +208,10 @@ void AbilityEditor::GenerateScript()
 
 void AbilityEditor::SaveAs()
 {
-	QFileDialog dial(this);
-	dial.setFileMode(QFileDialog::AnyFile);
-	dial.setAcceptMode(QFileDialog::AcceptSave);
-	m_currentSavePath = dial.getSaveFileName();
+	//QFileDialog dial(this);
+	//dial.setFileMode(QFileDialog::AnyFile);
+	//dial.setAcceptMode(QFileDialog::AcceptSave);
+	m_currentSavePath = QFileDialog::getSaveFileName(this, tr("Save file"), "", tr("ABILITY-file (*.ability)"));
 	if(m_currentSavePath.compare("") != 0)
 		m_exporter->Export(m_currentSavePath.toStdString(), m_entity, m_onCreate, m_onCollide, m_onDestroy);
 }
@@ -221,10 +224,11 @@ void AbilityEditor::Save()
 
 void AbilityEditor::Load()
 {
-	QFileDialog dial(this);
-	dial.setFileMode(QFileDialog::AnyFile);
-	dial.setAcceptMode(QFileDialog::AcceptOpen);
-	m_currentSavePath = dial.getOpenFileName();
+	//QFileDialog dial(this);
+	//dial.setFileMode(QFileDialog::AnyFile);
+	//dial.setAcceptMode(QFileDialog::AcceptOpen);
+	//m_currentSavePath = dial.getOpenFileName();
+	m_currentSavePath = QFileDialog::getOpenFileName(this, tr("Open file"), "", tr("ABILITY-file (*.ability)"));
 	if(m_currentSavePath.compare("") != 0)
 	{
 		//Clear existing values
@@ -276,6 +280,7 @@ void AbilityEditor::BrowseName()
 	dial.setFileMode(QFileDialog::AnyFile);
 	dial.setAcceptMode(QFileDialog::AcceptOpen);
 	QString asdf = dial.getOpenFileName();
+	//QString fullFileName = QFileDialog::getOpenFileName(this, tr("Open file"), "", tr("ABILITY-file (*.ability)"));
 	if(asdf.compare("") != 0)
 	{
 		QString name = &(asdf.toStdString().at(asdf.lastIndexOf("/")+1));

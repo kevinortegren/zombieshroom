@@ -219,16 +219,26 @@ namespace AbilityEditorNameSpace
 				{
 					AbilityComponents::StatChangeCaster* statCaster = static_cast<AbilityComponents::StatChangeCaster*>(p_component);
 					p_emitter << YAML::Key << "CasterSpeed" << YAML::Value << statCaster->m_speed;
+					p_emitter << YAML::Key << "CasterSpeedTime" << YAML::Value << statCaster->m_speedTime;
 					p_emitter << YAML::Key << "CasterJumpHeight" << YAML::Value << statCaster->m_jumpHeight;
+					p_emitter << YAML::Key << "CasterJumpTime" << YAML::Value << statCaster->m_jumpTime;
 					p_emitter << YAML::Key << "CasterKnockbackResistance" << YAML::Value << statCaster->m_knockbackResistance;
+					p_emitter << YAML::Key << "CasterKnockbackTime" << YAML::Value << statCaster->m_kbResTime;
+					p_emitter << YAML::Key << "CasterDamageResistance" << YAML::Value << statCaster->m_damageResistance;
+					p_emitter << YAML::Key << "CasterDamageTime" << YAML::Value << statCaster->m_dmgResTime;
 				}
 				break;
 			case AbilityComponents::ComponentType::STATCHANGETARGET:
 				{
 					AbilityComponents::StatChangeTarget* statTarget = static_cast<AbilityComponents::StatChangeTarget*>(p_component);
 					p_emitter << YAML::Key << "TargetSpeed" << YAML::Value << statTarget->m_speed;
+					p_emitter << YAML::Key << "TargetSpeedTime" << YAML::Value << statTarget->m_speedTime;
 					p_emitter << YAML::Key << "TargetJumpHeight" << YAML::Value << statTarget->m_jumpHeight;
+					p_emitter << YAML::Key << "TargetJumpTime" << YAML::Value << statTarget->m_jumpTime;
 					p_emitter << YAML::Key << "TargetKnockbackResistance" << YAML::Value << statTarget->m_knockbackResistance;
+					p_emitter << YAML::Key << "TargetKnockbackTime" << YAML::Value << statTarget->m_kbResTime;
+					p_emitter << YAML::Key << "TargetDamageResistance" << YAML::Value << statTarget->m_knockbackResistance;
+					p_emitter << YAML::Key << "TargetDamageTime" << YAML::Value << statTarget->m_dmgResTime;
 				}
 				break;
 			case AbilityComponents::ComponentType::PHYSICS:
@@ -238,6 +248,8 @@ namespace AbilityEditorNameSpace
 					glm::vec3 grav = glm::vec3(physCon->m_gravity.x(), physCon->m_gravity.y(), physCon->m_gravity.z());
 					p_emitter << YAML::Key << "PhysicsGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq <<  grav.x << grav.y << grav.z << YAML::EndSeq;
 					p_emitter << YAML::Key << "PhysicsCollide" << YAML::Value << physCon->m_collide;
+					p_emitter << YAML::Key << "PhysicsCollideStatic" << YAML::Value << physCon->m_colWStatic;
+					p_emitter << YAML::Key << "PhysicsExternally" << YAML::Value << physCon->m_externally;
 				}
 				break;
 			case AbilityComponents::ComponentType::CHARGEVARIABLES:
@@ -263,6 +275,12 @@ namespace AbilityEditorNameSpace
 					p_emitter << YAML::Key << "SoundRangeMin" << YAML::Value << sound->m_rangeMin;
 					p_emitter << YAML::Key << "SoundRangeMax" << YAML::Value << sound->m_rangeMax;
 					p_emitter << YAML::Key << "SoundLoop" << YAML::Value << sound->m_loop;
+				}
+				break;
+			case AbilityComponents::ComponentType::FOLLOW:
+				{
+					AbilityComponents::Follow* follow = static_cast<AbilityComponents::Follow*>(p_component);
+					p_emitter << YAML::Key << "FollowOffset" << YAML::Value << follow->m_offset;
 				}
 				break;
 			default:

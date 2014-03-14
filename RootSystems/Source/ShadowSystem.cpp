@@ -87,6 +87,8 @@ namespace RootForce
 			}
 		}
 
+		glm::mat4 lazyOrthoAroundMap = glm::ortho(m_minWorldX, m_maxWorldX, m_minWorldY, m_maxWorldY, -m_maxWorldZ, -m_minWorldZ);
+
 		// Get the eye camera.
 		ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
 		RootForce::Camera* camera = m_world->GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
@@ -118,19 +120,6 @@ namespace RootForce
 			directions[i].z = glm::normalize(frustumCorners[i+4].z - frustumCorners[i].z);
 		}
 
-		// Define near/far planes for the sub frustrums.
-		float _near[RENDER_SHADOW_CASCADES];
-		_near[0] = camera->m_frustum.m_near;
-		_near[1] = 8.0f; //Daniel's 2k-values: 15, 60, 200
-		_near[2] = 40.0f;
-		_near[3] = 150.0f;
-		
-		float _far[RENDER_SHADOW_CASCADES];
-		_far[0] = _near[1];
-		_far[1] = _near[2];
-		_far[2] = _near[3];
-		_far[3] = camera->m_frustum.m_far;
-
 		static glm::vec4 localOBB[8] = 
 		{
 			glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f),
@@ -143,37 +132,58 @@ namespace RootForce
 			glm::vec4(1.0f, -1.0f, 1.0f, 1.0f)
 		};
 
-		// Create cascades.
-		for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
+		if(RENDER_SHADOW_CASCADES >= 4)
 		{
-			AABB boundingbox;
-			for(int p = 0; p < 4; p++)
+			// Define near/far planes for the sub frustrums.
+			float _near[4];
+			_near[0] = camera->m_frustum.m_near;
+			_near[1] = 8.0f; //Daniel's 2k-values: 15, 60, 200
+			_near[2] = 40.0f;
+			_near[3] = 150.0f;
+
+			float _far[4];
+			_far[0] = _near[1];
+			_far[1] = _near[2];
+			_far[2] = _near[3];
+			_far[3] = camera->m_frustum.m_far;
+
+			// Create cascades.
+			for(int i = 0; i < RENDER_SHADOW_CASCADES; i++)
 			{
-				glm::vec3 nearCorner;
-				nearCorner = glm::swizzle<glm::X, glm::Y, glm::Z>(frustumCorners[p]);
-				boundingbox.Expand(nearCorner + directions[p] * _near[i]);
-				boundingbox.Expand(nearCorner + directions[p] * _far[i]);
+				AABB boundingbox;
+				for(int p = 0; p < 4; p++)
+				{
+					glm::vec3 nearCorner;
+					nearCorner = glm::swizzle<glm::X, glm::Y, glm::Z>(frustumCorners[p]);
+					boundingbox.Expand(nearCorner + directions[p] * _near[i]);
+					boundingbox.Expand(nearCorner + directions[p] * _far[i]);
+				}
+
+				glm::vec3 center = boundingbox.GetCenter();
+				glm::vec3 centerInWorldSpace = glm::swizzle<glm::X, glm::Y, glm::Z>(glm::inverse(camera->m_viewMatrix) * glm::vec4(center, 1.0f)); 
+				glm::vec4 centerInViewSpace = lightSpace * glm::vec4(centerInWorldSpace, 1.0f);
+
+				float nearPlane = 1.0f;
+				float lookAtDistance = glm::length(centerInViewSpace - 2000.0f) + nearPlane;
+				float radius = glm::length(center - glm::vec3(boundingbox.m_maxX, boundingbox.m_maxY, boundingbox.m_maxZ)); 
+				float farPlane = lookAtDistance + radius;
+
+				sc.m_projectionMatrices[i] = glm::ortho(-radius, radius, -radius, radius, nearPlane, farPlane);
+				sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
+				sc.m_viewProjections[i] = sc.m_projectionMatrices[i] * sc.m_viewMatrices[i];
 			}
 
-			glm::vec3 center = boundingbox.GetCenter();
-			glm::vec3 centerInWorldSpace = glm::swizzle<glm::X, glm::Y, glm::Z>(glm::inverse(camera->m_viewMatrix) * glm::vec4(center, 1.0f)); 
-			glm::vec4 centerInViewSpace = lightSpace * glm::vec4(centerInWorldSpace, 1.0f);
-			
-			float nearPlane = 1.0f;
-			float lookAtDistance = glm::length(centerInViewSpace - 2000.0f) + nearPlane;
-			float radius = glm::length(center - glm::vec3(boundingbox.m_maxX, boundingbox.m_maxY, boundingbox.m_maxZ)); 
-			float farPlane = lookAtDistance + radius;
-			
-			sc.m_projectionMatrices[i] = glm::ortho(-radius, radius, -radius, radius, nearPlane, farPlane);
-			sc.m_viewMatrices[i] = glm::lookAt(centerInWorldSpace + tOr.GetFront() * lookAtDistance, centerInWorldSpace - tOr.GetFront() * lookAtDistance, tOr.GetUp());
-			sc.m_viewProjections[i] = sc.m_projectionMatrices[i] * sc.m_viewMatrices[i];
+			sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] = OrthoProjectionFromFrustum(&camera->m_frustum, lightSpace);
+			sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1] = lightSpace;
+			sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
 		}
-
-		sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] = OrthoProjectionFromFrustum(&camera->m_frustum, lightSpace);
-		sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1] = lightSpace;
-		sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
-
-		g_engineContext.m_renderer->AddShadowcaster(sc, shadowcaster->m_directionalLightSlot);
+		else
+		{
+			sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] = lazyOrthoAroundMap;
+			sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1] = lightSpace;
+			sc.m_viewProjections[RENDER_SHADOW_CASCADES-1] = sc.m_projectionMatrices[RENDER_SHADOW_CASCADES-1] * sc.m_viewMatrices[RENDER_SHADOW_CASCADES-1];
+		}
+		g_engineContext.m_renderer->AddShadowcaster(sc, (int)shadowcaster->m_directionalLightSlot);
 	}
 
 	void ShadowSystem::End()

@@ -50,6 +50,10 @@ img
 {
 	text-align: right;
 }
+.v_align_middle
+{
+  vertical-align: middle;
+}
 .red
 {
 	color: #FF9999;
@@ -81,24 +85,57 @@ img
 {
 	position: absolute;
 	top:0;
-	left:50%;
-	margin-left: -60px;
-	width: 120px;
+	left:100%;
+	margin-left: -141px;
+	padding: 0 4px 10px 30px;
+	padding-right: 4px;
+	width: 107px;
+	height: 60px;
+	text-align: right;
+	background: url('TimeBar.png') no-repeat;
+	background-size: 100% 100%;
+	font-size: 24px;
+}
+#KillAnnouncementContainer
+{
+	position: absolute;
+	top:70px;
+	left:100%;
+  margin-left: -300px;
+	width: 300px;
+	height: 70px;
+	text-align: right;
+	color: white;
+	font-size: 18px;
+}
+#KillAnnouncementContainer img
+{
+  height: 26px;
+}
+#KillAnnouncementContainer *
+{
+  vertical-align: middle;
+}
+#AnnouncementContainer
+{
+	position: absolute;
+	top:100px;
+	left:0;
+	width: 100%;
 	height: 35px;
 	text-align: center;
-	background-color: rgba(60,60,60,0.5);
-	font-size: 32px;
+	color: white;
+	-webkit-text-stroke: 1px black;
+	font-size: 48px;
 }
 #chatbody
 {
-	min-width: 300px;
+	width: 300px;
 	height: 200px;
-	width: 30%;
-	background-color:rgba(60,60,60,0.4);
 	position: absolute;
 	top: 100%;
 	left: 0;
-	margin-top: -210px;
+	margin-top: -360px;
 	margin-left: 10px;
 	z-index: 500;
 }
@@ -108,6 +145,8 @@ img
 	overflow-x: hidden;
 	overflow-y: auto;
 	font-family: Comic Sans MS;
+  display: table-cell;
+  vertical-align: bottom;
 }
 ::-webkit-scrollbar
 {
@@ -117,58 +156,80 @@ img
 {
 	width: 100%;
 	height: 20px;
+	font-family: Comic Sans MS;
+  color: transparent;
+  background: transparent;
+  border: 0;
+}
+#chatinput:focus
+{
 	background-color:rgba(60,60,60,0.4);
 	border: 1px solid rgba(40,40,40,0.4);
-	font-family: Comic Sans MS;
 	color: white;
 }
-#healthcontainer
-{
-	position: absolute;
-	width: 180px;
-	height: 60px;
-	left: 100%;
-	margin-left: -200px;
-	top: 100%;
-	margin-top: -85px;
-	/*background-color:rgba(50,45,255,0.5);*/
-	color: rgba(255,90,114,0.7);
-	font-size: 50px;
-}
-#chargebar
+#healthbar
 {
 	position: absolute;
 	left: 0;
 	top: 100%;
 	width: 100%;
-	margin: -100px 0 0 0;
-	height: 12px;
+	margin: -120px 0 0 450px;
+	height: 33px;
 }
-#chargebar div
+#healthbar div
+{
+	padding: 0 11px;
+	width: 304px;
+	height: 33px;
+	background: center url('healthBorder.png');
+	margin: auto;
+}
+#healthbar div div
+{
+	padding: 0;
+	height: 33px;
+  width: 0;
+	background: center url('healthBackground.gif');
+	margin: auto;
+}
+#healthbar div div div
+{
+	padding: 0;
+	height: 33px;
+  width: 0;
+	background: center url('healthOverflowBackground.gif');
+	margin: auto;
+}
+#chargebar,
+#chargebar>div
+{
+	overflow: hidden;
+	position: absolute;
+	width: 400px;
+	height: 400px;
+	clip: rect(0px,400px,400px,200px);
+	-webkit-transform: rotate(-45deg);
+	margin: auto;
+}
+#chargebar
 {
 	display: none;
-	width: 345px;
-	height: 12px;
-	background-color: rgba(0,0,0,0.2);
-	margin: auto;
-	border: 1px solid rgba(1,1,1,0.6);
 }
-#chargebar div div
+#chargebar>div
 {
-	height: 12px;
-	width: 100px;
-	background-color: rgba(255,0,0,0.8);
-	margin: auto;
+	-webkit-transform: rotate(90deg);
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-image: url('chargebar.png');
 }
 #abilitybar
 {
 	position: absolute;
 	left: 0;
-	top: 100%;
+	top: 50%;
 	width: 100%;
-	margin-top: -75px;
-	height: 75px;
-	text-align: center;
+	margin-top: -96px;
+	height: 192px;
 	overflow: hidden;
 }
 #deathscreen
@@ -205,12 +266,17 @@ img
   background-image: url('damageTaken.png');
   background-size: 100% 100%;
 }
+#scorescreen
+{
+	display: none;
+}
 #scorescreen-wrapper
 {
+	padding: 18px 34px 5px;
 	width: 600px;
 	height: 350px;
 	margin: auto;
-	background: rgba(0,0,0,0.5);
+	background-image: url('ScoreBackground.png');
 }
 .scorewrapper
 {
@@ -229,35 +295,69 @@ img
 }
 .slot
 {
-	background-color:rgba(60,60,60,0.4);
-	width: 75px;
-	height: 75px;
+	width: 64px;
+	height: 64px;
 	font-size: 18px;
-	margin: 0 5px;
-	display: inline-block;
+	margin: 0 0 0 0;
+	/*display: inline-block;*/
 	text-align: right;
-	background-image: url('empty.png');
+	position: relative;
+	background-image: url('Abilityring.png');
 	background-repeat: no-repeat;
-	background-position: -2px -2px;
 }
-.slot div
+.slot>div.focus
 {
-	border: 2px solid rgba(0,0,0,0);
+	height: 64px;
+	width: 64px;
+	position: absolute;
+	top: 0;
+	z-index: 1;
 }
-.slotselected div
+/* Ability cooldown */
+.slot>div.cooldown
 {
-	border: 2px solid white;
+	height: 64px;
+	width: 64px;
+	position: absolute;
+	top: 0;
+  background-image: url('cooldown.png');
+	background-size: 64px;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	z-index: -1;
 }
-.cooldown
+/* Ability icon */
+.slot>div.icon
 {
-	padding: 50px 5px 0 5px;
-	width: 61px;
-	height: 21px;
+	position: absolute;
+	top: 0;
+	padding: 30px 15px 0 15px;
+	width: 34px;
+	height: 34px;
 	overflow: hidden;
-	background-image: url('cooldown.png');
-	background-size: 75px;
-	background-repeat: no-repeat;
-	background-position: 0% 75px;
+  background: transparent;
+	z-index: -2;
+}
+@-webkit-keyframes spin {  
+  from {  
+    -webkit-transform: rotate(0deg);  
+  }  
+  to {  
+    -webkit-transform: rotate(360deg);  
+  } 
+}
+.slotselected>div.focus
+{
+  background-image: url('JustGlow.png');
+  -webkit-animation-name: blinker;
+  -webkit-animation-iteration-count: infinite; 
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-duration: 2s; 
+}
+#slot2
+{
+  /*position: relative;
+  top: -32px;*/
 }
 
 .verticaltablehax

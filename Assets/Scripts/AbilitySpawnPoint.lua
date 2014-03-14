@@ -5,8 +5,7 @@ end
 
 function AbilitySpawnPoint.OnCollide (self, entity)
   local hitCol = entity:GetCollision();
-  local hitPhys = entity:GetPhysics();
-  local type = hitPhys:GetType(hitCol);
+  local type = hitCol:GetType();
    --Logging.Log(LogLevel.DEBUG_PRINT, "Entity collided");
   	if type == PhysicsType.TYPE_PLAYER then
       local tryPickup = entity:GetTryPickupComponent();
@@ -16,7 +15,7 @@ function AbilitySpawnPoint.OnCollide (self, entity)
         local playerId = entity:GetNetwork():GetUserId();
         abilitySpawn:SetClaimed(playerId);
         tryPickup:SetTryPickup(false);
-        Logging.Log(LogLevel.DEBUG_PRINT, "Pick up succesfull");
+        Logging.Log(LogLevel.DEBUG_PRINT, "Pick up successful");
       end
     end
 end

@@ -14,6 +14,7 @@ file(GLOB_RECURSE HEADERS Include/*.h)
 file(GLOB_RECURSE UI_FILES UI/*.ui)
 file(GLOB_RECURSE QRC_FILES UI/*.qrc)
 file(GLOB_RECURSE GEN_FILES GeneratedFiles/*.*)
+file(GLOB_RECURSE RESOURCE_FILES *.rc)
 set(LIBRARIES ${EXTERNAL_LIBRARIES} DynamicLoader ECS RootSystems)
 
 foreach(it ${UI_FILES})
@@ -46,5 +47,5 @@ endforeach()
 include_directories(Include)
 
 # Add the target
-add_executable(${PROJECT_NAME} ${UI_FILES} ${GEN_FILES} ${QRC_FILES} ${HEADERS} ${SOURCES})
+add_executable(${PROJECT_NAME} ${UI_FILES} ${GEN_FILES} ${QRC_FILES} ${HEADERS} ${SOURCES} ${RESOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})

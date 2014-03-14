@@ -5,9 +5,15 @@
 		<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
 		<script type="text/javascript" src="jquery.tablesorter.min.js"></script>
 		<script type="text/javascript" src="menu.js"></script>
-	<script type="text/javascript" src="settings.js"></script>
+		<script type="text/javascript" src="settings.js"></script>
 	</head>
 	<body id="main-body">
+		<div style="display: none"><!-- Preload images -->
+			<img src="ButtonClicked.png" />
+			<img src="ButtonHover.png" />
+			<img src="SmallWindow2.png" />
+			<img src="Ram.png" />
+		</div>
 		<div id="splash">
 		</div>
 		
@@ -59,22 +65,65 @@
 		<div id="graphics-settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
 			<div id="graphics-settings-wrapper" class="windowbackground">
 				<h1 class="textcenter">Graphics settings</h1>
-				<div><div class="inline-150px">Fullscreen</div><div id="settings-fullscreen">On <input type="radio" name="settings-fullscreen" value="true" />&nbsp;&nbsp;&nbsp;&nbsp;Off <input type="radio" name="settings-fullscreen" value="false" /></div></div>
-				<div><div class="inline-150px">Resolution</div><select id="settings-resolution" size="5" style="vertical-align: middle;">
-					<option value="1920x1080">1920x1080</option>
-					<option value="1680x1080">1680x1080</option>
-					<option value="1600x900">1600x900</option>
-					<option value="1366x768">1366x768</option>
-					<option value="1024x768">1024x768</option>
-				</select></div>
-				<input id="graphics-settings-back" type="submit" class="button" value="Back" />
-				<input id="graphics-settings-save" type="submit" class="button floatright" value="Save" /></div>
+				<div class="textcenter">
+					<div class="inline-100px floatleft textleft">Glow</div>
+					<input type="radio" name="settings-glow" value="false"/> <label>Off</label>
+					<input type="radio" name="settings-glow" value="true"/> <label>On</label>
+				</div>
+				<div class="textcenter">
+					<div class="inline-100px floatleft textleft">Grass</div>
+					<input type="radio" name="settings-grass" value="low"/> <label>Low</label>
+					<input type="radio" name="settings-grass" value="medium"/> <label>Med</label>
+					<input type="radio" name="settings-grass" value="high"/> <label>High</label>
+				</div>
+				<div class="textcenter">
+					<div class="inline-100px floatleft textleft">Shadows</div>
+					<input type="radio" name="settings-shadows" value="low"/> <label>Low</label>
+					<input type="radio" name="settings-shadows" value="medium"/> <label>Med</label>
+					<input type="radio" name="settings-shadows" value="high"/><label>High</label>
+				</div>
+				<div class="textcenter">
+					<div class="inline-100px floatleft textleft">Water</div>
+					<input type="radio" name="settings-water" value="low"/> <label>Low</label>
+					<input type="radio" name="settings-water" value="medium"/> <label>Med</label>
+					<input type="radio" name="settings-water" value="high"/> <label>High</label>
+				</div>
+				<div class="textcenter">
+					<div class="inline-100px floatleft textleft">Fullscreen</div>
+					<input type="radio" name="settings-fullscreen" value="false"/> <label>Off</label>
+					<input type="radio" name="settings-fullscreen" value="true"/> <label>On</label>
+					<!--div id="settings-fullscreen">On <input type="radio" name="settings-fullscreen" value="true" />&nbsp;&nbsp;&nbsp;&nbsp;Off <input type="radio" name="settings-fullscreen" value="false" /></div-->
+				</div>
+				<div class="textcenter">
+					<div class="inline-100px floatleft textleft">Resolution</div>
+					<select id="settings-resolution" size="5" style="vertical-align: middle;">
+							<option value="1920x1080">1920x1080</option>
+							<option value="1680x1080">1680x1080</option>
+							<option value="1600x900">1600x900</option>
+							<option value="1366x768">1366x768</option>
+							<option value="1024x768">1024x768</option>
+					</select>
+				</div>
+				<div>
+					<input id="graphics-settings-back" type="submit" class="button" value="Back" />
+					<input id="graphics-settings-save" type="submit" class="button floatright" value="Save" />
+				</div>
 			</div>
 		</div></div>
 		
 		<div id="controls-settings-menu" class="hiddenmenu verticaltablehax"><div class="verticalcenterhax">
 			<div id="controls-settings-wrapper" class="windowbackground">
-				<h1 class="textcenter">Keybinding settings</h1>
+				<h1 class="textcenter">Control settings</h1>
+        <a style="display: block;">
+          <div class="inline-200px floatleft textleft"> Mouse sensitivity </div>
+          <input id="settings-mouse-sensitivity" type="range" min="0.01" max="1.0" step="0.01" />
+          <label></label>
+        </a>
+				<a class="textcenter" style="display: block;">
+					<div class="inline-200px floatleft textleft">Invert mouse</div>
+					<input type="radio" name="settings-mouse-invert" value="false"/> <label>Off</label>
+					<input type="radio" name="settings-mouse-invert" value="true"/> <label>On</label>
+				</a>
 				<input id="controls-settings-back" type="submit" class="button" value="Back" />
 				<input id="controls-settings-save" type="submit" class="button floatright" value="Save" /></div>
 			</div>
