@@ -18,10 +18,12 @@
 #include <RootSystems/Include/HomingSystem.h>
 #include <RootSystems/Include/DamageAndKnockback.h>
 #include <RootSystems/Include/StatChangeSystem.h>
+#include <RootSystems/Include/Components.h>
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
+extern ECS::World* g_world;
 
 namespace RootForce
 {
@@ -260,12 +262,70 @@ namespace RootForce
 			if (p_writeToBitstream)
 			{
 				p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->Name.c_str()) );
+				
+				// Serialize the storage
+				unsigned int s;
+
+				s = (unsigned int) p_c->StorageNumber.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageNumber)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, it.second);
+				}
+
+				s = (unsigned int) p_c->StorageString.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageString)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.second.c_str()));
+				}
+
+				s = (unsigned int) p_c->StorageEntity.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageEntity)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, it.second.SynchronizedID);
+				}
 			}
 			else
 			{
-				RakNet::RakString s;
+				RakNet::RakString t;
+				p_bs->Serialize(p_writeToBitstream, t);
+				p_c->Name = std::string(t.C_String());
+
+				unsigned int s;
 				p_bs->Serialize(p_writeToBitstream, s);
-				p_c->Name = std::string(s.C_String());
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					float value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value);
+					p_c->InsertNumber(key.C_String(), value);
+				}
+
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					RakNet::RakString value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value);
+					p_c->InsertString(key.C_String(), value.C_String());
+				}
+
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					Network::NetworkEntityID value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value.SynchronizedID);
+					p_c->InsertEntity(key.C_String(), value);
+				}
 			}
 		}
 
@@ -636,6 +696,13 @@ namespace RootForce
 				return false;
 			}
 
+			// Make sure the components/flag for the entity is valid.
+			if (!AssertEntityValid(p_entityManager, p_entity))
+			{
+				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Serialization error. Component/Flag mismatch. Flag: %u. (%u, %u, %u)", p_entity->GetFlag(), it->first.UserID, it->first.ActionID, it->first.SequenceID);
+				return false;
+			}
+
 			// Serialize the network entity ID
 			p_bs->Serialize(true, it->first);
 
@@ -664,6 +731,7 @@ namespace RootForce
 			return true;
 		}
 
+		
 
 		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self)
 		{
@@ -753,15 +821,64 @@ namespace RootForce
 				}
 			}
 
+			#ifdef _DEBUG
+			if (entity != nullptr)
+			{
+				if (!AssertEntityValid(p_entityManager, entity))
+				{
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Catastrophy: Entity flag component mismatch with flag: %u (%u, %u, %u)", entity->GetFlag(), id.UserID, id.ActionID, id.SequenceID);
+				}
+			}
+			#endif
+
 			return entity;
 		}
 
 
+		bool SortEntitiesToSerialize(ECS::Entity* p_first, ECS::Entity* p_second)
+		{
+			Network::NetworkComponent* network[2] = { g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_first),
+													  g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_second)};
 
+			if (network[0]->ID.UserID < network[1]->ID.UserID)
+				return true;
+			else if (network[0]->ID.UserID > network[1]->ID.UserID)
+				return false;
+			else
+			{
+				if (network[0]->ID.ActionID < network[1]->ID.ActionID)
+					return true;
+				else if (network[0]->ID.ActionID > network[1]->ID.ActionID)
+					return false;
+				else
+				{
+					if (network[0]->ID.SequenceID < network[1]->ID.SequenceID)
+						return true;
+					else if (network[0]->ID.SequenceID > network[1]->ID.SequenceID)
+						return false;
+					else
+					{
+						// No two entities should have the same ID!
+						return p_first->GetId() < p_second->GetId();
+					}
+				}
+			}
+		}
 
 		void SerializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, const Network::NetworkEntityMap& p_map)
 		{
+			// Get all the entities with network components and sort them on UserID, ActionID and SequenceID (in that order).
 			std::vector<ECS::Entity*> entities = p_world->GetEntityManager()->GetAllEntities();
+			for (size_t i = 0; i < entities.size();)
+			{
+				Network::NetworkComponent* network = p_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entities[i]);
+				if (network == nullptr)
+					entities.erase(entities.begin() + i);
+				else
+					i++;
+			}
+
+			std::sort(entities.begin(), entities.end(), SortEntitiesToSerialize);
 			
 			// Write the number of serializable entities.
 			int count = 0;

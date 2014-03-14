@@ -58,7 +58,9 @@ namespace RootEngine
 #ifndef COMPILE_LEVEL_EDITOR
 		Network::NetworkInterface*		m_network;
 		GUISystem::GUISystemInterface*	m_gui;
+#ifdef _DEBUG
 		DebugOverlayInterface*			m_debugOverlay;
+#endif
 		InputManager::InputInterface*	m_inputSys;
 		Physics::PhysicsInterface*		m_physics;
 		Script::ScriptInterface*		m_script;

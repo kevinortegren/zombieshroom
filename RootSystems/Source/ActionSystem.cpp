@@ -63,6 +63,8 @@ namespace RootSystems
 					health->GotHit = false;
 					animation->UpperBodyAnim.m_locked = 0;
 					animation->LowerBodyAnim.m_locked = 0;
+
+
 				}
 
 				// Check abilities here as well, to make sure abilities are properly interrupted.
@@ -106,17 +108,16 @@ namespace RootSystems
 					if (action->JumpTime >= RootForce::JUMP_TIME_LIMIT)
 					{
 						action->JumpTime = 0.0f;
-					}
+					}				
 					else
 					{
 						if (g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 						{
 							// Apply jump force and go into jump animation
 							m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
-
 							//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 							animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
-						
+							state->CurrentState = RootForce::EntityState::ASCENDING;
 						}
 						else
 						{
@@ -129,7 +130,14 @@ namespace RootSystems
 
 			if(state->CurrentState == RootForce::EntityState::ASCENDING)
 			{
-				
+				action->IdleTime = 0.0f;
+				action->FallTime = 0.0f;
+
+				if(animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE2 || animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE3)
+				{
+					animation->UpperBodyAnim.m_locked = 0;
+					animation->LowerBodyAnim.m_locked = 0;
+				}
 
 				if(action->StrafePower > 0)
 				{
@@ -150,7 +158,8 @@ namespace RootSystems
 			else if(state->CurrentState == RootForce::EntityState::DESCENDING)
 			{
 				action->FallTime += dt;
-		
+				action->IdleTime = 0.0f;
+
 				if(action->StrafePower > 0)
 				{
 					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::AIRSTRAFERIGHT, false);
@@ -178,7 +187,6 @@ namespace RootSystems
 				//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
 
 				state->CurrentState = RootForce::EntityState::GROUNDED;
-
 				action->JumpTime = 0.0f;
 				action->FallTime = 0.0f;
 			}
@@ -196,14 +204,39 @@ namespace RootSystems
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 				//}
-				if(action->IdleTime >= 15.0f)
+				if(action->IdleTime >= 10.0f)
 				{
-					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::DANCE1, false);
-					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::DANCE1, false);
+					std::srand((int)time(NULL));
+					int random = std::rand() % 2 + 1;
+
+					if(random == 1 && animation->UpperBodyAnim.m_animClip == RootForce::AnimationClip::IDLE && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE &&
+									  animation->UpperBodyAnim.m_animClip != RootForce::AnimationClip::IDLE3 && animation->LowerBodyAnim.m_animClip != RootForce::AnimationClip::IDLE3)
+					{						
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE2, true);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE2, true);
+					}
+					else if(animation->UpperBodyAnim.m_animClip == RootForce::AnimationClip::IDLE && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE &&
+							animation->UpperBodyAnim.m_animClip != RootForce::AnimationClip::IDLE2 && animation->LowerBodyAnim.m_animClip != RootForce::AnimationClip::IDLE2)
+					{
+						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE3, true);
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE3, true);
+					}
+
+					if(action->IdleTime >= 13)
+						action->IdleTime = 0.0f;
 				}
 
 				if(!isGameOver)
 				{
+					if(action->MovePower != 0 || action->StrafePower != 0)
+					{
+						if(animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE2 || animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE3)
+						{
+							animation->UpperBodyAnim.m_locked = 0;
+							animation->LowerBodyAnim.m_locked = 0;
+						}
+					}
+
 					if(action->MovePower < 0)
 					{
 						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::BACKWARDS, false);

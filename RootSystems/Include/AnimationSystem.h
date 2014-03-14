@@ -46,6 +46,9 @@ namespace RootForce
 			AIRSTRAFERIGHT,
 			DESCEND1,
 			DANCE1,
+			SPAWN1,
+			IDLE2,
+			IDLE3,
 			RAGDOLL,
 			NOCLIP,
 		};

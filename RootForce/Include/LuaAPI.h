@@ -48,6 +48,13 @@ namespace RootForce
 			return 0;
 		}
 
+		static int GetDeltaTime(lua_State* p_luaState)
+		{
+			NumberOfArgs(0);
+			lua_pushnumber(p_luaState, g_world->GetDelta());
+			return 1;
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		//LOGGING
@@ -124,12 +131,12 @@ namespace RootForce
 			Network::NetworkComponent* network = g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(*e);
 			if (network != nullptr)
 			{
-				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u, Sequence: %u).", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+				//g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity (User: %u, Action: %u, Sequence: %u).", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
 				g_networkDeletedList.push_back(network->ID);
 			}
 			else
 			{
-				g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
+				//g_engineContext.m_logger->LogScript(ar.short_src, ar.currentline, LogTag::SCRIPT, LogLevel::DEBUG_PRINT, "Removing entity without network component.");
 			}
 
 			g_world->GetEntityManager()->RemoveEntity(*e);
@@ -793,17 +800,6 @@ namespace RootForce
 			RootForce::CollisionResponder* collisionResponder = *(RootForce::CollisionResponder**)luaL_checkudata(p_luaState, 5, "CollisionResponder");
 			collision->m_handle = g_engineContext.m_physics->AddPlayerObjectToWorld(collision->m_meshHandle , *entity,
 				transform->m_position, transform->m_orientation.GetQuaternion(), 1, playerPhysics->MovementSpeed, 0.0f, 0.3f, &collisionResponder->m_collisions);
-			return 0;
-		}
-
-		static int CollisionRemoveObjectFromWorld(lua_State* p_luaState)
-		{
-			NumberOfArgs(1); // entity, collision, transform, physics, playerPhysics, collisionResponder
-			RootForce::Collision* collision = *(RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
-			if (collision)
-				g_engineContext.m_physics->RemoveObject(*collision->m_handle);
-			else
-				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::WARNING, "Trying to remove non-existing CollisionObject.");
 			return 0;
 		}
 
@@ -1643,6 +1639,60 @@ namespace RootForce
 			NumberOfArgs(1);
 			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
 			lua_pushstring(p_luaState, (*s)->Name.c_str());
+			return 1;
+		}
+
+		static int ScriptSetNumber(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			float value = (float) luaL_checknumber(p_luaState, 3);
+			(*s)->InsertNumber(key, value);
+			return 0;
+		}
+		static int ScriptSetString(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			std::string value = luaL_checkstring(p_luaState, 3);
+			(*s)->InsertString(key, value);
+			return 0;
+		}
+		static int ScriptSetEntity(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			ECS::Entity** value = (ECS::Entity**) luaL_checkudata(p_luaState, 3, "Entity");
+			(*s)->InsertEntity(key, *value);
+			return 0;
+		}
+		static int ScriptGetNumber(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			lua_pushnumber(p_luaState, (*s)->GetNumber(key));
+			return 1;
+		}
+		static int ScriptGetString(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			lua_pushstring(p_luaState, (*s)->GetString(key).c_str());
+			return 1;
+		}
+		static int ScriptGetEntity(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			ECS::Entity** e = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
+			*e = (*s)->GetEntity(key);
+			luaL_setmetatable(p_luaState, "Entity");
 			return 1;
 		}
 
@@ -2838,6 +2888,7 @@ namespace RootForce
 		//////////////////////////////////////////////////////////////////////////
 		static const struct luaL_Reg static_f [] = {
 			{"KnockBack", Knockback},
+			{"GetDeltaTime", GetDeltaTime},
 			{NULL, NULL}
 		};
 
@@ -2966,7 +3017,6 @@ namespace RootForce
 		static const struct luaL_Reg collision_f [] = {
 			{"New", CollisionCreate},
 			{"AddPlayerObjectToWorld", CollisionAddPlayerObjectToWorld},
-			{"RemoveObjectFromWorld", CollisionRemoveObjectFromWorld},
 			{NULL, NULL}
 		};
 
@@ -3127,6 +3177,12 @@ namespace RootForce
 		static const struct luaL_Reg script_m [] = {
 			{"SetName", ScriptSetName},
 			{"GetName", ScriptGetName},
+			{"SetNumber", ScriptSetNumber},
+			{"SetString", ScriptSetString},
+			{"SetEntity", ScriptSetEntity},
+			{"GetNumber", ScriptGetNumber},
+			{"GetString", ScriptGetString},
+			{"GetEntity", ScriptGetEntity},
 			{NULL, NULL}
 		};
 

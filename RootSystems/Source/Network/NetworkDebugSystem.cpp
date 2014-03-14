@@ -26,6 +26,7 @@ namespace RootForce
 
 		void NetworkDebugSystem::ProcessEntity(ECS::Entity* p_entity)
 		{
+#ifdef _DEBUG
 			NetworkComponent* network = m_networks.Get(p_entity);
 			PlayerComponent* player = m_players.Get(p_entity);
 			Transform* transform = m_transforms.Get(p_entity);
@@ -36,6 +37,7 @@ namespace RootForce
 			ss << "<br/>";
 
 			g_engineContext.m_debugOverlay->AddHTMLToBuffer(ss.str().c_str());
+#endif
 		}
 	}
 }
