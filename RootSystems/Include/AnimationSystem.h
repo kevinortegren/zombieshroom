@@ -49,6 +49,8 @@ namespace RootForce
 			SPAWN1,
 			IDLE2,
 			IDLE3,
+			ASCEND2,
+			DESCEND3_STRECTH,
 			RAGDOLL,
 			NOCLIP,
 		};

@@ -119,5 +119,7 @@ AnimClip = {
 	SPAWN1				= 31;
 	IDLE2				= 32;
 	IDLE3				= 33;
-	RAGDOLL 			= 34;
+	ASCEND2				= 34;
+	DESCEND3_STRECTH	= 35;
+	RAGDOLL 			= 36;
 }
