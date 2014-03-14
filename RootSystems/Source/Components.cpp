@@ -1,10 +1,12 @@
 #include <RootSystems/Include/Components.h>
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 namespace RootForce
 {
 	namespace ComponentType
 	{
-#ifndef COMPILE_LEVEL_EDITOR
+
 		void Initialize()
 		{
 			RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
@@ -67,6 +69,64 @@ namespace RootForce
 			RootForce::TryPickupComponent::SetTypeId(RootForce::ComponentType::TRYPICKUPCOMPONENT);
 			RootForce::KillAnnouncement::SetTypeId(RootForce::ComponentType::KILLANNOUNCEMENT);
 		}
-#endif
+	}
+
+	template <typename T>
+	bool AssertComponentValidity(ECS::EntityManager* p_entityManager, ECS::Entity* p_entity)
+	{
+		T* component = p_entityManager->GetComponent<T>(p_entity);
+		if ((p_entity->GetFlag() & ECS::Component<T>::GetTypeId()) != 0)
+		{
+			return component != nullptr;
+		}
+		else
+		{
+			return component == nullptr;
+		}
+	}
+
+	bool AssertEntityValid(ECS::EntityManager* p_entityManager, ECS::Entity* p_entity)
+	{
+		// Assert that the entity has all the components it has flags for.
+		if (!AssertComponentValidity<Renderable>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Transform>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<PointLight>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Camera>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<HealthComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<PlayerControl>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Physics>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Network::NetworkComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<LookAtBehavior>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<ThirdPersonBehavior>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Script>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Collision>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<CollisionResponder>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<PlayerComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Animation>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<ParticleEmitter>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<TDMRuleSet>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<PlayerActionComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<PlayerPhysics>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<StateComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Shadowcaster>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<DirectionalLight>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Network::ServerInformationComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Network::ClientComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Ragdoll>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<WaterCollider>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<AbilitySpawnComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<TryPickupComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<SoundComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<TimerComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<FollowComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<HomingComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<RayComponent>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<DamageAndKnockback>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<Scalable>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<StatChange>(p_entityManager, p_entity)) return false;
+		if (!AssertComponentValidity<KillAnnouncement>(p_entityManager, p_entity)) return false;
+		return true;
 	}
 }
+
+#endif

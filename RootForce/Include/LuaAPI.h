@@ -1653,6 +1653,60 @@ namespace RootForce
 			return 1;
 		}
 
+		static int ScriptSetNumber(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			float value = (float) luaL_checknumber(p_luaState, 3);
+			(*s)->InsertNumber(key, value);
+			return 0;
+		}
+		static int ScriptSetString(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			std::string value = luaL_checkstring(p_luaState, 3);
+			(*s)->InsertString(key, value);
+			return 0;
+		}
+		static int ScriptSetEntity(lua_State* p_luaState)
+		{
+			NumberOfArgs(3);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			ECS::Entity** value = (ECS::Entity**) luaL_checkudata(p_luaState, 3, "Entity");
+			(*s)->InsertEntity(key, *value);
+			return 0;
+		}
+		static int ScriptGetNumber(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			lua_pushnumber(p_luaState, (*s)->GetNumber(key));
+			return 1;
+		}
+		static int ScriptGetString(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			lua_pushstring(p_luaState, (*s)->GetString(key).c_str());
+			return 1;
+		}
+		static int ScriptGetEntity(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::Script **s = (RootForce::Script**)luaL_checkudata(p_luaState, 1, "Script");
+			std::string key = luaL_checkstring(p_luaState, 2);
+			ECS::Entity** e = (ECS::Entity**)lua_newuserdata(p_luaState, sizeof(ECS::Entity*));
+			*e = (*s)->GetEntity(key);
+			luaL_setmetatable(p_luaState, "Entity");
+			return 1;
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		//POINTLIGHT
 		//////////////////////////////////////////////////////////////////////////
@@ -3135,6 +3189,12 @@ namespace RootForce
 		static const struct luaL_Reg script_m [] = {
 			{"SetName", ScriptSetName},
 			{"GetName", ScriptGetName},
+			{"SetNumber", ScriptSetNumber},
+			{"SetString", ScriptSetString},
+			{"SetEntity", ScriptSetEntity},
+			{"GetNumber", ScriptGetNumber},
+			{"GetString", ScriptGetString},
+			{"GetEntity", ScriptGetEntity},
 			{NULL, NULL}
 		};
 
