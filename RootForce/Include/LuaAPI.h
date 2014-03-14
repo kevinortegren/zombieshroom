@@ -803,17 +803,6 @@ namespace RootForce
 			return 0;
 		}
 
-		static int CollisionRemoveObjectFromWorld(lua_State* p_luaState)
-		{
-			NumberOfArgs(1); // entity, collision, transform, physics, playerPhysics, collisionResponder
-			RootForce::Collision* collision = *(RootForce::Collision**)luaL_checkudata(p_luaState, 1, "Collision");
-			if (collision)
-				g_engineContext.m_physics->RemoveObject(*collision->m_handle);
-			else
-				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::WARNING, "Trying to remove non-existing CollisionObject.");
-			return 0;
-		}
-
 		static int CollisionSetMeshHandle(lua_State* p_luaState)
 		{
 			NumberOfArgs(2);
@@ -3028,7 +3017,6 @@ namespace RootForce
 		static const struct luaL_Reg collision_f [] = {
 			{"New", CollisionCreate},
 			{"AddPlayerObjectToWorld", CollisionAddPlayerObjectToWorld},
-			{"RemoveObjectFromWorld", CollisionRemoveObjectFromWorld},
 			{NULL, NULL}
 		};
 

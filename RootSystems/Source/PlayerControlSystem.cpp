@@ -13,19 +13,26 @@ namespace RootForce
 	Network::ActionID_t PlayerControlSystem::s_nextActionID = 0;
 
 	Keybinding::Keybinding()
-		: Action(PlayerAction::NONE), Edge(false)
+		: Action(PlayerAction::NONE), Edge(false), PressedTime(0.0f)
 	{}
 
 	Keybinding::Keybinding(SDL_Scancode binding, PlayerAction::PlayerAction action)
 	{
 		Bindings.push_back(binding);
 		Action = action;
+		PressedTime = 0.f;
+		Edge = false;
 	}
 
 	PlayerControlSystem::PlayerControlSystem(ECS::World* p_world)
 		: ECS::VoidSystem(p_world) 
 		, m_clientPeer(nullptr)
-	{}
+	{
+		for(int i = 0; i < PlayerAction::END; ++i)
+		{
+			m_playerActionData[i].ActiveTime = 0.0f;
+		}
+	}
 
 	void PlayerControlSystem::SetKeybindings(const std::vector<Keybinding>& keybindings)
 	{
@@ -65,12 +72,16 @@ namespace RootForce
 					RootEngine::InputManager::KeyState::KeyState keystate = m_inputManager->GetKeyState(sc);
 					if (keystate == RootEngine::InputManager::KeyState::DOWN_EDGE)
 					{
+						kb.PressedTime = 0.0f;
+						m_playerActionData[kb.Action].ActiveTime = 0.0f;
 						m_inputtedActionsCurrentFrame.push_back(kb.Action);
 						break;
 					}
 
 					if (keystate == RootEngine::InputManager::KeyState::UP_EDGE)
 					{
+						kb.PressedTime = 0.0f;
+						m_playerActionData[kb.Action].ActiveTime = 0.0f;
 						m_inputtedActionsCurrentFrame.push_back(kb.ActionUp);
 						break;
 					}
@@ -80,12 +91,16 @@ namespace RootForce
 					RootEngine::InputManager::KeyState::KeyState keystate = m_inputManager->GetKeyState(sc);
 					if (keystate == RootEngine::InputManager::KeyState::DOWN)
 					{
+						kb.PressedTime += m_world->GetDelta();
+						m_playerActionData[kb.Action].ActiveTime += m_world->GetDelta();
 						m_inputtedActionsCurrentFrame.push_back(kb.Action);
 						break;
 					}
 					
 					if (keystate == RootEngine::InputManager::KeyState::UP_EDGE)
 					{
+						kb.PressedTime = 0.0f;
+						m_playerActionData[kb.Action].ActiveTime = 0.0f;
 						m_inputtedActionsCurrentFrame.push_back(kb.ActionUp);
 						break;
 					}
@@ -148,17 +163,16 @@ namespace RootForce
 			switch (currentAction)
 			{
 			case PlayerAction::MOVE_FORWARDS:
-					action->MovePower += forwardPower;
-				
+					action->MovePower += glm::lerp(0.0f, forwardPower, 1.0f/0.1f * glm::min(m_playerActionData[PlayerAction::MOVE_FORWARDS].ActiveTime, 0.1f));
 				break;
 			case PlayerAction::MOVE_BACKWARDS:
-					action->MovePower -= backPower;
+					action->MovePower += glm::lerp(0.0f, -backPower, 1.0f/0.1f * glm::min(m_playerActionData[PlayerAction::MOVE_BACKWARDS].ActiveTime, 0.1f));
 				break;
 			case PlayerAction::STRAFE_RIGHT:
-					action->StrafePower += strafePower;
+					action->StrafePower += glm::lerp(0.0f, strafePower, 1.0f/0.1f * glm::min(m_playerActionData[PlayerAction::STRAFE_RIGHT].ActiveTime, 0.1f));;
 				break;
 			case PlayerAction::STRAFE_LEFT:
-					action->StrafePower -= strafePower;
+					action->StrafePower += glm::lerp(0.0f, -strafePower, 1.0f/0.1f * glm::min(m_playerActionData[PlayerAction::STRAFE_LEFT].ActiveTime, 0.1f));
 				break;
 			case PlayerAction::ORIENTATE:
 				{
@@ -281,7 +295,6 @@ namespace RootForce
 						bs.Write(RakNet::GetTime());
 						bs.Write((RakNet::MessageID) RootForce::NetworkMessage::MessageType::JumpStart);
 						m.Serialize(true, &bs);
-
 						m_clientPeer->Send(&bs, IMMEDIATE_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_RAKNET_GUID, true);
 					}
 
