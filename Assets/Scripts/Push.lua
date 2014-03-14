@@ -101,6 +101,7 @@ function Push.OnCollide (self, entity)
 				local selfPos = self:GetTransformation():GetPos();
 				local health = entity:GetHealth();
 				Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.currentKnockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+				health:Damage(abilityOwnerId, 0, "Push");
 			end
 		end
 	end
