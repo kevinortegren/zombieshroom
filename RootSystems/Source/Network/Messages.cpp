@@ -819,7 +819,7 @@ namespace RootForce
 			{
 				if (!AssertEntityValid(p_entityManager, entity))
 				{
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Catastrophy: Entity flag component mismatch with flag: %u", entity->GetFlag());
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Catastrophy: Entity flag component mismatch with flag: %u (%u, %u, %u)", entity->GetFlag(), id.UserID, id.ActionID, id.SequenceID);
 				}
 			}
 			#endif
