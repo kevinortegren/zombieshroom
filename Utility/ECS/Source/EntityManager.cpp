@@ -30,7 +30,7 @@ void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
 	if (p_entity->m_id != -1)
 	{
-		m_entitiesToBeRemoved.insert(p_entity->m_id);
+		m_entitiesToBeRemoved.insert(p_entity);
 
 		// Delete components at cleanup stage.
 		RemoveAllComponents(p_entity);
@@ -80,7 +80,7 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 		//p_entity->m_flag = 0;
 
 		// Remove components from systems belonging to the entity.
-		m_systemManager->RemoveEntityFromSystems(p_entity);	
+		//m_systemManager->RemoveEntityFromSystems(p_entity);	
 	}
 }
 
@@ -139,9 +139,25 @@ void ECS::EntityManager::CleanUp()
 	for(auto itr = m_entitiesToBeRemoved.begin(); itr != m_entitiesToBeRemoved.end(); ++itr)
 	{
 		// Recyle id.
-		m_recycledIds.push((*itr));
+		m_recycledIds.push((*itr)->GetId());
+
+		(*itr)->m_flag = 0;
+
+		m_systemManager->RemoveEntityFromSystems((*itr));
 	}
 
 	m_entitiesToBeRemoved.clear();
+}
+
+const std::set<int> ECS::EntityManager::GetEntitiesToBeRemoved() const
+{
+	std::set<int> entityIds;
+
+	for(auto itr = m_entitiesToBeRemoved.begin(); itr != m_entitiesToBeRemoved.end(); ++itr)
+	{
+		entityIds.insert((*itr)->GetId());
+	}
+
+	return entityIds;
 }
 

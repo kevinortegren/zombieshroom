@@ -118,7 +118,7 @@ namespace ECS
 
 		std::vector<ECS::Entity*> GetAllEntities();
 
-		const std::set<int>& GetEntitiesToBeRemoved() const { return m_entitiesToBeRemoved; }
+		const std::set<int> GetEntitiesToBeRemoved() const;
 	private:
 
 		EntitySystemManager* m_systemManager;
@@ -131,6 +131,6 @@ namespace ECS
 
 		// Recyling sets.
 		std::set<std::pair<unsigned int, unsigned int>> m_componentsToBeRemoved;
-		std::set<int> m_entitiesToBeRemoved;
+		std::set<Entity*> m_entitiesToBeRemoved;
 	};
 }
