@@ -115,12 +115,14 @@ namespace RootEngine
 			m_time = 0;
 		}
 #ifndef COMPILE_LEVEL_EDITOR
+#ifdef _DEBUG
 		for(std::string s : m_ouputList)
 		{
 			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, false);
 		}
-//#endif
 #endif
+#endif
+//#endif
 	}
 
 	void Profiling::ToggleSorted()
@@ -165,10 +167,11 @@ namespace RootEngine
 	}
 
 #ifndef COMPILE_LEVEL_EDITOR
+#ifdef _DEBUG
 	void Profiling::SetDebugOverlay( DebugOverlayInterface* p_debugOverlay )
 	{
 		m_debugOverlay = p_debugOverlay;
 	}
-
+#endif
 #endif
 }
