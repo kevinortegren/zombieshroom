@@ -54,7 +54,7 @@ namespace Render
 
 	BufferInterface* RenderResourceManager::CreateBuffer(GLenum p_type)
 	{ 
-		g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating Buffer. %d", m_buffers.size());
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating Buffer. %d", m_buffers.size());
 		Buffer* buffer = new Buffer(p_type);
 		m_buffers.push_back(buffer);
 		return buffer;
@@ -67,7 +67,7 @@ namespace Render
 		{
 			if((*itr) != nullptr)
 			{
-				g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Release buffer %d", p_buffer->GetBufferId());
+				//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Release buffer %d", p_buffer->GetBufferId());
 				delete (*itr);
 				(*itr) = nullptr;
 			}
@@ -78,7 +78,7 @@ namespace Render
 
 	TextureInterface* RenderResourceManager::CreateTexture()
 	{
-		g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating Texture. %d", m_textures.size());
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating Texture. %d", m_textures.size());
 		Texture* texture = new Texture();
 		m_textures.push_back(texture);
 		return texture;
@@ -91,7 +91,7 @@ namespace Render
 		{
 			if((*itr) != nullptr)
 			{
-				g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Release texture %d", p_texture->GetHandle());
+				//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Release texture %d", p_texture->GetHandle());
 				delete (*itr);
 				(*itr) = nullptr;
 			}
@@ -106,7 +106,7 @@ namespace Render
 		auto itr = m_materialNameMap.find(p_name);
 		if(itr == m_materialNameMap.end())
 		{
-			g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Creating Material %s", p_name.c_str());
+			//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Creating Material %s", p_name.c_str());
 			m_materialNameMap[p_name] = m_materials.size();
 
 			Material mat = Material(m_materials.size());
@@ -119,7 +119,7 @@ namespace Render
 
 	VertexAttributesInterface* RenderResourceManager::CreateVertexAttributes()
 	{ 
-		g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating VAO %d.", m_vaos.size());
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating VAO %d.", m_vaos.size());
 		VertexAttributes* vao = new VertexAttributes();
 		m_vaos.push_back(vao);
 		return vao;
@@ -127,7 +127,7 @@ namespace Render
 
 	MeshInterface* RenderResourceManager::CreateMesh() 
 	{ 
-		g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating mesh %d.", m_meshes.size());
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating mesh %d.", m_meshes.size());
 		Mesh* mesh = new Mesh();
 		m_meshes.push_back(mesh);
 		return mesh;
@@ -135,7 +135,7 @@ namespace Render
 
 	EffectInterface* RenderResourceManager::CreateEffect() 
 	{ 
-		g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating effect %d.", m_effects.size());
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating effect %d.", m_effects.size());
 		Effect* effect = new Effect();
 		m_effects.push_back(effect);
 		return effect;
@@ -158,7 +158,7 @@ namespace Render
 		{
 			if((*itr) != nullptr)
 			{
-				g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Remove Mesh.");
+				//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Remove Mesh.");
 				(*itr)->FreeBuffers(this);
 
 				delete (*itr);
@@ -176,7 +176,7 @@ namespace Render
 		{
 			if((*itr) != nullptr)
 			{
-				g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Remove VAO.");
+			//	g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Remove VAO.");
 				delete (*itr);
 				(*itr) = nullptr;
 			}

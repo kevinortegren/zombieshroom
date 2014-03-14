@@ -79,6 +79,7 @@ namespace RootEngine
 			}
 			else
 			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "[MODEL] NOT LOADED: '%s'", p_path.c_str());
 				return nullptr;
 			}
 		}

@@ -94,7 +94,6 @@ namespace RootEngine
 
 	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
 	{
-		
 		static const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
 		std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
