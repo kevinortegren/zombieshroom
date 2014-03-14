@@ -184,8 +184,6 @@ namespace RootEngine
 			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
 			return m_effects[p_path];
 		}
-
-		
 	}
 
 	Render::TextureInterface* ResourceManager::LoadTexture( std::string p_path, Render::TextureType::TextureType p_type )
@@ -226,9 +224,9 @@ namespace RootEngine
 		if(m_particles.find(p_handle) == m_particles.end())
 		{
 			if(p_fullPath)
-				particleStruct = *m_particleImporter->LoadParticleSystem(p_handle);
+				particleStruct = m_particleImporter->LoadParticleSystem(p_handle);
 			else
-				particleStruct = *m_particleImporter->LoadParticleSystem(m_workingDirectory + "Assets\\Particles\\" + p_handle + ".particle");
+				particleStruct = m_particleImporter->LoadParticleSystem(m_workingDirectory + "Assets\\Particles\\" + p_handle + ".particle");
 			
 			if(particleStruct.size() != 0)
 			{

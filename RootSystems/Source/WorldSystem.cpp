@@ -10,21 +10,21 @@ namespace RootForce
 		// Import entities, groups, tags and storage.
 		m_world->GetEntityImporter()->Import(m_engineContext->m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\" + p_worldName + ".world");
 		
-		BuildStaticShadowMesh();
+		//BuildStaticShadowMesh();
 
 		// Parse ambient data.
 		glm::vec4 ambient = m_world->GetStorage()->GetValueAsVec4("Ambient");
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
-		CreateSkyBox();
+		//CreateSkyBox();
 		CreatePlayerCamera();
 
 		// Put the static entities into a spatial quad tree.
-		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split");
+		//m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split");
 
 		// Adds static entities.
-		AddStaticEntitiesToPhysics();
+		//AddStaticEntitiesToPhysics();
 	}
 #endif
 
@@ -291,7 +291,7 @@ namespace RootForce
 
 			g_engineContext.m_renderer->AddShadowJob(job);
 		}
-	
+	/*
 #ifndef COMPILE_LEVEL_EDITOR
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
@@ -315,6 +315,7 @@ namespace RootForce
 			m_engineContext->m_renderer->AddRenderJob(job);
 		}
 #endif
+		*/
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)

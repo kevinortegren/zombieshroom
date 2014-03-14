@@ -119,3 +119,4 @@ class Logging : public LoggingInterface
 };
 //(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...)
 #define LogText(...) LT(__FUNCTION__, __LINE__, ##__VA_ARGS__)
+

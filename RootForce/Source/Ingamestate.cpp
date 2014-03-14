@@ -209,7 +209,7 @@ namespace RootForce
 
 	void IngameState::Enter()
 	{
-		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+		//m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 #ifndef _DEBUG
 		BotanyTextures textures;
@@ -300,14 +300,11 @@ namespace RootForce
 		rayVertices.m_pos = glm::vec3(0.0f);
 		
 		// Create 1P mesh for shadows.
-		Render::MeshInterface* mesh1P = g_engineContext.m_renderer->CreateMesh();
-		mesh1P->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
-		mesh1P->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
-		mesh1P->CreateVertexBuffer1P((Render::Vertex1P*)(&rayVertices), 1);
-		mesh1P->SetPrimitiveType(GL_POINTS);
+		rayModel->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
+		rayModel->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+		rayModel->m_meshes[0]->CreateVertexBuffer1P((Render::Vertex1P*)(&rayVertices), 1);
+		rayModel->m_meshes[0]->SetPrimitiveType(GL_POINTS);
 
-		rayModel->m_meshes[0] = mesh1P;
-		
 		//Team selection stuff
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 		m_displayIngameMenu = true;
