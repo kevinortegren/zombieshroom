@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Utility/ECS/Include/EntityManager.h>
 #include <RootSystems/Include/ComponentTypes.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
@@ -35,4 +36,9 @@ namespace RootForce
 		void Initialize();
 		void InitializeServerComponents();
 	}
+
+	/*
+		Make sure that the component flag corresponds to all existing components on the entity.
+	*/
+	bool AssertEntityValid(ECS::EntityManager* p_entityManager, ECS::Entity* p_entity);
 }
