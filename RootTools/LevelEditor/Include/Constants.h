@@ -9,7 +9,7 @@ const int g_maxMeshes = 400;
 const int g_maxCameras = 15;
 const int g_maxLights = 40;
 
-const int g_maxVerticesPerMesh = 30000;
+const int g_maxVerticesPerMesh = 40000;
 const int g_maxNameLength = 30;
 const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 150;
