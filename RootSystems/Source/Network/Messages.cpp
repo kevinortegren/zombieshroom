@@ -696,6 +696,13 @@ namespace RootForce
 				return false;
 			}
 
+			// Make sure the components/flag for the entity is valid.
+			if (!AssertEntityValid(p_entityManager, p_entity))
+			{
+				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Serialization error. Component/Flag mismatch. Flag: %u. (%u, %u, %u)", p_entity->GetFlag(), it->first.UserID, it->first.ActionID, it->first.SequenceID);
+				return false;
+			}
+
 			// Serialize the network entity ID
 			p_bs->Serialize(true, it->first);
 
