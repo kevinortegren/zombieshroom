@@ -75,7 +75,7 @@ namespace RootForce
 	bool AssertComponentValidity(ECS::EntityManager* p_entityManager, ECS::Entity* p_entity)
 	{
 		T* component = p_entityManager->GetComponent<T>(p_entity);
-		if ((p_entity->GetFlag() & ECS::Component<T>::GetTypeId()) != 0)
+		if ((p_entity->GetFlag() & int64_t(1ULL << ECS::Component<T>::GetTypeId())) != 0)
 		{
 			return component != nullptr;
 		}

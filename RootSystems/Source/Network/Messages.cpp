@@ -817,7 +817,10 @@ namespace RootForce
 			#ifdef _DEBUG
 			if (entity != nullptr)
 			{
-				assert(AssertEntityValid(p_entityManager, entity));
+				if (!AssertEntityValid(p_entityManager, entity))
+				{
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Catastrophy: Entity flag component mismatch with flag: %u", entity->GetFlag());
+				}
 			}
 			#endif
 
