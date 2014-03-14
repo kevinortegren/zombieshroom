@@ -108,17 +108,16 @@ namespace RootSystems
 					if (action->JumpTime >= RootForce::JUMP_TIME_LIMIT)
 					{
 						action->JumpTime = 0.0f;
-					}
+					}				
 					else
 					{
 						if (g_engineContext.m_physics->IsOnGround(*collision->m_handle))
 						{
 							// Apply jump force and go into jump animation
 							m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
-
 							//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 							animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
-						
+							state->CurrentState = RootForce::EntityState::ASCENDING;
 						}
 						else
 						{
@@ -188,7 +187,6 @@ namespace RootSystems
 				//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
 
 				state->CurrentState = RootForce::EntityState::GROUNDED;
-
 				action->JumpTime = 0.0f;
 				action->FallTime = 0.0f;
 			}

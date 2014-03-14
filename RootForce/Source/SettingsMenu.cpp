@@ -118,11 +118,11 @@ namespace RootForce
 		}
 		else if(p_key.compare("settings-grass") == 0)
 		{
-			float factor = 1;
+			float factor = 6.0f;
 			if(p_value.compare("low") == 0)
-				factor = 0.25f;
+				factor = 4.0f;
 			else if(p_value.compare("medium") == 0)
-				factor = 0.5f;
+				factor = 2.0f;
 			if(m_chatSystem)
 				m_chatSystem->InjectEvent("botany factor " + std::to_string(factor));
 		}

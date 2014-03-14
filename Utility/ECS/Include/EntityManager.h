@@ -69,6 +69,10 @@ namespace ECS
 		{
 		   // Make sure the entity exist within the component list range.
 		   assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
+
+		   //Entity does not have this component. Return to avoid re-toggling.
+		   if ((p_entity->GetFlag() & (1ULL << Component<T>::GetTypeId())) == 0)
+			   return;
  
 		   // If already removed, skip.
 		   if(m_components[Component<T>::GetTypeId()][p_entity->m_id] != nullptr)
@@ -76,7 +80,7 @@ namespace ECS
 			    // Push the type of component and the given entity.
 			   m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(Component<T>::GetTypeId(), p_entity->GetId()));
 
-			   p_entity->m_flag ^= (1ULL << Component<T>::GetTypeId());
+			   p_entity->m_flag &= ~(1ULL << Component<T>::GetTypeId());
 
 			   m_systemManager->RemoveEntityFromSystems(p_entity);
 		   }
@@ -88,6 +92,8 @@ namespace ECS
 		T* GetComponent(Entity* p_entity)
 		{
 			if(p_entity->m_id >= (int)m_components[Component<T>::GetTypeId()].size() || p_entity->m_id == -1)
+				return nullptr;
+			if ((p_entity->GetFlag() & (1ULL << Component<T>::GetTypeId())) == 0)
 				return nullptr;
 
 			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id]);
