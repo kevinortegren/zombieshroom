@@ -1,14 +1,14 @@
 TotemProjectile = {};
 TotemProjectile.direction = 0;
 TotemProjectile.duration = 1;
-TotemProjectile.damage = 20;
-TotemProjectile.knockback = 0;
-TotemProjectile.speed = 20;
+TotemProjectile.damage = 40;
+TotemProjectile.knockback = 10;
+TotemProjectile.speed = 40;
 
 function TotemProjectile.OnLoad()
-	ResourceManager.LoadModel("blowdart");
-	ResourceManager.LoadTexture("blowdartDiffuse");
-	ResourceManager.LoadEffect("Mesh");
+    ResourceManager.LoadModel("blowdart");
+    ResourceManager.LoadTexture("blowdartDiffuse");
+    ResourceManager.LoadEffect("Mesh");
     ResourceManager.LoadParticle("Acid");
 end
 
@@ -27,14 +27,14 @@ function TotemProjectile.OnCreate (userId, actionId)
     local dakComp = DamageAndKnockback.New(self, TotemProjectile.damage, TotemProjectile.knockback);
     
     if Global.IsClient then
-		local renderComp = Renderable.New(self);
-		renderComp:SetModel("blowdart");
-		renderComp:SetMaterial("TotemProjectile");
-		renderComp:SetMaterialDiffuse("blowdartDiffuse");
-		renderComp:SetMaterialEffect("Mesh");
+        local renderComp = Renderable.New(self);
+        renderComp:SetModel("blowdart");
+        renderComp:SetMaterial("TotemProjectile");
+        renderComp:SetMaterialDiffuse("blowdartDiffuse");
+        renderComp:SetMaterialEffect("Mesh");
         
         local particleComp = ParticleEmitter.New(self, "Acid");
-	end
+    end
     
     -- Setup timers
     TimerEntity.StartTimer(userId, actionId, TotemProjectile.duration, "TotemProjectile", "Disappear", self);
@@ -46,10 +46,9 @@ function TotemProjectile.OnCreate (userId, actionId)
     
     if parent:DoesExist() then
         local spawnPosition = parent:GetTransformation():GetPos();
-        local spawnOrientation = parent:GetTransformation():GetOrient();
-
-        spawnOrientation:Yaw(TotemProjectile.direction * 90);
-        local direction = spawnOrientation:GetFront();
+        transformComp:SetOrient(parent:GetTransformation():GetOrient());
+        transformComp:GetOrient():Yaw(TotemProjectile.direction * 90)
+        local direction = transformComp:GetOrient():GetFront();
         
         spawnPosition = Vec3.New((spawnPosition.x + direction.x * 1.35), (0.5 + spawnPosition.y + direction.y * 1.35), (spawnPosition.z + direction.z * 1.35));
         
@@ -65,49 +64,49 @@ function TotemProjectile.OnCreate (userId, actionId)
 end
 
 function TotemProjectile.OnCollide (self, entity)
-	if entity:DoesExist() then
-		local hitCol = entity:GetCollision();
-		local type = hitCol:GetType();
-		
+    if entity:DoesExist() then
+        local hitCol = entity:GetCollision();
+        local type = hitCol:GetType();
+        
         if type == PhysicsType.TYPE_PLAYER then
-			local targetPlayerComponent = entity:GetPlayerComponent();
-			local abilityOwnerNetwork = self:GetNetwork();
-			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
-			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
-			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
-			local health = entity:GetHealth();
-			
+            local targetPlayerComponent = entity:GetPlayerComponent();
+            local abilityOwnerNetwork = self:GetNetwork();
+            local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+            local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
+            local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
+            local health = entity:GetHealth();
+            
             if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
-				if not health:IsDead() then
-					health:Damage(abilityOwnerId, 10 * entity:GetStatChange():GetDamageResistance(), "AbilityTotem");
-				end
+                if not health:IsDead() then
+                    health:Damage(abilityOwnerId, AbilityTotem.damage * entity:GetStatChange():GetDamageResistance(), "AbilityTotem");
+                end
                 
                 local hitPos = entity:GetTransformation():GetPos();
-				local selfPos = self:GetTransformation():GetPos();
-				Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), 20 * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
-			end
-		end
+                local selfPos = self:GetTransformation():GetPos();
+                Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), AbilityTotem.knockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+            end
+        end
         
         TotemProjectile.Disappear(self);
-	end
+    end
 end
 
 function TotemProjectile.Disappear(self)
     if Global.IsClient then
-		self:RemoveRenderable();
-	end
+        self:RemoveRenderable();
+    end
 
     self:RemovePhysics();
-	self:RemoveCollision();
-	self:RemoveCollisionResponder();
+    self:RemoveCollision();
+    self:RemoveCollisionResponder();
     self:RemoveDamageAndKnockback();
 
-	local emitter = self:GetParticleEmitter();
-	if emitter ~= nil then
-		self:GetParticleEmitter():SetAlive(-1.0);
-	end
+    local emitter = self:GetParticleEmitter();
+    if emitter ~= nil then
+        self:GetParticleEmitter():SetAlive(-1.0);
+    end
 end
 
 function TotemProjectile.OnDestroy (self)
-	Entity.Remove(self);
+    Entity.Remove(self);
 end

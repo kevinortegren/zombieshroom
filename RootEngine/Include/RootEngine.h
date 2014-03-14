@@ -72,7 +72,9 @@ namespace RootEngine
 		ConfigManager m_configManager;
 		Profiling m_profiler;
 #ifndef COMPILE_LEVEL_EDITOR
+#ifdef _DEBUG
 		DebugOverlay m_debugOverlay;
+#endif
 		Network::NetworkInterface*		m_network;
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface*	m_inputSys;

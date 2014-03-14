@@ -268,7 +268,9 @@ namespace RootForce
 		m_playerControlSystem->SetHUD(m_hud.get());
 
 		// Initialize the debug, setting the html view
+#ifdef _DEBUG
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
+#endif
 
 		// Init the hud and set one test ability for now
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
@@ -311,7 +313,9 @@ namespace RootForce
 		//Team selection stuff
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 		m_displayIngameMenu = true;
+#ifdef _DEBUG
 		g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+#endif
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 		m_ingameMenu->GetView()->SetActive(true);
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
@@ -341,7 +345,9 @@ namespace RootForce
 
 		// Destroy the ingame GUI views.
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
+#ifdef _DEBUG
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
+#endif
 		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
 
 		// Remove all entities.
@@ -376,7 +382,10 @@ namespace RootForce
 		g_engineContext.m_renderer->Render();
 
 		g_engineContext.m_profiler->Update(p_deltaTime);
-		g_engineContext.m_debugOverlay->RenderOverlay();
+#ifdef _DEBUG
+			g_engineContext.m_debugOverlay->RenderOverlay();
+#endif
+
 		{
 			g_engineContext.m_gui->Update();
 			//Update Menu to make sure Setting changes are made in the main thread
@@ -398,6 +407,7 @@ namespace RootForce
 					if(m_displayGuiHUD)
 						g_engineContext.m_gui->Render(m_hud->GetView());
 				}
+#ifdef _DEBUG
 				{
 					PROFILE("GUI Debug", g_engineContext.m_profiler);
 
@@ -405,6 +415,7 @@ namespace RootForce
 					if(m_displayDebugHUD)
 						g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 				}
+#endif
 			}
 		}
 
@@ -618,7 +629,9 @@ namespace RootForce
 		{
 			m_displayIngameMenu = true;
 			m_hud->GetView()->SetActive(false);
+#ifdef _DEBUG
 			g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+#endif
 			m_ingameMenu->GetView()->SetActive(true);
 			g_engineContext.m_inputSys->LockMouseToCenter(false);
 			m_ingameMenu->Reset();
@@ -628,7 +641,9 @@ namespace RootForce
 			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 			m_displayIngameMenu = true;
 			m_hud->GetView()->SetActive(false);
+#ifdef _DEBUG
 			g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+#endif
 			m_ingameMenu->GetView()->SetActive(true);
 			g_engineContext.m_inputSys->LockMouseToCenter(false);
 			m_ingameMenu->Reset();
@@ -639,7 +654,9 @@ namespace RootForce
 			m_ingameMenu->GetView()->SetActive(false);
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
 			m_hud->GetView()->SetActive(m_displayGuiHUD);
+#ifdef _DEBUG
 			g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
+#endif
 			m_ingameMenu->Reset();
 			// Update keybindings when returning to game
 			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());

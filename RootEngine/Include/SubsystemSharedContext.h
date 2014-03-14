@@ -22,7 +22,9 @@ namespace RootEngine
 		ResourceManagerInterface* m_resourceManager;
 		ProfilingInterface* m_profiler;
 #ifndef COMPILE_LEVEL_EDITOR
+#ifdef _DEBUG
 		DebugOverlayInterface* m_debugOverlay;
+#endif
 #endif
 	};
 
