@@ -921,7 +921,10 @@ namespace RootForce
 			// Remove all entities that are in the network entity map but is not in the serialization message.
 			for (auto it = p_map.begin(); it != p_map.end();)
 			{
-				if (occuranceCount.find(it->first) != occuranceCount.end())
+				if (occuranceCount.find(it->first) != occuranceCount.end() &&
+					it->first.UserID >= Network::ReservedUserID::NONE &&
+					it->first.ActionID >= Network::ReservedActionID::NONE &&
+					it->first.SequenceID >= Network::ReservedSequenceID::NONE)
 				{
 					assert(occuranceCount.find(it->first)->second < 2);
 
