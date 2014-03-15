@@ -104,7 +104,7 @@ namespace RootEngine
 
 	void Profiling::Update( float p_dt )
 	{
-//#ifdef _DEBUG
+#ifdef _DEBUG
 		m_time += p_dt;
 		m_frames += 1;
 
@@ -115,14 +115,14 @@ namespace RootEngine
 			m_time = 0;
 		}
 #ifndef COMPILE_LEVEL_EDITOR
-#ifdef _DEBUG
+
 		for(std::string s : m_ouputList)
 		{
 			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, false);
 		}
+
 #endif
 #endif
-//#endif
 	}
 
 	void Profiling::ToggleSorted()
