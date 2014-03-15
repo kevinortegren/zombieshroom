@@ -241,17 +241,6 @@ namespace RootForce
 		m_networkContext.m_client->SetChatSystem(m_hud->GetChatSystem().get());
 		m_networkContext.m_clientMessageHandler->SetChatSystem(m_hud->GetChatSystem().get());
 		
-		// Set server peers to null
-		/*
-		m_sharedSystems.m_abilitySpawnSystem->SetServerPeerInterface(nullptr);
-		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(nullptr);
-		m_sharedSystems.m_respawnSystem->SetServerPeer(nullptr);
-		m_sharedSystems.m_respawnSystem->SetClientPeer(nullptr);
-		m_playerControlSystem->SetClientPeer(nullptr);
-		m_actionSystem->SetServerPeerInterface(nullptr);
-		m_actionSystem->SetClientPeerInterface(nullptr);
-		m_timerSystem->SetServerPeer(nullptr);
-		*/
 
 		// Set the network client peer interfaces.
 		m_sharedSystems.m_abilitySpawnSystem->SetClientPeerInterface(m_networkContext.m_client->GetPeerInterface());
