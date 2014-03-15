@@ -921,9 +921,10 @@ namespace RootForce
 			// Remove all entities that are in the network entity map but is not in the serialization message.
 			for (auto it = p_map.begin(); it != p_map.end();)
 			{
-				assert(occuranceCount.find(it->first)->second < 2);
-				if (occuranceCount.find(it->first)->second == 0)
+				if (occuranceCount.find(it->first) != occuranceCount.end())
 				{
+					assert(occuranceCount.find(it->first)->second < 2);
+
 					// Not encountered in the serialization message. Remove it locally as well.
 					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Removing local entity (%u, %u, %u) that is non-existant in serialization message.", it->first.UserID, it->first.ActionID, it->first.SequenceID);
 					
