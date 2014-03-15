@@ -52,7 +52,7 @@ function AbilityBall.Explode(self)
 	self:GetParticleEmitter():SetAlive(-1.0);
 
 	self:RemoveSoundable();
-	Static.Play3DSound("CC-BY3.0/explosion_dull.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 50.0);
+	Static.Play3DSound("CC-BY3.0/explosion_dull.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0);
 end
 
 function AbilityBall.OnCreate (userId, actionId)
