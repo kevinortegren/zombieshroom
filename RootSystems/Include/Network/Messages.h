@@ -6,6 +6,7 @@
 #include <RakNet/BitStream.h>
 #include <stdint.h>
 #include <vector>
+#include <set>
 #include <Utility/ECS/Include/Entity.h>
 #include <RootSystems/Include/ComponentTypes.h>
 #include <RootSystems/Include/Network/NetworkTypes.h>
