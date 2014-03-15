@@ -52,17 +52,7 @@ function AbilityBall.Explode(self)
 	self:GetParticleEmitter():SetAlive(-1.0);
 
 	self:RemoveSoundable();
-	local explosionSoundEffectEntity = Entity.New();
-	local networkComponent = Network.New(explosionSoundEffectEntity, network:GetUserId(), network:GetActionId());
-	local explosionSoundEffectTransform = Transformation.New(explosionSoundEffectEntity);
-	explosionSoundEffectTransform:SetPos(self:GetTransformation():GetPos());
-	local soundable = Soundable.New(explosionSoundEffectEntity);
-	soundable:SetSound("CC-BY3.0/explosion_dull.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	soundable:SetRange(10.0, 200.0);
-	soundable:SetVolume(1.0);
-	soundable:Play();
-
-	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "AbilityBall", "OnDestroy", explosionSoundEffectEntity);
+	Static.Play3DSound("CC-BY3.0/explosion_dull.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0);
 end
 
 function AbilityBall.OnCreate (userId, actionId)
@@ -77,15 +67,11 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
 	local networkEnt = Network.New(self, userId, actionId);
-	local soundable = Soundable.New(self);
+	
 	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "Explode", self);
 	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration + 2, "AbilityBall", "OnDestroy", self);
 
 	--Setting stuff
-	soundable:SetSound("fireloop.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	soundable:SetRange(10.0, 100.0);
-	soundable:SetVolume(1.0);
-	soundable:Play();
 
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
@@ -100,6 +86,12 @@ function AbilityBall.OnCreate (userId, actionId)
 	transformComp:SetScale(Vec3.New(0.5, 0.5, 0.5));
 
 	if Global.IsClient then
+		local soundable = Soundable.New(self);
+		soundable:SetSound("fireloop.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+		soundable:SetRange(10.0, 100.0);
+		soundable:SetVolume(1.0);
+		soundable:Play();
+
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Fireball");
@@ -143,5 +135,6 @@ function AbilityBall.OnCollide (self, entity)
 end
 
 function AbilityBall.OnDestroy (self)
+	self:RemoveSoundable();
 	Entity.Remove(self);
 end

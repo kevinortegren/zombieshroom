@@ -77,7 +77,7 @@ namespace Physics
 	}
 	void RootPhysics::Shutdown()
 	{
-		//Magic loop of deleting, might not work with ghostobjects(players). Check this before release.
+		//Magic loop of deleting
 		RemoveAll();
 		delete m_debugDrawer;
 		delete m_dynamicWorld;
@@ -333,12 +333,18 @@ namespace Physics
 			CustomUserPointer* temp = m_userPointer[i];
 			delete temp;
 		}
+		for(unsigned int i = 0; i < m_btTriangleIndexVertexArrays.size(); i++)
+		{
+			btTriangleIndexVertexArray* temp = m_btTriangleIndexVertexArrays[i];
+			delete temp;
+		}	
 		m_ragdolls.clear();
 		m_externallyControlled.clear();
 		m_shapelessObjects.clear();
 		m_dynamicObjects.clear();
 		m_playerObjects.clear();
 		m_userPointer.clear();
+		m_btTriangleIndexVertexArrays.clear();
 
 	}
 
@@ -368,7 +374,6 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_type = PhysicsShape::SHAPE_SPHERE;
@@ -383,6 +388,8 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
+
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 
 
@@ -404,7 +411,6 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_height = p_height;
@@ -420,6 +426,7 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
@@ -439,7 +446,6 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_height = p_height;
@@ -455,6 +461,7 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
@@ -572,7 +579,7 @@ namespace Physics
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
-	
+		m_btTriangleIndexVertexArrays.push_back(indexVertexArray);
 		//create a body
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
@@ -629,10 +636,11 @@ namespace Physics
 
 			btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true);
 			objectMeshShape->setLocalScaling(btVector3(p_shapeStruct.m_scale.x, p_shapeStruct.m_scale.y, p_shapeStruct.m_scale.z));
-			btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
-			trinfoMap->m_edgeDistanceThreshold = 0.01f;
-			trinfoMap->m_equalVertexThreshold = 0.01f;
-			btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
+			m_btTriangleIndexVertexArrays.push_back(indexVertexArray);
+// 			btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
+// 			trinfoMap->m_edgeDistanceThreshold = 0.01f;
+// 			trinfoMap->m_equalVertexThreshold = 0.01f;
+// 			btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
 			return (btCollisionShape*)objectMeshShape;
 		}
 		else
