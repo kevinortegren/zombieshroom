@@ -51,18 +51,7 @@ function Cannonball.Explode(self)
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
 
-	self:RemoveSoundable();
-	local explosionSoundEffectEntity = Entity.New();
-	local networkComponent = Network.New(explosionSoundEffectEntity, network:GetUserId(), network:GetActionId());
-	local explosionSoundEffectTransform = Transformation.New(explosionSoundEffectEntity);
-	explosionSoundEffectTransform:SetPos(self:GetTransformation():GetPos());
-	local soundable = Soundable.New(explosionSoundEffectEntity);
-	soundable:SetSound("CC-BY3.0/DeathFlash.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	soundable:SetRange(50.0, 400.0);
-	soundable:SetVolume(1.0);
-	soundable:Play();
-
-	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "Cannonball", "StopHitSound", explosionSoundEffectEntity);
+	Static.Play3DSound("CC-BY3.0/DeathFlash.wav", 1.0, entity:GetTransformation():GetPos(), 50.0, 400.0);
 
 	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "Cannonball", "OnDestroy", self);
 end
@@ -83,13 +72,8 @@ function Cannonball.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Cannonball");
 	local networkEnt = Network.New(self, userId, actionId);
-	local soundable = Soundable.New(self);
 
 	--Setting stuff
-	soundable:SetSound("CC-BY3.0/rumble.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	soundable:SetRange(10.0, 100.0);
-	soundable:SetVolume(0.8);
-	soundable:Play();
 
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
@@ -103,6 +87,7 @@ function Cannonball.OnCreate (userId, actionId)
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
+		Static.Play3DSound("CC-BY3.0/rumble.wav", 0.6, entity:GetTransformation():GetPos(), 10.0, 100.0);
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Cannonballs");

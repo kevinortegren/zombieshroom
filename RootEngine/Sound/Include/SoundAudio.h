@@ -3,6 +3,7 @@
 #include <Fmod/fmod_errors.h>
 #include <string>
 #include <RootEngine/Include/SubsystemSharedContext.h>
+#include <glm/glm.hpp>
 
 typedef unsigned int SOUND_FLAGS;
 
@@ -49,6 +50,8 @@ namespace RootEngine
 			virtual bool LoadSound(std::string p_name, unsigned p_flags) = 0;
 			virtual FMOD::Sound* GetFmodSound() = 0;
 			virtual bool Is3D() = 0;
+			virtual void PlayOnce3D(float p_volume, glm::vec3 p_position, float p_minRange, float p_maxRange) = 0;
+			//virtual void PlayOnce2D(float p_volume) = 0;
 		};
 
 		class SoundAudio : public SoundAudioInterface
@@ -59,6 +62,8 @@ namespace RootEngine
 			bool LoadSound(std::string p_name, unsigned p_flags);
 			FMOD::Sound* GetFmodSound();
 			bool Is3D();
+			void PlayOnce3D(float p_volume, glm::vec3 p_position, float p_minRange, float p_maxRange);
+			//void PlayOnce2D(float p_volume);
 		private:
 			FMOD::System*		m_system;
 			FMOD::Sound*		m_sound;

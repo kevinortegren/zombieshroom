@@ -58,5 +58,18 @@ namespace RootEngine
 			return m_is3D;
 		}
 
+		void SoundAudio::PlayOnce3D(float p_volume, glm::vec3 p_position, float p_minRange, float p_maxRange )
+		{
+			FMOD::Channel* channel;
+			m_system->playSound(FMOD_CHANNEL_FREE, m_sound, true, &channel);
+
+			channel->setVolume(p_volume);
+			FMOD_VECTOR position = {p_position.x, p_position.y, p_position.z};
+			channel->set3DAttributes(&position, 0);
+			channel->set3DDopplerLevel(0.0f);
+			channel->set3DMinMaxDistance(p_minRange, p_maxRange);
+			channel->setPaused(false);
+		}
+
 	}
 }

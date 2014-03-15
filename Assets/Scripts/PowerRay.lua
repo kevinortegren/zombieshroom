@@ -81,10 +81,12 @@ if entity:DoesExist() then
 	local dakComp = self:GetDamageAndKnockback();
 	local hitCol = entity:GetCollision();
 	local type = hitCol:GetType();
+
+	local abilityOwnerNetwork = self:GetNetwork();
+	local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 	if type == PhysicsType.TYPE_PLAYER then
 		local targetPlayerComponent = entity:GetPlayerComponent();
-		local abilityOwnerNetwork = self:GetNetwork();
-		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+
 		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
@@ -101,6 +103,7 @@ if entity:DoesExist() then
 	end
 
 	local hitPositionEntity = Entity.New();
+	local hitPositionNetwork = Network.New(hitPositionEntity, abilityOwnerId, abilityOwnerNetwork:GetActionId());
 	local hitPositionTransform = Transformation.New(hitPositionEntity);
 	hitPositionTransform:SetPos(entity:GetTransformation():GetPos());
 	local soundable = Soundable.New(hitPositionEntity);
@@ -113,6 +116,7 @@ end
 end
 
 function PowerRay.StopHitSound(hitPositionEntity)
+	hitPositionEntity:RemoveSoundable();
 	Entity.Remove(hitPositionEntity);
 end
 

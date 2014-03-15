@@ -19,6 +19,9 @@ namespace RootForce
 		SoundComponent(): m_volume(0.5f), m_play(false), m_minDist(0.0f), m_maxDist(100.0f), m_soundChannel(nullptr), m_soundAudio(nullptr) {}
 		~SoundComponent()
 		{
+			m_play = false;
+			m_soundChannel->SetVolume(0.0f);
+			m_soundChannel->SetPaused(true);
 			delete m_soundChannel;
 		}
 

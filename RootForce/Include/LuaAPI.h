@@ -55,6 +55,23 @@ namespace RootForce
 			return 1;
 		}
 
+		static int Play3DSound(lua_State* p_luaState)
+		{
+			///NAME, VOLUME, POSITION, MINRANGE, MAXRANGE
+			NumberOfArgs(5);
+
+			std::string name = luaL_checkstring(p_luaState, 1);
+			float volume = (float) luaL_checknumber(p_luaState, 2);
+			glm::vec3 position = (*(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3"));
+			float minRange = (float) luaL_checknumber(p_luaState, 4);
+			float maxRange = (float) luaL_checknumber(p_luaState, 5);
+
+			RootEngine::Sound::SoundAudioInterface* sound = g_engineContext.m_resourceManager->LoadSoundAudio(name, SOUND_3D | SOUND_3D_LINEARSQUAREROLLOFF | SOUND_LOOP_OFF);
+			sound->PlayOnce3D(volume, position, minRange, maxRange);
+
+			return 0;
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		//LOGGING
@@ -471,11 +488,6 @@ namespace RootForce
 			NumberOfArgs(1);
 			ECS::Entity** e = (ECS::Entity**)luaL_checkudata(p_luaState, 1, "Entity");
 			RootForce::SoundComponent* s = g_world->GetEntityManager()->GetComponent<RootForce::SoundComponent>(*e);
-			if(s)
-			{
-				s->m_play = false;
-				s->m_soundChannel->SetPaused(true);
-			}
 			g_world->GetEntityManager()->RemoveComponent<RootForce::SoundComponent>(*e);
 			return 0;
 		}
@@ -3150,6 +3162,7 @@ namespace RootForce
 		static const struct luaL_Reg static_f [] = {
 			{"KnockBack", Knockback},
 			{"GetDeltaTime", GetDeltaTime},
+			{"Play3DSound", Play3DSound},
 			{NULL, NULL}
 		};
 
