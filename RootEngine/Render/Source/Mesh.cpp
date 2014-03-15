@@ -1,4 +1,5 @@
 #include <RootEngine/Render/Include/Mesh.h>
+#include <RootEngine/Render/Include/RenderResourceManager.h>
 
 namespace Render
 {
@@ -215,4 +216,10 @@ namespace Render
 		m_noCulling = p_noCulling;
 	}
 
+	void Mesh::FreeBuffers(RenderResourceManager* p_resources)
+	{
+		p_resources->ReleaseBuffer(m_vertexBuffer);
+		p_resources->ReleaseBuffer(m_elementBuffer);
+		p_resources->RemoveVAO(m_vertexAttributes);
+	}
 }

@@ -61,6 +61,8 @@ namespace Render
 		virtual int GetMipsLevels() const = 0;
 
 		virtual void SetAccess(GLenum p_access) = 0;
+
+		virtual ~TextureInterface(){};
 	};
 
 
@@ -69,6 +71,9 @@ namespace Render
 	public:
 		friend class RenderResourceManager;
 		
+		Texture();
+		~Texture();
+
 		bool Load(const std::string filepath);
 		bool LoadCubeMap(const std::string& filepath);
 
@@ -97,8 +102,7 @@ namespace Render
 		void SetAccess(GLenum p_access);
 		
 	private:
-		Texture();
-		~Texture();
+	
 
 		GLuint m_textureHandle;
 		GLenum m_target;

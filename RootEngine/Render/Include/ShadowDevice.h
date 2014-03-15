@@ -24,6 +24,7 @@ namespace Render
 		void Init(GLRenderer* p_renderer, int p_width, int p_height, BufferInterface* p_cameraBuffer, BufferInterface* p_uniforms);
 		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index);
 		void Process();
+		void Clear();
 
 		int GetWidth(){ return m_width; }
 		int GetHeight(){ return m_height; }

@@ -66,6 +66,7 @@ namespace RootEngine
 #ifndef COMPILE_LEVEL_EDITOR
 	Model* ResourceManager::LoadCollada(std::string p_path)
 	{
+		
 		if(m_models.find(p_path) == m_models.end())
 		{
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::START_PRINT, "[MODEL] Starting to load: '%s'", p_path.c_str());
@@ -79,6 +80,7 @@ namespace RootEngine
 			}
 			else
 			{
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "[MODEL] NOT LOADED: '%s'", p_path.c_str());
 				return nullptr;
 			}
 		}
@@ -184,8 +186,6 @@ namespace RootEngine
 			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Effect already exists: %s", p_path.c_str());
 			return m_effects[p_path];
 		}
-
-		
 	}
 
 	Render::TextureInterface* ResourceManager::LoadTexture( std::string p_path, Render::TextureType::TextureType p_type )
@@ -226,9 +226,9 @@ namespace RootEngine
 		if(m_particles.find(p_handle) == m_particles.end())
 		{
 			if(p_fullPath)
-				particleStruct = *m_particleImporter->LoadParticleSystem(p_handle);
+				particleStruct = m_particleImporter->LoadParticleSystem(p_handle);
 			else
-				particleStruct = *m_particleImporter->LoadParticleSystem(m_workingDirectory + "Assets\\Particles\\" + p_handle + ".particle");
+				particleStruct = m_particleImporter->LoadParticleSystem(m_workingDirectory + "Assets\\Particles\\" + p_handle + ".particle");
 			
 			if(particleStruct.size() != 0)
 			{
@@ -438,28 +438,82 @@ namespace RootEngine
 		m_defaultTexture->CreateEmptyTexture(4, 4, Render::TextureFormat::TEXTURE_RGBA);
 	}
 
+	void ResourceManager::AddProtectedResource(const std::string& p_name)
+	{
+		m_protectedResources.push_back(p_name);
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	//Remove functions
 	//////////////////////////////////////////////////////////////////////////
+	void ResourceManager::Clean()
+	{
+		std::vector<std::map<std::string, Model*>::iterator> m_ittsToRemove;
+
+		// Clean models.
+		for(auto itr = m_models.begin(); itr != m_models.end(); ++itr)
+		{
+			if(std::find(m_protectedResources.begin(), m_protectedResources.end(), (*itr).first) == m_protectedResources.end())
+			{
+				m_ittsToRemove.push_back(itr);
+			}			
+		}
+		for(auto itrb = m_ittsToRemove.begin(); itrb != m_ittsToRemove.end(); ++itrb)
+		{
+			RemoveModel((*itrb)->second);
+		}
+
+		// Clear physics meshes.
+		m_physicMeshes.clear();
+
+		// Clean particles.
+		for(auto itr = m_particles.begin(); itr != m_particles.end(); ++itr)
+		{
+			for(auto itrp = (*itr).second.begin(); itrp != (*itr).second.end(); ++itrp)
+			{
+				delete (*itrp);
+			}
+		}
+		m_particles.clear();
+
+		// Clean sounds.
+		for(auto itr = m_soundAudios.begin(); itr != m_soundAudios.end(); ++itr)
+		{
+			delete (*itr).second;
+		}
+		m_soundAudios.clear();
+	
+		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
+		{
+			//std::cout << (*itr).first << std::endl;
+			m_context->m_renderer->ReleaseTexture((*itr).second);
+		}
+		m_textures.clear();
+
+		// Clear render resource references.
+		m_meshes.clear();
+
+		m_context->m_renderer->CleanResources(Render::RenderResources::RR_MATERIAL);
+
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "ResourceManager clean.");
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Models %d", m_models.size());
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Meshes %d", m_meshes.size());
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "PhysicsMeshes %d", m_physicMeshes.size());
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Effects %d", m_effects.size());
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Textures %d", m_textures.size());
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Sounds %d", m_soundAudios.size());
+		m_context->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Particles %d", m_particles.size());
+	}
+
 	void ResourceManager::RemoveModel(Model* p_model)
 	{
 		// Remove rendering meshes.
-		if(p_model->m_meshes[0] != nullptr)
-		{
-			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetVertexBuffer());
-			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetElementBuffer());
-		}
-
-		if(p_model->m_meshes[1] != nullptr)
-		{
-			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetVertexBuffer());
-			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetElementBuffer());
-		}
+		m_context->m_renderer->RemoveMesh(p_model->m_meshes[0]);
+		m_context->m_renderer->RemoveMesh(p_model->m_meshes[1]);
 
 		// Remove physics meshes.
 		for(auto itr = p_model->m_physicsMeshes.begin(); itr != p_model->m_physicsMeshes.end(); ++itr)
 		{
-			delete (*itr);
 			(*itr) = nullptr;
 		}
 
@@ -477,17 +531,7 @@ namespace RootEngine
 
 	void ResourceManager::RemoveRenderingMeshesFromModel(Model* p_model)
 	{
-		// Remove rendering meshes.
-		if(p_model->m_meshes[0] != nullptr)
-		{
-			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetVertexBuffer());
-			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetElementBuffer());
-		}
-
-		if(p_model->m_meshes[1] != nullptr)
-		{
-			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetVertexBuffer());
-			m_context->m_renderer->ReleaseBuffer(p_model->m_meshes[0]->GetElementBuffer());
-		}
+		m_context->m_renderer->RemoveMesh(p_model->m_meshes[0]);
+		m_context->m_renderer->RemoveMesh(p_model->m_meshes[1]);
 	}
 }

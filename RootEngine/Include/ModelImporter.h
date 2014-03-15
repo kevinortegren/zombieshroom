@@ -29,7 +29,7 @@ namespace RootEngine
 	struct Model
 	{
 		Render::MeshInterface* m_meshes[2];
-		std::vector<Physics::PhysicsMeshInterface*> m_physicsMeshes;
+		std::vector<std::shared_ptr<Physics::PhysicsMeshInterface>> m_physicsMeshes;
 #ifndef COMPILE_LEVEL_EDITOR
 		RootEngine::RootAnimation::AnimationInterface* m_animation;
 #endif

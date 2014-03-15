@@ -57,6 +57,8 @@ namespace RootForce
 	{
 	public:
 		
+		QuadTree();
+		~QuadTree();
 		// Create a quad tree bound by an entity group.
 		void Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName);
 

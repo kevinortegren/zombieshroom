@@ -84,6 +84,18 @@ namespace Render
 		glSamplerParameteri(m_samplerObjectFloat, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 
+	void ShadowDevice::Clear()
+	{
+		// Deconstruct the job batch.
+		for(auto itr = m_shadowJobs.begin(); itr != m_shadowJobs.end(); ++itr)
+		{
+			(*itr)->~ShadowJob();
+		}
+
+		m_shadowJobAllocator.Clear();
+		m_shadowJobs.clear();	
+	}
+
 	void ShadowDevice::AddShadowcaster( const Render::Shadowcaster& p_shadowcaster, int p_index)
 	{
 		if(p_index > RENDER_MAX_SHADOWCASTERS)

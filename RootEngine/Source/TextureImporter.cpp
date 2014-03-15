@@ -18,19 +18,31 @@ namespace RootEngine
 	{
 		Render::TextureInterface* texture = m_renderer->CreateTexture();
 
-		if (texture->Load(p_fileName)) 
+		if (texture->Load(p_fileName))
+		{
 			return texture;
+		}
 		else
+		{
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Failed to load texture. Releasing.. %s", p_fileName.c_str());
+			m_renderer->ReleaseTexture(texture);
 			return nullptr;
+		}
 	}
 
 	Render::TextureInterface* TextureImporter::LoadCubeTexture( const std::string p_fileName )
 	{
 		Render::TextureInterface* texture = m_renderer->CreateTexture();
 
-		if (texture->LoadCubeMap(p_fileName)) 
+		if (texture->LoadCubeMap(p_fileName))
+		{
 			return texture;
+		}
 		else
+		{
+			m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Failed to load texture. Releasing.. %s", p_fileName.c_str());
+			m_renderer->ReleaseTexture(texture);
 			return nullptr;
+		}
 	}
 }

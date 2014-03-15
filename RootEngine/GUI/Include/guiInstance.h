@@ -96,6 +96,8 @@ namespace RootEngine
 			std::vector<WebViewImpl*> m_viewBuffer;
 			std::mutex m_loadListMutex;
 			std::vector<std::pair<WebViewImpl*,Awesomium::WebURL>> m_loadList;
+			std::mutex m_destroyListMutex;
+			std::vector<WebViewImpl*> m_destroyList;
 			std::atomic_bool m_shouldTerminate;
 			std::thread m_thread;
 			SDL_GLContext m_glContext;

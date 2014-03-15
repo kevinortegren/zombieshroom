@@ -130,6 +130,7 @@ namespace RootForce
 		g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_sharedSystems.m_respawnSystem);
 
 		m_currentState = GameStates::Menu;
+
 	}
 
 	Main::~Main() 

@@ -1091,6 +1091,41 @@ namespace Render
 #endif
 	}
 
+	void GLRenderer::ClearJobs()
+	{
+		// Deconstruct the job batch.
+		for(auto itr = m_jobs.begin(); itr != m_jobs.end(); ++itr)
+		{
+			(*itr)->~RenderJob();
+		}
+
+		for(auto itr = m_forwardJobs.begin(); itr != m_forwardJobs.end(); ++itr)
+		{
+			(*itr)->~RenderJob();
+		}
+
+		m_allocator.Clear();
+		m_jobs.clear();
+		m_forwardJobs.clear();
+
+		m_shadowDevice.Clear();
+	}
+
+	void GLRenderer::CleanResources(unsigned p_flag)
+	{
+		m_resources.Clean(p_flag);
+	}
+
+	void GLRenderer::RemoveMesh(MeshInterface* p_mesh)
+	{
+		m_resources.RemoveMesh(p_mesh);
+	}
+
+	void GLRenderer::RemoveVAO(VertexAttributesInterface* p_vao)
+	{
+		m_resources.RemoveVAO(p_vao);
+	}
+
 	void GLRenderer::FreeParticleSystem( ParticleSystemInterface* p_particleSys )
 	{
 		m_particles.Free((ParticleSystem*)p_particleSys);
@@ -1100,7 +1135,6 @@ namespace Render
 	{
 		return m_lighting.GetDirectionalLight();
 	}
-
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)

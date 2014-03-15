@@ -14,8 +14,8 @@ namespace RootForce
 	{
 	public:
 		WorldSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
-			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext), m_showDebug(false) {}
-
+			: ECS::VoidSystem(p_world), m_engineContext(p_engineContext), m_showDebug(false), m_staticMesh(nullptr) {}
+		~WorldSystem();
 #ifndef COMPILE_LEVEL_EDITOR
 		void LoadWorld(const std::string& p_worldName);
 		void CreatePlayerCamera();
