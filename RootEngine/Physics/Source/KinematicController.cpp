@@ -23,13 +23,12 @@ void KinematicController::RemovePlayer()
 {
 	if(m_activated)
 		m_dynamicWorld->removeCollisionObject(m_ghostObject);
-	delete m_motionState;
+	
 	delete m_ghostObject->getCollisionShape();
 	delete m_ghostObject;
 }
 
-void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices, 
-							float* p_vertexBuffer, int p_vertexStride, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
+void KinematicController::Init( btDiscreteDynamicsWorld* p_world, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight )
 {
 	m_dynamicWorld = p_world;
 	m_heightOffset = p_modelHeight / 2.0f; //cleanup
@@ -38,30 +37,18 @@ void KinematicController::Init( btDiscreteDynamicsWorld* p_world,int p_numTriang
 	m_mass = p_mass;
 	m_activated = true;
 	//Shape
-	btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(p_numTriangles, p_indexBuffer, p_indexStride, p_numVertices , (btScalar*) p_vertexBuffer, p_vertexStride);
-	btConvexShape* objectMeshShape = new btConvexTriangleMeshShape(indexVertexArray);
-	//Cull unneccesary vertices to improve performance 
-	btShapeHull* objectHull = new btShapeHull(objectMeshShape);
-	btScalar margin = objectMeshShape->getMargin();
-	objectHull->buildHull(margin);
-	btConvexHullShape* simplifiedObject = new btConvexHullShape();
-	for(int i = 0; i < objectHull->numVertices(); i++)
-	{
-		simplifiedObject->addPoint(objectHull->getVertexPointer()[i]);
-	}
-	simplifiedObject->recalcLocalAabb();
+	
 	//End shape
 	
 	
 	//Set Inertia
 	btVector3 fallInertia =  btVector3(0,0,0);
-	simplifiedObject->calculateLocalInertia(p_mass,fallInertia);
 	//Set startpos and start rotation and bind them to a motionstate
 	btTransform startTransform;
 	startTransform.setIdentity();
 	startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 	startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
-	m_motionState = new btDefaultMotionState(startTransform);
+	
 
 	btCapsuleShape* capsuleShape = new btCapsuleShape(0.8f, 2.5f);
 	//btSphereShape* capsuleShape = new btSphereShape(2);
