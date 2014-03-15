@@ -28,13 +28,10 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 
 void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
-	if (p_entity->m_id != -1)
-	{
-		m_entitiesToBeRemoved.insert(p_entity);
+	m_entitiesToBeRemoved.insert(p_entity);
 
-		// Delete components at cleanup stage.
-		RemoveAllComponents(p_entity);
-	}
+	// Delete components at cleanup stage.
+	RemoveAllComponents(p_entity);
 }
 
 ECS::ComponentAllocator* ECS::EntityManager::GetAllocator()
@@ -63,25 +60,17 @@ std::vector<std::pair<unsigned int, ECS::ComponentInterface*>> ECS::EntityManage
 
 void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 {
-	if (p_entity->m_id != -1)
+	for(unsigned i = 0; i < m_components.size(); ++i)
 	{
-		for(unsigned i = 0; i < m_components.size(); ++i)
+		if(p_entity->m_id < (int)m_components[i].size())
 		{
-			if(p_entity->m_id < (int)m_components[i].size())
+			if(m_components[i][p_entity->m_id] != nullptr)
 			{
-				if(m_components[i][p_entity->m_id] != nullptr)
-				{
-					// Push the type of component and the given entity.
-					m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(i, p_entity->GetId()));
-				}
+				// Push the type of component and the given entity.
+				m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(i, p_entity->GetId()));
 			}
 		}
-
-		//p_entity->m_flag = 0;
-
-		// Remove components from systems belonging to the entity.
-		//m_systemManager->RemoveEntityFromSystems(p_entity);	
-	}
+	}	
 }
 
 std::vector<ECS::ComponentInterface*>* ECS::EntityManager::GetComponentList(int p_typeId)
@@ -133,7 +122,6 @@ void ECS::EntityManager::CleanUp()
 		// Null the component at the given slot.
 		m_components[(*itr).first][(*itr).second] = nullptr;
 	}
-
 	m_componentsToBeRemoved.clear();
 
 	for(auto itr = m_entitiesToBeRemoved.begin(); itr != m_entitiesToBeRemoved.end(); ++itr)
