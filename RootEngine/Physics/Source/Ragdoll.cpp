@@ -23,15 +23,20 @@ namespace Ragdoll
 	void Ragdoll::Deactivate()
 	{
 		//Remove bodies from world, 
+		for(int i = 0; i < m_constraintCounter; i++)
+		{
+			m_dynamicWorld->removeConstraint(m_joints[i]);
+			delete m_joints[i];
+		}
 		for(int i = 0; i < BodyPart::TOTAL_BONE_AMUNT ; i++)
 		{
 			m_bodies[i]->clearForces();
 			m_dynamicWorld->removeRigidBody(m_bodies[i]);
+			delete m_bodies[i]->getMotionState();
+			delete m_bodies[i]->getCollisionShape();
+			delete m_bodies[i];
 		}
-		for(int i = 0; i < m_constraintCounter; i++)
-		{
-			m_dynamicWorld->removeConstraint(m_joints[i]);
-		}
+		
 	}
 
 
