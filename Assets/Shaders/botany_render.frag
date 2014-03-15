@@ -42,7 +42,7 @@ void main()
 		ambient = g_GrassAmbient;
 
 		// Set diffuse color.
-		diffuse = vec4(color.rgb, 0.1);
+		diffuse = vec4(color.rgb, 0.0);
 
 		// Store normals.
 		vec3 normal = normalize(vert_normal1);    

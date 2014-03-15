@@ -10,7 +10,7 @@ extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
-	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName)
+	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName, bool p_clear)
 	{
 		if(m_root != nullptr)
 			delete m_root;
@@ -194,9 +194,13 @@ namespace RootForce
 
 		m_root = new QuadNode(quadTreeBounds);
 
-		m_vertices.clear();
-		m_boundsPolygons.clear();
-		m_sizes.clear();
+		if(p_clear)
+		{
+			m_vertices.clear();
+			m_boundsPolygons.clear();
+			m_sizes.clear();
+		}
+
 	}
 
 	void QuadTree::BeginDivide(unsigned int p_polygonsPerNode, bool p_splitPolygons, bool p_removeOrigionalEntities)

@@ -214,7 +214,9 @@ namespace RootForce
 
 	void IngameState::Enter()
 	{
-		//m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
+		g_world->GetEntityManager()->CleanUp();
+
+		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
 #ifndef _DEBUG
 		BotanyTextures textures;
@@ -232,8 +234,6 @@ namespace RootForce
 		//m_sharedSystems.m_worldSystem->SubdivideTree();	
 #endif
 		
-		g_world->GetEntityManager()->CleanUp();
-
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
 

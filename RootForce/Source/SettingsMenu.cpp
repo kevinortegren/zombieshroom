@@ -120,21 +120,33 @@ namespace RootForce
 		{
 			float factor = 6.0f;
 			if(p_value.compare("low") == 0)
-				factor = 4.0f;
+				factor = 1.0f;
 			else if(p_value.compare("medium") == 0)
-				factor = 2.0f;
+				factor = 4.0f;
 			if(m_chatSystem)
 				m_chatSystem->InjectEvent("botany factor " + std::to_string(factor));
 		}
 		else if(p_key.compare("settings-shadows") == 0)
 		{
-			float factor = 1;
-			if(p_value.compare("low") == 0)
-				factor = 0.25f;
-			else if(p_value.compare("medium") == 0)
-				factor = 0.5f;
 			if(m_chatSystem)
-				m_chatSystem->InjectEvent("render shadow " + std::to_string(factor==1));
+			{
+				if(p_value.compare("low") == 0)
+				{
+					m_chatSystem->InjectEvent("r l ssao " + std::to_string(0));
+					m_chatSystem->InjectEvent("render shadow " + std::to_string(0));
+				}
+				else if(p_value.compare("medium") == 0)
+				{
+					m_chatSystem->InjectEvent("r l ssao " + std::to_string(0));
+					m_chatSystem->InjectEvent("render shadow " + std::to_string(1));
+
+				}
+				else if(p_value.compare("high") == 0)
+				{
+					m_chatSystem->InjectEvent("r l ssao " + std::to_string(1));
+					m_chatSystem->InjectEvent("render shadow " + std::to_string(1));
+				}
+			}			
 		}
 		else if(p_key.compare("settings-water") == 0)
 		{

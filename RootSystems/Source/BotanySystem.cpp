@@ -35,7 +35,7 @@ namespace RootForce
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_terrainTexture, Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
 	
-		m_quadTree.Initialize(m_engineContext, m_world, "Grass", "Painted_Split");
+		m_quadTree.Initialize(m_engineContext, m_world, "Grass", "Painted_Split", false);
 		Divide();
 
 		if(!m_initialized)
@@ -267,6 +267,7 @@ namespace RootForce
 		{	
 			std::getline(*p_ss, value, ' ');
 			SetGrassFactor((float)atof(value.c_str()));
+			Reconstruct();
 		}
 		else if(module == "show" || module == "s")
 		{	

@@ -23,7 +23,7 @@ namespace RootForce
 		CreatePlayerCamera();
 
 		// Put the static entities into a spatial quad tree.
-		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split");
+		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split", true);
 
 		// Adds static entities.
 		AddStaticEntitiesToPhysics();
