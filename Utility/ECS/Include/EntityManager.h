@@ -37,6 +37,9 @@ namespace ECS
 		template<class T> 
 		T* CreateComponent(Entity* p_entity)
 		{
+			if(p_entity == nullptr)
+				return nullptr;
+
 			assert(Component<T>::GetTypeId() != UINT_MAX);
 
 			// Allocate component.
@@ -67,6 +70,9 @@ namespace ECS
 		template<class T> 
 		void RemoveComponent(Entity* p_entity)
 		{
+			if(p_entity == nullptr)
+				return;
+
 			// Make sure the entity exist within the component list range.
 			if((size_t) p_entity->m_id >= m_components[Component<T>::GetTypeId()].size())
 				return;
@@ -92,6 +98,9 @@ namespace ECS
 		template<class T>
 		T* GetComponent(Entity* p_entity)
 		{
+			if(p_entity == nullptr)
+				return nullptr;
+
 			// Make sure the entity exist within the component list range.
 			if(p_entity->m_id >= (int)m_components[Component<T>::GetTypeId()].size() || p_entity->m_id == -1)
 				return nullptr;
