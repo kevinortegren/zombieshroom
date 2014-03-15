@@ -543,23 +543,31 @@ namespace RootForce
 					// Only remote clients need to handle this message. Local ones have already set spawnPoint->Claimed in AbilityRespawnSystem.
 					if(clientComponent->IsRemote)
 					{
-						AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(FindEntity(g_networkEntityMap, m.AbilitySpawnPointID));
-						assert(spawnPoint);
-						spawnPoint->Claimed = m.User;
-
-						ECS::Entity* player = RootForce::Network::FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-					
-						// Don't set stuff on entities that don't exist.
-						if (player)
+						if (ClientState::IsConnected(clientComponent->State) ||
+							clientComponent->State == ClientState::AWAITING_SPAWN_POINT)
 						{
-							TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
-							assert(tryPickup);
-							tryPickup->TryPickup = false;
+							AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(FindEntity(g_networkEntityMap, m.AbilitySpawnPointID));
+							assert(spawnPoint);
+							spawnPoint->Claimed = m.User;
+
+							ECS::Entity* player = RootForce::Network::FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+					
+							// Don't set stuff on entities that don't exist.
+							if (player)
+							{
+								TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+								assert(tryPickup);
+								tryPickup->TryPickup = false;
 							
+							}
+							else
+							{
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Tried to set TryPickup on a null player.");
+							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Tried to set TryPickup on a null player.");
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityClaimedBy received in an invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
