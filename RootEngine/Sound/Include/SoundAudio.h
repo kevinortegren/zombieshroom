@@ -52,6 +52,9 @@ namespace RootEngine
 			virtual bool Is3D() = 0;
 			virtual void PlayOnce3D(float p_volume, glm::vec3 p_position, float p_minRange, float p_maxRange) = 0;
 			//virtual void PlayOnce2D(float p_volume) = 0;
+
+			virtual ~SoundAudioInterface(){};
+
 		};
 
 		class SoundAudio : public SoundAudioInterface

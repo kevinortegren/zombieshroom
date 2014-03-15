@@ -240,6 +240,11 @@ namespace Render
 		return m_perTechniqueBuffer;
 	}
 
+	Technique::~Technique()
+	{
+
+	}
+
 	std::shared_ptr<Technique> Effect::CreateTechnique(RendererInterface* p_renderer)
 	{
 		auto technique = std::shared_ptr<Technique>(new Technique);
@@ -255,4 +260,15 @@ namespace Render
 	{
 		return m_techniques;
 	}
+
+	Effect::Effect()
+	{
+
+	}
+
+	Effect::~Effect()
+	{
+
+	}
+
 }

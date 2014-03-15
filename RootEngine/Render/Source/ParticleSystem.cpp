@@ -97,6 +97,16 @@ namespace Render
 		return m_meshes[m_currentVB];
 	}
 
+	ParticleSystem::ParticleSystem()
+	{
+
+	}
+
+	ParticleSystem::~ParticleSystem()
+	{
+
+	}
+
 	ParticleSystemHandler::ParticleSystemHandler()
 		: m_particleSystemsCount(0)
 	{

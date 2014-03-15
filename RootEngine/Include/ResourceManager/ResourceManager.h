@@ -58,9 +58,14 @@ namespace RootEngine
 		virtual Render::EffectInterface*			GetEffect(std::string p_handle) = 0;
 		virtual Render::TextureInterface*			GetTexture(std::string p_handle) = 0;
 
+		virtual void AddProtectedResource(const std::string& p_name) = 0;
+
 		// Remove methods.
+		virtual void Clean() = 0;
 		virtual void RemoveModel(Model* p_model) = 0;
 		virtual void RemoveRenderingMeshesFromModel(Model* p_model) = 0;
+
+		virtual ~ResourceManagerInterface(){};
 	};
 
 	class ResourceManager : public ResourceManagerInterface
@@ -104,12 +109,17 @@ namespace RootEngine
 
 		const std::string& GetWorkingDirectory();
 
+		void AddProtectedResource(const std::string& p_name);
+
 		// Remove methods.
+		void Clean();
 		void RemoveModel(Model* p_model);
 		void RemoveRenderingMeshesFromModel(Model* p_model);
 
 	private:
 		// Resources owned by the resource manager.
+		std::vector<std::string> m_protectedResources;
+
 		std::map<std::string, Model*> m_models;
 		std::map<std::string, std::vector<ParticleSystemStruct*>> m_particles;
 		std::map<std::string, Sound::SoundAudioInterface*> m_soundAudios;

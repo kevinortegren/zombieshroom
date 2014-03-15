@@ -15,16 +15,20 @@ namespace RootForce
 		*/
 		struct NetworkComponent : public ECS::Component<NetworkComponent>
 		{
+			static const int MAXIMUM_STRIKE_COUNT = 1;
+
 			typedef std::map<UserActionKey_t, SequenceID_t> SequenceIDMap;
 			static SequenceIDMap s_sequenceIDMap;
 
 			NetworkEntityID ID;
+			unsigned int DeletionStrikeCount; // Should not be synced. This is used locally on clients to determine if this entity is stale and doesn't exist on the server.
 			
 			NetworkComponent()
 			{
 				ID.UserID = ReservedUserID::NONE;
 				ID.ActionID = ReservedActionID::NONE;
 				ID.SequenceID = ReservedSequenceID::NONE;
+				DeletionStrikeCount = 0;
 			}
 
 			/*

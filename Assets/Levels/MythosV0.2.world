@@ -1932,7 +1932,7 @@
     - Key: GrassBillboard
       Value: grassStrawBillboard
     - Key: GrassDiffuse
-      Value: GrassStraw
+      Value: Grass
     - Key: GrassTranslucency
       Value: grass_translucency
     - Key: Water

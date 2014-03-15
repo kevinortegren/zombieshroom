@@ -77,8 +77,11 @@ namespace RootEngine
 			virtual void InjectMouseMove(int p_x, int p_y) = 0;
 			virtual void InjectMouseWheel(int p_x, int p_y) = 0;
 
+			virtual ~WebView(){};
+
 			virtual bool GetShouldResize() const = 0;
 			virtual void SetShouldResize(bool p_shouldResize) = 0;
+
 		};
 
 		// Used by the guiSystem to establish communications between Awesomium::WebView and the program

@@ -239,16 +239,26 @@ namespace Physics
 			else if (userPointer->m_type == PhysicsType::TYPE_DYNAMIC || (userPointer->m_type == PhysicsType::TYPE_ABILITY && userPointer->m_externalControlled == false))
 			{
 				//unsigned int removedIndex = userPointer->m_vectorIndex;
+
+				if (m_dynamicObjects.at(removedIndex) && m_dynamicObjects.at(removedIndex)->getMotionState())
+				{
+					delete m_dynamicObjects.at(removedIndex)->getMotionState();
+				}
+				if(m_dynamicObjects.at(removedIndex) && m_dynamicObjects.at(removedIndex)->getCollisionShape())
+				{
+					btCollisionShape* temp = m_dynamicObjects.at(removedIndex)->getCollisionShape();
+					delete temp;
+				}
 				m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
 				delete m_dynamicObjects.at(removedIndex);
+
 				m_dynamicObjects.erase(m_dynamicObjects.begin() + removedIndex);
-			
+
 				delete userPointer;
 				m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
 
 				for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
 				{
-
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE && m_userPointer.at(i)->m_externalControlled == false)
 					{
@@ -464,7 +474,7 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
+		
 		ShapeStruct temp;
 		temp.m_modelHandle = p_modelHandle;
 		temp.m_scale = p_scale;
@@ -480,7 +490,7 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
-
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
 			return;
@@ -641,8 +651,7 @@ namespace Physics
 	int* RootPhysics::AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::map<void*, RootForce::CollisionInfo>* p_collisions)
 	{
 		KinematicController* player = new KinematicController();
-		player->Init(m_dynamicWorld, 0, 0, 3*sizeof(int), 
-			0 , (btScalar*) 0, 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
+		player->Init(m_dynamicWorld,  p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 		m_playerObjects.push_back(player);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex =  m_playerObjects.size()-1;

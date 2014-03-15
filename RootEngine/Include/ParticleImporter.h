@@ -46,7 +46,7 @@ namespace RootEngine
 		ParticleImporter(RootEngine::GameSharedContext* p_context);
 		~ParticleImporter();
 
-		std::vector<ParticleSystemStruct*>* LoadParticleSystem(const std::string p_fileName);
+		std::vector<ParticleSystemStruct*> LoadParticleSystem(const std::string p_fileName);
 
 	private:
 		RootEngine::GameSharedContext* m_context;

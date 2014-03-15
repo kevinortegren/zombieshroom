@@ -10,6 +10,9 @@ namespace RootEngine
 		{
 			m_workingSetMiB = m_workingSetKiB = m_workingSetB = m_peakSetMiB = m_peakSetKiB = m_peakSetB = 0;
 		}
+		size_t m_privateSetMiB;
+		size_t m_privateSetKiB;
+		size_t m_privateSetB;
 		size_t m_workingSetMiB;
 		size_t m_workingSetKiB;
 		size_t m_workingSetB;
@@ -24,6 +27,7 @@ namespace RootEngine
 	public:
 		virtual void LogProcessMemoryInfo() = 0;
 		virtual MemInfo* GetProcessMemInfo() = 0;
+		virtual ~MemoryTrackingInterface(){};
 	};
 	
 	class MemoryTracker : public MemoryTrackingInterface 

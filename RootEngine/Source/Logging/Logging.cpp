@@ -40,6 +40,7 @@ Logging::Logging() : m_enableLogging(true)
 	m_levelInfo[LogLevel::NOLEVEL]			= TagLevelInfo("NOLEVEL    ", true);
 	m_levelInfo[LogLevel::HELP_PRINT]		= TagLevelInfo("HELP_PRINT ", true);
 	m_levelInfo[LogLevel::IDENTIFY_PRINT]   = TagLevelInfo("IDENTIFY   ", true);
+
 #endif // _DEBUG
 }
 
@@ -92,6 +93,7 @@ std::string Logging::GetTimeString( int p_time )
 //////////////////////////////////////////////////////////////////////////
 void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
+
 #ifdef _DEBUG
 	va_list args;
 	va_start (args, p_format);

@@ -23,14 +23,18 @@ namespace RootForce
 
 		void CheckNrOfArgs(lua_State* p_luaState, int p_expectedNrOfArgs, std::string p_func, int p_line)
 		{
+			lua_Debug ar;
+			lua_getstack(p_luaState, 1, &ar);
+			lua_getinfo(p_luaState, "Sl", &ar);
+
 			int nargs = lua_gettop(p_luaState);
 			if(nargs > p_expectedNrOfArgs)
 			{
-				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::NON_FATAL_ERROR, "Lua Error: Too many arguments when calling C function %s at line %s!", p_func.c_str(), std::to_string(p_line).c_str());
+				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::NON_FATAL_ERROR, "Lua Error: Too many arguments when calling C function %s at line %s! (%s:%d)", p_func.c_str(), std::to_string(p_line).c_str(), ar.short_src, ar.currentline);
 			}
 			else if(nargs < p_expectedNrOfArgs)
 			{
-				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Lua Error: Too few arguments when calling C function %s at line %s!", p_func.c_str(), std::to_string(p_line).c_str());
+				g_engineContext.m_logger->LogText(LogTag::SCRIPT, LogLevel::FATAL_ERROR, "Lua Error: Too few arguments when calling C function %s at line %s! (%s:%d)", p_func.c_str(), std::to_string(p_line).c_str(), ar.short_src, ar.currentline);
 				luaL_argerror(p_luaState, nargs, "Too few arguments!");
 			}
 		}

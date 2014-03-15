@@ -16,7 +16,6 @@ namespace RootForce
 
 		// Parse ambient data.
 		glm::vec4 ambient = m_world->GetStorage()->GetValueAsVec4("Ambient");
-		//glm::vec4 ambient = glm::vec4(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
@@ -36,6 +35,9 @@ namespace RootForce
 
 	void WorldSystem::BuildStaticShadowMesh()
 	{
+		if(m_staticMesh != nullptr)
+			g_engineContext.m_renderer->RemoveMesh(m_staticMesh);
+
 		ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
 
 		std::vector<Render::Vertex1P> vertices;
@@ -286,11 +288,15 @@ namespace RootForce
 
 	void WorldSystem::Process()
 	{	
-		Render::ShadowJob job;
-		job.m_technique = Render::ShadowTechnique::SHADOW_OPAQUE;
-		job.m_mesh = m_staticMesh;
+		if(m_staticMesh != nullptr)
+		{
+			Render::ShadowJob job;
+			job.m_technique = Render::ShadowTechnique::SHADOW_OPAQUE;
+			job.m_mesh = m_staticMesh;
 
-		g_engineContext.m_renderer->AddShadowJob(job);
+			g_engineContext.m_renderer->AddShadowJob(job);
+		}
+	/*
 #ifndef COMPILE_LEVEL_EDITOR
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
@@ -314,6 +320,7 @@ namespace RootForce
 			m_engineContext->m_renderer->AddRenderJob(job);
 		}
 #endif
+		*/
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)
@@ -325,5 +332,10 @@ namespace RootForce
 	{
 		return &m_quadTree;
 	}
+
+	WorldSystem::~WorldSystem()
+	{
+	}
+
 }
 

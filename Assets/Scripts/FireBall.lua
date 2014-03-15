@@ -12,6 +12,7 @@ FireBall.crosshair = "";
 function FireBall.OnLoad()
 	ResourceManager.LoadParticle("SmockeochElden");
 	ResourceManager.LoadScript("FireBallExplosion");
+	ResourceManager.LoadSound("fireloop.wav", 0x00400012);
 	FireBallExplosion.OnLoad();
 end
 
@@ -44,6 +45,7 @@ function FireBall.OnCreate (userId, actionId)
 	local colRespComp = CollisionResponder.New(self);
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "FireBall");
+	local soundable = Soundable.New(self);
 	--Setting stuff
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
@@ -56,10 +58,15 @@ function FireBall.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
 
+	soundable:SetSound("fireloop.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	soundable:SetRange(10.0, 100.0);
+	soundable:SetVolume(1.0);
+	soundable:Play();
+
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "SmockeochElden");
 		local pointlightComp = PointLight.New(self);
-		pointlightComp:SetColor(Vec4.New(0.2, 0.05, 1.0, 1.0));
+		pointlightComp:SetColor(Vec4.New(1.0, 0.5, 0.05, 1.0));
 		pointlightComp:SetRange(5.0);
 		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
 	end

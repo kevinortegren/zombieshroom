@@ -29,7 +29,7 @@ namespace RootEngine
 	void MemoryTracker::UpdateMemory()
 	{
 		HANDLE hProcess;
-		PROCESS_MEMORY_COUNTERS pmc;
+		PROCESS_MEMORY_COUNTERS_EX pmc;
 
 		hProcess = GetCurrentProcess();
 		if (NULL == hProcess) 
@@ -38,11 +38,11 @@ namespace RootEngine
 			return;
 		}
 
-		if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
+		if (GetProcessMemoryInfo(hProcess,(PROCESS_MEMORY_COUNTERS *) &pmc, sizeof(pmc)))
 		{
 			if (pmc.WorkingSetSize > m_memInfo.m_max) 
 				m_memInfo.m_max = pmc.WorkingSetSize;
-
+			
 			m_memInfo.m_workingSetMiB	= pmc.WorkingSetSize / (1024 * 1024);
 			m_memInfo.m_workingSetKiB	= (pmc.WorkingSetSize - m_memInfo.m_workingSetMiB * 1024 * 1024) / 1024;
 			m_memInfo.m_workingSetB	= pmc.WorkingSetSize - m_memInfo.m_workingSetMiB * 1024 * 1024 - m_memInfo.m_workingSetKiB * 1024;
@@ -50,6 +50,10 @@ namespace RootEngine
 			m_memInfo.m_peakSetMiB = pmc.PeakWorkingSetSize / (1024 * 1024);
 			m_memInfo.m_peakSetKiB = (pmc.PeakWorkingSetSize - m_memInfo.m_peakSetMiB * 1024 * 1024) / 1024;
 			m_memInfo.m_peakSetB = pmc.PeakWorkingSetSize - m_memInfo.m_peakSetMiB * 1024 * 1024 - m_memInfo.m_peakSetKiB * 1024;
+
+			m_memInfo.m_privateSetMiB = pmc.PrivateUsage / (1024 * 1024);
+			m_memInfo.m_privateSetKiB = (pmc.PrivateUsage - m_memInfo.m_privateSetMiB * 1024 * 1024) / 1024;
+			m_memInfo.m_privateSetB   = pmc.PrivateUsage - m_memInfo.m_privateSetMiB * 1024 * 1024 - m_memInfo.m_privateSetKiB * 1024;
 			
 		}
 	}
