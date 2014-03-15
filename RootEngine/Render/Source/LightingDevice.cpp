@@ -30,6 +30,7 @@ namespace Render
 #ifndef COMPILE_LEVEL_EDITOR
 		m_unitSphere = g_context.m_resourceManager->LoadCollada("Primitives/sphere")->m_meshes[0];
 		g_context.m_resourceManager->AddProtectedResource("Primitives/sphere");
+		
 #endif
 		// TODO: Init triangle.
 

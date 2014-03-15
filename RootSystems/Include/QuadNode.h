@@ -7,7 +7,7 @@ namespace RootForce
 	public:
 		friend class QuadTree;
 		QuadNode(const AABB& p_bounds);
-
+		~QuadNode();
 		void AddChild(QuadNode* p_child);
 		const std::vector<QuadNode*>& GetChilds();
 		const AABB& GetBounds() const;

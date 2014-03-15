@@ -66,6 +66,7 @@ namespace RootEngine
 #ifndef COMPILE_LEVEL_EDITOR
 	Model* ResourceManager::LoadCollada(std::string p_path)
 	{
+		
 		if(m_models.find(p_path) == m_models.end())
 		{
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::START_PRINT, "[MODEL] Starting to load: '%s'", p_path.c_str());

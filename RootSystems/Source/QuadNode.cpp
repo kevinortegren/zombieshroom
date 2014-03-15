@@ -20,4 +20,13 @@ namespace RootForce
 	{
 		return m_childs;
 	}
+
+	QuadNode::~QuadNode()
+	{
+		for(auto itr = m_childs.begin(); itr != m_childs.end(); itr++)
+		{
+			delete (*itr);
+		}
+	}
+
 }
