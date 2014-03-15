@@ -28,6 +28,9 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 
 void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
+	if(p_entity == nullptr)
+		return;
+
 	m_entitiesToBeRemoved.insert(p_entity);
 
 	// Delete components at cleanup stage.
