@@ -61,7 +61,7 @@ void main()
         if(color.a < 0.5)
             discard;
 
-		diffuse = vec4(color.xyz,0.1);
+		diffuse = vec4(color.xyz, 0.0);
 		vec3 normal = normalize(vert_normal1);    
 		float p = sqrt(normal.z*8+8);
 		normals = normal.xy/p + 0.5;

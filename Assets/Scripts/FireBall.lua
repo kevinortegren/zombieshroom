@@ -59,7 +59,7 @@ function FireBall.OnCreate (userId, actionId)
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "SmockeochElden");
 		local pointlightComp = PointLight.New(self);
-		pointlightComp:SetColor(Vec4.New(0.2, 0.05, 1.0, 1.0));
+		pointlightComp:SetColor(Vec4.New(1.0, 0.5, 0.05, 1.0));
 		pointlightComp:SetRange(5.0);
 		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
 	end
