@@ -454,7 +454,7 @@ namespace RootForce
 				- Components
 			Where components are deserialized differently depending on their type. See DeserializeComponent for more information.
 		*/
-		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self, std::map<Network::NetworkEntityID, unsigned int>& p_entityOccuranceCount);
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self, std::set<Network::NetworkEntityID>& p_occuranceSet);
 
 		/*
 			Serialize all entities in the world along with all their components that can be serialized.
