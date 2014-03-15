@@ -926,12 +926,23 @@ namespace RootForce
 					it->first.ActionID < Network::ReservedActionID::NONE &&
 					it->first.SequenceID < Network::ReservedSequenceID::NONE))
 				{
-					// Not encountered in the serialization message. Remove it locally as well.
-					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Removing local entity (%u, %u, %u) that is non-existant in serialization message.", it->first.UserID, it->first.ActionID, it->first.SequenceID);
+					// This entity doesn't exist on the server. This could be an entity that remains forever, or it could be an entity that hasn't been synced yet.
+					Network::NetworkComponent* network = p_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(it->second);
+					network->DeletionStrikeCount++;
+
+					if (network->DeletionStrikeCount > Network::NetworkComponent::MAXIMUM_STRIKE_COUNT)
+					{
+						// This entity has not existed in the last two serialization messages. It probably will never exist on the server. Remove it locally.
+						//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Removing local entity (%u, %u, %u) that is non-existant in serialization message.", it->first.UserID, it->first.ActionID, it->first.SequenceID);
 					
-					p_world->GetEntityManager()->RemoveEntity(it->second);
-					g_networkDeletedList.push_back(it->first);
-					it = p_map.erase(it);
+						p_world->GetEntityManager()->RemoveEntity(it->second);
+						g_networkDeletedList.push_back(it->first);
+						it = p_map.erase(it); 
+					}
+					else
+					{
+						it++;
+					}
 				}
 				else
 				{
