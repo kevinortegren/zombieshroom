@@ -43,7 +43,7 @@ function Homing.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "Homing");
 
-	TimerEntity.StartTimer(userId, actionId, Homing.duration, "Homing", "OnDestroy", self);
+	
 
 	local dakComp = DamageAndKnockback.New(self, Homing.currentDamage , Homing.currentKnockback);
 	--Setting stuff
@@ -73,14 +73,18 @@ function Homing.OnCreate (userId, actionId)
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
 				homingComp:SetTargetEntity(entityAtAim);
+				TimerEntity.StartTimer(userId, actionId, Homing.duration, "Homing", "OnDestroy", self);
 			else
 				homingComp:SetTargetPosition(rayComp:GetHitPos());
+				TimerEntity.StartTimer(userId, actionId, 15, "Homing", "OnDestroy", self);
 			end
 		else
 			homingComp:SetTargetPosition(rayComp:GetHitPos());
+			TimerEntity.StartTimer(userId, actionId, 15, "Homing", "OnDestroy", self);
 		end
 	else
 		homingComp:SetTargetPosition(rayComp:GetHitPos());
+		TimerEntity.StartTimer(userId, actionId, 15, "Homing", "OnDestroy", self);
 	end
 	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 1, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
