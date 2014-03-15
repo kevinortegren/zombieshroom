@@ -9,6 +9,7 @@
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootSystems/Include/AbilitySpawnSystem.h>
 #include <RootSystems/Include/StatChangeSystem.h>
+#include <RootSystems/Include/SoundSystem.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -938,6 +939,15 @@ namespace RootForce
 						health->RespawnDelay = 3.0f;
 						health->LastDamageSourceID = m.LastDamageSource;
 						health->LastDamageAbilityName = m.LastDamageSourceName;
+
+						RootForce::SoundComponent* soundable = m_world->GetEntityManager()->CreateComponent<RootForce::SoundComponent>(player);
+						soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00400011);
+						soundable->m_soundChannel = g_engineContext.m_sound->CreateSoundChannel();
+						soundable->m_minDist = 1.0f;
+						soundable->m_maxDist = 50.0f;
+						soundable->m_volume = 0.3f;
+						soundable->m_play = true;
+
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
 					}
 

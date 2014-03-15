@@ -18,10 +18,12 @@
 #include <RootSystems/Include/HomingSystem.h>
 #include <RootSystems/Include/DamageAndKnockback.h>
 #include <RootSystems/Include/StatChangeSystem.h>
+#include <RootSystems/Include/Components.h>
 #include <cstring>
 
 extern RootEngine::GameSharedContext g_engineContext;
 extern RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
+extern ECS::World* g_world;
 
 namespace RootForce
 {
@@ -260,12 +262,70 @@ namespace RootForce
 			if (p_writeToBitstream)
 			{
 				p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->Name.c_str()) );
+				
+				// Serialize the storage
+				unsigned int s;
+
+				s = (unsigned int) p_c->StorageNumber.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageNumber)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, it.second);
+				}
+
+				s = (unsigned int) p_c->StorageString.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageString)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.second.c_str()));
+				}
+
+				s = (unsigned int) p_c->StorageEntity.size();
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (auto it : p_c->StorageEntity)
+				{
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(it.first.c_str()));
+					p_bs->Serialize(p_writeToBitstream, it.second.SynchronizedID);
+				}
 			}
 			else
 			{
-				RakNet::RakString s;
+				RakNet::RakString t;
+				p_bs->Serialize(p_writeToBitstream, t);
+				p_c->Name = std::string(t.C_String());
+
+				unsigned int s;
 				p_bs->Serialize(p_writeToBitstream, s);
-				p_c->Name = std::string(s.C_String());
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					float value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value);
+					p_c->InsertNumber(key.C_String(), value);
+				}
+
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					RakNet::RakString value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value);
+					p_c->InsertString(key.C_String(), value.C_String());
+				}
+
+				p_bs->Serialize(p_writeToBitstream, s);
+				for (unsigned int i = 0; i < s; ++i)
+				{
+					RakNet::RakString key;
+					Network::NetworkEntityID value;
+					p_bs->Serialize(p_writeToBitstream, key);
+					p_bs->Serialize(p_writeToBitstream, value.SynchronizedID);
+					p_c->InsertEntity(key.C_String(), value);
+				}
 			}
 		}
 
@@ -636,6 +696,15 @@ namespace RootForce
 				return false;
 			}
 
+#ifdef _DEBUG
+			// Make sure the components/flag for the entity is valid.
+			if (!AssertEntityValid(p_entityManager, p_entity))
+			{
+				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Serialization error. Component/Flag mismatch. Flag: %u. (%u, %u, %u)", p_entity->GetFlag(), it->first.UserID, it->first.ActionID, it->first.SequenceID);
+				return false;
+			}
+#endif
+
 			// Serialize the network entity ID
 			p_bs->Serialize(true, it->first);
 
@@ -664,8 +733,9 @@ namespace RootForce
 			return true;
 		}
 
+		
 
-		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self)
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self, std::map<Network::NetworkEntityID, unsigned int>& p_entityOccuranceCount)
 		{
 			Network::NetworkEntityID id;
 			RakNet::RakString scriptName;
@@ -675,6 +745,9 @@ namespace RootForce
 			if (!p_bs->Serialize(false, scriptName))
 				return nullptr;
 
+			// Increase the occurance counter.
+			p_entityOccuranceCount[id]++;
+
 			ECS::Entity* entity = nullptr;
 			Network::NetworkEntityMap::const_iterator it = p_map.find(id);
 			if (it == p_map.end())
@@ -682,13 +755,26 @@ namespace RootForce
 				// See if this entity has been destroyed before, in which case this is an out-dated deserialization message.
 				if (std::find(g_networkDeletedList.begin(), g_networkDeletedList.end(), id) == g_networkDeletedList.end())
 				{
+					// Store the next sequence ID, and set the sequence ID for the next entity to be created to the sent sequence ID.
+					Network::UserActionKey_t userActionKey = Network::NetworkComponent::GetUserActionKey(id.UserID, id.ActionID);
+					Network::SequenceID_t nextSequenceId = Network::NetworkComponent::s_sequenceIDMap[userActionKey];
+					Network::NetworkComponent::s_sequenceIDMap[userActionKey] = id.SequenceID;
+
 					// Entity doesn't exist, use the script to create it.
-					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u, Sequence: %u) with script: %s", id.UserID, id.ActionID, id.SequenceID, scriptName.C_String());
+					g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::DEBUG_PRINT, "Deserializing entity (User: %u, Action: %u, Sequence: %u) with script: \"%s\". Stored next sequence ID: %u.", id.UserID, id.ActionID, id.SequenceID, scriptName.C_String(), nextSequenceId);
 					g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->LoadScript(scriptName.C_String()), "OnCreate");
 					g_engineContext.m_script->AddParameterNumber(id.UserID);
 					g_engineContext.m_script->AddParameterNumber(id.ActionID);
 					g_engineContext.m_script->ExecuteScript();
-				
+
+					// Reset the sequence ID map to the highest sequence ID currently used.
+					Network::NetworkComponent::s_sequenceIDMap[userActionKey] = std::max(nextSequenceId, Network::NetworkComponent::s_sequenceIDMap[userActionKey]);
+
+					// Get the entity.
+					entity = Network::FindEntity(p_map, id);
+					assert(entity != nullptr);
+
+					/*
 					entity = Network::FindEntity(p_map, id);
 					// If entity is not found, assume unsynched sequence ID. Correct the sequence IDs.
 					if(entity == nullptr)
@@ -709,6 +795,7 @@ namespace RootForce
 						p_map[id] = entity;
 						p_map.erase(p_map.find(tempId));
 					}
+					*/
 				}
 				else
 				{
@@ -739,15 +826,64 @@ namespace RootForce
 				}
 			}
 
+			#ifdef _DEBUG
+			if (entity != nullptr)
+			{
+				if (!AssertEntityValid(p_entityManager, entity))
+				{
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Catastrophy: Entity flag component mismatch with flag: %u (%u, %u, %u)", entity->GetFlag(), id.UserID, id.ActionID, id.SequenceID);
+				}
+			}
+			#endif
+
 			return entity;
 		}
 
 
+		bool SortEntitiesToSerialize(ECS::Entity* p_first, ECS::Entity* p_second)
+		{
+			Network::NetworkComponent* network[2] = { g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_first),
+													  g_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(p_second)};
 
+			if (network[0]->ID.UserID < network[1]->ID.UserID)
+				return true;
+			else if (network[0]->ID.UserID > network[1]->ID.UserID)
+				return false;
+			else
+			{
+				if (network[0]->ID.ActionID < network[1]->ID.ActionID)
+					return true;
+				else if (network[0]->ID.ActionID > network[1]->ID.ActionID)
+					return false;
+				else
+				{
+					if (network[0]->ID.SequenceID < network[1]->ID.SequenceID)
+						return true;
+					else if (network[0]->ID.SequenceID > network[1]->ID.SequenceID)
+						return false;
+					else
+					{
+						// No two entities should have the same ID!
+						return p_first->GetId() < p_second->GetId();
+					}
+				}
+			}
+		}
 
 		void SerializeWorld(RakNet::BitStream* p_bs, ECS::World* p_world, const Network::NetworkEntityMap& p_map)
 		{
+			// Get all the entities with network components and sort them on UserID, ActionID and SequenceID (in that order).
 			std::vector<ECS::Entity*> entities = p_world->GetEntityManager()->GetAllEntities();
+			for (size_t i = 0; i < entities.size();)
+			{
+				Network::NetworkComponent* network = p_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(entities[i]);
+				if (network == nullptr)
+					entities.erase(entities.begin() + i);
+				else
+					i++;
+			}
+
+			std::sort(entities.begin(), entities.end(), SortEntitiesToSerialize);
 			
 			// Write the number of serializable entities.
 			int count = 0;
@@ -773,10 +909,36 @@ namespace RootForce
 			int count;
 			p_bs->Serialize(false, count);
 
+			// Keep track of which entities have been encountered in the serialization message.
+			std::map<Network::NetworkEntityID, unsigned int> occuranceCount;
+
 			// Deserialize all entities
 			for (int i = 0; i < count; ++i)
 			{
-				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map, p_self);
+				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map, p_self, occuranceCount);
+			}
+
+			// Remove all entities that are in the network entity map but is not in the serialization message.
+			for (auto it = p_map.begin(); it != p_map.end();)
+			{
+				if (occuranceCount.find(it->first) == occuranceCount.end() &&
+					(it->first.UserID < Network::ReservedUserID::NONE &&
+					it->first.ActionID < Network::ReservedActionID::NONE &&
+					it->first.SequenceID < Network::ReservedSequenceID::NONE))
+				{
+					assert(occuranceCount.find(it->first)->second < 2);
+
+					// Not encountered in the serialization message. Remove it locally as well.
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Removing local entity (%u, %u, %u) that is non-existant in serialization message.", it->first.UserID, it->first.ActionID, it->first.SequenceID);
+					
+					p_world->GetEntityManager()->RemoveEntity(it->second);
+					g_networkDeletedList.push_back(it->first);
+					it = p_map.erase(it);
+				}
+				else
+				{
+					it++;
+				}
 			}
 		}
 	}

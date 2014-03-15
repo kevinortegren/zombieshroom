@@ -7,6 +7,7 @@
 #include <mutex>
 
 #define TILE_SIZE 128
+//#define NSIGHT
 
 class SurfaceTile
 {
@@ -27,8 +28,10 @@ public:
 		glGenBuffers(2, PBO);
 		glBindTexture(GL_TEXTURE_2D, Texture);
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TILE_SIZE, TILE_SIZE);
+#ifndef NSIGHT 
 		if(glClearTexImage)
 			glClearTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_INT, 0);
+#endif
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	~SurfaceTile()
@@ -72,8 +75,6 @@ public:
 	//int GetActiveTexture() { return m_activeTexture; }
 
 	void UpdateTexture();
-	bool GetShouldResize() const { return m_shouldResize; }
-	void SetShouldResize(bool p_shouldResize) { m_shouldResize = p_shouldResize; }
 
 protected:
 	virtual void Paint(unsigned char* src_buffer, int src_row_span, const Awesomium::Rect& src_rect, const Awesomium::Rect& dest_rect);
@@ -84,7 +85,6 @@ protected:
 	//unsigned char* buffer_;
 	std::vector<std::vector<SurfaceTile>> m_tiles;
 	int m_bpp, m_rowspan, m_width, m_height;
-	bool m_shouldResize;
 	//bool needs_update_, needs_swap;
 	//std::mutex m_needsUpdateMutex;
 };

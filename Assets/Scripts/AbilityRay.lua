@@ -4,6 +4,7 @@ AbilityRay.pushback = 0;
 AbilityRay.cooldown = 5;
 AbilityRay.chargeTime = 0.0;
 AbilityRay.channelingTime = 0.0;
+AbilityRay.crosshair = "crosshairPrecision";
 
 function AbilityRay.ChargeStart(userId, actionId)
 end

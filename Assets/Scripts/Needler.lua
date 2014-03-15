@@ -4,7 +4,7 @@ Needler.knockback = 0;
 Needler.cooldown = 1;
 Needler.charges = 15;
 Needler.duration = 60;
-Needler.crosshair = "";
+Needler.crosshair = "crosshairPrecision";
 
 function Needler.OnLoad()
 	ResourceManager.LoadParticle("magic_missile_01");

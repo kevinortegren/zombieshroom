@@ -1,6 +1,8 @@
 #include <RootSystems/Include/WorldSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/ControllerActionSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 namespace RootForce
 {
@@ -25,6 +27,9 @@ namespace RootForce
 
 		// Adds static entities.
 		AddStaticEntitiesToPhysics();
+
+		//LOL THIS IS NOT THE PLACE
+		g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00200011);
 	}
 #endif
 
@@ -248,19 +253,19 @@ namespace RootForce
 		RootForce::Camera* camera = m_world->GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
 		RootForce::Transform* cameraTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
 
-		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
-		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
-		
+		//RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
+		//RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+		//
 		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
 		camera->m_frustum = Frustum(45.0f, 1.0f, 5000.0f, aspectRatio);
 
-		cameraLookAt->m_targetTag = "AimingDevice";
-		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
-		
-		cameraThirdPerson->m_targetTag = "AimingDevice";
-		cameraThirdPerson->m_displacement = glm::vec3(0.0f, -1.0f, -2.0f);
-		cameraThirdPerson->m_distance = 8.0f;
+		//cameraLookAt->m_targetTag = "AimingDevice";
+		//cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
+		//
+		//cameraThirdPerson->m_targetTag = "AimingDevice";
+		//cameraThirdPerson->m_displacement = glm::vec3(0.0f, -1.0f, -2.0f);
+		//cameraThirdPerson->m_distance = 8.0f;
 
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);

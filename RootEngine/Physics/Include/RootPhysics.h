@@ -160,7 +160,7 @@ namespace RootEngine
 			virtual void SetPosition(int p_objectHandle, glm::vec3 p_position) = 0;
 			virtual void Move(int p_objectHandle , glm::vec3 p_position, float p_dt) = 0;
 			virtual void SetCollisionContainer(int p_objectHandle, std::map<void*, RootForce::CollisionInfo>* p_collisions) = 0;
-			virtual void SetResitution(int p_objectHandle, float p_resitution) = 0;
+			virtual void SetRestitution(int p_objectHandle, float p_resitution) = 0;
 			//virtual void SetPlayerOrientation(int p_objectHandle, float* p_playerOrientation) = 0;
 			
 
@@ -237,7 +237,7 @@ namespace RootEngine
 			void SetPosition(int p_objectHandle, glm::vec3 p_position);
 			void Move(int p_objectHandle , glm::vec3 p_position, float p_dt);
 			void SetCollisionContainer(int p_objectHandle , std::map<void*, RootForce::CollisionInfo>* p_collisions);
-			void SetResitution(int p_objectHandle, float p_resitution);
+			void SetRestitution(int p_objectHandle, float p_resitution);
 
 			void RemoveObject(int p_objectHandle);
 			void RemoveAll();

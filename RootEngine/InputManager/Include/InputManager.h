@@ -31,7 +31,6 @@ namespace RootEngine
 
 			static InputManager* GetInstance();
 		private:
-
 			KeyState::KeyState m_keyState[MAX_KEYS];
 
 			glm::ivec2 m_globMousePos;

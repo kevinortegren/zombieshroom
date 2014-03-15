@@ -94,7 +94,8 @@ namespace RootForce
 		}
 		else
 		{
-			// Connect the client.
+			// Delay a bit (to allow a restarting server to fully setup) and connect the client.
+			SDL_Delay(50);
 			m_networkContext.m_client->Connect(p_playData.ClientInfo.Address, p_playData.ClientInfo.Password, p_playData.ClientInfo.Port, true);
 
 			// Set the server peer to null on the respawn system, since we're a dedicated client.

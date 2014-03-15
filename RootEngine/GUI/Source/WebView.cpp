@@ -48,7 +48,7 @@ namespace RootEngine
 		void WebViewImpl::Update()
 		{
 			// Don't do anything if view is still loading
-			if(m_webView->IsLoading())
+			if(!m_webView || m_webView->IsLoading())
 				return;
 
 			// Bind callback functions

@@ -46,6 +46,10 @@ namespace RootForce
 			SCROLL_ABILITY_FORWARD,
 			SCROLL_ABILITY_BACKWARD,
 			SWITCH_ABILITY_FORWARD,
+			MOVE_FORWARDS_EDGE,
+			MOVE_BACKWARDS_EDGE,
+
+			END
 		};
 	}
 
@@ -56,7 +60,7 @@ namespace RootForce
 		PlayerAction::PlayerAction ActionUp;
 		std::vector<SDL_Scancode> Bindings;
 		bool Edge;
-
+		float PressedTime;
 		Keybinding();
 		Keybinding(SDL_Scancode binding, PlayerAction::PlayerAction action);
 	};
@@ -79,6 +83,11 @@ namespace RootForce
 	private:
 		void HandleAbilityPressed(float p_dt, bool p_push);
 		void HandleAbilityReleased();
+
+		struct PlayerActionData
+		{
+			float ActiveTime;
+		} m_playerActionData[PlayerAction::END];
 
 		static Network::ActionID_t s_nextActionID;
 		std::vector<Keybinding> m_keybindings;

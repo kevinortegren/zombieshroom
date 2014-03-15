@@ -21,6 +21,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Camera>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::HealthComponent>(12);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::PlayerControl>(12);
+		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::ControllerActions>(10);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Physics>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::Network::NetworkComponent>(5000);
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::LookAtBehavior>(20);
@@ -80,6 +81,10 @@ namespace RootForce
 		m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
 		m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 		m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
+
+		// Initialize the controller action system
+		m_controllerActionSystem = new RootForce::ControllerActionSystem(g_world);
+		g_world->GetSystemManager()->AddSystem<RootForce::ControllerActionSystem>(m_controllerActionSystem);
 
 		// Initialize physics systems.
 		m_physicsTransformCorrectionSystem = new RootForce::PhysicsTransformCorrectionSystem(g_world);
@@ -268,7 +273,9 @@ namespace RootForce
 		m_playerControlSystem->SetHUD(m_hud.get());
 
 		// Initialize the debug, setting the html view
+#ifdef _DEBUG
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
+#endif
 
 		// Init the hud and set one test ability for now
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
@@ -308,7 +315,9 @@ namespace RootForce
 		//Team selection stuff
 		m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 		m_displayIngameMenu = true;
+#ifdef _DEBUG
 		g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+#endif
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
 		m_ingameMenu->GetView()->SetActive(true);
 		g_engineContext.m_inputSys->LockMouseToCenter(false);
@@ -322,6 +331,9 @@ namespace RootForce
 		PlayerControl* control = g_world->GetEntityManager()->GetComponent<PlayerControl>(g_world->GetTagManager()->GetEntityByTag("Player"));
 		control->m_mouseSensitivity = g_engineContext.m_configManager->GetConfigValueAsFloat("settings-mouse-sensitivity");
 		control->m_invertMouse = g_engineContext.m_configManager->GetConfigValueAsBool("settings-mouse-invert");
+
+		g_engineContext.m_sound->PlayBackgroundSound("gustav4_2.mp3");
+		//g_engineContext->m_resourceManager->LoadSoundAudio("gustav4_2.mp3", SOUND_LOOP_NORMAL | )
 	}
 
 	void IngameState::Exit()
@@ -338,7 +350,9 @@ namespace RootForce
 
 		// Destroy the ingame GUI views.
 		g_engineContext.m_gui->DestroyView(m_hud->GetView());
+#ifdef _DEBUG
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
+#endif
 		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
 
 		// Remove all entities.
@@ -376,7 +390,10 @@ namespace RootForce
 		g_engineContext.m_renderer->Render();
 
 		g_engineContext.m_profiler->Update(p_deltaTime);
-		g_engineContext.m_debugOverlay->RenderOverlay();
+#ifdef _DEBUG
+			g_engineContext.m_debugOverlay->RenderOverlay();
+#endif
+
 		{
 			g_engineContext.m_gui->Update();
 			//Update Menu to make sure Setting changes are made in the main thread
@@ -398,6 +415,7 @@ namespace RootForce
 					if(m_displayGuiHUD)
 						g_engineContext.m_gui->Render(m_hud->GetView());
 				}
+#ifdef _DEBUG
 				{
 					PROFILE("GUI Debug", g_engineContext.m_profiler);
 
@@ -405,6 +423,7 @@ namespace RootForce
 					if(m_displayDebugHUD)
 						g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
 				}
+#endif
 			}
 		}
 
@@ -443,7 +462,7 @@ namespace RootForce
 		// Check for special keypress events.
 		if(g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_F12) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
-			m_displayGuiHUD = m_displayGuiHUD ? false : true;
+			m_displayGuiHUD = !m_displayGuiHUD;
 		}
 		
 		{
@@ -462,6 +481,11 @@ namespace RootForce
 
 			g_engineContext.m_inputSys->LockInput(m_hud->GetChatSystem()->IsFocused() || m_displayIngameMenu);
 			m_playerControlSystem->Process();
+		}
+
+		{
+			PROFILE("Controller action system", g_engineContext.m_profiler);
+			m_controllerActionSystem->Process();
 		}
 
 		if (m_networkContext.m_server != nullptr)
@@ -618,7 +642,9 @@ namespace RootForce
 		{
 			m_displayIngameMenu = true;
 			m_hud->GetView()->SetActive(false);
+#ifdef _DEBUG
 			g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+#endif
 			m_ingameMenu->GetView()->SetActive(true);
 			g_engineContext.m_inputSys->LockMouseToCenter(false);
 			m_ingameMenu->Reset();
@@ -628,7 +654,9 @@ namespace RootForce
 			m_ingameMenu->GetView()->BufferJavascript("ShowTeamSelect();");
 			m_displayIngameMenu = true;
 			m_hud->GetView()->SetActive(false);
+#ifdef _DEBUG
 			g_engineContext.m_debugOverlay->GetView()->SetActive(false);
+#endif
 			m_ingameMenu->GetView()->SetActive(true);
 			g_engineContext.m_inputSys->LockMouseToCenter(false);
 			m_ingameMenu->Reset();
@@ -639,7 +667,9 @@ namespace RootForce
 			m_ingameMenu->GetView()->SetActive(false);
 			g_engineContext.m_inputSys->LockMouseToCenter(true);
 			m_hud->GetView()->SetActive(m_displayGuiHUD);
+#ifdef _DEBUG
 			g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
+#endif
 			m_ingameMenu->Reset();
 			// Update keybindings when returning to game
 			m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());

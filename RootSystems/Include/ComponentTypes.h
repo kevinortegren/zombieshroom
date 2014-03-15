@@ -43,6 +43,7 @@ namespace RootForce
 			SCALABLE,
 			STATCHANGE,
 			KILLANNOUNCEMENT,
+			CONTROLLERACTIONS,
 		};
 	}
 }

@@ -239,16 +239,26 @@ namespace Physics
 			else if (userPointer->m_type == PhysicsType::TYPE_DYNAMIC || (userPointer->m_type == PhysicsType::TYPE_ABILITY && userPointer->m_externalControlled == false))
 			{
 				//unsigned int removedIndex = userPointer->m_vectorIndex;
+
+				if (m_dynamicObjects.at(removedIndex) && m_dynamicObjects.at(removedIndex)->getMotionState())
+				{
+					delete m_dynamicObjects.at(removedIndex)->getMotionState();
+				}
+				if(m_dynamicObjects.at(removedIndex) && m_dynamicObjects.at(removedIndex)->getCollisionShape())
+				{
+					btCollisionShape* temp = m_dynamicObjects.at(removedIndex)->getCollisionShape();
+					delete temp;
+				}
 				m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
 				delete m_dynamicObjects.at(removedIndex);
+
 				m_dynamicObjects.erase(m_dynamicObjects.begin() + removedIndex);
-			
+
 				delete userPointer;
 				m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
 
 				for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
 				{
-
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE && m_userPointer.at(i)->m_externalControlled == false)
 					{
@@ -464,7 +474,7 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
+		
 		ShapeStruct temp;
 		temp.m_modelHandle = p_modelHandle;
 		temp.m_scale = p_scale;
@@ -480,7 +490,7 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
-
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
 			return;
@@ -1069,15 +1079,15 @@ namespace Physics
 		}
 		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
-			float x,y,z, w;
+			float x,y,z,w;
 			btRigidBody* body = m_dynamicObjects.at(index);
-		
+			
 			x = p_objectOrientation[0];
 			y = p_objectOrientation[1];
 			z = p_objectOrientation[2];
 			w = p_objectOrientation[3];
-			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
-			
+			body->setWorldTransform(btTransform(btQuaternion(x,y,z,w), body->getWorldTransform().getOrigin()));
+			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Values: %f, %f, %f, %f", x, y, z, w);
 		}
 		else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
 		{
@@ -1162,12 +1172,15 @@ namespace Physics
 		
 	}
 
-	void RootPhysics::SetResitution( int p_objectHandle, float p_resitution )
+	void RootPhysics::SetRestitution( int p_objectHandle, float p_resitution )
 	{
 		if(!DoesObjectExist(p_objectHandle))
 			return;
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
-			m_dynamicObjects.at(p_objectHandle)->setRestitution(p_resitution);
+		{
+			int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+			m_dynamicObjects.at(index)->setRestitution(p_resitution);
+		}
 	}
 
 	void RootPhysics::Move( int p_objectHandle , glm::vec3 p_position, float p_dt )

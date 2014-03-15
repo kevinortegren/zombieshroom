@@ -34,7 +34,10 @@ namespace RootEngine
 		void ScriptManager::ExecuteWholeScript(std::string p_scriptPath)
 		{
 			// Execute the script
-			luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str());
+			if(luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str()))
+			{
+				g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::NON_FATAL_ERROR, lua_tostring(m_luaState, -1));
+			}
 		}
 
 		bool ScriptManager::IsFunctionDefined(const std::string& p_scriptName, const std::string& p_functionName)
@@ -63,7 +66,7 @@ namespace RootEngine
 			int error = 0;
 			if(error = lua_pcall(m_luaState, m_parameterCount, 0, 0) != 0)
 			{
-				printf("Error: %s\n", lua_tostring(m_luaState, -1));
+				g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::NON_FATAL_ERROR, lua_tostring(m_luaState, -1));
 				lua_pop(m_luaState, 1);
 			}
 
@@ -164,10 +167,9 @@ namespace RootEngine
 		int ScriptManager::LoadScript( std::string p_scriptPath )
 		{
 			// Execute the script
-
 			if (luaL_dofile(m_luaState, (m_workingDir + "Assets/Scripts/" + p_scriptPath).c_str()))
 			{
-				printf("%s\n", lua_tostring(m_luaState, -1));
+				g_context.m_logger->LogText(LogTag::SCRIPT, LogLevel::NON_FATAL_ERROR, lua_tostring(m_luaState, -1));
 				return 1;
 			}
 			return 0;
@@ -177,7 +179,6 @@ namespace RootEngine
 		{
 			return m_luaState;
 		}
-
 	}
 }
 

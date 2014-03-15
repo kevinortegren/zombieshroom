@@ -4,14 +4,15 @@ AbilityTotem.charges = 1;
 AbilityTotem.chargeTime = 0;
 AbilityTotem.channelingTime = 0;
 AbilityTotem.duration = 30;
-AbilityTotem.interval = 0.5;
-AbilityTotem.crosshair = "";
+AbilityTotem.interval = 0.25;
+AbilityTotem.crosshair = "crosshairNone";
 
 function AbilityTotem.OnLoad()
 	ResourceManager.LoadModel("TotemPole");
 	ResourceManager.LoadTexture("TotemPoleDiffuse");
 	ResourceManager.LoadTexture("TotemPoleNormal");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
+	TotemProjectile.OnLoad();
 end
 
 function AbilityTotem.ChargeStart(userId, actionId)
@@ -77,6 +78,11 @@ function AbilityTotem.OnCreate (userId, actionId)
 	end
 end
 
+function AbilityTotem.OnUpdate(self)
+	local orientation = self:GetTransformation():GetOrient();
+	orientation:Yaw(Static.GetDeltaTime() * 70);
+end
+
 function AbilityTotem.Disappear(self)
 	if Global.IsClient then
 		self:RemoveRenderable();
@@ -91,7 +97,7 @@ function AbilityTotem.Disappear(self)
 end
 
 function AbilityTotem.Fire(self)
-    Logging.Log(LogLevel.DEBUG_PRINT, "Totem is firing!");
+    --Logging.Log(LogLevel.DEBUG_PRINT, "Totem is firing!");
 
     local networkComp = self:GetNetwork();
     TotemProjectile.direction = 0;

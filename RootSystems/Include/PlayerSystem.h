@@ -75,6 +75,7 @@ namespace RootForce
 		glm::vec3 JumpDir;
 
 		float FallTime;
+		float IdleTime;
 
 		uint8_t SelectedAbility;
 		std::queue<AbilityEvent> AbilityEvents;
@@ -90,6 +91,7 @@ namespace RootForce
 			, SelectedAbility(0)
 			, WantRespawn(false)
 			, FallTime(0.0f)
+			, IdleTime(0.0f)
 		{}
 	};
 #endif
@@ -154,7 +156,7 @@ namespace RootForce
 		int Charges;
 
 		AbilityInfo()
-			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1), Crosshair("crosshair")
+			: Name(""), Cooldown(0.0f), OnCooldown(false), Charges(-1), Crosshair("crosshairNone")
 		{}
 	};
 
