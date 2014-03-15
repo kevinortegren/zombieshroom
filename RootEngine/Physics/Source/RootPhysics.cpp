@@ -651,8 +651,7 @@ namespace Physics
 	int* RootPhysics::AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::map<void*, RootForce::CollisionInfo>* p_collisions)
 	{
 		KinematicController* player = new KinematicController();
-		player->Init(m_dynamicWorld, 0, 0, 3*sizeof(int), 
-			0 , (btScalar*) 0, 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
+		player->Init(m_dynamicWorld,  p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 		m_playerObjects.push_back(player);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex =  m_playerObjects.size()-1;

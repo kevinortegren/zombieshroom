@@ -74,7 +74,7 @@ namespace RootSystems
 				animation->LowerBodyAnim.m_animClip = RootForce::AnimationClip::RAGDOLL;
 				animation->UpperBodyAnim.m_locked = false;
 				animation->LowerBodyAnim.m_locked = false;
-				m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "RAGDOLL");
+				//m_engineContext->m_logger->LogText(LogTag::ANIMATION, LogLevel::PINK_PRINT, "RAGDOLL");
 				return;
 			}
 
