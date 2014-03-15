@@ -10,7 +10,7 @@ RefractiveBall.charges = -1;
 RefractiveBall.crosshair = "";
 
 function RefractiveBall.OnLoad()
-	ResourceManager.LoadModel("PentagonSphere");
+	ResourceManager.LoadModel("HexagonSphere");
 	ResourceManager.LoadEffect("Mesh_Refractive");
 	ResourceManager.LoadSound("CC-BY3.0/plane.ogg", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	ResourceManager.LoadSound("CC-BY3.0/pop.ogg", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));

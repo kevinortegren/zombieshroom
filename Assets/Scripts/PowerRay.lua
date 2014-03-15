@@ -101,17 +101,7 @@ if entity:DoesExist() then
 			Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 		end
 	end
-
-	local hitPositionEntity = Entity.New();
-	local hitPositionNetwork = Network.New(hitPositionEntity, abilityOwnerId, abilityOwnerNetwork:GetActionId());
-	local hitPositionTransform = Transformation.New(hitPositionEntity);
-	hitPositionTransform:SetPos(entity:GetTransformation():GetPos());
-	local soundable = Soundable.New(hitPositionEntity);
-	soundable:SetSound("CC-BY3.0/qubodupElectricityDamage01.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	soundable:SetRange(10.0, 50.0);
-	soundable:SetVolume(0.6);
-	soundable:Play();
-	TimerEntity.StartTimer(userId, actionId, PowerRay.duration, "PowerRay", "StopHitSound", hitPositionEntity);
+	Static.Play3DSound("CC-BY3.0/qubodupElectricityDamage01.wav", 0.6, entity:GetTransformation():GetPos(), 10.0, 50.0);
 end
 end
 
