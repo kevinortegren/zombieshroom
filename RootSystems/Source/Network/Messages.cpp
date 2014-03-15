@@ -735,7 +735,7 @@ namespace RootForce
 
 		
 
-		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self, std::map<Network::NetworkEntityID, unsigned int>& p_entityOccuranceCount)
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self, std::set<Network::NetworkEntityID>& p_occuranceSet)
 		{
 			Network::NetworkEntityID id;
 			RakNet::RakString scriptName;
@@ -745,8 +745,8 @@ namespace RootForce
 			if (!p_bs->Serialize(false, scriptName))
 				return nullptr;
 
-			// Increase the occurance counter.
-			p_entityOccuranceCount[id]++;
+			// We have encountered this ID!
+			p_occuranceSet.insert(id);
 
 			ECS::Entity* entity = nullptr;
 			Network::NetworkEntityMap::const_iterator it = p_map.find(id);
@@ -910,24 +910,22 @@ namespace RootForce
 			p_bs->Serialize(false, count);
 
 			// Keep track of which entities have been encountered in the serialization message.
-			std::map<Network::NetworkEntityID, unsigned int> occuranceCount;
+			std::set<Network::NetworkEntityID> occuranceSet;
 
 			// Deserialize all entities
 			for (int i = 0; i < count; ++i)
 			{
-				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map, p_self, occuranceCount);
+				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map, p_self, occuranceSet);
 			}
 
 			// Remove all entities that are in the network entity map but is not in the serialization message.
 			for (auto it = p_map.begin(); it != p_map.end();)
 			{
-				if (occuranceCount.find(it->first) == occuranceCount.end() &&
+				if (occuranceSet.find(it->first) == occuranceSet.end() &&
 					(it->first.UserID < Network::ReservedUserID::NONE &&
 					it->first.ActionID < Network::ReservedActionID::NONE &&
 					it->first.SequenceID < Network::ReservedSequenceID::NONE))
 				{
-					assert(occuranceCount.find(it->first)->second < 2);
-
 					// Not encountered in the serialization message. Remove it locally as well.
 					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Removing local entity (%u, %u, %u) that is non-existant in serialization message.", it->first.UserID, it->first.ActionID, it->first.SequenceID);
 					

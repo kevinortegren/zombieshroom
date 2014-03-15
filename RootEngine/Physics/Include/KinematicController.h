@@ -11,8 +11,7 @@ class KinematicController
 public:
 	KinematicController(void);
 	~KinematicController(void);
-	void Init(btDiscreteDynamicsWorld* p_world,int p_numTriangles, int* p_indexBuffer, int p_indexStride, int p_numVertices,
-		float* p_vertexBuffer, int p_vertexStride, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight,
+	void Init(btDiscreteDynamicsWorld* p_world, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight,
 		float p_stepHeight );
 	void Deactivate();
 	void Activate();
@@ -47,7 +46,6 @@ public:
 private:
 	btDiscreteDynamicsWorld* m_dynamicWorld;
 	btPairCachingGhostObject* m_ghostObject;
-	btMotionState* m_motionState;
 	BulletCharacter* m_kinController;
 
 	bool m_hasStepped;
