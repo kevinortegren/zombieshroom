@@ -929,7 +929,7 @@ namespace RootForce
 					assert(occuranceCount.find(it->first)->second < 2);
 
 					// Not encountered in the serialization message. Remove it locally as well.
-					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Removing local entity (%u, %u, %u) that is non-existant in serialization message.", it->first.UserID, it->first.ActionID, it->first.SequenceID);
+					//g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Removing local entity (%u, %u, %u) that is non-existant in serialization message.", it->first.UserID, it->first.ActionID, it->first.SequenceID);
 					
 					p_world->GetEntityManager()->RemoveEntity(it->second);
 					g_networkDeletedList.push_back(it->first);
