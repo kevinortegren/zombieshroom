@@ -9,7 +9,7 @@ function TotemProjectile.OnLoad()
     ResourceManager.LoadModel("blowdart");
     ResourceManager.LoadTexture("blowdartDiffuse");
     ResourceManager.LoadEffect("Mesh");
-    ResourceManager.LoadParticle("Acid");
+    --ResourceManager.LoadParticle("Acid");
 end
 
 function TotemProjectile.OnCreate (userId, actionId)
@@ -33,7 +33,7 @@ function TotemProjectile.OnCreate (userId, actionId)
         renderComp:SetMaterialDiffuse("blowdartDiffuse");
         renderComp:SetMaterialEffect("Mesh");
         
-        local particleComp = ParticleEmitter.New(self, "Acid");
+        --local particleComp = ParticleEmitter.New(self, "Acid");
     end
     
     -- Setup timers
@@ -101,10 +101,12 @@ function TotemProjectile.Disappear(self)
     self:RemoveCollisionResponder();
     self:RemoveDamageAndKnockback();
 
+	--[[
     local emitter = self:GetParticleEmitter();
     if emitter ~= nil then
         self:GetParticleEmitter():SetAlive(-1.0);
     end
+	]]--
 end
 
 function TotemProjectile.OnDestroy (self)
