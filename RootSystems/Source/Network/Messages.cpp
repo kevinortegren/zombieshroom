@@ -696,12 +696,14 @@ namespace RootForce
 				return false;
 			}
 
+#ifdef _DEBUG
 			// Make sure the components/flag for the entity is valid.
 			if (!AssertEntityValid(p_entityManager, p_entity))
 			{
 				g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::FATAL_ERROR, "Serialization error. Component/Flag mismatch. Flag: %u. (%u, %u, %u)", p_entity->GetFlag(), it->first.UserID, it->first.ActionID, it->first.SequenceID);
 				return false;
 			}
+#endif
 
 			// Serialize the network entity ID
 			p_bs->Serialize(true, it->first);
@@ -733,7 +735,7 @@ namespace RootForce
 
 		
 
-		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self)
+		ECS::Entity* DeserializeEntity(RakNet::BitStream* p_bs, ECS::EntityManager* p_entityManager, Network::NetworkEntityMap& p_map, Network::UserID_t p_self, std::map<Network::NetworkEntityID, unsigned int>& p_entityOccuranceCount)
 		{
 			Network::NetworkEntityID id;
 			RakNet::RakString scriptName;
@@ -742,6 +744,9 @@ namespace RootForce
 				return nullptr;
 			if (!p_bs->Serialize(false, scriptName))
 				return nullptr;
+
+			// Increase the occurance counter.
+			p_entityOccuranceCount[id]++;
 
 			ECS::Entity* entity = nullptr;
 			Network::NetworkEntityMap::const_iterator it = p_map.find(id);
@@ -904,10 +909,32 @@ namespace RootForce
 			int count;
 			p_bs->Serialize(false, count);
 
+			// Keep track of which entities have been encountered in the serialization message.
+			std::map<Network::NetworkEntityID, unsigned int> occuranceCount;
+
 			// Deserialize all entities
 			for (int i = 0; i < count; ++i)
 			{
-				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map, p_self);
+				DeserializeEntity(p_bs, p_world->GetEntityManager(), p_map, p_self, occuranceCount);
+			}
+
+			// Remove all entities that are in the network entity map but is not in the serialization message.
+			for (auto it = p_map.begin(); it != p_map.end();)
+			{
+				assert(occuranceCount.find(it->first)->second < 2);
+				if (occuranceCount.find(it->first)->second == 0)
+				{
+					// Not encountered in the serialization message. Remove it locally as well.
+					g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Removing local entity (%u, %u, %u) that is non-existant in serialization message.", it->first.UserID, it->first.ActionID, it->first.SequenceID);
+					
+					p_world->GetEntityManager()->RemoveEntity(it->second);
+					g_networkDeletedList.push_back(it->first);
+					it = p_map.erase(it);
+				}
+				else
+				{
+					it++;
+				}
 			}
 		}
 	}

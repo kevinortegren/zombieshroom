@@ -75,13 +75,11 @@ namespace ECS
 		   if ((p_entity->GetFlag() & (1ULL << Component<T>::GetTypeId())) == 0)
 			   return;
 
- 
 			// If already removed, skip.
 			if(m_components[Component<T>::GetTypeId()][p_entity->m_id] != nullptr)
 			{
 				// Push the type of component and the given entity.
 				m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(Component<T>::GetTypeId(), p_entity->GetId()));
-
 
 			   p_entity->m_flag &= ~(1ULL << Component<T>::GetTypeId());
 
@@ -94,8 +92,11 @@ namespace ECS
 		template<class T>
 		T* GetComponent(Entity* p_entity)
 		{
+			// Make sure the entity exist within the component list range.
 			if(p_entity->m_id >= (int)m_components[Component<T>::GetTypeId()].size() || p_entity->m_id == -1)
 				return nullptr;
+
+			//Entity does not have this component. Return to avoid re-toggling.
 			if ((p_entity->GetFlag() & (1ULL << Component<T>::GetTypeId())) == 0)
 				return nullptr;
 

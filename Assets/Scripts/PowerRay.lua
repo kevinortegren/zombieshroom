@@ -104,11 +104,12 @@ if entity:DoesExist() then
 	local hitPositionTransform = Transformation.New(hitPositionEntity);
 	hitPositionTransform:SetPos(entity:GetTransformation():GetPos());
 	local soundable = Soundable.New(hitPositionEntity);
+    local networkComp = Network.New(hitPositionEntity, self:GetNetwork():GetUserId(), self:GetNetwork():GetActionId());
 	soundable:SetSound("CC-BY3.0/qubodupElectricityDamage01.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	soundable:SetRange(10.0, 50.0);
 	soundable:SetVolume(0.6);
 	soundable:Play();
-	TimerEntity.StartTimer(userId, actionId, PowerRay.duration, "PowerRay", "StopHitSound", hitPositionEntity);
+	TimerEntity.StartTimer(networkComp:GetUserId(), networkComp:GetActionId(), PowerRay.duration, "PowerRay", "StopHitSound", hitPositionEntity);
 end
 end
 
