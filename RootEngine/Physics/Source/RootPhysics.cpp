@@ -239,16 +239,26 @@ namespace Physics
 			else if (userPointer->m_type == PhysicsType::TYPE_DYNAMIC || (userPointer->m_type == PhysicsType::TYPE_ABILITY && userPointer->m_externalControlled == false))
 			{
 				//unsigned int removedIndex = userPointer->m_vectorIndex;
+
+				if (m_dynamicObjects.at(removedIndex) && m_dynamicObjects.at(removedIndex)->getMotionState())
+				{
+					delete m_dynamicObjects.at(removedIndex)->getMotionState();
+				}
+				if(m_dynamicObjects.at(removedIndex) && m_dynamicObjects.at(removedIndex)->getCollisionShape())
+				{
+					btCollisionShape* temp = m_dynamicObjects.at(removedIndex)->getCollisionShape();
+					delete temp;
+				}
 				m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
 				delete m_dynamicObjects.at(removedIndex);
+
 				m_dynamicObjects.erase(m_dynamicObjects.begin() + removedIndex);
-			
+
 				delete userPointer;
 				m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
 
 				for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
 				{
-
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE && m_userPointer.at(i)->m_externalControlled == false)
 					{
@@ -464,7 +474,7 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
+		
 		ShapeStruct temp;
 		temp.m_modelHandle = p_modelHandle;
 		temp.m_scale = p_scale;
@@ -480,7 +490,7 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
-
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
 			return;
