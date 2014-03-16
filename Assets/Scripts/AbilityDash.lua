@@ -1,5 +1,3 @@
-ACTION_CREATE = 0;
-ACTION_COLLIDE = 1;
 
 --Set table name
 AbilityDash = {};
