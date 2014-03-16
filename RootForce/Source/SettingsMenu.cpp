@@ -114,7 +114,17 @@ namespace RootForce
 		if(p_key.compare("settings-glow") == 0)
 		{
 			if(m_chatSystem)
-				m_chatSystem->InjectEvent("render glow display " + std::to_string(p_value.compare("true")==0));
+			{
+				if(p_value.compare("false") == 0)
+				{
+					m_chatSystem->InjectEvent("render glow radius " + std::to_string(0));
+				}
+				else
+				{
+					m_chatSystem->InjectEvent("render glow radius " + std::to_string(1.4));
+
+				}			
+			}
 		}
 		else if(p_key.compare("settings-grass") == 0)
 		{
