@@ -218,7 +218,6 @@ namespace RootForce
 
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
-#ifndef _DEBUG
 		BotanyTextures textures;
 		textures.m_diffuse = g_world->GetStorage()->GetValueAsString("GrassDiffuse");
 		textures.m_translucency = g_world->GetStorage()->GetValueAsString("GrassTranslucency");
@@ -232,7 +231,7 @@ namespace RootForce
 
 		// Subdivide world.
 		//m_sharedSystems.m_worldSystem->SubdivideTree();	
-#endif
+
 		
 		// Lock the mouse
 		g_engineContext.m_inputSys->LockMouseToCenter(true);
