@@ -48,7 +48,10 @@ namespace RootForce
 	void AnimationSystem::UpdateUpperBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
 	{
 		if(p_animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+		{
+			p_animation->UpperBodyAnim.m_locked = false;
 			return;
+		}
 
 		//If animation switched, start new clip
 		if(p_animation->UpperBodyAnim.m_animClip != p_animation->UpperBodyAnim.m_prevAnimClip)
@@ -91,7 +94,10 @@ namespace RootForce
 	void AnimationSystem::UpdateLowerBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
 	{
 		if(p_animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+		{
+			p_animation->LowerBodyAnim.m_locked = false;
 			return;
+		}
 
 		//If animation switched, start new clip
 		if(p_animation->LowerBodyAnim.m_animClip != p_animation->LowerBodyAnim.m_prevAnimClip)
