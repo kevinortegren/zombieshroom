@@ -1,5 +1,3 @@
-ACTION_CREATE = 0;
-ACTION_COLLIDE = 1;
 
 --Set table name
 AbilityDash = {};
@@ -32,6 +30,7 @@ function AbilityDash.ChannelingDone(time, userId, actionId)
 	
     Static.KnockBack(handle, Vec3.New(0,0.4,0)+frontVec, AbilityDash.power, 100);
     Static.Play3DSound("CC-BY3.0/jump_jack_03.wav", 1.0, casterEnt:GetTransformation():GetPos(), 10.0, 100.0);
+
 end
 
 function AbilityDash.Interrupted(time, userId, actionId)

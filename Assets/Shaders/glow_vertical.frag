@@ -46,24 +46,28 @@ float Gaussian (float x, float deviation)
 
 void main()
 {
-    /*float deviation = g_BlurFactor * 0.35;
-	deviation *= deviation;
-	float strength = 1.0 - g_BlurStrength;*/
-
     vec2 TexelCoord = gl_FragCoord.xy / vec2(g_Width * 2, g_Height * 2);	
 
     // Inverse size of Blur Sampler.
     float dy = 1.0f / textureSize(g_Glow, 0).y;
 
-    vec4 blur = texture(g_Input, TexelCoord) * g_Gauss[0];
     vec4 glow = texture(g_Glow, TexelCoord);
+    vec4 scene = texture(g_Scene, TexelCoord);
+
+    if(g_BlurRadius == 0.0)
+    {
+        frag_color = scene + glow;     
+    }
+    else
+    {
+        vec4 blur = texture(g_Input, TexelCoord) * g_Gauss[0];
     
-    for( int i = 1; i < TEXTURE_TAPS; i++ )
-	{
-		blur += texture(g_Input, TexelCoord + vec2( 0.0, PixelOffset[i] ) * dy * g_BlurRadius) * g_Gauss[i+1];
-		blur += texture(g_Input, TexelCoord - vec2( 0.0, PixelOffset[i] ) * dy * g_BlurRadius) * g_Gauss[i+1];
-	}
-    
-    blur.w = 1.0;
-	frag_color = texture(g_Scene, TexelCoord) + glow + clamp(blur, 0.0, 1.0);
+        for( int i = 1; i < TEXTURE_TAPS; i++ )
+        {
+            blur += texture(g_Input, TexelCoord + vec2( 0.0, PixelOffset[i] ) * dy * g_BlurRadius) * g_Gauss[i+1];
+            blur += texture(g_Input, TexelCoord - vec2( 0.0, PixelOffset[i] ) * dy * g_BlurRadius) * g_Gauss[i+1];
+        }
+        
+        frag_color = scene + glow + clamp(blur, 0.0, 1.0);
+    }
 }
