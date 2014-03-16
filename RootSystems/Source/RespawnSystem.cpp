@@ -41,7 +41,7 @@ namespace RootSystems
 		{
 			if(m_serverPeer != nullptr)
 			{
-				if(m_clientPeer == nullptr)
+				//if(m_clientPeer == nullptr)
 				{
 					health->IsDead = true;
 					health->RespawnDelay = 3.0f;
