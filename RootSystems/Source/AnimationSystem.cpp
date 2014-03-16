@@ -50,6 +50,7 @@ namespace RootForce
 		if(p_animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 		{
 			p_animation->UpperBodyAnim.m_locked = false;
+			p_animation->UpperBodyAnim.m_blending = false;
 			return;
 		}
 
@@ -96,6 +97,7 @@ namespace RootForce
 		if(p_animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 		{
 			p_animation->LowerBodyAnim.m_locked = false;
+			p_animation->LowerBodyAnim.m_blending = false;
 			return;
 		}
 
