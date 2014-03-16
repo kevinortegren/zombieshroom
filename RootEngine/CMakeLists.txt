@@ -19,7 +19,7 @@ include_directories(Include)
 # Check if we are compiling the editor or the game.
 if (NOT COMPILE_LEVEL_EDITOR)
 	# Add subdirectories
-	add_subdirectory(Network)
+	#add_subdirectory(Network)
 	add_subdirectory(Physics)
 	add_subdirectory(InputManager)
 	add_subdirectory(Render)
