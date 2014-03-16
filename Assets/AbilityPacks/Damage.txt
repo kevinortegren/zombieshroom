@@ -1,0 +1,8 @@
+AbilityBall
+FireBall
+PowerRay
+Homing
+MachineGun
+ExplodingShroom
+AbilityTotem
+Cannonball

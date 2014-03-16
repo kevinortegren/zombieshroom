@@ -147,11 +147,11 @@ endif()
 if (NOT COMPILE_LEVEL_EDITOR)
 	if(NOT COMPILE_RELEASE_BUILD)
 		add_custom_target(_Dependencies ALL
-			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86/Debug ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
 		)
 	else()
 		add_custom_target(_Dependencies ALL
-			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86/Release ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
 		)
 	endif()
 else()
