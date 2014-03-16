@@ -515,21 +515,24 @@ namespace RootSystems
 
 				if(!m_inMenu && action && transform)//assuming there is a health component
 				{
-					if(health->Health > 0)
+					if(health)
 					{
-						// Rotate the model and reset the angle
-						transform->m_orientation.YawGlobal(action->Angle.x);
-						action->Angle.x = 0;
+						if(health->Health > 0)
+						{
+							// Rotate the model and reset the angle
+							transform->m_orientation.YawGlobal(action->Angle.x);
+							action->Angle.x = 0;
 
-						aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
-						aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
-					}
-					else //Dead
-					{
-						aimingDeviceTransform->m_orientation.YawGlobal(action->Angle.x);
-						action->Angle.x = 0;
-						aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
-						action->Angle.y = 0;
+							aimingDeviceTransform->m_orientation.SetOrientation(transform->m_orientation.GetQuaternion());
+							aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+						}
+						else //Dead
+						{
+							aimingDeviceTransform->m_orientation.YawGlobal(action->Angle.x);
+							action->Angle.x = 0;
+							aimingDeviceTransform->m_orientation.Pitch(action->Angle.y);
+							action->Angle.y = 0;
+						}
 					}
 				}
 

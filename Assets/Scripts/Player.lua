@@ -118,7 +118,6 @@ function Player.OnTeamSelect(self, teamId)
 		self:RemovePlayerPhysics();
 		self:RemoveHealth();
 		self:RemovePhysics();
-		Collision.RemoveObjectFromWorld(self:GetCollision());
 		self:RemoveCollision();
 		self:RemoveCollisionResponder();
 		self:RemoveScript();

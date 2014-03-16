@@ -9,12 +9,13 @@ Push.duration = 0.5;
 
 function Push.OnLoad()
 	ResourceManager.LoadParticle("fireball");
+	ResourceManager.LoadSound("swosh-08.wav", 0x00400011);
 end
 
 function Push.ChargeStart(userId, actionId)
 	--Animation clip
 	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChargingAnimClip(AnimClip.CHARGING2);
-	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetLowerChargingAnimClip(AnimClip.CHARGING2);
+	--Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetLowerChargingAnimClip(AnimClip.CHARGING2);
 end
 
 function Push.ChargeDone (time, userId, actionId)
@@ -32,14 +33,14 @@ function Push.ChargeDone (time, userId, actionId)
 		if randomNumber == 1 then
 			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
 			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
-				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.SHOOTLEFT1, true);
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.LANDING, true);
 			end
 		end
 		
 		if randomNumber == 2 then
 			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
 			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
-				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.SHOOTRIGHT1, true);
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.LANDING, true);
 			end
 		end
 	end
@@ -48,14 +49,14 @@ function Push.ChargeDone (time, userId, actionId)
 		if randomNumber == 1 then
 			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
 			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
-				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.SHOOTDOUBLE1, true);
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.LANDING, true);
 			end
 		end
 
 		if randomNumber == 2 then
 			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE2, true);
 			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
-				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.SHOOTDOUBLE2, true);
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.LANDING, true);
 			end
 		end
 	end
@@ -101,6 +102,7 @@ function Push.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "PushMeMaybe");
+		Static.Play3DSound("swosh-08.wav", 1.0, self:GetTransformation():GetPos(), 50.0, 400.0);
 	end
 end
 
