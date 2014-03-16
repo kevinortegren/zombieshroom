@@ -56,7 +56,7 @@ namespace RootEngine
 		Render::RendererInterface* m_renderer;
 		ProfilingInterface* m_profiler;
 #ifndef COMPILE_LEVEL_EDITOR
-		Network::NetworkInterface*		m_network;
+		//Network::NetworkInterface*		m_network;
 		GUISystem::GUISystemInterface*	m_gui;
 #ifdef _DEBUG
 		DebugOverlayInterface*			m_debugOverlay;

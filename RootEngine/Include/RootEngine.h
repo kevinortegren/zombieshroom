@@ -44,7 +44,7 @@ namespace RootEngine
 	private:
 		void LoadRender();
 #ifndef COMPILE_LEVEL_EDITOR
-		void LoadNetwork();
+		//void LoadNetwork();
 		void LoadInput();
 		void LoadGUI();
 		//void LoadInputSystem();
@@ -54,7 +54,7 @@ namespace RootEngine
 		void LoadSoundEngine();
 #endif
 
-		void* m_networkModule;
+		//void* m_networkModule;
 		void* m_renderModule;
 		void* m_guiModule;
 		void* m_inputModule;
@@ -75,7 +75,7 @@ namespace RootEngine
 #ifdef _DEBUG
 		DebugOverlay m_debugOverlay;
 #endif
-		Network::NetworkInterface*		m_network;
+		//Network::NetworkInterface*		m_network;
 		GUISystem::GUISystemInterface*	m_gui;
 		InputManager::InputInterface*	m_inputSys;
 		Physics::PhysicsInterface*		m_physics;
