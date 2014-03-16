@@ -34,6 +34,9 @@ namespace RootForce
 
 			UpdateUpperBodyAnimation(renderable, animation, TicksPerSecond, animSpeed);
 			UpdateLowerBodyAnimation(renderable, animation, TicksPerSecond, animSpeed);
+
+			if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+				return;
 			//Calc upper root node rotation
 			CalcUpperRootNodeRotation(tempScene->mRootNode, animation, renderable, tempScene);
 			//Begin with lower body, which includes the hips(root node in animation)
