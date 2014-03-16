@@ -32,7 +32,6 @@ namespace RootForce
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_diffuse, Render::TextureType::TEXTURE_2D);
 		m_material->m_textures[Render::TextureSemantic::TRANSLUCENCY] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_translucency, Render::TextureType::TEXTURE_2D);
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE1] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_billboard, Render::TextureType::TEXTURE_2D);
-		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_terrainTexture, Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
 	
 		m_quadTree.Initialize(m_engineContext, m_world, "Grass", "Painted_Split", false);
