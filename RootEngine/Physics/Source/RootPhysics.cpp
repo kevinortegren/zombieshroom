@@ -1356,7 +1356,8 @@ namespace Physics
 
 	bool RootPhysics::IsRagdoll( int p_objecthandle )
 	{
-		assert(DoesObjectExist(p_objecthandle));
+		if(!DoesObjectExist(p_objecthandle))
+			return false;
 		return m_userPointer.at(p_objecthandle)->m_type == PhysicsType::TYPE_RAGDOLL;
 	}
 
