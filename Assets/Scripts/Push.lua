@@ -9,6 +9,7 @@ Push.duration = 0.5;
 
 function Push.OnLoad()
 	ResourceManager.LoadParticle("fireball");
+	ResourceManager.LoadSound("swosh-08.wav", 0x00400011);
 end
 
 function Push.ChargeStart(userId, actionId)
@@ -101,6 +102,7 @@ function Push.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "PushMeMaybe");
+		Static.Play3DSound("swosh-08.wav", 1.0, self:GetTransformation():GetPos(), 50.0, 400.0);
 	end
 end
 
