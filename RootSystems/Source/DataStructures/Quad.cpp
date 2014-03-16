@@ -24,7 +24,10 @@ namespace RootForce
 		m_context = p_context;
 		m_world = p_world;
 		m_newGroupName = p_newName;
+
 		m_entities.clear();
+		m_culledNodes.clear();
+		m_culledEntities.clear();
 
 		// Get working set.
 		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup(p_groupName);
