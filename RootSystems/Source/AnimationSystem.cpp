@@ -22,8 +22,6 @@ namespace RootForce
 			Renderable* renderable = m_renderables.Get(p_entity);
 			Animation* animation = m_animations.Get(p_entity);
 
-			if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL && animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
-				return;
 			const aiScene* tempScene = renderable->m_model->m_animation->GetScene();
 
 			float TicksPerSecond = (float)(tempScene->mAnimations[0]->mTicksPerSecond != 0 ? tempScene->mAnimations[0]->mTicksPerSecond : 25.0f);
@@ -46,6 +44,9 @@ namespace RootForce
 	//UPPER
 	void AnimationSystem::UpdateUpperBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
 	{
+		if(p_animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+			return;
+
 		//If animation switched, start new clip
 		if(p_animation->UpperBodyAnim.m_animClip != p_animation->UpperBodyAnim.m_prevAnimClip)
 		{
@@ -86,6 +87,9 @@ namespace RootForce
 	//LOWER
 	void AnimationSystem::UpdateLowerBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
 	{
+		if(p_animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+			return;
+
 		//If animation switched, start new clip
 		if(p_animation->LowerBodyAnim.m_animClip != p_animation->LowerBodyAnim.m_prevAnimClip)
 		{
