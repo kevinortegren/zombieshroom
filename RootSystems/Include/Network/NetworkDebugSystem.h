@@ -4,6 +4,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/Transform.h>
+#include <RootSystems/Include/AnimationSystem.h>
 
 namespace RootForce
 {
@@ -20,6 +21,7 @@ namespace RootForce
 			ECS::ComponentMapper<NetworkComponent> m_networks;
 			ECS::ComponentMapper<PlayerComponent> m_players;
 			ECS::ComponentMapper<Transform> m_transforms;
+			ECS::ComponentMapper<Animation> m_animations;
 		};
 	}
 }
