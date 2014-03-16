@@ -59,14 +59,22 @@ namespace RootForce
 
 			m_meshes[i]->SetPrimitiveType(GL_POINTS);			
 		}
-
 		delete[] data;
 	
 		m_meshCount = 0;
-
 		for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
 		{
 			m_cellDirectory[i] = 0;
+		}
+
+		for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
+		{
+			for(int j = 0; j < BOTANY_MESHES_PER_CELL; j++)
+			{
+				m_cells[i].m_meshIndices[j] = 0;
+			}
+
+			m_cells[i].m_meshSize = 0;
 		}
 
 		m_initialized = true;

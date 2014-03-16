@@ -953,7 +953,7 @@ namespace RootForce
 						soundable->m_soundChannel = g_engineContext.m_sound->CreateSoundChannel();
 						soundable->m_minDist = 1.0f;
 						soundable->m_maxDist = 50.0f;
-						soundable->m_volume = 0.3f;
+						soundable->m_volume = 0.1f;
 						soundable->m_play = true;
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
