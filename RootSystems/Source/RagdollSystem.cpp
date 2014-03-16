@@ -27,7 +27,7 @@ namespace RootForce
 		Ragdoll* ragdoll = m_world->GetEntityManager()->GetComponent<Ragdoll>(p_entity);
 		ECS::Entity* camera = m_world->GetTagManager()->GetEntityByTag("Camera");
 		
-		if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+		if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL && animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 		{
 			
 			if(ragdoll->m_firstTime)

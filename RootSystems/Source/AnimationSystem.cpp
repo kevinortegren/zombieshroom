@@ -22,7 +22,7 @@ namespace RootForce
 			Renderable* renderable = m_renderables.Get(p_entity);
 			Animation* animation = m_animations.Get(p_entity);
 
-			if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+			if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL && animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 				return;
 			const aiScene* tempScene = renderable->m_model->m_animation->GetScene();
 

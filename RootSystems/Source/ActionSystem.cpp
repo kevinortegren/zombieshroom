@@ -61,8 +61,8 @@ namespace RootSystems
 					action->IdleTime = 0.0f;
 					action->JumpDir = glm::vec3(0.0f);
 					health->GotHit = false;
-					animation->UpperBodyAnim.m_locked = 0;
-					animation->LowerBodyAnim.m_locked = 0;
+					animation->UpperBodyAnim.m_locked = false;
+					animation->LowerBodyAnim.m_locked = false;
 
 
 				}
