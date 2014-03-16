@@ -14,31 +14,49 @@ end
 function Push.ChargeStart(userId, actionId)
 	--Animation clip
 	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChargingAnimClip(AnimClip.CHARGING2);
+	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetLowerChargingAnimClip(AnimClip.CHARGING2);
 end
 
 function Push.ChargeDone (time, userId, actionId)
 
 	math.randomseed(os.time());
 	local randomNumber = math.random(1,2);	
+	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local movePower = playerEnt:GetPlayerAction():GetMovePower();
+	local strafePower = playerEnt:GetPlayerAction():GetStrafePower();
+	local playerState = playerEnt:GetStateComponent():GetCurrentState();
+	Logging.Log(LogLevel.DEBUG_PRINT, "State after charge is "..playerState);
 
 	--Animation clip
 	if ((time) / Push.chargeTime) < 0.5 then
 		if randomNumber == 1 then
-			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
+			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
+			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.SHOOTLEFT1, true);
+			end
 		end
 		
 		if randomNumber == 2 then
-			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
+			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
+			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.SHOOTRIGHT1, true);
+			end
 		end
 	end
 
 	if ((time) / Push.chargeTime) >= 0.5 then
 		if randomNumber == 1 then
-			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
+			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
+			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.SHOOTDOUBLE1, true);
+			end
 		end
 
 		if randomNumber == 2 then
-			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE2, true);
+			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE2, true);
+			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.SHOOTDOUBLE2, true);
+			end
 		end
 	end
 	

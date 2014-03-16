@@ -199,11 +199,15 @@ namespace RootSystems
 					action->IdleTime = 0.0f;
 				}
 
-				//if(action->IdleTime >= 0.2f)
-				//{
+				if(action->IdleTime >= 0.2f && animation->LowerBodyAnim.m_animClip != RootForce::AnimationClip::NOCLIP && animation->UpperBodyAnim.m_animClip != RootForce::AnimationClip::NOCLIP)
+				{
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
-				//}
+				}else if(animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::WALKING)
+				{
+					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
+					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
+				}
 				if(action->IdleTime >= 10.0f)
 				{
 					std::srand((int)time(NULL));
@@ -234,6 +238,7 @@ namespace RootSystems
 						{
 							animation->UpperBodyAnim.m_locked = 0;
 							animation->LowerBodyAnim.m_locked = 0;
+							action->IdleTime = 0.0f;
 						}
 					}
 
@@ -294,12 +299,21 @@ namespace RootSystems
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::GOTHIT2, true);
 				else if(random == 3)
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::GOTHIT3, true);
+
+				action->IdleTime = 0.0f;
 			}
 
 			if(!isGameOver)
 			{
 				if(player->AbilityState == RootForce::AbilityState::CHARGING)
 				{
+					action->IdleTime = 0.0f;
+					if(animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE2 || animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE3)
+					{
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
+						animation->LowerBodyAnim.m_locked = false;
+					}
+
 					if(animation->UpperBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP)
 					{
 						animation->UpperBodyAnim.m_animClip = animation->UpperBodyAnim.m_chargingClip;
@@ -313,6 +327,7 @@ namespace RootSystems
 				}
 				else if(player->AbilityState == RootForce::AbilityState::CHANNELING)
 				{
+					action->IdleTime = 0.0f;
 					if(animation->UpperBodyAnim.m_channelingClip != RootForce::AnimationClip::NOCLIP)
 					{
 						animation->UpperBodyAnim.m_animClip = animation->UpperBodyAnim.m_channelingClip;
