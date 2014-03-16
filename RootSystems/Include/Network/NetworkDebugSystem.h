@@ -22,6 +22,7 @@ namespace RootForce
 			ECS::ComponentMapper<PlayerComponent> m_players;
 			ECS::ComponentMapper<Transform> m_transforms;
 			ECS::ComponentMapper<Animation> m_animations;
+			ECS::ComponentMapper<StateComponent> m_states;
 		};
 	}
 }
