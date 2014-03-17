@@ -1,6 +1,12 @@
 <html>
   <head>
     <style type="text/css">
+		@font-face
+		{
+		  font-family: 'Sherwood';
+		  src: url("SHERWOOD.TTF");
+		}
+	
       body {
         position: absolute;
         top: 0;
@@ -11,6 +17,26 @@
         background: url('loading.jpg') #000066;
         background-size: 100% 100%;
       }
+	  #text
+	  {
+		font-family: Sherwood;
+		color: white;
+		font-size: 40px;
+	  }
+	  #tutorial-text
+	  {
+		font-family: Sherwood;
+		color: white;
+		width: 100%;
+		height: 80px;
+		font-size: 40px;
+		text-align: center;
+		position: absolute;
+		top: 100%;
+		left: 0;
+		margin-top: -150px;
+		width: 100%;
+	  }
     </style>
 		<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
 		<script type="text/Javascript">
@@ -19,10 +45,31 @@
 				var num = Math.floor(Math.random()*9)+1;
 				$("body").css("background", "url('loading"+num+".png')");
 				$("body").css("background-size", "100% 100%");
+				
+				if(num == 1)
+					$("#tutorial-text").html("This is an ability! Press 'Shift' to pick it up!");
+				else if(num == 2)
+					$("#tutorial-text").html("These are your ability slots! Toggle your selected ability with '1,2,3' or cycle with 'q'");
+				else if(num == 3)
+					$("#tutorial-text").html("Some abilities have limited charges! Make them count!");
+				else if(num == 4)
+					$("#tutorial-text").html("Don't like your team mates? Switch teams in the in-game menu!");
+				else if(num == 5)
+					$("#tutorial-text").html("Stay out of the water");
+				else if(num == 6)
+					$("#tutorial-text").html("You can change the controls from the settings menu");
+				else if(num == 7)
+					$("#tutorial-text").html("Use the 'right mouse button' to push your enemies away!");
+				else if(num == 8)
+					$("#tutorial-text").html("This is your health. Don't let it get to zero!");
+				else if(num == 9)
+					$("#tutorial-text").html("You can see the team scores and the time left in the top right corner!");
 			};
 			$(document).ready(Shuffle);
 		</script>
   </head>
-  <body>
+  <body> 
+	<div id="text"> Loading... </div>
+	<div id="tutorial-text"> </div>
   </body>
 </html>

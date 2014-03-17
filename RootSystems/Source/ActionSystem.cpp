@@ -208,7 +208,7 @@ namespace RootSystems
 					animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 					animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 				}
-				if(action->IdleTime >= 10.0f)
+				if(action->IdleTime >= 13.0f)
 				{
 					std::srand((int)time(NULL));
 					int random = std::rand() % 2 + 1;
@@ -218,16 +218,15 @@ namespace RootSystems
 					{						
 						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE2, true);
 						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE2, true);
+						action->IdleTime = 0.0f;
 					}
 					else if(animation->UpperBodyAnim.m_animClip == RootForce::AnimationClip::IDLE && animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE &&
 							animation->UpperBodyAnim.m_animClip != RootForce::AnimationClip::IDLE2 && animation->LowerBodyAnim.m_animClip != RootForce::AnimationClip::IDLE2)
 					{
 						animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE3, true);
 						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE3, true);
-					}
-
-					if(action->IdleTime >= 13)
 						action->IdleTime = 0.0f;
+					}						
 				}
 
 				if(!isGameOver)
@@ -236,8 +235,8 @@ namespace RootSystems
 					{
 						if(animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE2 || animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE3)
 						{
-							animation->UpperBodyAnim.m_locked = 0;
-							animation->LowerBodyAnim.m_locked = 0;
+							animation->UpperBodyAnim.m_locked = false;
+							animation->LowerBodyAnim.m_locked = false;
 							action->IdleTime = 0.0f;
 						}
 					}
@@ -310,8 +309,8 @@ namespace RootSystems
 					action->IdleTime = 0.0f;
 					if(animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE2 || animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE3)
 					{
-						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 						animation->LowerBodyAnim.m_locked = false;
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 					}
 
 					if(animation->UpperBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP)
