@@ -6,7 +6,7 @@ Boost.charges = 1;
 Boost.chargeTime = 0;
 Boost.channelingTime = 0;
 Boost.duration = 5;
-Boost.crosshair = "";
+Boost.crosshair = "crosshairNone";
 
 function Boost.OnLoad()
 end

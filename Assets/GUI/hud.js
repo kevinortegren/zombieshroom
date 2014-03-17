@@ -258,9 +258,10 @@ function DamageIndicator(p_damage)
   // }
 }
 
+//Used to testing
 $(document).ready(function(){
-	SetAbilityFocus(1);
-    Set("Health", 0);
+	//SetAbilityFocus(1);
+    //Set("Health", 0);
     //Set("Health", 40);
 	//SetAbility(1, "FireBall");
 	// StartCooldown(1, 3);

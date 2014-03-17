@@ -7,7 +7,7 @@ RefractiveBall.chargeTime = 0;
 RefractiveBall.channelingTime = 5;
 RefractiveBall.duration = 0;
 RefractiveBall.charges = -1;
-RefractiveBall.crosshair = "";
+RefractiveBall.crosshair = "crosshairNone";
 
 function RefractiveBall.OnLoad()
 	ResourceManager.LoadModel("HexagonSphere");
