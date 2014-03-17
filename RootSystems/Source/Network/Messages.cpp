@@ -351,6 +351,7 @@ namespace RootForce
 					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->AbilityScripts[i].Name.c_str()) );
 					p_bs->Serialize(p_writeToBitstream, p_c->AbilityScripts[i].Cooldown );
 					p_bs->Serialize(p_writeToBitstream, p_c->AbilityScripts[i].Charges );
+					p_bs->Serialize(p_writeToBitstream, RakNet::RakString(p_c->AbilityScripts[i].Crosshair.c_str()));
 				}
 				else
 				{
@@ -359,6 +360,8 @@ namespace RootForce
 					p_c->AbilityScripts[i].Name = std::string(s.C_String());
 					p_bs->Serialize(p_writeToBitstream, p_c->AbilityScripts[i].Cooldown);
 					p_bs->Serialize(p_writeToBitstream, p_c->AbilityScripts[i].Charges);
+					p_bs->Serialize(p_writeToBitstream, s);
+					p_c->AbilityScripts[i].Crosshair = std::string(s.C_String());
 				}
 			}
 			p_bs->Serialize(p_writeToBitstream, p_c->SelectedAbility);
