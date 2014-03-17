@@ -45,6 +45,7 @@ namespace RootSystems
 				{
 					health->IsDead = true;
 					health->RespawnDelay = 3.0f;
+					health->Health = 0.0f;
 				}
 
 				//Broadcast death
