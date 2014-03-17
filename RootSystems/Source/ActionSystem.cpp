@@ -310,8 +310,8 @@ namespace RootSystems
 					action->IdleTime = 0.0f;
 					if(animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE2 || animation->LowerBodyAnim.m_animClip == RootForce::AnimationClip::IDLE3)
 					{
-						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 						animation->LowerBodyAnim.m_locked = false;
+						animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::IDLE, false);
 					}
 
 					if(animation->UpperBodyAnim.m_chargingClip != RootForce::AnimationClip::NOCLIP)
