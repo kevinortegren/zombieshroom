@@ -180,6 +180,7 @@ int main(int argc, char* argv[])
 				numberMessages = *RM.NumberOfMessages;
 				RM.UnlockMutex("IdMutex");
 
+				//Copy shared memory messages to localMessages
 				for(int i = 0; i < numberMessages; i ++)
 				{
 					UpdateMessage temp = RM.PeekMessageAt(i);
@@ -196,7 +197,7 @@ int main(int argc, char* argv[])
 					ExportToLevel();
 				}
 
-				//UPDATE
+				//UPDATE information based on all available messages this frame
 				while(localMessages.size() > 0)
 				{
 					updateID = localMessages[0].updateID;
@@ -416,6 +417,7 @@ void LoadSceneFromMaya()
 	CreateCameraEntity(0);
 
 	LoadLocators();
+
 	//LOAD MATERIALS
 	RM.LockMutex("MeshMutex");
 
@@ -427,11 +429,8 @@ void LoadSceneFromMaya()
 	}
 
 	/////////////////////// LOAD MESHES ////////////////////////////////
-
-
 	numberMeshes = *RM.NumberOfMeshes;
 	numberMegaMeshes = *RM.NumberOfMegaMeshes;
-
 
 	for(int i = 0; i < numberMeshes; i++)
 	{				
@@ -451,6 +450,7 @@ void LoadSceneFromMaya()
 	}	
 
 	RM.UnlockMutex("MeshMutex");
+
 	///////////////////////// Load Lights ////////////////////////////////
 
 	RM.LockMutex("LightMutex");
@@ -692,8 +692,6 @@ void CopyMayaMaterial(string textureName, string materialName, string normalMap,
 
 
 	}
-
-	//Could use a materialName -> Lambert, Phong etc instead of "Mesh"
 }
 
 void RegisterEntityFlags(Transform transformation, ECS::Entity* entity, ECS::World* p_world)
