@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <Utility/ECS/Include/Component.h>
@@ -47,3 +49,5 @@ namespace RootForce
 		ECS::ComponentMapper<RootForce::RayComponent> m_ray;
 	};
 }
+
+#endif

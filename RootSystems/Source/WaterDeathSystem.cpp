@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/WaterDeathSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
@@ -52,3 +53,4 @@ namespace RootForce
 	{
 	}
 }
+#endif

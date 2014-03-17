@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include "RaySystem.h"
 
 namespace RootForce
@@ -15,3 +17,5 @@ namespace RootForce
 	}
 
 }
+
+#endif

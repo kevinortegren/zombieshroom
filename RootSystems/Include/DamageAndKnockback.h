@@ -1,3 +1,5 @@
+#ifndef COMPILE_LEVEL_EDITOR
+
 #pragma once
 
 #include <Utility/ECS/Include/Component.h>
@@ -10,3 +12,5 @@ namespace RootForce
 		float Knockback;
 	};
 }
+
+#endif

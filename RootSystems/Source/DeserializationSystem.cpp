@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <DeserializationSystem.h>
 #include <Network/Messages.h>
 #include <Network/NetworkTypes.h>
@@ -52,3 +53,4 @@ namespace RootForce
 		}
 	}
 }
+#endif

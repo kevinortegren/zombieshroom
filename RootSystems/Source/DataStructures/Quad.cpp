@@ -695,6 +695,7 @@ namespace RootForce
 		}
 	
 		m_world->GetGroupManager()->RegisterEntity(m_newGroupName, entity);
+		m_world->GetGroupManager()->RegisterEntity("NonExport", entity);
 
 		renderable->m_model->m_meshes[0]->CreateIndexBuffer(&p_indices[0], p_indices.size());		
 	}

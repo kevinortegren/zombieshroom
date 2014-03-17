@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 
 #include <RootEngine/Include/GameSharedContext.h>
@@ -44,3 +45,5 @@ namespace RootForce
 		ECS::ComponentMapper<RootForce::HomingComponent> m_target;
 	};
 }
+
+#endif

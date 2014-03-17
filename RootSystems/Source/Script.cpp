@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <Utility/ECS/Include/World.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Include/Logging/Logging.h>
@@ -84,3 +85,5 @@ namespace RootForce
 	}
 
 }
+
+#endif

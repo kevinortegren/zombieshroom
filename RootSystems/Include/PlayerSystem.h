@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 #include <RakNet/RakString.h>
 #include <Utility/ECS/Include/Component.h>
 #include <glm/glm.hpp>
@@ -38,7 +40,7 @@ namespace RootForce
 	}
 
 
-#ifndef COMPILE_LEVEL_EDITOR
+
 	namespace AbilityEventType
 	{
 		enum AbilityEventType
@@ -94,7 +96,7 @@ namespace RootForce
 			, IdleTime(0.0f)
 		{}
 	};
-#endif
+
 
 	struct PlayerPhysics : public ECS::Component<PlayerPhysics>
 	{
@@ -119,7 +121,7 @@ namespace RootForce
 		{}
 	};
 
-#ifndef COMPILE_LEVEL_EDITOR
+
 	struct HealthComponent : public ECS::Component<HealthComponent>
 	{	
 		float Health;
@@ -145,7 +147,7 @@ namespace RootForce
 			GotHit = false;
 		}
 	};
-#endif
+
 
 	struct AbilityInfo
 	{
@@ -193,3 +195,6 @@ namespace RootForce
 			: TryPickup(false) {}
 	};
 }
+
+#endif
+

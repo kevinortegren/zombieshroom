@@ -516,11 +516,11 @@ namespace RootEngine
 		{
 			(*itr) = nullptr;
 		}
-
+#ifndef COMPILE_LEVEL_EDITOR
 		// Remove animation.
 		delete p_model->m_animation;
 		p_model->m_animation = nullptr;
-
+#endif
 		// Remove model from map.
 		std::string modelName = ResolveStringFromModel(p_model);
 		if(modelName != "")

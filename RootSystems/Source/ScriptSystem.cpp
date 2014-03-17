@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootSystems/Include/ScriptSystem.h>
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
@@ -41,3 +42,4 @@ namespace RootForce
 	{
 	}
 }
+#endif

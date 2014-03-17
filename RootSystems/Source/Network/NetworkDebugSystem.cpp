@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Include/DebugOverlay/DebugOverlay.h>
 #include <Network/NetworkDebugSystem.h>
@@ -48,3 +49,4 @@ namespace RootForce
 		}
 	}
 }
+#endif

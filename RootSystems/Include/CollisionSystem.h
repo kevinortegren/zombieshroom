@@ -27,6 +27,8 @@ namespace RootForce
 		std::map<void*, CollisionInfo> m_collisions;
 	};
 
+#ifndef COMPILE_LEVEL_EDITOR
+
 	class CollisionSystem : public ECS::EntitySystem
 	{
 	public:
@@ -39,6 +41,7 @@ namespace RootForce
 			SetUsage<Script>();
 		}
 
+
 		ECS::ComponentMapper<Script> m_scripts;
 		ECS::ComponentMapper<CollisionResponder> m_responders;
 
@@ -49,5 +52,5 @@ namespace RootForce
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 	};
-
+#endif
 }

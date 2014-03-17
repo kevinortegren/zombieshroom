@@ -1,3 +1,4 @@
+#ifndef COMPILE_LEVEL_EDITOR
 #include "FollowSystem.h"
 
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
@@ -26,3 +27,4 @@ namespace RootForce
 	}
 
 }
+#endif
