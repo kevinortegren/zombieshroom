@@ -77,7 +77,7 @@ namespace Physics
 	}
 	void RootPhysics::Shutdown()
 	{
-		//Magic loop of deleting, might not work with ghostobjects(players). Check this before release.
+		//Magic loop of deleting
 		RemoveAll();
 		delete m_debugDrawer;
 		delete m_dynamicWorld;
@@ -239,16 +239,26 @@ namespace Physics
 			else if (userPointer->m_type == PhysicsType::TYPE_DYNAMIC || (userPointer->m_type == PhysicsType::TYPE_ABILITY && userPointer->m_externalControlled == false))
 			{
 				//unsigned int removedIndex = userPointer->m_vectorIndex;
+
+				if (m_dynamicObjects.at(removedIndex) && m_dynamicObjects.at(removedIndex)->getMotionState())
+				{
+					delete m_dynamicObjects.at(removedIndex)->getMotionState();
+				}
+				if(m_dynamicObjects.at(removedIndex) && m_dynamicObjects.at(removedIndex)->getCollisionShape())
+				{
+					btCollisionShape* temp = m_dynamicObjects.at(removedIndex)->getCollisionShape();
+					delete temp;
+				}
 				m_dynamicWorld->removeRigidBody(m_dynamicObjects.at(removedIndex));
 				delete m_dynamicObjects.at(removedIndex);
+
 				m_dynamicObjects.erase(m_dynamicObjects.begin() + removedIndex);
-			
+
 				delete userPointer;
 				m_userPointer.erase(m_userPointer.begin() + p_objectHandle);
 
 				for(unsigned int i = p_objectHandle; i < m_userPointer.size(); i++)
 				{
-
 					m_userPointer.at(i)->m_id[0] --;
 					if(m_userPointer.at(i)->m_type != PhysicsType::TYPE_PLAYER && m_userPointer.at(i)->m_shape != PhysicsShape::SHAPE_NONE && m_userPointer.at(i)->m_externalControlled == false)
 					{
@@ -323,12 +333,18 @@ namespace Physics
 			CustomUserPointer* temp = m_userPointer[i];
 			delete temp;
 		}
+		for(unsigned int i = 0; i < m_btTriangleIndexVertexArrays.size(); i++)
+		{
+			btTriangleIndexVertexArray* temp = m_btTriangleIndexVertexArrays[i];
+			delete temp;
+		}	
 		m_ragdolls.clear();
 		m_externallyControlled.clear();
 		m_shapelessObjects.clear();
 		m_dynamicObjects.clear();
 		m_playerObjects.clear();
 		m_userPointer.clear();
+		m_btTriangleIndexVertexArrays.clear();
 
 	}
 
@@ -358,7 +374,6 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_type = PhysicsShape::SHAPE_SPHERE;
@@ -373,6 +388,8 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
+
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 
 
@@ -394,7 +411,6 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_height = p_height;
@@ -410,6 +426,7 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
@@ -429,7 +446,6 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 		ShapeStruct temp;
 		temp.m_radius = p_radius;
 		temp.m_height = p_height;
@@ -445,6 +461,7 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
@@ -464,7 +481,7 @@ namespace Physics
 		pos.setZ( p_position[2]);
 		btQuaternion quat = btQuaternion(p_rotation[0], p_rotation[1], p_rotation[2],p_rotation[3]);
 		btTransform trans = btTransform(quat, pos );
-		btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
+		
 		ShapeStruct temp;
 		temp.m_modelHandle = p_modelHandle;
 		temp.m_scale = p_scale;
@@ -480,7 +497,7 @@ namespace Physics
 		}
 		if(!m_userPointer.at(p_objectHandle)->m_externalControlled) //if physics driven, i.e a rigidbody 
 		{
-
+			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
 			return;
@@ -562,7 +579,7 @@ namespace Physics
 		startTransform.setOrigin(btVector3(p_position[0],p_position[1],p_position[2]));
 		startTransform.setRotation(btQuaternion(p_rotation[0],p_rotation[1], p_rotation[2],p_rotation[3]));
 		btDefaultMotionState* motionstate = new btDefaultMotionState(startTransform);
-	
+		m_btTriangleIndexVertexArrays.push_back(indexVertexArray);
 		//create a body
 		btRigidBody::btRigidBodyConstructionInfo objectBodyInfo(p_mass, motionstate,simplifiedObject, fallInertia );
 		btRigidBody* objectBody = new btRigidBody(objectBodyInfo);
@@ -619,10 +636,11 @@ namespace Physics
 
 			btBvhTriangleMeshShape* objectMeshShape = new btBvhTriangleMeshShape(indexVertexArray, true);
 			objectMeshShape->setLocalScaling(btVector3(p_shapeStruct.m_scale.x, p_shapeStruct.m_scale.y, p_shapeStruct.m_scale.z));
-			btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
-			trinfoMap->m_edgeDistanceThreshold = 0.01f;
-			trinfoMap->m_equalVertexThreshold = 0.01f;
-			btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
+			m_btTriangleIndexVertexArrays.push_back(indexVertexArray);
+// 			btTriangleInfoMap* trinfoMap = new btTriangleInfoMap();
+// 			trinfoMap->m_edgeDistanceThreshold = 0.01f;
+// 			trinfoMap->m_equalVertexThreshold = 0.01f;
+// 			btGenerateInternalEdgeInfo(objectMeshShape, trinfoMap);
 			return (btCollisionShape*)objectMeshShape;
 		}
 		else
@@ -641,8 +659,7 @@ namespace Physics
 	int* RootPhysics::AddPlayerObjectToWorld(std::string p_modelHandle, void* p_entity, glm::vec3 p_position, glm::quat p_rotation, float p_mass, float p_maxSpeed, float p_modelHeight, float p_stepHeight, std::map<void*, RootForce::CollisionInfo>* p_collisions)
 	{
 		KinematicController* player = new KinematicController();
-		player->Init(m_dynamicWorld, 0, 0, 3*sizeof(int), 
-			0 , (btScalar*) 0, 3*sizeof(float), p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
+		player->Init(m_dynamicWorld,  p_position, p_rotation, p_mass, p_maxSpeed, p_modelHeight, p_stepHeight );
 		m_playerObjects.push_back(player);
 		CustomUserPointer* userPointer = new CustomUserPointer();
 		userPointer->m_vectorIndex =  m_playerObjects.size()-1;
@@ -1069,15 +1086,15 @@ namespace Physics
 		}
 		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
-			float x,y,z, w;
+			float x,y,z,w;
 			btRigidBody* body = m_dynamicObjects.at(index);
-		
+			
 			x = p_objectOrientation[0];
 			y = p_objectOrientation[1];
 			z = p_objectOrientation[2];
 			w = p_objectOrientation[3];
-			body->getMotionState()->setWorldTransform(btTransform(btQuaternion(x,y,z, w), body->getWorldTransform().getOrigin()));
-			
+			body->setWorldTransform(btTransform(btQuaternion(x,y,z,w), body->getWorldTransform().getOrigin()));
+			//g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Values: %f, %f, %f, %f", x, y, z, w);
 		}
 		else if (m_userPointer.at(p_objectHandle)->m_shape == PhysicsShape::SHAPE_NONE)
 		{
@@ -1339,7 +1356,8 @@ namespace Physics
 
 	bool RootPhysics::IsRagdoll( int p_objecthandle )
 	{
-		assert(DoesObjectExist(p_objecthandle));
+		if(!DoesObjectExist(p_objecthandle))
+			return false;
 		return m_userPointer.at(p_objecthandle)->m_type == PhysicsType::TYPE_RAGDOLL;
 	}
 

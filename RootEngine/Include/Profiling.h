@@ -28,7 +28,9 @@ namespace RootEngine
 		virtual void InitQuery() = 0;
 		virtual void ToggleSorted() = 0;
 #ifndef COMPILE_LEVEL_EDITOR
+#ifdef _DEBUG
 		virtual void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay) = 0;
+#endif
 #endif
 	private:
 		
@@ -49,14 +51,18 @@ namespace RootEngine
 		void InitQuery();
 		void ToggleSorted();
 #ifndef COMPILE_LEVEL_EDITOR
+#ifdef _DEBUG
 		void SetDebugOverlay(DebugOverlayInterface* p_debugOverlay);
+#endif
 #endif
 	private:
 		void Present();
 		std::map<std::string, std::vector<__int64>> m_sampleMap;
 		std::vector<std::string> m_ouputList;
 #ifndef COMPILE_LEVEL_EDITOR
+#ifdef _DEBUG
 		DebugOverlayInterface* m_debugOverlay;
+#endif
 #endif
 		MemoryTracker* m_memTracker;
 		Render::RendererInterface* m_renderer;
@@ -91,9 +97,9 @@ namespace RootEngine
 		__int64		m_startTime;
 		ProfilingInterface* m_profiling;
 	};
-//#ifdef _DEBUG
-#define PROFILE(name, profiler) RootEngine::AutoProfile profilingAutoProfile(name, profiler);
-//#else
-//#define PROFILE(name, profiler) 
-//#endif
+#ifdef _DEBUG
+	#define PROFILE(name, profiler) RootEngine::AutoProfile profilingAutoProfile(name, profiler)
+#else
+	#define PROFILE(name, profiler) 
+#endif
 }

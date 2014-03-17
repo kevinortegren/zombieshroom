@@ -9,6 +9,7 @@
 #include <RootEngine/Script/Include/RootScript.h>
 #include <RootSystems/Include/AbilitySpawnSystem.h>
 #include <RootSystems/Include/StatChangeSystem.h>
+#include <RootSystems/Include/SoundSystem.h>
 #include <cassert>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -542,23 +543,31 @@ namespace RootForce
 					// Only remote clients need to handle this message. Local ones have already set spawnPoint->Claimed in AbilityRespawnSystem.
 					if(clientComponent->IsRemote)
 					{
-						AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(FindEntity(g_networkEntityMap, m.AbilitySpawnPointID));
-						assert(spawnPoint);
-						spawnPoint->Claimed = m.User;
-
-						ECS::Entity* player = RootForce::Network::FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
-					
-						// Don't set stuff on entities that don't exist.
-						if (player)
+						if (ClientState::IsConnected(clientComponent->State) ||
+							clientComponent->State == ClientState::AWAITING_SPAWN_POINT)
 						{
-							TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
-							assert(tryPickup);
-							tryPickup->TryPickup = false;
+							AbilitySpawnComponent* spawnPoint = m_world->GetEntityManager()->GetComponent<AbilitySpawnComponent>(FindEntity(g_networkEntityMap, m.AbilitySpawnPointID));
+							assert(spawnPoint);
+							spawnPoint->Claimed = m.User;
+
+							ECS::Entity* player = RootForce::Network::FindEntity(g_networkEntityMap, NetworkEntityID(m.User, ReservedActionID::CONNECT, SEQUENCE_PLAYER_ENTITY));
+					
+							// Don't set stuff on entities that don't exist.
+							if (player)
+							{
+								TryPickupComponent* tryPickup = m_world->GetEntityManager()->GetComponent<TryPickupComponent>(player);
+								assert(tryPickup);
+								tryPickup->TryPickup = false;
 							
+							}
+							else
+							{
+								g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Tried to set TryPickup on a null player.");
+							}
 						}
 						else
 						{
-							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "Tried to set TryPickup on a null player.");
+							g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::WARNING, "AbilityClaimedBy received in an invalid state (%d). User (%d: %s).", clientComponent->State, m.User, p_packet->systemAddress.ToString());
 						}
 					}
 					else
@@ -938,6 +947,15 @@ namespace RootForce
 						health->RespawnDelay = 3.0f;
 						health->LastDamageSourceID = m.LastDamageSource;
 						health->LastDamageAbilityName = m.LastDamageSourceName;
+
+						RootForce::SoundComponent* soundable = m_world->GetEntityManager()->CreateComponent<RootForce::SoundComponent>(player);
+						soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00400011);
+						soundable->m_soundChannel = g_engineContext.m_sound->CreateSoundChannel();
+						soundable->m_minDist = 1.0f;
+						soundable->m_maxDist = 50.0f;
+						soundable->m_volume = 0.1f;
+						soundable->m_play = true;
+
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
 					}
 

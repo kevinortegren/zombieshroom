@@ -11,7 +11,7 @@
 #include <random>
 
 #define RENDER_NUM_PARTCILES 1000
-#define RENDER_NUM_PARTICLESYSTEMS 350
+#define RENDER_NUM_PARTICLESYSTEMS 500
 #define RENDER_NUM_RANDOMVECTORS 1000
 #define RENDER_PARTICLES_UNIFORM_SIZE 1024
 
@@ -38,11 +38,15 @@ namespace Render
 		virtual void Init(GLRenderer* p_renderer, unsigned p_slot) = 0;
 		virtual void Update() = 0;
 		virtual Render::MeshInterface* GetMesh() = 0;
+		virtual ~ParticleSystemInterface(){};
 	};
 
 	class ParticleSystem : public ParticleSystemInterface
 	{
 	public:
+
+		ParticleSystem();
+		~ParticleSystem();
 		friend class ParticleSystemHandler;
 
 		void Init(GLRenderer* p_renderer, unsigned p_slot);

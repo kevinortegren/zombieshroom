@@ -9,7 +9,7 @@ namespace RootForce
 {
 
 	WaterSystem::WaterSystem( ECS::World* p_world, RootEngine::GameSharedContext* p_context ) 
-		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f, 0.0f, 0.01f, 0.0f)), m_playerWaterDeath(true), m_showDebugDraw(false)
+		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f, 0.0f, 0.06f, 0.0f)), m_playerWaterDeath(true), m_showDebugDraw(false)
 	{
 		SetUsage<RootForce::Transform>();
 		SetUsage<RootForce::WaterCollider>();
@@ -171,7 +171,6 @@ namespace RootForce
 		
 		//Set textures to renderable
 		m_renderable->m_material->m_textures[Render::TextureSemantic::GLOW]		= m_context->m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP); 
-		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_G] = m_context->m_resourceManager->LoadTexture("foam", Render::TextureType::TEXTURE_2D);
 		m_renderable->m_material->m_textures[Render::TextureSemantic::NORMAL]	= m_computeJob.m_textures[2];
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B] = m_context->m_resourceManager->LoadTexture("waternormal", Render::TextureType::TEXTURE_2D);
 		m_renderable->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);

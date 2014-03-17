@@ -1,5 +1,6 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include <AnimationSystem.h>
+#include <RootSystems/Include/StatChangeSystem.h>
 
 namespace RootForce
 {
@@ -21,14 +22,21 @@ namespace RootForce
 			Renderable* renderable = m_renderables.Get(p_entity);
 			Animation* animation = m_animations.Get(p_entity);
 
-			if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
-				return;
 			const aiScene* tempScene = renderable->m_model->m_animation->GetScene();
 
 			float TicksPerSecond = (float)(tempScene->mAnimations[0]->mTicksPerSecond != 0 ? tempScene->mAnimations[0]->mTicksPerSecond : 25.0f);
 
-			UpdateUpperBodyAnimation(renderable, animation, TicksPerSecond);
-			UpdateLowerBodyAnimation(renderable, animation, TicksPerSecond);
+			float animSpeed = 1.0f; //Default animation speed
+
+			RootForce::StatChange* statComp = m_world->GetEntityManager()->GetComponent<RootForce::StatChange>(p_entity);
+			if(statComp)
+				animSpeed = statComp->SpeedChange;
+
+			UpdateUpperBodyAnimation(renderable, animation, TicksPerSecond, animSpeed);
+			UpdateLowerBodyAnimation(renderable, animation, TicksPerSecond, animSpeed);
+
+			if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+				return;
 			//Calc upper root node rotation
 			CalcUpperRootNodeRotation(tempScene->mRootNode, animation, renderable, tempScene);
 			//Begin with lower body, which includes the hips(root node in animation)
@@ -37,8 +45,15 @@ namespace RootForce
 	}
 
 	//UPPER
-	void AnimationSystem::UpdateUpperBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond )
+	void AnimationSystem::UpdateUpperBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
 	{
+		if(p_animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+		{
+			p_animation->UpperBodyAnim.m_locked = false;
+			p_animation->UpperBodyAnim.m_blending = false;
+			return;
+		}
+
 		//If animation switched, start new clip
 		if(p_animation->UpperBodyAnim.m_animClip != p_animation->UpperBodyAnim.m_prevAnimClip)
 		{
@@ -52,7 +67,7 @@ namespace RootForce
 		if(!p_animation->UpperBodyAnim.m_blending)
 		{
 			//If not blending, add animTime as normal
-			p_animation->UpperBodyAnim.m_animTime += m_world->GetDelta() * p_animation->AnimationSpeed;
+			p_animation->UpperBodyAnim.m_animTime += m_world->GetDelta() * p_animationSpeed;
 			//Check if animation need to unlock
 			if(p_animation->UpperBodyAnim.m_locked && p_animation->UpperBodyAnim.m_animTime * p_ticksPerSecond >= (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_duration)
 			{
@@ -65,7 +80,7 @@ namespace RootForce
 		else
 		{
 			//If blending, update blendtime and unlock blending if blending time is up
-			p_animation->UpperBodyAnim.m_blendTime += m_world->GetDelta() * p_animation->AnimationSpeed;
+			p_animation->UpperBodyAnim.m_blendTime += m_world->GetDelta() * p_animationSpeed;
 			if (p_animation->UpperBodyAnim.m_blendTime >= m_blendTime)
 			{
 				p_animation->UpperBodyAnim.m_blending = false;
@@ -77,8 +92,15 @@ namespace RootForce
 	}
 
 	//LOWER
-	void AnimationSystem::UpdateLowerBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond )
+	void AnimationSystem::UpdateLowerBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
 	{
+		if(p_animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
+		{
+			p_animation->LowerBodyAnim.m_locked = false;
+			p_animation->LowerBodyAnim.m_blending = false;
+			return;
+		}
+
 		//If animation switched, start new clip
 		if(p_animation->LowerBodyAnim.m_animClip != p_animation->LowerBodyAnim.m_prevAnimClip)
 		{
@@ -92,7 +114,7 @@ namespace RootForce
 		if(!p_animation->LowerBodyAnim.m_blending)
 		{
 			//If not blending, add animTime as normal
-			p_animation->LowerBodyAnim.m_animTime += m_world->GetDelta() * p_animation->AnimationSpeed;
+			p_animation->LowerBodyAnim.m_animTime += m_world->GetDelta() * p_animationSpeed;
 			//Check if animation need to unlock
 			if(p_animation->LowerBodyAnim.m_locked && p_animation->LowerBodyAnim.m_animTime * p_ticksPerSecond >= (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_duration)
 			{
@@ -103,7 +125,7 @@ namespace RootForce
 		else
 		{
 			//If blending, update blendtime and unlock blending if blending time is up
-			p_animation->LowerBodyAnim.m_blendTime += m_world->GetDelta() * p_animation->AnimationSpeed;
+			p_animation->LowerBodyAnim.m_blendTime += m_world->GetDelta() * p_animationSpeed;
 			if (p_animation->LowerBodyAnim.m_blendTime >= m_blendTime)
 			{
 				p_animation->LowerBodyAnim.m_blending = false;

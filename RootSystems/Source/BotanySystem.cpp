@@ -32,44 +32,48 @@ namespace RootForce
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_diffuse, Render::TextureType::TEXTURE_2D);
 		m_material->m_textures[Render::TextureSemantic::TRANSLUCENCY] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_translucency, Render::TextureType::TEXTURE_2D);
 		m_material->m_textures[Render::TextureSemantic::DIFFUSE1] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_billboard, Render::TextureType::TEXTURE_2D);
-		m_material->m_textures[Render::TextureSemantic::DIFFUSE2] = m_engineContext->m_resourceManager->LoadTexture(m_textures.m_terrainTexture, Render::TextureType::TEXTURE_2D);
 		m_material->m_effect = m_effect;
 	
-		m_quadTree.Initialize(m_engineContext, m_world, "Grass", "Painted_Split");
+		m_quadTree.Initialize(m_engineContext, m_world, "Grass", "Painted_Split", false);
 		Divide();
 
-		if(!m_initialized)
+		// Allocate mesh memory.
+		char* data = new char[BOTANY_CELL_SIZE];
+		memset(data, 0, BOTANY_CELL_SIZE);
+		for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
 		{
-			// Allocate mesh memory.
-			char* data = new char[BOTANY_CELL_SIZE];
-			memset(data, 0, BOTANY_CELL_SIZE);
-			for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
-			{
-				m_meshes[i] = m_engineContext->m_renderer->CreateMesh();
+			m_meshes[i] = m_engineContext->m_renderer->CreateMesh();
 
-				m_meshes[i]->SetTransformFeedback();
-				m_meshes[i]->BindTransformFeedback();	
-				m_meshes[i]->SetVertexBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-				m_meshes[i]->GetVertexBuffer()->BufferData(1, BOTANY_CELL_SIZE, data, GL_STATIC_DRAW); 
-				glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_meshes[i]->GetVertexBuffer()->GetBufferId());
+			m_meshes[i]->SetTransformFeedback();
+			m_meshes[i]->BindTransformFeedback();	
+			m_meshes[i]->SetVertexBuffer(m_engineContext->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+			m_meshes[i]->GetVertexBuffer()->BufferData(1, BOTANY_CELL_SIZE, data, GL_STATIC_DRAW); 
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_meshes[i]->GetVertexBuffer()->GetBufferId());
 
-				m_meshes[i]->SetVertexAttribute(m_engineContext->m_renderer->CreateVertexAttributes());
-				m_meshes[i]->GetVertexAttribute()->Init(3);
-				m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 28, 0);
-				m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 28, (char*)0 + 3 * sizeof(float));
-				m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 2, 1, GL_FLOAT, GL_FALSE, 28, (char*)0 + 6 * sizeof(float));
+			m_meshes[i]->SetVertexAttribute(m_engineContext->m_renderer->CreateVertexAttributes());
+			m_meshes[i]->GetVertexAttribute()->Init(3);
+			m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 0, 3, GL_FLOAT, GL_FALSE, 28, 0);
+			m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 1, 3, GL_FLOAT, GL_FALSE, 28, (char*)0 + 3 * sizeof(float));
+			m_meshes[i]->GetVertexAttribute()->SetVertexAttribPointer(m_meshes[i]->GetVertexBuffer()->GetBufferId(), 2, 1, GL_FLOAT, GL_FALSE, 28, (char*)0 + 6 * sizeof(float));
 
-				m_meshes[i]->SetPrimitiveType(GL_POINTS);			
-			}
-
-			delete[] data;
+			m_meshes[i]->SetPrimitiveType(GL_POINTS);			
 		}
-
+		delete[] data;
+	
 		m_meshCount = 0;
-
 		for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
 		{
 			m_cellDirectory[i] = 0;
+		}
+
+		for(int i = 0; i < BOTANY_MESHES_SIZE; i++)
+		{
+			for(int j = 0; j < BOTANY_MESHES_PER_CELL; j++)
+			{
+				m_cells[i].m_meshIndices[j] = 0;
+			}
+
+			m_cells[i].m_meshSize = 0;
 		}
 
 		m_initialized = true;
@@ -267,6 +271,7 @@ namespace RootForce
 		{	
 			std::getline(*p_ss, value, ' ');
 			SetGrassFactor((float)atof(value.c_str()));
+			Reconstruct();
 		}
 		else if(module == "show" || module == "s")
 		{	

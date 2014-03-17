@@ -16,6 +16,7 @@ namespace RootForce
 		m_return = false;
 		m_exit = false;
 		m_changeName =false;
+		m_changeTeam = -1;
 
 		m_view = p_view;
 		m_settingsMenu = new SettingsMenu(p_context, p_keymapper, p_chatSystem);

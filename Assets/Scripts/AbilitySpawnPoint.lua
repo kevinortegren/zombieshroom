@@ -16,12 +16,12 @@ function AbilitySpawnPoint.OnCollide (self, entity)
         abilitySpawn:SetClaimed(playerId);
         tryPickup:SetTryPickup(false);
         Logging.Log(LogLevel.DEBUG_PRINT, "Pick up successful");
+        Static.Play3DSound("CC-BY3.0/sfx_fly.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0);
       end
     end
 end
 
 
 function AbilitySpawnPoint.OnDestroy (self)
-	local collision = self:GetCollision();
-	Collision.RemoveObjectFromWorld(collision);
+	self:RemoveCollision();
 end

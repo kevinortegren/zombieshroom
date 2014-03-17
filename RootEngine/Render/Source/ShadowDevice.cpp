@@ -84,6 +84,18 @@ namespace Render
 		glSamplerParameteri(m_samplerObjectFloat, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 
+	void ShadowDevice::Clear()
+	{
+		// Deconstruct the job batch.
+		for(auto itr = m_shadowJobs.begin(); itr != m_shadowJobs.end(); ++itr)
+		{
+			(*itr)->~ShadowJob();
+		}
+
+		m_shadowJobAllocator.Clear();
+		m_shadowJobs.clear();	
+	}
+
 	void ShadowDevice::AddShadowcaster( const Render::Shadowcaster& p_shadowcaster, int p_index)
 	{
 		if(p_index > RENDER_MAX_SHADOWCASTERS)
@@ -114,6 +126,7 @@ namespace Render
 			std::sort(m_shadowJobs.begin(), m_shadowJobs.end(), SortShadowJobs);
 
 			ShadowTechnique::ShadowTechnique currentTechnique = ShadowTechnique::SHADOW_NONE;
+			std::shared_ptr<Technique> tech = nullptr;
 
 			for(auto itr = m_shadowJobs.begin(); itr != m_shadowJobs.end(); ++itr)
 			{
@@ -121,13 +134,13 @@ namespace Render
 				{
 					currentTechnique = (*itr)->m_technique;
 
-					std::shared_ptr<Technique> tech = m_shadowEffect->GetTechniques()[currentTechnique-1];
+					tech = m_shadowEffect->GetTechniques()[currentTechnique-1];
 					tech->GetPrograms()[0]->Apply();
+				}
 
-					for(auto param = (*itr)->m_params.begin(); param != (*itr)->m_params.end(); ++param)
-					{	
-						m_uniforms->BufferSubData(tech->m_uniformsParams[param->first], Render::GLRenderer::s_sizes[param->first], param->second);
-					}
+				for(auto param = (*itr)->m_params.begin(); param != (*itr)->m_params.end(); ++param)
+				{	
+					m_uniforms->BufferSubData(tech->m_uniformsParams[param->first], Render::GLRenderer::s_sizes[param->first], param->second);
 				}
 
 				for(auto texture = (*itr)->m_textures.begin(); texture != (*itr)->m_textures.end(); ++texture)

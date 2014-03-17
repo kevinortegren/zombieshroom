@@ -104,7 +104,7 @@ namespace RootEngine
 
 	void Profiling::Update( float p_dt )
 	{
-//#ifdef _DEBUG
+#ifdef _DEBUG
 		m_time += p_dt;
 		m_frames += 1;
 
@@ -115,11 +115,13 @@ namespace RootEngine
 			m_time = 0;
 		}
 #ifndef COMPILE_LEVEL_EDITOR
+
 		for(std::string s : m_ouputList)
 		{
 			m_debugOverlay->AddHTMLToBuffer(s.c_str(), TextColor::GREEN, false);
 		}
-//#endif
+
+#endif
 #endif
 	}
 
@@ -165,10 +167,11 @@ namespace RootEngine
 	}
 
 #ifndef COMPILE_LEVEL_EDITOR
+#ifdef _DEBUG
 	void Profiling::SetDebugOverlay( DebugOverlayInterface* p_debugOverlay )
 	{
 		m_debugOverlay = p_debugOverlay;
 	}
-
+#endif
 #endif
 }

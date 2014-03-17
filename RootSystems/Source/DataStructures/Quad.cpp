@@ -10,16 +10,24 @@ extern RootEngine::GameSharedContext g_engineContext;
 
 namespace RootForce
 {
-	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName)
+	void QuadTree::Initialize(RootEngine::GameSharedContext* p_context, ECS::World* p_world, const std::string& p_groupName, const std::string& p_newName, bool p_clear)
 	{
+		if(m_root != nullptr)
+			delete m_root;
+
 		m_idCounter = 0;
 		m_groupName = p_groupName;
 		m_vertices.clear();
 		m_materials.clear();
 		m_boundsPolygons.clear();
+		m_sizes.clear();
 		m_context = p_context;
 		m_world = p_world;
 		m_newGroupName = p_newName;
+
+		m_entities.clear();
+		m_culledNodes.clear();
+		m_culledEntities.clear();
 
 		// Get working set.
 		ECS::GroupManager::GroupRange range = p_world->GetGroupManager()->GetEntitiesInGroup(p_groupName);
@@ -189,6 +197,14 @@ namespace RootForce
 		quadTreeBounds.m_minZ = (float)-RoundToPow2(abs(minZ));
 
 		m_root = new QuadNode(quadTreeBounds);
+
+		if(p_clear)
+		{
+			m_vertices.clear();
+			m_boundsPolygons.clear();
+			m_sizes.clear();
+		}
+
 	}
 
 	void QuadTree::BeginDivide(unsigned int p_polygonsPerNode, bool p_splitPolygons, bool p_removeOrigionalEntities)
@@ -793,4 +809,15 @@ namespace RootForce
 
 		return entitiesIds;
 	}
+
+	QuadTree::QuadTree() : m_root(nullptr)
+	{
+
+	}
+
+	QuadTree::~QuadTree()
+	{
+		delete m_root;
+	}
+
 }

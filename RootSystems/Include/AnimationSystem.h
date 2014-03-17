@@ -46,6 +46,11 @@ namespace RootForce
 			AIRSTRAFERIGHT,
 			DESCEND1,
 			DANCE1,
+			SPAWN1,
+			IDLE2,
+			IDLE3,
+			ASCEND2,
+			DESCEND3_STRECTH,
 			RAGDOLL,
 			NOCLIP,
 		};
@@ -82,11 +87,10 @@ namespace RootForce
 
 	struct Animation : public ECS::Component<Animation>
 	{
-		Animation() : AnimationSpeed(1.0f) {}
+		Animation(){}
 		glm::mat4 m_bones[20];
 		AnimBodyPart UpperBodyAnim;
 		AnimBodyPart LowerBodyAnim;
-		float AnimationSpeed;
 	};
 
 	struct AnimationSystem : public ECS::ConcurrentSystem
@@ -110,8 +114,8 @@ namespace RootForce
 		ECS::ComponentMapper<Renderable> m_renderables;
 
 	private:
-		void UpdateUpperBodyAnimation(Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond );
-		void UpdateLowerBodyAnimation(Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond );
+		void UpdateUpperBodyAnimation(Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed );
+		void UpdateLowerBodyAnimation(Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed );
 		void ReadNodeHeirarchyLower(const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
 		void ReadNodeHeirarchyUpper(const aiNode* pNode, const glm::mat4& ParentTransform, Animation* p_anim, Renderable* p_render, const aiScene* p_aiScene);
 

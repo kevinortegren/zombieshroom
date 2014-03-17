@@ -1,6 +1,0 @@
-
-* Exportera directional till level-fil
-* Importera Ambient och directional FRÅN levelfil
-* Partiklar i leveleditor borta?
-* Importera partiklar från level-fil
-* 

@@ -27,11 +27,13 @@ namespace RootEngine
 		
 #ifndef COMPILING_LEVEL_EDITOR
 
+		/*
 		if(m_network != nullptr)
 		{
 			m_network->Shutdown();
 			DynamicLoader::FreeSharedLibrary(m_networkModule);
 		}
+		*/
 
 		if(m_physics != nullptr)
 		{
@@ -73,7 +75,7 @@ namespace RootEngine
 		m_configManager.LoadConfig(p_workingDirectory + "config.yaml");
 
 #ifndef COMPILING_LEVEL_EDITOR
-		m_network = nullptr;
+		//m_network = nullptr;
 		m_gui = nullptr;
 		m_physics = nullptr;
 		m_scriptEngine = nullptr;
@@ -94,14 +96,17 @@ namespace RootEngine
 		}
 
 #ifndef COMPILING_LEVEL_EDITOR
-				
+#ifdef _DEBUG
 		m_subsystemSharedContext.m_debugOverlay = &m_debugOverlay;
+#endif
 
 		// Load external dlls.
+		/*
 		if((p_flags & SubsystemInit::INIT_NETWORK) == SubsystemInit::INIT_NETWORK)
 		{
 			LoadNetwork();
 		}
+		*/
 		if((p_flags & SubsystemInit::INIT_INPUT) == SubsystemInit::INIT_INPUT)
 		{
 			LoadInput();
@@ -143,14 +148,16 @@ namespace RootEngine
 		m_gameSharedContext.m_renderer = m_renderer;
 		m_gameSharedContext.m_profiler = &m_profiler;
 #ifndef COMPILING_LEVEL_EDITOR
+#ifdef _DEBUG
 		m_gameSharedContext.m_debugOverlay = m_subsystemSharedContext.m_debugOverlay;
+		m_gameSharedContext.m_profiler->SetDebugOverlay(m_subsystemSharedContext.m_debugOverlay);
+#endif
 		m_gameSharedContext.m_inputSys = m_inputSys;
-		m_gameSharedContext.m_network = m_network;
+		//m_gameSharedContext.m_network = m_network;
 		m_gameSharedContext.m_gui = m_gui;
 		m_gameSharedContext.m_physics = m_physics;
 		m_gameSharedContext.m_inputSys = m_inputSys;
 		m_gameSharedContext.m_script = m_scriptEngine;
-		m_gameSharedContext.m_profiler->SetDebugOverlay(m_subsystemSharedContext.m_debugOverlay);
 		m_gameSharedContext.m_sound = m_soundEngine;
 
 #endif
@@ -196,7 +203,7 @@ namespace RootEngine
 	}
 
 #ifndef COMPILING_LEVEL_EDITOR
-
+	/*
 	void EngineMain::LoadNetwork()
 	{
 		// Load the network module
@@ -220,6 +227,7 @@ namespace RootEngine
 			g_logger.LogText(LogTag::NETWORK,  LogLevel::FATAL_ERROR, "Failed to load Network subsystem: %s", DynamicLoader::GetLastError());
 		}
 	}
+	*/
 
 	void EngineMain::LoadInput()
 	{

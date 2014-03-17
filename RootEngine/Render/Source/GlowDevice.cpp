@@ -70,19 +70,19 @@ namespace Render
 	void GlowDevice::SetGlowFactor(float p_factor)
 	{
 		g_context.m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Changed glow factor to %f", p_factor);
-		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(8, sizeof(float), &p_factor);
+		//m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(8, sizeof(float), &p_factor);
 	}
 
 	void GlowDevice::SetGlowStrength(float p_strength)
 	{
 		g_context.m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Changed glow strength to %f", p_strength);
-		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &p_strength);
+		//m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(12, sizeof(float), &p_strength);
 	}
 
 	void GlowDevice::SetGlowRadius(float p_radius)
 	{
 		g_context.m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Changed glow radius to %f", p_radius);
-		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(16, sizeof(float), &p_radius);
+		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(8, sizeof(float), &p_radius);
 	}
 
 	void GlowDevice::HorizontalPass(Mesh* m_mesh)

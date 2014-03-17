@@ -20,7 +20,7 @@ end
 function SlowNova.ChannelingDone (time, userId, actionId)
 end
 
-function FireBall.Interrupted (time, userId, actionId)
+function SlowNova.Interrupted (time, userId, actionId)
 end
 
 function SlowNova.OnCreate (userId, actionId)

@@ -18,6 +18,10 @@ function AbilityBall.OnLoad()
 	ResourceManager.LoadTexture("fireballGlow");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("SmockeochElden");
+	ResourceManager.LoadScript("Explosion");
+	ResourceManager.LoadSound("CC-BY3.0/explosion_dull.wav", 0x00400011);
+	ResourceManager.LoadSound("fireloop.wav", 0x00400012);
+
 end
 
 function AbilityBall.ChargeStart(userId, actionId)
@@ -46,6 +50,9 @@ function AbilityBall.Explode(self)
 	self:RemoveCollision();
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
+
+	self:RemoveSoundable();
+	Static.Play3DSound("CC-BY3.0/explosion_dull.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0);
 end
 
 function AbilityBall.OnCreate (userId, actionId)
@@ -60,10 +67,12 @@ function AbilityBall.OnCreate (userId, actionId)
 	local physicsComp = Physics.New(self);
 	local scriptComp = Script.New(self, "AbilityBall");
 	local networkEnt = Network.New(self, userId, actionId);
+	
 	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration, "AbilityBall", "Explode", self);
 	TimerEntity.StartTimer(userId, actionId, AbilityBall.duration + 2, "AbilityBall", "OnDestroy", self);
 
 	--Setting stuff
+
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local tempPos = casterEnt:GetTransformation():GetPos();
@@ -77,6 +86,12 @@ function AbilityBall.OnCreate (userId, actionId)
 	transformComp:SetScale(Vec3.New(0.5, 0.5, 0.5));
 
 	if Global.IsClient then
+		local soundable = Soundable.New(self);
+		soundable:SetSound("fireloop.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+		soundable:SetRange(10.0, 100.0);
+		soundable:SetVolume(1.0);
+		soundable:Play();
+
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Fireball");
@@ -120,5 +135,6 @@ function AbilityBall.OnCollide (self, entity)
 end
 
 function AbilityBall.OnDestroy (self)
+	self:RemoveSoundable();
 	Entity.Remove(self);
 end

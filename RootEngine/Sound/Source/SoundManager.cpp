@@ -122,8 +122,7 @@ namespace RootEngine
 			std::string soundFile = m_workingDir + "Assets\\Audio\\" + p_name;
 			if(m_BackGroundChannel != nullptr)
 				m_BackGroundChannel->stop();
-			const char* l_temp = p_name.c_str();
-			m_system->createStream(l_temp,FMOD_DEFAULT, 0, &m_backGroundStream);
+			m_system->createStream(soundFile.c_str(),FMOD_DEFAULT, 0, &m_backGroundStream);
 			m_system->playSound(FMOD_CHANNEL_FREE, m_backGroundStream, false, &m_BackGroundChannel);
 			m_BackGroundChannel->setMode(FMOD_LOOP_NORMAL);
 			m_BackGroundChannel->setLoopCount(-1);

@@ -7,10 +7,11 @@ PowerRay.cooldown = 1;
 PowerRay.charges = 10;
 PowerRay.chargeTime = 0;
 PowerRay.channelingTime = 0;
-PowerRay.duration = 1;
+PowerRay.duration = 0.4;
 PowerRay.crosshair = "crosshairPrecision";
 
 function PowerRay.OnLoad()
+	ResourceManager.LoadSound("CC-BY3.0/qubodupElectricityDamage01.wav", 0x00400011);
 end
 
 function PowerRay.ChargeStart(userId, actionId)
@@ -42,7 +43,15 @@ function PowerRay.OnCreate (userId, actionId)
 	local scriptComp = Script.New(self, "PowerRay");
 	TimerEntity.StartTimer(userId, actionId, PowerRay.duration, "PowerRay", "OnDestroy", self);
 	local dakComp = DamageAndKnockback.New(self, PowerRay.currentDamage , PowerRay.currentKnockback);
+
+	local soundable = Soundable.New(self);
+	
 	--Setting stuff
+	soundable:SetSound("CC-BY3.0/qubodupElectricityDamage01.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	soundable:SetRange(10.0, 50.0);
+	soundable:SetVolume(0.4);
+	soundable:Play();
+
 	collisionComp:CreateHandle(self, 1, true);
 	colRespComp:SetContainer(collisionComp);
 	local facePos = casterEnt:GetTransformation():GetPos() + Vec3.New(0,1,0);
@@ -72,10 +81,12 @@ if entity:DoesExist() then
 	local dakComp = self:GetDamageAndKnockback();
 	local hitCol = entity:GetCollision();
 	local type = hitCol:GetType();
+
+	local abilityOwnerNetwork = self:GetNetwork();
+	local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 	if type == PhysicsType.TYPE_PLAYER then
 		local targetPlayerComponent = entity:GetPlayerComponent();
-		local abilityOwnerNetwork = self:GetNetwork();
-		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
+
 		local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 		local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 		if abilityOwnerPlayerComponent:GetTeamId() ~= targetPlayerComponent:GetTeamId() then
@@ -90,7 +101,13 @@ if entity:DoesExist() then
 			Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 		end
 	end
+	Static.Play3DSound("CC-BY3.0/qubodupElectricityDamage01.wav", 0.6, entity:GetTransformation():GetPos(), 10.0, 50.0);
 end
+end
+
+function PowerRay.StopHitSound(hitPositionEntity)
+	hitPositionEntity:RemoveSoundable();
+	Entity.Remove(hitPositionEntity);
 end
 
 function PowerRay.OnDestroy (self)

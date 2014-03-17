@@ -9,36 +9,55 @@ Push.duration = 0.5;
 
 function Push.OnLoad()
 	ResourceManager.LoadParticle("fireball");
+	ResourceManager.LoadSound("swosh-08.wav", 0x00400011);
 end
 
 function Push.ChargeStart(userId, actionId)
 	--Animation clip
 	Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperChargingAnimClip(AnimClip.CHARGING2);
+	--Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetLowerChargingAnimClip(AnimClip.CHARGING2);
 end
 
 function Push.ChargeDone (time, userId, actionId)
 
 	math.randomseed(os.time());
 	local randomNumber = math.random(1,2);	
+	local playerEnt = Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0);
+	local movePower = playerEnt:GetPlayerAction():GetMovePower();
+	local strafePower = playerEnt:GetPlayerAction():GetStrafePower();
+	local playerState = playerEnt:GetStateComponent():GetCurrentState();
+	Logging.Log(LogLevel.DEBUG_PRINT, "State after charge is "..playerState);
 
 	--Animation clip
 	if ((time) / Push.chargeTime) < 0.5 then
 		if randomNumber == 1 then
-			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
+			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTLEFT1, true);
+			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.LANDING, true);
+			end
 		end
 		
 		if randomNumber == 2 then
-			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
+			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTRIGHT1, true);
+			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.LANDING, true);
+			end
 		end
 	end
 
 	if ((time) / Push.chargeTime) >= 0.5 then
 		if randomNumber == 1 then
-			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
+			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE1, true);
+			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.LANDING, true);
+			end
 		end
 
 		if randomNumber == 2 then
-			Entity.GetEntityByNetworkID(userId, ReservedActionID.CONNECT, 0):GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE2, true);
+			playerEnt:GetAnimation():SetUpperAnimClip(AnimClip.SHOOTDOUBLE2, true);
+			if movePower == 0 and strafePower == 0 and playerState == EntityState.GROUNDED then
+				playerEnt:GetAnimation():SetLowerAnimClip(AnimClip.LANDING, true);
+			end
 		end
 	end
 	
@@ -83,6 +102,7 @@ function Push.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "PushMeMaybe");
+		Static.Play3DSound("swosh-08.wav", 1.0, self:GetTransformation():GetPos(), 50.0, 400.0);
 	end
 end
 
@@ -101,6 +121,7 @@ function Push.OnCollide (self, entity)
 				local selfPos = self:GetTransformation():GetPos();
 				local health = entity:GetHealth();
 				Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), Push.currentKnockback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+				health:Damage(abilityOwnerId, 0, "Push");
 			end
 		end
 	end

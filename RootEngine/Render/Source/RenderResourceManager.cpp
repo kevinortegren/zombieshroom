@@ -15,20 +15,8 @@ namespace Render
 
 	RenderResourceManager::~RenderResourceManager()
 	{
-		for(auto itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
-			delete (*itr);
-
-		for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
-			delete (*itr);
-
-		for(auto itr = m_meshes.begin(); itr != m_meshes.end(); ++itr)
-			delete (*itr);
-
-		for(auto itr = m_vaos.begin(); itr != m_vaos.end(); ++itr)
-			delete (*itr);
-
-		for(auto itr = m_effects.begin(); itr != m_effects.end(); ++itr)
-			delete (*itr);
+		g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Cleaning all render resources.");
+		Clean(RenderResources::RR_ALL);
 	}
 
 	void RenderResourceManager::PrintResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
@@ -66,6 +54,7 @@ namespace Render
 
 	BufferInterface* RenderResourceManager::CreateBuffer(GLenum p_type)
 	{ 
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating Buffer. %d", m_buffers.size());
 		Buffer* buffer = new Buffer(p_type);
 		m_buffers.push_back(buffer);
 		return buffer;
@@ -73,22 +62,23 @@ namespace Render
 
 	void RenderResourceManager::ReleaseBuffer(BufferInterface* p_buffer)
 	{
-		if(p_buffer != nullptr)
+		auto itr = std::find(m_buffers.begin(), m_buffers.end(), p_buffer);
+		if(itr != m_buffers.end())
 		{
-			auto itr = std::find(m_buffers.begin(), m_buffers.end(), p_buffer);
-			if(itr != m_buffers.end())
+			if((*itr) != nullptr)
 			{
-				if((*itr) != nullptr)
-				{
-					delete (*itr);
-					(*itr) = nullptr;
-				}
+				//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Release buffer %d", p_buffer->GetBufferId());
+				delete (*itr);
+				(*itr) = nullptr;
 			}
-		}
+
+			m_buffers.erase(itr);
+		}		
 	}
 
 	TextureInterface* RenderResourceManager::CreateTexture()
 	{
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating Texture. %d", m_textures.size());
 		Texture* texture = new Texture();
 		m_textures.push_back(texture);
 		return texture;
@@ -97,14 +87,26 @@ namespace Render
 	void RenderResourceManager::ReleaseTexture(TextureInterface* p_texture)
 	{
 		auto itr = std::find(m_textures.begin(), m_textures.end(), p_texture);
-		m_textures.erase(itr);
+		if(itr != m_textures.end())
+		{
+			if((*itr) != nullptr)
+			{
+				//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Release texture %d", p_texture->GetHandle());
+				delete (*itr);
+				(*itr) = nullptr;
+			}
+
+			m_textures.erase(itr);
+		}	
 	}
 
 	Material* RenderResourceManager::CreateMaterial(const std::string& p_name)
 	{
+		
 		auto itr = m_materialNameMap.find(p_name);
 		if(itr == m_materialNameMap.end())
 		{
+			//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Creating Material %s", p_name.c_str());
 			m_materialNameMap[p_name] = m_materials.size();
 
 			Material mat = Material(m_materials.size());
@@ -117,6 +119,7 @@ namespace Render
 
 	VertexAttributesInterface* RenderResourceManager::CreateVertexAttributes()
 	{ 
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating VAO %d.", m_vaos.size());
 		VertexAttributes* vao = new VertexAttributes();
 		m_vaos.push_back(vao);
 		return vao;
@@ -124,6 +127,7 @@ namespace Render
 
 	MeshInterface* RenderResourceManager::CreateMesh() 
 	{ 
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating mesh %d.", m_meshes.size());
 		Mesh* mesh = new Mesh();
 		m_meshes.push_back(mesh);
 		return mesh;
@@ -131,6 +135,7 @@ namespace Render
 
 	EffectInterface* RenderResourceManager::CreateEffect() 
 	{ 
+		//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Allocating effect %d.", m_effects.size());
 		Effect* effect = new Effect();
 		m_effects.push_back(effect);
 		return effect;
@@ -143,8 +148,83 @@ namespace Render
 			if((*itr).second == p_material->m_id)
 				return (*itr).first;
 		}
-		assert(false);
 		return std::string("");
 	}
 
+	void RenderResourceManager::RemoveMesh(MeshInterface* p_mesh)
+	{
+		auto itr = std::find(m_meshes.begin(), m_meshes.end(), p_mesh);
+		if(itr != m_meshes.end())
+		{
+			if((*itr) != nullptr)
+			{
+				//g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Remove Mesh.");
+				(*itr)->FreeBuffers(this);
+
+				delete (*itr);
+				(*itr) = nullptr;
+			}
+
+			m_meshes.erase(itr);
+		}	
+	}
+
+	void RenderResourceManager::RemoveVAO(VertexAttributesInterface* p_vao)
+	{	
+		auto itr = std::find(m_vaos.begin(), m_vaos.end(), p_vao);
+		if(itr != m_vaos.end())
+		{
+			if((*itr) != nullptr)
+			{
+			//	g_context.m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Remove VAO.");
+				delete (*itr);
+				(*itr) = nullptr;
+			}
+			m_vaos.erase(itr);
+		}		
+	}
+
+	void RenderResourceManager::Clean(unsigned p_cleanFlag)
+	{
+		if((p_cleanFlag & RenderResources::RR_BUFFER) == RenderResources::RR_BUFFER)
+		{
+			for(auto itr = m_buffers.begin(); itr != m_buffers.end(); ++itr)
+				delete (*itr);
+			m_buffers.clear();
+		}
+
+		if((p_cleanFlag & RenderResources::RR_TEXTURE) == RenderResources::RR_TEXTURE)
+		{
+			for(auto itr = m_textures.begin(); itr != m_textures.end(); ++itr)
+				delete (*itr);
+			m_textures.clear();
+		}
+
+		if((p_cleanFlag & RenderResources::RR_MESH) == RenderResources::RR_MESH)
+		{
+			for(auto itr = m_meshes.begin(); itr != m_meshes.end(); ++itr)
+				delete (*itr);
+			m_meshes.clear();
+		}
+
+		if((p_cleanFlag & RenderResources::RR_VAO) == RenderResources::RR_VAO)
+		{
+			for(auto itr = m_vaos.begin(); itr != m_vaos.end(); ++itr)
+				delete (*itr);
+			m_vaos.clear();
+		}
+
+		if((p_cleanFlag & RenderResources::RR_EFFECT) == RenderResources::RR_EFFECT)
+		{
+			for(auto itr = m_effects.begin(); itr != m_effects.end(); ++itr)
+				delete (*itr);
+			m_effects.clear();
+		}
+
+		if((p_cleanFlag & RenderResources::RR_MATERIAL) == RenderResources::RR_MATERIAL)
+		{
+			m_materials.clear();
+			m_materialNameMap.clear();
+		}
+	}
 }

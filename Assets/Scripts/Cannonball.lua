@@ -20,6 +20,8 @@ function Cannonball.OnLoad()
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("CannonballTrail");
 	ResourceManager.LoadScript("BigExplosion");
+	ResourceManager.LoadSound("CC-BY3.0/DeathFlash.wav", 0x00400011);
+	ResourceManager.LoadSound("CC-BY3.0/rumble.wav", 0x00400011);
 	BigExplosion.OnLoad();
 end
 
@@ -49,7 +51,13 @@ function Cannonball.Explode(self)
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
 
+	Static.Play3DSound("CC-BY3.0/DeathFlash.wav", 1.0, self:GetTransformation():GetPos(), 50.0, 400.0);
+
 	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "Cannonball", "OnDestroy", self);
+end
+
+function Cannonball.StopHitSound(explosionSoundEffectEntity)
+	Entity.Remove(explosionSoundEffectEntity);
 end
 
 function Cannonball.OnCreate (userId, actionId)
@@ -66,6 +74,7 @@ function Cannonball.OnCreate (userId, actionId)
 	local networkEnt = Network.New(self, userId, actionId);
 
 	--Setting stuff
+
 	collisionComp:CreateHandle(self, 1, false);
 	colRespComp:SetContainer(collisionComp);
 	local tempPos = casterEnt:GetTransformation():GetPos();
@@ -78,6 +87,7 @@ function Cannonball.OnCreate (userId, actionId)
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
+		Static.Play3DSound("CC-BY3.0/rumble.wav", 0.6, self:GetTransformation():GetPos(), 10.0, 100.0);
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Cannonballs");

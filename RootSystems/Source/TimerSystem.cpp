@@ -43,7 +43,7 @@ void RootForce::TimerSystem::ProcessEntity( ECS::Entity* p_entity )
 
 	if (timer->TimeUp)
 	{
-		g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::PINK_PRINT, "Time up (User: %u, Action: %u, Sequence: %u)", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
+		//g_engineContext.m_logger->LogText(LogTag::NETWORK, LogLevel::PINK_PRINT, "Time up (User: %u, Action: %u, Sequence: %u)", network->ID.UserID, network->ID.ActionID, network->ID.SequenceID);
 
 		ECS::Entity* target = Network::FindEntity(g_networkEntityMap, timer->Target);
 		if (target != nullptr)

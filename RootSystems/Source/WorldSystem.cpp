@@ -1,6 +1,8 @@
 #include <RootSystems/Include/WorldSystem.h>
 #include <RootSystems/Include/Components.h>
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/ControllerActionSystem.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 namespace RootForce
 {
@@ -14,7 +16,6 @@ namespace RootForce
 
 		// Parse ambient data.
 		glm::vec4 ambient = m_world->GetStorage()->GetValueAsVec4("Ambient");
-		//glm::vec4 ambient = glm::vec4(0.1f);
 		SetAmbientLight(ambient);
 
 		// Create constant entities.
@@ -22,15 +23,21 @@ namespace RootForce
 		CreatePlayerCamera();
 
 		// Put the static entities into a spatial quad tree.
-		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split");
+		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split", true);
 
 		// Adds static entities.
 		AddStaticEntitiesToPhysics();
+
+		//LOL THIS IS NOT THE PLACE
+		g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00200011);
 	}
 #endif
 
 	void WorldSystem::BuildStaticShadowMesh()
 	{
+		if(m_staticMesh != nullptr)
+			g_engineContext.m_renderer->RemoveMesh(m_staticMesh);
+
 		ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
 
 		std::vector<Render::Vertex1P> vertices;
@@ -246,19 +253,19 @@ namespace RootForce
 		RootForce::Camera* camera = m_world->GetEntityManager()->CreateComponent<RootForce::Camera>(cameraEntity);
 		RootForce::Transform* cameraTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(cameraEntity);
 
-		RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
-		RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
-		
+		//RootForce::LookAtBehavior* cameraLookAt = m_world->GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(cameraEntity);
+		//RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world->GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(cameraEntity);
+		//
 		float aspectRatio = (float)m_engineContext->m_renderer->GetWidth() / m_engineContext->m_renderer->GetHeight();
 
 		camera->m_frustum = Frustum(45.0f, 1.0f, 5000.0f, aspectRatio);
 
-		cameraLookAt->m_targetTag = "AimingDevice";
-		cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
-		
-		cameraThirdPerson->m_targetTag = "AimingDevice";
-		cameraThirdPerson->m_displacement = glm::vec3(0.0f, -1.0f, -2.0f);
-		cameraThirdPerson->m_distance = 8.0f;
+		//cameraLookAt->m_targetTag = "AimingDevice";
+		//cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
+		//
+		//cameraThirdPerson->m_targetTag = "AimingDevice";
+		//cameraThirdPerson->m_displacement = glm::vec3(0.0f, -1.0f, -2.0f);
+		//cameraThirdPerson->m_distance = 8.0f;
 
 		m_world->GetTagManager()->RegisterEntity("Camera", cameraEntity);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", cameraEntity);
@@ -281,11 +288,15 @@ namespace RootForce
 
 	void WorldSystem::Process()
 	{	
-		Render::ShadowJob job;
-		job.m_technique = Render::ShadowTechnique::SHADOW_OPAQUE;
-		job.m_mesh = m_staticMesh;
+		if(m_staticMesh != nullptr)
+		{
+			Render::ShadowJob job;
+			job.m_technique = Render::ShadowTechnique::SHADOW_OPAQUE;
+			job.m_mesh = m_staticMesh;
 
-		g_engineContext.m_renderer->AddShadowJob(job);
+			g_engineContext.m_renderer->AddShadowJob(job);
+		}
+	/*
 #ifndef COMPILE_LEVEL_EDITOR
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");
 
@@ -309,6 +320,7 @@ namespace RootForce
 			m_engineContext->m_renderer->AddRenderJob(job);
 		}
 #endif
+		*/
 	}
 
 	void WorldSystem::ShowDebug(bool p_value)
@@ -320,5 +332,10 @@ namespace RootForce
 	{
 		return &m_quadTree;
 	}
+
+	WorldSystem::~WorldSystem()
+	{
+	}
+
 }
 

@@ -37,6 +37,9 @@ namespace ECS
 		template<class T> 
 		T* CreateComponent(Entity* p_entity)
 		{
+			if(p_entity == nullptr)
+				return nullptr;
+
 			assert(Component<T>::GetTypeId() != UINT_MAX);
 
 			// Allocate component.
@@ -67,19 +70,27 @@ namespace ECS
 		template<class T> 
 		void RemoveComponent(Entity* p_entity)
 		{
-		   // Make sure the entity exist within the component list range.
-		   assert((size_t) p_entity->m_id < m_components[Component<T>::GetTypeId()].size());
- 
-		   // If already removed, skip.
-		   if(m_components[Component<T>::GetTypeId()][p_entity->m_id] != nullptr)
-		   {
-			    // Push the type of component and the given entity.
-			   m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(Component<T>::GetTypeId(), p_entity->GetId()));
+			if(p_entity == nullptr)
+				return;
 
-			   p_entity->m_flag ^= (1ULL << Component<T>::GetTypeId());
+			// Make sure the entity exist within the component list range.
+			if((size_t) p_entity->m_id >= m_components[Component<T>::GetTypeId()].size())
+				return;
 
-			   m_systemManager->RemoveEntityFromSystems(p_entity);
-		   }
+		   //Entity does not have this component. Return to avoid re-toggling.
+		   if ((p_entity->GetFlag() & (1ULL << Component<T>::GetTypeId())) == 0)
+			   return;
+
+			// If already removed, skip.
+			if(m_components[Component<T>::GetTypeId()][p_entity->m_id] != nullptr)
+			{
+				// Push the type of component and the given entity.
+				m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(Component<T>::GetTypeId(), p_entity->GetId()));
+
+			   p_entity->m_flag &= ~(1ULL << Component<T>::GetTypeId());
+
+				m_systemManager->RemoveEntityFromSystems(p_entity);
+			}
 		}
 
 		void CleanUp();
@@ -87,7 +98,15 @@ namespace ECS
 		template<class T>
 		T* GetComponent(Entity* p_entity)
 		{
+			if(p_entity == nullptr)
+				return nullptr;
+
+			// Make sure the entity exist within the component list range.
 			if(p_entity->m_id >= (int)m_components[Component<T>::GetTypeId()].size() || p_entity->m_id == -1)
+				return nullptr;
+
+			//Entity does not have this component. Return to avoid re-toggling.
+			if ((p_entity->GetFlag() & (1ULL << Component<T>::GetTypeId())) == 0)
 				return nullptr;
 
 			return static_cast<T*>(m_components[Component<T>::GetTypeId()][p_entity->m_id]);
@@ -112,7 +131,7 @@ namespace ECS
 
 		std::vector<ECS::Entity*> GetAllEntities();
 
-		const std::set<int>& GetEntitiesToBeRemoved() const { return m_entitiesToBeRemoved; }
+		const std::set<int> GetEntitiesToBeRemoved() const;
 	private:
 
 		EntitySystemManager* m_systemManager;
@@ -125,6 +144,6 @@ namespace ECS
 
 		// Recyling sets.
 		std::set<std::pair<unsigned int, unsigned int>> m_componentsToBeRemoved;
-		std::set<int> m_entitiesToBeRemoved;
+		std::set<Entity*> m_entitiesToBeRemoved;
 	};
 }

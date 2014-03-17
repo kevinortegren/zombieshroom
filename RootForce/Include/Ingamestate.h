@@ -7,6 +7,7 @@
 #include <RootSystems/Include/Shadowcaster.h>
 #include <RootSystems/Include/PlayerSystem.h>
 #include <RootSystems/Include/PlayerControlSystem.h>
+#include <RootSystems/Include/ControllerActionSystem.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/ScriptSystem.h>
@@ -68,6 +69,7 @@ namespace RootForce
 		// Game systems
 		SharedSystems& m_sharedSystems;
 		std::shared_ptr<RootForce::PlayerControlSystem> m_playerControlSystem;
+		RootForce::ControllerActionSystem*				m_controllerActionSystem;
 		RootForce::PhysicsTransformCorrectionSystem*	m_physicsTransformCorrectionSystem;
 		RootForce::PhysicsSystem*						m_physicsSystem;
 		RootForce::ScriptSystem*						m_scriptSystem;

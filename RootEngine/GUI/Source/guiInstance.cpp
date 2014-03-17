@@ -24,12 +24,6 @@ namespace RootEngine
 			m_shouldTerminate = true;
 			m_thread.join();
 
-			for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-			{
-				delete m_viewBuffer.at(i);
-			}
-			//Awesomium::WebCore::Shutdown(); // This causes the program to freeze, but does not seem necessary. Code remains for future reference.
-
 			glDeleteTextures(1, &m_texture);
 			glDeleteVertexArrays(1, &m_vertexArrayBuffer);
 			delete m_glTexSurfaceFactory;
@@ -161,12 +155,9 @@ namespace RootEngine
 
 		void guiInstance::DestroyView( WebView* p_view )
 		{
-			m_viewBufferMutex.lock();
-			for(unsigned i = 0; i < m_viewBuffer.size(); i++)
-				if(m_viewBuffer.at(i) == p_view)
-					m_viewBuffer.erase(m_viewBuffer.begin() + i--);
-			m_viewBuffer.shrink_to_fit();
-			m_viewBufferMutex.unlock();
+			m_destroyListMutex.lock();
+				m_destroyList.push_back((WebViewImpl*)p_view);
+			m_destroyListMutex.unlock();
 		}
 
 		void guiInstance::HandleEvents( SDL_Event p_event )
@@ -337,6 +328,21 @@ namespace RootEngine
 						m_loadList.clear();
 					m_loadListMutex.unlock();
 
+					m_destroyListMutex.lock();
+						m_viewBufferMutex.lock();
+							for(auto view : m_destroyList)
+								for(auto itr = m_viewBuffer.begin(); itr != m_viewBuffer.end(); ++itr)
+									if(*itr == view)
+									{
+										delete *itr;
+										m_viewBuffer.erase(itr);
+										break;
+									}
+							m_destroyList.clear();
+							m_viewBuffer.shrink_to_fit();
+						m_viewBufferMutex.unlock();
+					m_destroyListMutex.unlock();
+
 					m_viewBufferMutex.lock();
 						for(unsigned i = 0; i < m_viewBuffer.size(); i++)
 							if(m_viewBuffer[i] && m_viewBuffer[i]->m_isActive)
@@ -365,6 +371,7 @@ namespace RootEngine
 					}
 				}
 				SDL_GL_DeleteContext(m_glContext);
+				Awesomium::WebCore::Shutdown(); 
 			}
 			catch(std::exception e)
 			{
@@ -387,6 +394,7 @@ namespace RootEngine
 					{
 						view->SetShouldResize(true);
 						view->m_webView->Resize(p_width, p_height);
+						view->m_webView->ReduceMemoryUsage();
 					}
 				m_viewBufferMutex.unlock();
 			m_drawMutex.unlock();

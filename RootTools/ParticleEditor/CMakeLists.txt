@@ -22,7 +22,7 @@ foreach(it ${UI_FILES})
     get_filename_component(infile ${it} ABSOLUTE)
     set(outfile ${CMAKE_CURRENT_SOURCE_DIR}/GeneratedFiles/ui_${outfile}.h)
     add_custom_command(OUTPUT ${outfile}
-      COMMAND ${CMAKE_SOURCE_DIR}/External/Bin/x86/uic.exe
+      COMMAND ${CMAKE_SOURCE_DIR}/External/Bin/x86/Debug/uic.exe
       ARGS -o ${outfile} ${infile}
       MAIN_DEPENDENCY ${infile} VERBATIM)
    # list(APPEND ${outfiles} ${outfile})
@@ -34,7 +34,7 @@ foreach(it ${HEADERS})
     get_filename_component(infile ${it} ABSOLUTE)
     set(outfile ${CMAKE_CURRENT_SOURCE_DIR}/GeneratedFiles/moc_${outfile}.cpp)
     add_custom_command(OUTPUT ${outfile}
-      COMMAND ${CMAKE_SOURCE_DIR}/External/Bin/x86/moc.exe
+      COMMAND ${CMAKE_SOURCE_DIR}/External/Bin/x86/Debug/moc.exe
       ARGS ${MOC_OPTIONS} -o ${outfile} ${infile}
       MAIN_DEPENDENCY ${infile} VERBATIM)
    # list(APPEND ${outfiles} ${outfile})
@@ -47,5 +47,6 @@ endforeach()
 include_directories(Include)
 
 # Add the target
+
 add_executable(${PROJECT_NAME} ${UI_FILES} ${GEN_FILES} ${QRC_FILES} ${HEADERS} ${SOURCES} ${RESOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})

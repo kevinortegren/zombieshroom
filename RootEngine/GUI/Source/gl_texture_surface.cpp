@@ -122,13 +122,14 @@ void GLTextureSurface::UpdateTexture()
 				tile.FenceID = 0;
 				
 				glBindTexture(GL_TEXTURE_2D, tile.Texture);
-				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, tile.PBO[tile.ActiveBuffer]);
+				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, tile.PBO[!tile.ActiveBuffer]);
 
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TILE_SIZE, TILE_SIZE,
 					tile.Bpp == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE, 0);
 		
 				glBindTexture(GL_TEXTURE_2D, 0);
 				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
+				tile.ActiveBuffer = !tile.ActiveBuffer;
 			}
 			if (tile.NeedsUpdate)
 			{
@@ -146,8 +147,8 @@ void GLTextureSurface::UpdateTexture()
 				glBindTexture(GL_TEXTURE_2D, 0);
 				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
 				tile.NeedsUpdate = false;
-				tile.ActiveBuffer = !tile.ActiveBuffer;
-
+				if(tile.FenceID > 0)
+					glDeleteSync(tile.FenceID);
 				tile.FenceID = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
 			}
 		}
