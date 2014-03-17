@@ -99,9 +99,6 @@ function RefractiveBall.OnCollide (self, entity)
 				hitPhys:KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), RefractiveBall.knockback, health:GetHealth());
 			end
 		end
-		if type == PhysicsType.TYPE_ABILITY then
-			Static.Play3DSound("CC-BY3.0/pop.ogg", 1.0, entity:GetTransformation():GetPos(), 10.0, 50.0);
-		end
 	end
 end
 
