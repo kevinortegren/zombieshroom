@@ -1930,7 +1930,7 @@
     - Key: Ambient
       Value: 0.357473 0.357473 0.357473 1
     - Key: GrassBillboard
-      Value: grassStrawBillboard
+      Value: grass_billboard
     - Key: GrassDiffuse
       Value: Grass
     - Key: GrassTranslucency
