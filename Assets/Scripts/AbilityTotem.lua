@@ -5,7 +5,7 @@ AbilityTotem.chargeTime = 0;
 AbilityTotem.channelingTime = 0;
 AbilityTotem.duration = 30;
 AbilityTotem.interval = 0.25;
-AbilityTotem.crosshair = "crosshairNone";
+AbilityTotem.crosshair = "";
 
 function AbilityTotem.OnLoad()
 	ResourceManager.LoadModel("TotemPole");

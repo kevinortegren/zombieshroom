@@ -855,6 +855,7 @@ namespace RootForce
 					m_hud->SetCharges(2, playerComponent->AbilityScripts[1].Charges);
 					m_hud->SetCharges(3, playerComponent->AbilityScripts[2].Charges);
 					
+					//g_engineContext.m_logger->LogText(LogTag::GUI, LogLevel::PINK_PRINT, ("current crosshair: " + playerComponent->AbilityScripts[playerActionComponent->SelectedAbility].Crosshair).c_str());
 					m_hud->SetCrosshair(playerComponent->AbilityScripts[playerActionComponent->SelectedAbility].Crosshair);
 
 					if(playerComponent->AbilityScripts[0].Cooldown > 0 && playerComponent->AbilityScripts[0].Name.compare("") != 0)
