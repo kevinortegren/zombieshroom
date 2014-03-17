@@ -59,6 +59,26 @@ namespace RootForce
 			return 1;
 		}
 
+		static int GetMousePosition(lua_State* p_luaState)
+		{
+			NumberOfArgs(0);
+
+			glm::vec2 *s = (glm::vec2 *)lua_newuserdata(p_luaState, sizeof(glm::vec2));
+			*s = glm::vec2(g_engineContext.m_inputSys->GetGlobalMousePos());
+			luaL_setmetatable(p_luaState, "Vec2");
+			return 1;
+		}
+
+		static int GetMouseDelta(lua_State* p_luaState)
+		{
+			NumberOfArgs(0);
+
+			glm::vec2 *s = (glm::vec2 *)lua_newuserdata(p_luaState, sizeof(glm::vec2));
+			*s = glm::vec2(g_engineContext.m_inputSys->GetDeltaMousePos());
+			luaL_setmetatable(p_luaState, "Vec2");
+			return 1;
+		}
+
 		static int Play3DSound(lua_State* p_luaState)
 		{
 			///NAME, VOLUME, POSITION, MINRANGE, MAXRANGE
@@ -3166,6 +3186,8 @@ namespace RootForce
 		static const struct luaL_Reg static_f [] = {
 			{"KnockBack", Knockback},
 			{"GetDeltaTime", GetDeltaTime},
+			{"GetMousePosition", GetMousePosition},
+			{"GetMouseDelta", GetMouseDelta},
 			{"Play3DSound", Play3DSound},
 			{NULL, NULL}
 		};
