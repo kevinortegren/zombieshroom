@@ -23,6 +23,5 @@ end
 
 
 function AbilitySpawnPoint.OnDestroy (self)
-	local collision = self:GetCollision();
-	Collision.RemoveObjectFromWorld(collision);
+	self:RemoveCollision();
 end
