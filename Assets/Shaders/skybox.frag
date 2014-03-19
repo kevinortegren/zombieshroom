@@ -42,23 +42,24 @@ void main()
 	vec3 blue = vec3(149.0/256.0, 183.0/256.0, 211.0/256.0);
 
 	float d = abs(dot(vec3(0.0, 1.0, 0.0), normalize(vert_texcoord)));
-	frag_color = vec3(mix(blue.r, blue2.r, d), mix(blue.g, blue2.g, d), mix(blue.g, blue2.g, d));
-
+	vec3 skycolor = vec3(mix(blue.r, blue2.r, d), mix(blue.g, blue2.g, d), mix(blue.g, blue2.g, d));
 	vec3 worldFragCoord = (modelMatrix * vec4(normalize(vert_texcoord), 0.0)).xyz;
 	float s = max(0.0, dot(normalize(sunDirection.xyz), normalize(worldFragCoord)));
 	
 	float sunFactor = 0.0;
 	sunFactor = pow(s, 256.0) * 0.7;
-	vec3 sunContribution = vec3(0.0);
+	vec3 sunContribution = sunColor * sunFactor;
+	glow = vec4(0.0);
+	frag_color = vec3(mix(skycolor, sunColor, sunFactor));
 	if(s > 0.999)
 	{
 		sunFactor = 1.0;
 		sunContribution = sunColor * sunFactor;
+		glow = vec4(sunContribution, 0.0);
+		frag_color = vec3(0.0);
 	}
-	frag_color += sunColor * sunFactor;
 
     diffuse = vec4(vec3(0), 0);
 	normals = vec3(0);
-	glow = vec4(sunContribution, 0.0);
 	background = vec4(frag_color, 1.0);
 }

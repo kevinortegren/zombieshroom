@@ -188,7 +188,7 @@ namespace RootForce
 		{
 #ifndef COMPILE_LEVEL_EDITOR
 			// Get player position.
-			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Player");
+			ECS::Entity* player = m_world->GetTagManager()->GetEntityByTag("Camera");
 			RootForce::Transform* ptransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(player);
 			// Buffer player position.
 			m_effect->GetTechniques()[2]->m_perTechniqueBuffer->BufferSubData(0, sizeof(glm::vec3), &ptransform->m_position);

@@ -47,7 +47,7 @@ function FreeFlying.OnUpdate(self)
 		transform:GetOrient():YawGlobal(-FreeFlying.RotateSpeed * dt);
 	end
 
-	local mouseSensitivity = 0.2;
+	local mouseSensitivity = 0.1;
 --	local playerEntity = Entity.GetEntityByTag("Player");
 --	if playerEntity ~= nil then
 --		local playerControl = playerEntity:GetPlayerControl();
