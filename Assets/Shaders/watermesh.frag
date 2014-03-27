@@ -82,8 +82,8 @@ void main()
 		vec3 normal2 			= normalize(texture(g_NormalMap, vec2(-TexCoord_FS_in.x, TexCoord_FS_in.y ) * 128.0 + 	vec2(cos(-time*0.45), time * 0.56))       * 2.0 - 1.0).xyz;
 		vec3 normalT 			= mix(normal1, normal2, 0.5);
 		normalT 				= normalize(normalT);
-		vec3 tangent			= normalize(vec3(dx2, 0, calcNorm.x));
-		vec3 bitangent			= normalize(vec3(0, dx2, -calcNorm.y));
+		vec3 tangent			= normalize(vec3(dx2*2, -calcNorm.x, 0 ));
+		vec3 bitangent			= normalize(vec3(0,  -calcNorm.y, dx2*2));
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
 		normalMap 				= mix(TBN * normalT, normalMap, 0.85); //Smooth the normal from the normal map
 	}
