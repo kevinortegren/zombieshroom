@@ -683,6 +683,7 @@ public:
         frame = new QFrame(centralWidget);
         frame->setObjectName(QStringLiteral("frame"));
         frame->setGeometry(QRect(2, 28, 1173, 899));
+        frame->setFocusPolicy(Qt::ClickFocus);
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
         newEmitterWidget = new QDockWidget(frame);

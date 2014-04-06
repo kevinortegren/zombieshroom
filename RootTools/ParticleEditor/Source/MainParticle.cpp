@@ -7,6 +7,7 @@
 #include <RootEngine/Include/RootEngine.h>
 #include <SDL2/SDL_main.h>
 #include <SDL2/SDL_syswm.h> 
+#include <SDL2/SDL_hints.h>
 
 #undef main
 int main(int argc, char *argv[])
@@ -110,17 +111,15 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 		throw std::runtime_error("Failed to initialize SDL");
 	}
 
-
-	// TODO: Make these parameters (even?) more configurable.
-	m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindow(
+	//Create temporary SDL window to set up correct pixel format and SDL_WINDOW_OPENGL flag
+	SDL_Window* sdlwindow = SDL_CreateWindow(
 		"Root Particle",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		p_particleEditorQt->ui.frame->width(),
 		p_particleEditorQt->ui.frame->height(),
-		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS),
-		SDL_DestroyWindow);
-	
+		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
+/*	
 	//////////////////////////////////////////////////////////////////////////
 	//Get HWND from SDL window and change its position
 	//////////////////////////////////////////////////////////////////////////
@@ -136,10 +135,24 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 			SWP_NOREPOSITION|SWP_NOZORDER|SWP_NOSIZE|SWP_NOACTIVATE);
 
 		SetParent(handle, (HWND)p_particleEditorQt->winId());
-	}
+	}*/
 	//////////////////////////////////////////////////////////////////////////
+
+	//Format string with adress to temporary SDL window
+	char buffer [10];
+	sprintf_s(buffer, "%p", sdlwindow);
+	//Set SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT hint with adresst to temporary window
+	SDL_SetHint(SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT, buffer );
+	//Get Qt WId from the frame wherer we want to render. Cast to HWND
+	HWND qtWindowHandle = (HWND)p_particleEditorQt->ui.frame->winId();
+	//SDL_CreateWindowFrom takes an already created native window handle and builds an SDL_Window for us
+	m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindowFrom((void*)qtWindowHandle), SDL_DestroyWindow);
+	//Destroy temporary window
+	SDL_DestroyWindow(sdlwindow);
+
 	if (m_window == nullptr) 
 	{
+		std::cout << SDL_GetError() << std::endl;
 		throw std::runtime_error("Failed to create window");
 	}
 	// Setup the SDL context
@@ -182,7 +195,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
 	
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
-	
+	SDL_SetRelativeMouseMode(SDL_FALSE);
 	//Create player aiming device
 	m_aimingDevice = m_world.GetEntityManager()->CreateEntity();
 	m_world.GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
