@@ -16,7 +16,7 @@
 #include <QtCore/QTextStream>
 #include <yaml-cpp\yaml.h>
 #include <RootForce/Include/ComponentImporter.h>
-
+#include <RootTools/ParticleEditor/Include/Canvas3D.h>
 
 class ParticleEditor : public QMainWindow
 {
@@ -45,6 +45,8 @@ public:
 	void OpenParticleFile(std::string p_filePath);
 	//MEMBERS
 	Ui::ParticleEditorClass ui;
+
+	Canvas3D* m_canvas;
 private:
 	struct AxisBoundingBox
 	{

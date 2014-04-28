@@ -16,7 +16,6 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QDoubleSpinBox>
-#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -130,7 +129,12 @@ public:
     QLineEdit *textureModelLineEdit;
     QGroupBox *groupBox;
     QListWidget *listWidget;
-    QFrame *frame;
+    QDockWidget *aboutWidget;
+    QWidget *dockWidgetContents_2;
+    QTextBrowser *textBrowser;
+    QDockWidget *helpWidget;
+    QWidget *dockWidgetContents_6;
+    QTextBrowser *textBrowser_2;
     QDockWidget *newEmitterWidget;
     QWidget *dockWidgetContents_7;
     QLineEdit *nameEmitterLineEdit;
@@ -139,12 +143,6 @@ public:
     QWidget *dockWidgetContents_8;
     QLineEdit *renameEmitterLineEdit;
     QPushButton *renameEmitterButton;
-    QDockWidget *aboutWidget;
-    QWidget *dockWidgetContents_2;
-    QTextBrowser *textBrowser;
-    QDockWidget *helpWidget;
-    QWidget *dockWidgetContents_6;
-    QTextBrowser *textBrowser_2;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuHelp;
@@ -680,45 +678,6 @@ public:
         listWidget = new QListWidget(groupBox);
         listWidget->setObjectName(QStringLiteral("listWidget"));
         listWidget->setGeometry(QRect(6, 16, 329, 111));
-        frame = new QFrame(centralWidget);
-        frame->setObjectName(QStringLiteral("frame"));
-        frame->setGeometry(QRect(2, 28, 1173, 899));
-        frame->setFocusPolicy(Qt::ClickFocus);
-        frame->setFrameShape(QFrame::StyledPanel);
-        frame->setFrameShadow(QFrame::Raised);
-        newEmitterWidget = new QDockWidget(frame);
-        newEmitterWidget->setObjectName(QStringLiteral("newEmitterWidget"));
-        newEmitterWidget->setEnabled(true);
-        newEmitterWidget->setGeometry(QRect(192, 144, 275, 121));
-        newEmitterWidget->setFloating(true);
-        newEmitterWidget->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable);
-        newEmitterWidget->setAllowedAreas(Qt::NoDockWidgetArea);
-        dockWidgetContents_7 = new QWidget();
-        dockWidgetContents_7->setObjectName(QStringLiteral("dockWidgetContents_7"));
-        nameEmitterLineEdit = new QLineEdit(dockWidgetContents_7);
-        nameEmitterLineEdit->setObjectName(QStringLiteral("nameEmitterLineEdit"));
-        nameEmitterLineEdit->setGeometry(QRect(28, 16, 219, 25));
-        newEmitterButton = new QPushButton(dockWidgetContents_7);
-        newEmitterButton->setObjectName(QStringLiteral("newEmitterButton"));
-        newEmitterButton->setEnabled(true);
-        newEmitterButton->setGeometry(QRect(94, 58, 75, 23));
-        newEmitterWidget->setWidget(dockWidgetContents_7);
-        renameWidget = new QDockWidget(frame);
-        renameWidget->setObjectName(QStringLiteral("renameWidget"));
-        renameWidget->setGeometry(QRect(190, 274, 275, 121));
-        renameWidget->setFloating(true);
-        renameWidget->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable);
-        renameWidget->setAllowedAreas(Qt::NoDockWidgetArea);
-        dockWidgetContents_8 = new QWidget();
-        dockWidgetContents_8->setObjectName(QStringLiteral("dockWidgetContents_8"));
-        renameEmitterLineEdit = new QLineEdit(dockWidgetContents_8);
-        renameEmitterLineEdit->setObjectName(QStringLiteral("renameEmitterLineEdit"));
-        renameEmitterLineEdit->setGeometry(QRect(28, 16, 219, 25));
-        renameEmitterButton = new QPushButton(dockWidgetContents_8);
-        renameEmitterButton->setObjectName(QStringLiteral("renameEmitterButton"));
-        renameEmitterButton->setEnabled(true);
-        renameEmitterButton->setGeometry(QRect(94, 60, 75, 23));
-        renameWidget->setWidget(dockWidgetContents_8);
         aboutWidget = new QDockWidget(centralWidget);
         aboutWidget->setObjectName(QStringLiteral("aboutWidget"));
         aboutWidget->setGeometry(QRect(268, -2, 301, 115));
@@ -743,6 +702,39 @@ public:
         textBrowser_2->setObjectName(QStringLiteral("textBrowser_2"));
         textBrowser_2->setGeometry(QRect(2, 0, 417, 277));
         helpWidget->setWidget(dockWidgetContents_6);
+        newEmitterWidget = new QDockWidget(centralWidget);
+        newEmitterWidget->setObjectName(QStringLiteral("newEmitterWidget"));
+        newEmitterWidget->setEnabled(true);
+        newEmitterWidget->setGeometry(QRect(0, 0, 275, 121));
+        newEmitterWidget->setFloating(true);
+        newEmitterWidget->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable);
+        newEmitterWidget->setAllowedAreas(Qt::NoDockWidgetArea);
+        dockWidgetContents_7 = new QWidget();
+        dockWidgetContents_7->setObjectName(QStringLiteral("dockWidgetContents_7"));
+        nameEmitterLineEdit = new QLineEdit(dockWidgetContents_7);
+        nameEmitterLineEdit->setObjectName(QStringLiteral("nameEmitterLineEdit"));
+        nameEmitterLineEdit->setGeometry(QRect(28, 16, 219, 25));
+        newEmitterButton = new QPushButton(dockWidgetContents_7);
+        newEmitterButton->setObjectName(QStringLiteral("newEmitterButton"));
+        newEmitterButton->setEnabled(true);
+        newEmitterButton->setGeometry(QRect(94, 58, 75, 23));
+        newEmitterWidget->setWidget(dockWidgetContents_7);
+        renameWidget = new QDockWidget(centralWidget);
+        renameWidget->setObjectName(QStringLiteral("renameWidget"));
+        renameWidget->setGeometry(QRect(1000, 10, 275, 121));
+        renameWidget->setFloating(true);
+        renameWidget->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable);
+        renameWidget->setAllowedAreas(Qt::NoDockWidgetArea);
+        dockWidgetContents_8 = new QWidget();
+        dockWidgetContents_8->setObjectName(QStringLiteral("dockWidgetContents_8"));
+        renameEmitterLineEdit = new QLineEdit(dockWidgetContents_8);
+        renameEmitterLineEdit->setObjectName(QStringLiteral("renameEmitterLineEdit"));
+        renameEmitterLineEdit->setGeometry(QRect(28, 16, 219, 25));
+        renameEmitterButton = new QPushButton(dockWidgetContents_8);
+        renameEmitterButton->setObjectName(QStringLiteral("renameEmitterButton"));
+        renameEmitterButton->setEnabled(true);
+        renameEmitterButton->setGeometry(QRect(94, 60, 75, 23));
+        renameWidget->setWidget(dockWidgetContents_8);
         ParticleEditorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(ParticleEditorClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -1069,15 +1061,6 @@ public:
         label_25->setText(QApplication::translate("ParticleEditorClass", "Texture:", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("ParticleEditorClass", "Models", 0));
         groupBox->setTitle(QApplication::translate("ParticleEditorClass", "Emitters", 0));
-        newEmitterWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "New Emitter", 0));
-        nameEmitterLineEdit->setText(QString());
-        nameEmitterLineEdit->setPlaceholderText(QApplication::translate("ParticleEditorClass", "EmitterName", 0));
-        newEmitterButton->setText(QApplication::translate("ParticleEditorClass", "Create", 0));
-        newEmitterButton->setShortcut(QApplication::translate("ParticleEditorClass", "Ctrl+N", 0));
-        renameWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "Rename Emitter", 0));
-        renameEmitterLineEdit->setText(QString());
-        renameEmitterLineEdit->setPlaceholderText(QApplication::translate("ParticleEditorClass", "EmitterName", 0));
-        renameEmitterButton->setText(QApplication::translate("ParticleEditorClass", "Rename", 0));
         aboutWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "About", 0));
         textBrowser->setHtml(QApplication::translate("ParticleEditorClass", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -1112,6 +1095,15 @@ public:
                         " on particle origin to select it</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Drag an axis to move a particle emitter</span></p>\n"
 "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p></body></html>", 0));
+        newEmitterWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "New Emitter", 0));
+        nameEmitterLineEdit->setText(QString());
+        nameEmitterLineEdit->setPlaceholderText(QApplication::translate("ParticleEditorClass", "EmitterName", 0));
+        newEmitterButton->setText(QApplication::translate("ParticleEditorClass", "Create", 0));
+        newEmitterButton->setShortcut(QApplication::translate("ParticleEditorClass", "Ctrl+N", 0));
+        renameWidget->setWindowTitle(QApplication::translate("ParticleEditorClass", "Rename Emitter", 0));
+        renameEmitterLineEdit->setText(QString());
+        renameEmitterLineEdit->setPlaceholderText(QApplication::translate("ParticleEditorClass", "EmitterName", 0));
+        renameEmitterButton->setText(QApplication::translate("ParticleEditorClass", "Rename", 0));
         menuFile->setTitle(QApplication::translate("ParticleEditorClass", "File", 0));
         menuHelp->setTitle(QApplication::translate("ParticleEditorClass", "Help", 0));
         menuView->setTitle(QApplication::translate("ParticleEditorClass", "View", 0));

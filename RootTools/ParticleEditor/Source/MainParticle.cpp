@@ -45,12 +45,34 @@ int main(int argc, char *argv[])
 		a.setStyle(QStyleFactory::create("Fusion"));
 		a.setPalette(palette);
 
+		void* engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
+
+		if (engineModule == nullptr)
+		{
+			throw std::runtime_error("Failed to load RootEngine - please check your installation");
+		}
+
+		INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(engineModule, "InitializeEngine");
+
+		if (libInitializeEngine == nullptr)
+		{
+			throw std::runtime_error("Failed to load RootEngine - please check your installation");
+		}
+
+		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_INPUT | RootEngine::SubsystemInit::INIT_RENDER, path);
+
+		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
+		{
+			throw std::runtime_error("Failed to initialize SDL");
+		}
+
 		ParticleEditor w;
 
 		w.setStyle(QStyleFactory::create("Fusion"));
 		w.setPalette(palette);
 
 		MainParticle m(path, &w, loadFile);
+
 		w.show();
 		uint64_t old = SDL_GetPerformanceCounter();
 		bool notExit = true;
@@ -58,8 +80,6 @@ int main(int argc, char *argv[])
 		{
 			notExit = w.CheckExit();
 			
-			
-
 			uint64_t now = SDL_GetPerformanceCounter();
 			float dt = (now - old) / (float)SDL_GetPerformanceFrequency();
 			old = now;
@@ -67,6 +87,8 @@ int main(int argc, char *argv[])
 			a.processEvents(QEventLoop::AllEvents);
 			m.Update(dt);
 		}
+
+		DynamicLoader::FreeSharedLibrary(engineModule);
 		
 	} 
 	catch (std::exception& e) 
@@ -89,74 +111,6 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	m_particleEditorQt = p_particleEditorQt;
 	m_workingDirectory = p_workingDirectory;
 	g_world = &m_world;
-
-	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
-
-	if (m_engineModule == nullptr)
-	{
-		throw std::runtime_error("Failed to load RootEngine - please check your installation");
-	}
-
-	INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(m_engineModule, "InitializeEngine");
-
-	if (libInitializeEngine == nullptr)
-	{
-		throw std::runtime_error("Failed to load RootEngine - please check your installation");
-	}
-
-	g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_INPUT | RootEngine::SubsystemInit::INIT_RENDER, p_workingDirectory);
-
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
-	{
-		throw std::runtime_error("Failed to initialize SDL");
-	}
-
-	//Create temporary SDL window to set up correct pixel format and SDL_WINDOW_OPENGL flag
-	SDL_Window* sdlwindow = SDL_CreateWindow(
-		"Root Particle",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
-		p_particleEditorQt->ui.frame->width(),
-		p_particleEditorQt->ui.frame->height(),
-		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
-/*	
-	//////////////////////////////////////////////////////////////////////////
-	//Get HWND from SDL window and change its position
-	//////////////////////////////////////////////////////////////////////////
-	SDL_SysWMinfo windowInfo;
-	SDL_VERSION(&windowInfo.version);
-
-	if(SDL_GetWindowWMInfo(m_window.get(), &windowInfo))
-	{
-		HWND handle = windowInfo.info.win.window;
-		int x = p_particleEditorQt->ui.frame->pos().x();
-		int y = p_particleEditorQt->ui.frame->pos().y() + p_particleEditorQt->ui.menuBar->height();
-		BOOL result = SetWindowPos(handle, NULL, x, y, 0, 0, 
-			SWP_NOREPOSITION|SWP_NOZORDER|SWP_NOSIZE|SWP_NOACTIVATE);
-
-		SetParent(handle, (HWND)p_particleEditorQt->winId());
-	}*/
-	//////////////////////////////////////////////////////////////////////////
-
-	//Format string with adress to temporary SDL window
-	char buffer [10];
-	sprintf_s(buffer, "%p", sdlwindow);
-	//Set SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT hint with adresst to temporary window
-	SDL_SetHint(SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT, buffer );
-	//Get Qt WId from the frame wherer we want to render. Cast to HWND
-	HWND qtWindowHandle = (HWND)p_particleEditorQt->ui.frame->winId();
-	//SDL_CreateWindowFrom takes an already created native window handle and builds an SDL_Window for us
-	m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindowFrom((void*)qtWindowHandle), SDL_DestroyWindow);
-	//Destroy temporary window
-	SDL_DestroyWindow(sdlwindow);
-
-	if (m_window == nullptr) 
-	{
-		std::cout << SDL_GetError() << std::endl;
-		throw std::runtime_error("Failed to create window");
-	}
-	// Setup the SDL context
-	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);
 	RootForce::Transform::SetTypeId(RootForce::ComponentType::TRANSFORM);
@@ -205,8 +159,9 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	RootForce::Renderable* aimingRenderable = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(m_aimingDevice);
 	aimingRenderable->m_material = g_engineContext.m_renderer->CreateMaterial("AimingDeviceRenderable");
 	aimingRenderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
-	aimingRenderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
 	aimingRenderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
+	aimingRenderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
+	
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 
 	// Add camera entity.	
@@ -251,8 +206,6 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 MainParticle::~MainParticle()
 {
 	SDL_Quit();
-	DynamicLoader::FreeSharedLibrary(m_engineModule);
-
 }
 
 void MainParticle::HandleEvents()

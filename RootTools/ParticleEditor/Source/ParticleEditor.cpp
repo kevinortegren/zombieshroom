@@ -4,6 +4,9 @@ ParticleEditor::ParticleEditor(QWidget *parent)
 	: QMainWindow(parent), m_running(true), m_showGrid(true), m_showAxis(true), m_firstDrag(true)
 {
 	ui.setupUi(this);
+
+	m_canvas = new Canvas3D(ui.centralWidget);
+
 	ui.aboutWidget->hide();
 	ui.helpWidget->hide();
 	ui.newEmitterWidget->hide();
@@ -157,7 +160,7 @@ void ParticleEditor::Init()
 	m_model->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
 	m_model->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 
-	m_inverseProjection = glm::inverse(glm::perspectiveFov<float>(45.0f, (float)ui.frame->width(), (float)ui.frame->height(), 0.1f, 100.0f));
+	m_inverseProjection = glm::inverse(glm::perspectiveFov<float>(45.0f, (float)m_canvas->width(), (float)m_canvas->height(), 0.1f, 100.0f));
 
 	Saved();
 
@@ -1189,9 +1192,11 @@ QMessageBox::StandardButton ParticleEditor::SaveWarningDialog()
 			msgBox.setInformativeText("Do you want to save your changes?");
 			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 			msgBox.setDefaultButton(QMessageBox::Save);
+			msgBox.setWindowModality(Qt::NonModal);
 			int ret = msgBox.exec();
 
-			switch (ret) {
+
+		switch (ret) {
 			case QMessageBox::Save:
 				{
 					MenuSave();
@@ -1331,8 +1336,8 @@ int ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos,
 	int closestEmitter = -1;
 
 	//Calculate NDC coords
-	float x = (2.0f * -p_mousePos.x) / (float)ui.frame->width() - 1.0f;
-	float y = (2.0f * p_mousePos.y) / (float)ui.frame->height() + 1.0f;
+	float x = (2.0f * -p_mousePos.x) / (float)m_canvas->width() - 1.0f;
+	float y = (2.0f * p_mousePos.y) / (float)m_canvas->height() + 1.0f;
 	//View space coords
 	glm::vec4 rayView = m_inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
 	rayView = glm::vec4(rayView.x, rayView.y, -1.0f, 0.0f);
@@ -1417,8 +1422,8 @@ void ParticleEditor::DragEmitter( int p_axis, glm::ivec2 p_mousePos, glm::vec3 p
 		return;
 
 	//Calculate NDC coords
-	float x = (2.0f * -p_mousePos.x) / (float)ui.frame->width() - 1.0f;
-	float y = (2.0f * p_mousePos.y) / (float)ui.frame->height() + 1.0f;
+	float x = (2.0f * -p_mousePos.x) / (float)m_canvas->width() - 1.0f;
+	float y = (2.0f * p_mousePos.y) / (float)m_canvas->height() + 1.0f;
 	//View space coords
 	glm::vec4 rayView = m_inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
 	rayView = glm::vec4(rayView.x, rayView.y, -1.0f, 0.0f);

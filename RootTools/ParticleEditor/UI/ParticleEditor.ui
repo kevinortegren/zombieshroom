@@ -927,143 +927,6 @@
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame">
-    <property name="geometry">
-     <rect>
-      <x>2</x>
-      <y>28</y>
-      <width>1173</width>
-      <height>899</height>
-     </rect>
-    </property>
-    <property name="focusPolicy">
-     <enum>Qt::ClickFocus</enum>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QDockWidget" name="newEmitterWidget">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>192</x>
-       <y>144</y>
-       <width>275</width>
-       <height>121</height>
-      </rect>
-     </property>
-     <property name="floating">
-      <bool>true</bool>
-     </property>
-     <property name="features">
-      <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable</set>
-     </property>
-     <property name="allowedAreas">
-      <set>Qt::NoDockWidgetArea</set>
-     </property>
-     <property name="windowTitle">
-      <string>New Emitter</string>
-     </property>
-     <widget class="QWidget" name="dockWidgetContents_7">
-      <widget class="QLineEdit" name="nameEmitterLineEdit">
-       <property name="geometry">
-        <rect>
-         <x>28</x>
-         <y>16</y>
-         <width>219</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="placeholderText">
-        <string>EmitterName</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="newEmitterButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>94</x>
-         <y>58</y>
-         <width>75</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Create</string>
-       </property>
-       <property name="shortcut">
-        <string>Ctrl+N</string>
-       </property>
-      </widget>
-     </widget>
-    </widget>
-    <widget class="QDockWidget" name="renameWidget">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>274</y>
-       <width>275</width>
-       <height>121</height>
-      </rect>
-     </property>
-     <property name="floating">
-      <bool>true</bool>
-     </property>
-     <property name="features">
-      <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable</set>
-     </property>
-     <property name="allowedAreas">
-      <set>Qt::NoDockWidgetArea</set>
-     </property>
-     <property name="windowTitle">
-      <string>Rename Emitter</string>
-     </property>
-     <widget class="QWidget" name="dockWidgetContents_8">
-      <widget class="QLineEdit" name="renameEmitterLineEdit">
-       <property name="geometry">
-        <rect>
-         <x>28</x>
-         <y>16</y>
-         <width>219</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="placeholderText">
-        <string>EmitterName</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="renameEmitterButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>94</x>
-         <y>60</y>
-         <width>75</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Rename</string>
-       </property>
-      </widget>
-     </widget>
-    </widget>
-   </widget>
    <widget class="QDockWidget" name="aboutWidget">
     <property name="geometry">
      <rect>
@@ -1160,6 +1023,124 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;LMB-click on particle origin to select it&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Drag an axis to move a particle emitter&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QDockWidget" name="newEmitterWidget">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>275</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="floating">
+     <bool>true</bool>
+    </property>
+    <property name="features">
+     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable</set>
+    </property>
+    <property name="allowedAreas">
+     <set>Qt::NoDockWidgetArea</set>
+    </property>
+    <property name="windowTitle">
+     <string>New Emitter</string>
+    </property>
+    <widget class="QWidget" name="dockWidgetContents_7">
+     <widget class="QLineEdit" name="nameEmitterLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>28</x>
+        <y>16</y>
+        <width>219</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>EmitterName</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="newEmitterButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>94</x>
+        <y>58</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Create</string>
+      </property>
+      <property name="shortcut">
+       <string>Ctrl+N</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QDockWidget" name="renameWidget">
+    <property name="geometry">
+     <rect>
+      <x>1000</x>
+      <y>10</y>
+      <width>275</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="floating">
+     <bool>true</bool>
+    </property>
+    <property name="features">
+     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable</set>
+    </property>
+    <property name="allowedAreas">
+     <set>Qt::NoDockWidgetArea</set>
+    </property>
+    <property name="windowTitle">
+     <string>Rename Emitter</string>
+    </property>
+    <widget class="QWidget" name="dockWidgetContents_8">
+     <widget class="QLineEdit" name="renameEmitterLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>28</x>
+        <y>16</y>
+        <width>219</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>EmitterName</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="renameEmitterButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>94</x>
+        <y>60</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Rename</string>
       </property>
      </widget>
     </widget>

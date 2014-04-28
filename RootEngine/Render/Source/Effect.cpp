@@ -95,6 +95,10 @@ namespace Render
 	void Program::CreateProgram()
 	{
 		m_glHandle = glCreateProgram();
+		if(m_glHandle == 0)
+		{
+			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to create program handle[%s, line %d]", __FUNCTION__, __LINE__ );
+		}
 	}
 
 	GLint Program::AttachShader( GLenum p_shaderType, const char* p_filename )
