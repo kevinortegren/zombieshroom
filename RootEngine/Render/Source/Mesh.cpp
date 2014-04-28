@@ -123,6 +123,7 @@ namespace Render
 			else
 			{
 				glDrawElements(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
+
 			}
 		}
 		else if(m_transformFeedback != 0)

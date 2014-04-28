@@ -7,7 +7,7 @@ namespace RootForce
 	void BotanySystem::Divide()
 	{
 		// Divide painted meshes into chunks.
-		m_quadTree.BeginDivide(BOTANY_VERTICES_PER_TERRAIN_CHUNK, true, false);
+		m_quadTree.BeginDivide(2048, true, false);
 	}
 
 	void BotanySystem::Initialize(BotanyTextures& m_textures, float m_grassAmbient)
@@ -16,7 +16,7 @@ namespace RootForce
 		m_renderUniforms.m_lod2Distance = 60.0f;
 		m_renderUniforms.m_grassAmbient = m_grassAmbient;
 
-		m_updateUniforms.m_grassFactor = 4.0f;
+		m_updateUniforms.m_grassFactor = 6.0f;
 
 		// Load effect.
 		m_effect = m_engineContext->m_resourceManager->LoadEffect("Botany");

@@ -64,7 +64,7 @@ namespace RootForce
 
 		if(a == 0.0f)
 		{
-			assert(b != 0.0f);
+			
 			x = -(c-1/sigma)/b;
 		}
 		else
@@ -99,7 +99,6 @@ namespace RootForce
 				pl->m_attenuation = glm::vec3(0.0f, 0.1f, 0.02f);
 				t->m_position = glm::vec3(x * i * 10.0f, y, z * i * 10.0f);
 
-				m_world->GetEntityExporter()->Export("LightTest");
 			}
 			m_test = true;
 		}

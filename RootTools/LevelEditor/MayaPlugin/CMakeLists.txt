@@ -22,11 +22,11 @@ target_link_libraries(${PROJECT_NAME} ${MAYA_LIBRARIES})
 
 # Copy the DLL on compile
 set(INPUT_FILE "${CMAKE_BINARY_DIR}/Debug/MayaPlugin.dll")
-set(OUTPUT_FILE "C:/Program Files/Autodesk/Maya2014/bin/plug-ins/MayaPlugin.mll")
+set(OUTPUT_FILE "D:/Program/Maya 2014/Maya2014/bin/plug-ins/MayaPlugin.mll")
 #add_custom_command(OUTPUT OUTPUT_FILE
 #    COMMAND ${CMAKE_COMMAND} -E copy
 #		ARGS INPUT_FILE OUTPUT_FILE
 #		MAIN_DEPENDENCY INPUT_FILE VERBATIM)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy ARGS "${CMAKE_BINARY_DIR}/Debug/MayaPlugin.dll" "C:/Program Files/Autodesk/Maya2014/bin/plug-ins/MayaPlugin.mll")
+	COMMAND ${CMAKE_COMMAND} -E copy ARGS "${CMAKE_BINARY_DIR}/Debug/MayaPlugin.dll" "D:/Program/Maya 2014/Maya2014/bin/plug-ins/MayaPlugin.mll")

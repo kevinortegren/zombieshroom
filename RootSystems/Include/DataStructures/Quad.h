@@ -11,8 +11,8 @@
 #include <RootEngine/Render/Include/Vertex.h>
 #include <vector>
 
-//#define QUADTREE_VERBOSE
-//#define QUADTREE_DRAWLINES
+#define QUADTREE_VERBOSE
+#define QUADTREE_DRAWLINES
 
 namespace RootForce
 {

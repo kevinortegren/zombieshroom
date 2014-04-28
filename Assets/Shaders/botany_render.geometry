@@ -1,7 +1,7 @@
 #version 400
 #extension GL_EXT_geometry_shader4 : enable  
 
-#define USE_TERRAIN_NORMAL;
+//#define USE_TERRAIN_NORMAL;
 
 layout(points) in;
 layout(triangle_strip, max_vertices = 29) out;
@@ -32,6 +32,12 @@ out vec2 vert_texcoord1;
 out vec3 vert_normal1;
 out vec3 vert_color1;
 out float vert_texture1;
+
+float random(vec3 seed, int i){
+     vec4 seed4 = vec4(seed, i);
+     float dot_product = dot(seed4, vec4(12.9898,78.233,45.164,94.673));
+     return fract(sin(dot_product) * 43758.5453);
+}
 
 float FlipNormal(vec3 position, vec3 normal, vec3 cameraPosition)
 {
@@ -81,24 +87,34 @@ vec3 mediumBlade3NormalsLOD[3] = vec3[](
 );
 
 // Output medium blade 3.
-void CreateMediumBlade3LOD(vec3 position, vec3 cameraPosition)
+void CreateMediumBlade3LOD(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, mediumBlade3NormalsLOD[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+
     int i;
     for(i = 0; i < 3; i++)
     {
-        vec4 pos = vec4(position + mediumBlade3LOD[i], 1.0);
+        vec4 pos = rotation * vec4(mediumBlade3LOD[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(mediumBlade3NormalsLOD[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(mediumBlade3NormalsLOD[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         
         vert_texcoord1 = mediumBladeTCLOD[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -121,23 +137,34 @@ vec3 mediumBladeNormalsLOD[3] = vec3[](
 );
 
 // Output medium blade 3.
-void CreateMediumBladeLOD(vec3 position, vec3 cameraPosition)
+void CreateMediumBladeLOD(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, mediumBladeNormalsLOD[2], cameraPosition);
-       
+
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+
     int i;
     for(i = 0; i < 3; i++)
     {
-        vec4 pos = vec4(position + mediumBladeLOD[i], 1.0);
+        vec4 pos = rotation * vec4(mediumBladeLOD[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(mediumBladeNormalsLOD[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(mediumBladeNormalsLOD[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = mediumBladeTCLOD[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -160,23 +187,33 @@ vec3 mediumBlade2NormalsLOD[3] = vec3[](
 );
 
 // Output medium blade 3.
-void CreateMediumBlade2LOD(vec3 position, vec3 cameraPosition)
+void CreateMediumBlade2LOD(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, mediumBlade2NormalsLOD[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+ 
     int i;
     for(i = 0; i < 3; i++)
     {
-        vec4 pos = vec4(position + mediumBlade2LOD[i], 1.0);
+        vec4 pos = rotation * vec4(mediumBlade2LOD[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(mediumBlade2NormalsLOD[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(mediumBlade2NormalsLOD[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = mediumBladeTCLOD[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -211,23 +248,33 @@ vec3 tallBlade2NormalsLOD[5] = vec3[](
 );
 
 // Output medium blade 3.
-void CreateTallBlade2LOD(vec3 position, vec3 cameraPosition)
+void CreateTallBlade2LOD(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, tallBlade2NormalsLOD[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+    
     int i;
     for(i = 0; i < 5; i++)
     {
-        vec4 pos = vec4(position + tallBlade2[i], 1.0);
+        vec4 pos = rotation * vec4(tallBlade2[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(tallBlade2NormalsLOD[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(tallBlade2NormalsLOD[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = tallBladeTCLOD[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -254,23 +301,33 @@ vec3 tallBladeNormalsLOD[5] = vec3[](
 );
 
 // Output medium blade 3.
-void CreateTallBladeLOD(vec3 position, vec3 cameraPosition)
+void CreateTallBladeLOD(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, tallBladeNormalsLOD[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+    
     int i;
     for(i = 0; i < 5; i++)
     {
-        vec4 pos = vec4(position + tallBlade[i], 1.0);
+        vec4 pos = rotation * vec4(tallBlade[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(tallBladeNormalsLOD[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(tallBladeNormalsLOD[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = tallBladeTCLOD[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -309,23 +366,33 @@ vec3 mediumBlade3Normals[5] = vec3[](
 );
 
 // Output medium blade 3.
-void CreateMediumBlade3(vec3 position, vec3 cameraPosition)
+void CreateMediumBlade3(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, mediumBlade3Normals[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+
     int i;
     for(i = 0; i < 5; i++)
     {
-        vec4 pos = vec4(position + mediumBlade3[i], 1.0);
+        vec4 pos = rotation * vec4(mediumBlade3[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(mediumBlade3Normals[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(mediumBlade3Normals[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = mediumBladeTC[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -352,23 +419,33 @@ vec3 mediumBladeNormals[5] = vec3[](
 );
 
 // Output medium blade 3.
-void CreateMediumBlade(vec3 position, vec3 cameraPosition)
+void CreateMediumBlade(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, mediumBladeNormals[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+    
     int i;
     for(i = 0; i < 5; i++)
     {
-        vec4 pos = vec4(position + mediumBlade[i], 1.0);
+        vec4 pos = rotation * vec4(mediumBlade[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(mediumBladeNormals[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(mediumBladeNormals[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = mediumBladeTC[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -395,23 +472,33 @@ vec3 mediumBlade2Normals[5] = vec3[](
 );
 
 // Output medium blade 2.
-void CreateMediumBlade2(vec3 position, vec3 cameraPosition)
+void CreateMediumBlade2(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, mediumBlade2Normals[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+    
     int i;
     for(i = 0; i < 5; i++)
     {
-        vec4 pos = vec4(position + mediumBlade2[i], 1.0);
+        vec4 pos = rotation * vec4(mediumBlade2[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(mediumBlade2Normals[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(mediumBlade2Normals[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = mediumBladeTC[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -453,23 +540,33 @@ vec3 TallBlade2Normals[7] = vec3[](
 );
 
 // Output tall blade 2.
-void CreateTallBlade2(vec3 position, vec3 cameraPosition)
+void CreateTallBlade2(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, TallBlade2Normals[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+    
     int i;
     for(i = 0; i < 7; i++)
     {
-        vec4 pos = vec4(position + TallBlade2[i], 1.0);
+        vec4 pos = rotation * vec4(TallBlade2[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(TallBlade2Normals[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(TallBlade2Normals[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = TallBladeTC[i];
         vert_texture1 = 0;
+                if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -500,23 +597,33 @@ vec3 TallBladeNormals[7] = vec3[](
 );
 
 // Output tall blade 2.
-void CreateTallBlade(vec3 position, vec3 cameraPosition)
+void CreateTallBlade(vec3 position, vec3 cameraPosition, float angle)
 {
-    float flip = FlipNormal(position, TallBladeNormals[2], cameraPosition);
-       
+    mat4 rotation;
+    rotation[0] = vec4(cos(angle), 0, sin(angle), 0);
+    rotation[1] = vec4(0, 1, 0, 0);
+    rotation[2] = vec4(-sin(angle), 0, cos(angle), 0);
+    rotation[3] = vec4(0, 0, 0, 1);
+
     int i;
     for(i = 0; i < 7; i++)
     {
-        vec4 pos = vec4(position + TallBlade[i], 1.0);
+        vec4 pos = rotation * vec4(TallBlade[i], 0.0);
+        pos += vec4(position, 1.0);
         gl_Position = projectionMatrix * viewMatrix * pos;  
 #ifndef USE_TERRAIN_NORMAL
-        vec3 normal = normalize(TallBladeNormals[i].xyz);   
-        vert_normal1 = (viewMatrix * vec4(normal, 0.0)).xyz * flip;
+        vec4 normal = rotation * vec4(normalize(TallBladeNormals[i].xyz), 0.0);  
+        float flip = FlipNormal(position, normal.xyz, cameraPosition);        
+        vert_normal1 = (viewMatrix * normal).xyz * flip;
 #else
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
 #endif
         vert_texcoord1 = TallBladeTC[i];
         vert_texture1 = 0;
+        if(flip == -1.0)
+        vert_color1 = vec3(1,0,0);
+        else
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     EndPrimitive();
@@ -526,14 +633,14 @@ void CreateTallBlade(vec3 position, vec3 cameraPosition)
 void CreateQuad(vec3 position, vec3 cameraPosition)
 {
     // Scale.
-    vec2 scale = vec2(1.0, 1.0);
+    vec2 scale = vec2(1.0, 0.5);
     
     // Local vertices.
 	vec4 vertices[4];  
-	vertices[0] = vec4(-scale.x, scale.y, 0, 1.0f);  
-	vertices[1] = vec4(scale.x, scale.y, 0, 1.0f);   
-	vertices[2] = vec4(-scale.x, -scale.y, 0, 1.0f);  
-	vertices[3] = vec4(scale.x, -scale.y, 0, 1.0f);
+	vertices[0] = vec4(-scale.x, 2.0 * scale.y, 0, 1.0f);  
+	vertices[1] = vec4(scale.x,  2.0 * scale.y, 0, 1.0f);   
+	vertices[2] = vec4(-scale.x, 0, 0, 1.0f);  
+	vertices[3] = vec4(scale.x, 0, 0, 1.0f);
 
     // Billboard basis.
     vec3 up = vec3(0.0, 1.0, 0.0);
@@ -560,6 +667,7 @@ void CreateQuad(vec3 position, vec3 cameraPosition)
         vert_texcoord1 = texCoords[i];
         vert_normal1 = (viewMatrix * vec4(gs_normal_in[0], 0.0)).xyz;
         vert_texture1 = 1;
+        vert_color1 = vec3(0,0,1);
         EmitVertex();
     }
     
@@ -574,58 +682,69 @@ void main()
     // Camera position.
     vec3 cameraPos = (invView * vec4(0,0,0,1)).xyz;
     
+    float angle = random(gl_in[0].gl_Position.xyz, 0);
+    
     if(gs_lod_in[0] == 0)
     {
         if(avgDensity > 0.1)
         {
-            CreateMediumBlade3(gl_in[0].gl_Position.xyz, cameraPos);
+            
+            CreateMediumBlade3(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         } 
 
         if(avgDensity > 0.3)
         {
-            CreateMediumBlade(gl_in[0].gl_Position.xyz, cameraPos);
+        
+            CreateMediumBlade(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         }   
 
         if(avgDensity > 0.4)
         {
-            CreateMediumBlade2(gl_in[0].gl_Position.xyz, cameraPos);
+        
+            CreateMediumBlade2(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         }
         
         if( avgDensity > 0.6)
         {
-            CreateTallBlade2(gl_in[0].gl_Position.xyz, cameraPos);
+          
+            CreateTallBlade2(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         }
         
         if( avgDensity > 0.8)
         {
-            CreateTallBlade(gl_in[0].gl_Position.xyz, cameraPos);
+       
+            CreateTallBlade(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         }
     }
     else if(gs_lod_in[0] == 1)
     {
         if(avgDensity > 0.1)
         {
-            CreateMediumBlade3LOD(gl_in[0].gl_Position.xyz, cameraPos);
+     
+            CreateMediumBlade3LOD(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         } 
         
         if(avgDensity > 0.3)
         {
-            CreateMediumBladeLOD(gl_in[0].gl_Position.xyz, cameraPos);
+           
+            CreateMediumBladeLOD(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         }
         
         if(avgDensity > 0.4)
         {
-            CreateMediumBlade2LOD(gl_in[0].gl_Position.xyz, cameraPos);
+            CreateMediumBlade2LOD(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         }
         
         if(avgDensity > 0.6)
         {
-            CreateTallBlade2LOD(gl_in[0].gl_Position.xyz, cameraPos);
+  
+            CreateTallBlade2LOD(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         }
         
         if(avgDensity > 0.8)
         {
-            CreateTallBladeLOD(gl_in[0].gl_Position.xyz, cameraPos);
+        
+            CreateTallBladeLOD(gl_in[0].gl_Position.xyz, cameraPos, 2*3.14*angle);
         }
     }
     else

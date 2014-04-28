@@ -2072,7 +2072,7 @@ void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
 	MPlugArray connections;
 	normal_plug = material_node.findPlug("glowIntensity", true, &status);
 	//if(status == true)
-	//Print("GLOW");
+	Print("GLOW");
 
 	MPlugArray bv_connections;
 	normal_plug.connectedTo(bv_connections, true, false, &status);
@@ -2087,7 +2087,7 @@ void ExtractGlow(MFnDependencyNode &material_node, MString &out_glow_path)
 			MFnDependencyNode test1(bv_connections[j].node(&status));
 			MPlug ftn = test1.findPlug("ftn", &status);
 			out_glow_path = ftn.asString(MDGContext::fsNormal);
-			//Print(out_glow_path);
+			Print(out_glow_path);
 			found_glow = true;
 		}
 	}

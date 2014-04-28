@@ -677,7 +677,23 @@ namespace Render
 
 		m_renderFlags = Render::TechniqueFlags::RENDER_DEFERRED0;
 
+		GLuint query;
+		glGenQueries(1, &query);
+		glBeginQuery(GL_TIME_ELAPSED, query);
+
 		ProcessRenderJobs(m_jobs);
+
+		glEndQuery(GL_TIME_ELAPSED);
+		GLint done = 0;
+		while(!done)
+		{
+			glGetQueryObjectiv(query, GL_QUERY_RESULT_AVAILABLE, &done);
+		}
+		GLuint64 elapsedTime;
+		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsedTime);
+		
+		g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "Time ms %f", elapsedTime/1000000.0);
+
 	}
 
 	void GLRenderer::ProcessRenderJobs(std::vector<RenderJob*>& p_jobs)
