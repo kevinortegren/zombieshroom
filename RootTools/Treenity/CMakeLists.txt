@@ -44,7 +44,7 @@ endforeach()
 #message("${HEADERS}")
 
 # Set search paths
-include_directories(Include)
+include_directories(Include GeneratedFiles)
 
 # Add the target
 
