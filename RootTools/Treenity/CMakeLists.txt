@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 
 # Root project settings
-set(PROJECT_NAME Treenity
+set(PROJECT_NAME Treenity)
 project(${PROJECT_NAME})
 
 # Find includes in corresponding build directories
