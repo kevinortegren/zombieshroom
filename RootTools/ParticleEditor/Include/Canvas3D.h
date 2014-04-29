@@ -14,7 +14,10 @@ public:
 	~Canvas3D();
 
 protected:
+	void wheelEvent(QWheelEvent* event);
 	void keyPressEvent( QKeyEvent *k );
+	void keyReleaseEvent( QKeyEvent *k );
+
 	
 private:
 	std::shared_ptr<SDL_Window> m_window;

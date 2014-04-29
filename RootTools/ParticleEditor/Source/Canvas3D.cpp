@@ -15,6 +15,19 @@ static void InitialiseKeymap();
 static const int KEYMAP_SIZE = 256;
 static SDL_Scancode s_keymap[KEYMAP_SIZE];
 
+static SDL_Scancode GetScanCodeFromQtKey(int key)
+{
+	// 7-bit common ASCII can be sent right away.
+	if(key >= Qt::Key_Space && key <= Qt::Key_AsciiTilde) 
+	{		
+		return SDL_GetScancodeFromKey(key);
+	} 
+	else // misc keys & modifiers needs to be identified.
+	{
+		return s_keymap[key&0x00000011];
+	}
+}
+
 Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 {
 	//Flicker fix
@@ -65,29 +78,33 @@ Canvas3D::~Canvas3D()
 
 }
 
-
+void Canvas3D::wheelEvent(QWheelEvent* event)
+{
+	SDL_Event scrollEvent;
+	scrollEvent.type = SDL_MOUSEWHEEL;
+	scrollEvent.wheel.y = event->delta() / 100;
+	SDL_PushEvent(&scrollEvent);
+}
 
 void Canvas3D::keyPressEvent( QKeyEvent *k )
 {
 	SDL_Event keyEvent;
 	keyEvent.type = SDL_KEYDOWN;
-
-	int key = k->key();
-
-	// 7-bit common ASCII can be sent right away.
-	if(key >= Qt::Key_Space && key <= Qt::Key_AsciiTilde) 
-	{		
-		keyEvent.key.keysym.scancode = SDL_GetScancodeFromKey(key);
-	} 
-	else // misc keys & modifiers needs to be identified.
-	{
-		keyEvent.key.keysym.scancode = s_keymap[key&0x00000011];
-	}
-
+	keyEvent.key.keysym.scancode = GetScanCodeFromQtKey(k->key());
 	keyEvent.key.repeat = false;
-
 	SDL_PushEvent(&keyEvent);
 }
+
+void Canvas3D::keyReleaseEvent( QKeyEvent *k )
+{
+	SDL_Event keyEvent;
+	keyEvent.type = SDL_KEYUP;
+	keyEvent.key.keysym.scancode = GetScanCodeFromQtKey(k->key());
+	keyEvent.key.repeat = false;
+	SDL_PushEvent(&keyEvent);
+}
+
+
 
 static void InitialiseKeymap()
 {
