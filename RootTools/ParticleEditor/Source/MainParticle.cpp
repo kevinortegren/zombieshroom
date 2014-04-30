@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
 		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_INPUT | RootEngine::SubsystemInit::INIT_RENDER, path);
 
-		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
+		if (SDL_Init(SDL_INIT_TIMER) != 0) 
 		{
 			throw std::runtime_error("Failed to initialize SDL");
 		}

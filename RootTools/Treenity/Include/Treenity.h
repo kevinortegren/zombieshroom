@@ -12,7 +12,11 @@ public:
 	Treenity(QWidget *parent = 0);
 	~Treenity();
 
+	bool IsRunning();
+	void closeEvent(QCloseEvent *event);
+
 private:
+	bool m_running;
 	Ui::TreenityClass ui;
 };
 
