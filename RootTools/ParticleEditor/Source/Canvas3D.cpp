@@ -20,6 +20,9 @@ static SDL_Scancode GetScanCodeFromQtKey(int key)
 	// 7-bit common ASCII can be sent right away.
 	if(key >= Qt::Key_Space && key <= Qt::Key_AsciiTilde) 
 	{		
+		if(key >= Qt::Key_A && key <= Qt::Key_Z)
+			key += 32;
+
 		return SDL_GetScancodeFromKey(key);
 	} 
 	else // misc keys & modifiers needs to be identified.
