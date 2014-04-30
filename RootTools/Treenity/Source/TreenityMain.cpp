@@ -49,7 +49,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 		throw std::runtime_error("Failed to load RootEngine - please check your installation");
 	}
 
-	g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_path);
+	g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_INPUT | RootEngine::SubsystemInit::INIT_RENDER, p_path);
 
 	if (SDL_Init(SDL_INIT_TIMER) != 0) 
 	{

@@ -6,10 +6,6 @@ Treenity::Treenity(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	m_entityOutliner = new EntityOutliner(this);
-	m_entityOutliner->setObjectName(QStringLiteral("entityOutliner"));
-	m_entityOutliner->setGeometry(QRect(50, 50, 200, 400));
-
 	connect(ui.pushButton_createEntity, SIGNAL(clicked()), this, SLOT(CreateEntity()));
 }
 

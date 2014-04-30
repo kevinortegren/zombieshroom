@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>899</width>
+    <height>581</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="pushButton_createEntity">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>400</x>
       <y>160</y>
       <width>75</width>
       <height>23</height>
@@ -27,13 +27,28 @@
      <string>Create Entity</string>
     </property>
    </widget>
+   <widget class="EntityOutliner" name="treeView_entityOutliner">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+    <column>
+     <property name="text">
+      <string notr="true">1</string>
+     </property>
+    </column>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>899</width>
      <height>21</height>
     </rect>
    </property>
@@ -49,6 +64,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>EntityOutliner</class>
+   <extends>QTreeWidget</extends>
+   <header location="global">RootTools/Treenity/include/EntityOutliner.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="Treenity.qrc"/>
  </resources>
