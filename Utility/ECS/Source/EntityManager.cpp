@@ -1,8 +1,8 @@
 #include <Utility\ECS\Include\EntityManager.h>
-#include <Utility\ECS\Include\EntitySystemManager.h>
+#include <Utility\ECS\Include\World.h>
 
-ECS::EntityManager::EntityManager(EntitySystemManager* p_systemManager)
-	: m_nextID(0), m_systemManager(p_systemManager), m_allocator(ECS_MAX_COMPONENTS)
+ECS::EntityManager::EntityManager(World* p_world)
+	: m_nextID(0), m_world(p_world), m_allocator(ECS_MAX_COMPONENTS)
 {
 	m_entities.resize(ECS_MAX_ENTITIES);
 	m_components.resize(ECS_MAX_COMPONENTS);	
@@ -23,6 +23,11 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 	e->m_flag = 0;
 	m_nextID++;
 
+	Message m;
+	m.m_type = MessageType::ENTITY_ADDED;
+	m.m_entity = e;
+	m_world->m_messages.push_back(m);
+
 	return e;
 }
 
@@ -30,6 +35,11 @@ void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 {
 	if(p_entity == nullptr)
 		return;
+
+	Message m;
+	m.m_type = MessageType::ENTITY_REMOVED;
+	m.m_entity = p_entity;
+	m_world->m_messages.push_back(m);
 
 	m_entitiesToBeRemoved.insert(p_entity);
 
@@ -72,6 +82,12 @@ void ECS::EntityManager::RemoveAllComponents(Entity* p_entity)
 		{
 			if(m_components[i][p_entity->m_id] != nullptr)
 			{
+				Message m;
+				m.m_type = MessageType::COMPONENT_REMOVED;
+				m.m_entity = p_entity;
+				m.m_compType = i;
+				m_world->m_messages.push_back(m);
+
 				// Push the type of component and the given entity.
 				m_componentsToBeRemoved.insert(std::pair<unsigned int, unsigned int>(i, p_entity->GetId()));
 			}
@@ -116,6 +132,8 @@ std::vector<ECS::Entity*> ECS::EntityManager::GetAllEntities()
 
 void ECS::EntityManager::CleanUp()
 {
+	m_world->TestMessaging();
+
 	// Loop through components to remove.
 	for(auto itr = m_componentsToBeRemoved.begin(); itr != m_componentsToBeRemoved.end(); ++itr)
 	{
@@ -137,10 +155,12 @@ void ECS::EntityManager::CleanUp()
 
 		(*itr)->m_flag = 0;
 
-		m_systemManager->RemoveEntityFromSystems((*itr));
+		m_world->m_systemManager.RemoveEntityFromSystems((*itr));
 	}
 
 	m_entitiesToBeRemoved.clear();
+
+	m_world->m_messages.clear();
 }
 
 const std::set<int> ECS::EntityManager::GetEntitiesToBeRemoved() const

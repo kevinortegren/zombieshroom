@@ -238,7 +238,7 @@ void MainParticle::Update( float p_delta )
 	m_renderingSystem->Process();
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
-	
+	g_world->GetEntityManager()->CleanUp();
 }
 
 void MainParticle::UpdateInput()
