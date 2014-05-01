@@ -1,6 +1,10 @@
 #include "Treenity.h"
 #include <QtWidgets\qmessagebox.h>
 
+#include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/GameSharedContext.h>
+extern RootEngine::GameSharedContext g_engineContext;
+
 Treenity::Treenity(QWidget *parent)
 	: QMainWindow(parent), m_running(true)
 {
@@ -35,6 +39,12 @@ bool Treenity::IsRunning()
 void Treenity::closeEvent(QCloseEvent *event)
 {
 	m_running = false;
+}
+
+void Treenity::CreateOpenGLContext()
+{
+	ui.widget_canvas3D->CreateOpenGLContext();
+	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::START_PRINT, "Creating OpenGL context in treenity.");
 }
 
 void Treenity::CreateEntity()

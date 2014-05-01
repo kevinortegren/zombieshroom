@@ -22,6 +22,8 @@ public:
 	bool IsRunning();
 	void closeEvent(QCloseEvent *event);
 
+	void CreateOpenGLContext();
+
 private:
 	
 	EngineInterface* m_engineInterface;

@@ -1,7 +1,8 @@
 #pragma once
-
 #include <Utility/ECS/Include/World.h>
 #include <RootTools/Treenity/Include/EngineActions.h>
+
+#include <RootSystems/Include/RenderingSystem.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
 RootEngine::GameSharedContext g_engineContext;
@@ -22,4 +23,6 @@ private:
 	ECS::World m_world;
 	Treenity m_treenityEditor;
 	EngineActions m_engineActions;	
+
+	RootForce::RenderingSystem* m_renderingSystem;
 };

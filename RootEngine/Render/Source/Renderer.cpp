@@ -213,7 +213,7 @@ namespace Render
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
-		glClearColor(0,0,0,0);
+		glClearColor(1,0,0,0);
 		
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
