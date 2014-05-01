@@ -40,4 +40,19 @@ ECS::Storage* ECS::World::GetStorage()
 	return &m_storage;
 }
 
+const std::vector<ECS::Message>& ECS::World::GetMessages() const
+{
+	return m_messages;
+}
+
+void ECS::World::TestMessaging()
+{
+	auto msgs = GetMessages();
+
+	for(auto itr = msgs.begin(); itr != msgs.end(); ++itr) {
+
+		//std::cout << "Message Type: " << itr->m_type << " Entity ID: " << itr->m_entity->GetId() << " Component Type: " << itr->m_compType << std::endl;
+	}
+
+}
 

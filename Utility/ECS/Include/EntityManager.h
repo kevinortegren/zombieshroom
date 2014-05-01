@@ -24,7 +24,7 @@ namespace ECS
 		friend class EntityExporter;
 		friend class EntityImporter;
 
-		EntityManager(EntitySystemManager* p_systemManager);
+		EntityManager(World* p_world);
 
 		// Creates an entity incrementing nextID.
 		Entity* CreateEntity();
@@ -61,7 +61,13 @@ namespace ECS
 			// Flag the entity to use the component.
 			p_entity->m_flag |= (1ULL << Component<T>::GetTypeId());
 
-			m_systemManager->AddEntityToSystems(p_entity);
+			m_world->m_systemManager.AddEntityToSystems(p_entity);
+
+			Message m;
+			m.m_type = MessageType::COMPONENT_ADDED;
+			m.m_entity = p_entity;
+			m.m_compType = Component<T>::GetTypeId();
+			m_world->m_messages.push_back(m);
 
 			return component;
 		}
@@ -89,7 +95,13 @@ namespace ECS
 
 			   p_entity->m_flag &= ~(1ULL << Component<T>::GetTypeId());
 
-				m_systemManager->RemoveEntityFromSystems(p_entity);
+			   Message m;
+			   m.m_type = MessageType::COMPONENT_REMOVED;
+			   m.m_entity = p_entity;
+			   m.m_compType = Component<T>::GetTypeId();
+			   m_world->m_messages.push_back(m);
+
+				m_world->m_systemManager.RemoveEntityFromSystems(p_entity);
 			}
 		}
 
@@ -134,7 +146,9 @@ namespace ECS
 		const std::set<int> GetEntitiesToBeRemoved() const;
 	private:
 
-		EntitySystemManager* m_systemManager;
+		//EntitySystemManager* m_systemManager;
+		World* m_world;
+
 		int m_nextID;
 		std::vector<Entity> m_entities;
 		std::stack<int> m_recycledIds;
