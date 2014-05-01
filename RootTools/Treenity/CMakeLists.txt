@@ -45,8 +45,13 @@ endforeach()
 
 # Set search paths
 include_directories(Include GeneratedFiles)
-
-# Add the target
+  
+  message("${CMAKE_CURRENT_BUILD_DIR} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${PROJECT_NAME}")
 
 add_executable(${PROJECT_NAME} ${UI_FILES} ${GEN_FILES} ${QRC_FILES} ${HEADERS} ${SOURCES} ${RESOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/UI/Resources ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/Resources
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/UI/Resources ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Resources
+COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/UI/Resources ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RootTools/Treenity/Resources)

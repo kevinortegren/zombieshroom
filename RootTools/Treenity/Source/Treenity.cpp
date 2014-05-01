@@ -6,7 +6,15 @@ Treenity::Treenity(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	connect(ui.pushButton_createEntity, SIGNAL(clicked()), this, SLOT(CreateEntity()));
+	QActionGroup* group = new QActionGroup(ui.toolBar);
+
+	group->addAction(ui.actionTranslate);
+	group->addAction(ui.actionRotate);
+	group->addAction(ui.actionResize);
+
+	ui.actionTranslate->setChecked(true);
+
+	connect(ui.actionAdd_entity, SIGNAL(triggered()), this, SLOT(CreateEntity()));
 }
 
 Treenity::~Treenity()
@@ -33,5 +41,5 @@ void Treenity::CreateEntity()
 {
 	ECS::Entity* e = m_engineInterface->CreateEntity();
 
-	QMessageBox::warning(this, QString::number(e->GetId()), "Entity id in the title!", QMessageBox::NoButton, QMessageBox::NoButton);
+//	QMessageBox::warning(this, QString::number(e->GetId()), "Entity id in the title!", QMessageBox::NoButton, QMessageBox::NoButton);
 }
