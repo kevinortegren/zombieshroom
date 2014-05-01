@@ -88,14 +88,20 @@ void TreenityMain::HandleEvents()
 
 void TreenityMain::Update(float dt)
 {
-	//g_world->SetDelta(p_delta);
-
-	//g_engineContext.m_renderer->Clear();
+	m_world.SetDelta(dt);
 
 	HandleEvents();
 
+	auto msgs = m_world.GetMessages();
+	for(auto itr = msgs.begin(); itr != msgs.end(); ++itr) {
+
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
+	}
+
+	m_world.GetEntityManager()->CleanUp();
+
+	//g_engineContext.m_renderer->Clear();
 	//g_engineContext.m_renderer->Render();
 	//g_engineContext.m_renderer->Swap();
-
 }
 

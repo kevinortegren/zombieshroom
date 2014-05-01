@@ -18,12 +18,19 @@ namespace ECS
 			ENTITY_ADDED,
 			ENTITY_REMOVED,
 			COMPONENT_ADDED,
-			COMPONENT_REMOVED
+			COMPONENT_REMOVED,
+			NONE
 		};
 	}
 
 	struct Message
 	{
+		Message() : 
+			m_type(MessageType::NONE),
+			m_entity(nullptr),
+			m_compType(-1) 
+		{}
+
 		MessageType::MessageType m_type;
 		Entity* m_entity;
 		int m_compType;
