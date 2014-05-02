@@ -14,7 +14,7 @@ Treenity::Treenity(QWidget *parent)
 
 	ui.actionTranslate->setChecked(true);
 
-	connect(ui.actionAdd_entity, SIGNAL(triggered()), this, SLOT(CreateEntity()));
+	connect(ui.action_addEntity, SIGNAL(triggered()), this, SLOT(CreateEntity()));
 }
 
 Treenity::~Treenity()

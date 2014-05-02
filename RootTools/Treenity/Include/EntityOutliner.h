@@ -17,5 +17,4 @@ class EntityOutliner : public QTreeWidget
 {
 public:
 	EntityOutliner(QWidget *parent);
-
 };
