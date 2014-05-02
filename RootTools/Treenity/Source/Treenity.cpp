@@ -97,6 +97,11 @@ void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 	m_engineInterface = p_engineInterface;
 }
 
+void Treenity::SetProjectManager(ProjectManager* p_projectManager)
+{
+	m_projectManager = p_projectManager;
+}
+
 bool Treenity::IsRunning()
 {
 	return m_running;
@@ -110,9 +115,9 @@ void Treenity::closeEvent(QCloseEvent *event)
 
 void Treenity::EntityCreated(ECS::Entity* p_entity)
 {
-	m_entityNames[p_entity] = "Unnamed";
+	m_projectManager->SetEntityName(p_entity, "Unnamed");
 
-	ui.treeView_entityOutliner->EntityCreated(p_entity, m_entityNames.find(p_entity)->second);
+	ui.treeView_entityOutliner->EntityCreated(p_entity, m_projectManager.GetEntityName(p_entity));
 
 	Log::Write("Entity added: " + QString::number(p_entity->GetId()));
 }
@@ -171,7 +176,7 @@ void Treenity::RenameEntity()
 {
 	if (m_selectedEntity != nullptr)
 	{
-		m_entityNames[m_selectedEntity] = ui.lineEdit_entityName->text();
+		m_projectManager.SetEntityName(m_selectedEntity, ui.lineEdit_entityName->text());
 
 		ui.treeView_entityOutliner->EntityRenamed(m_selectedEntity, ui.lineEdit_entityName->text());
 	}
@@ -286,7 +291,7 @@ void Treenity::SelectEntity(ECS::Entity* p_entity)
 	m_selectedEntity = p_entity;
 
 	// Update the general properties.
-	QString name = m_entityNames.find(m_selectedEntity) != m_entityNames.end() ? m_entityNames.find(m_selectedEntity)->second : "";
+	QString name = m_projectManager.GetEntityName(m_selectedEntity);
 	ui.lineEdit_entityName->setText(name);
 
 	// Update the component toolbox.

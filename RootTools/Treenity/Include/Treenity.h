@@ -9,6 +9,7 @@
 #include <Utility/ECS/include/World.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>
 #include <RootTools/Treenity/Include/EntityOutliner.h>
+#include <RootTools/Treenity/Include/ProjectManager.h>
 
 class Treenity : public QMainWindow
 {
@@ -19,6 +20,7 @@ public:
 	~Treenity();
 
 	void SetEngineInterface(EngineInterface* p_engineInterface);
+	void SetProjectManager(ProjectManager* p_projectManager);
 
 	bool IsRunning();
 	void closeEvent(QCloseEvent *event);
@@ -34,7 +36,7 @@ private:
 	std::map<int, QString> m_componentNames;
 
 	// Project meta-data.
-	std::map<ECS::Entity*, QString> m_entityNames;
+	ProjectManager* m_projectManager;
 	ECS::Entity* m_selectedEntity;
 
 	EngineInterface* m_engineInterface;

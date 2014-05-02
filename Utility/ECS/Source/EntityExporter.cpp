@@ -10,7 +10,7 @@ void ECS::EntityExporter::SetExporter(COMPEXPORT p_exporter)
 	m_exporter = p_exporter;
 }
 
-void ECS::EntityExporter::Export(const std::string& p_filepath)
+void ECS::EntityExporter::Export(const std::string& p_filepath, std::map<ECS::Entity*, std::string>* p_entityNames)
 {
 	std::vector<bool> nonExportIds;
 	nonExportIds.resize(m_world->GetEntityManager()->GetNumEntities());
@@ -45,6 +45,30 @@ void ECS::EntityExporter::Export(const std::string& p_filepath)
 
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
+
+	// Export names
+	if (p_entityNames != nullptr)
+	{
+		out << YAML::BeginMap;
+		out << YAML::Key << "EntityNames" << YAML::Value << YAML::BeginSeq;
+		
+		for(unsigned int i = 0; i < m_world->GetEntityManager()->m_entities.size(); i++)
+		{
+			out << YAML::Value << YAML::BeginMap;
+			if(m_world->GetEntityManager()->m_entities[i].m_id == -1)
+			continue;
+
+			if(nonExportIds[m_world->GetEntityManager()->m_entities[i].m_id])
+				continue;
+
+			out << YAML::Key << "ID" << YAML::Value << m_world->GetEntityManager()->m_entities[i].m_id;
+			out << YAML::Key << "Name" << YAML::Value << p_entityNames->find(&m_world->GetEntityManager()->m_entities[i])->second.c_str();
+			out << YAML::EndMap;
+		}
+
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
+	}
 
 	// Export Components.
 	out << YAML::BeginMap;
