@@ -44,7 +44,8 @@ endforeach()
 #message("${HEADERS}")
 
 # Set search paths
-include_directories(Include GeneratedFiles)
+include_directories(Include GeneratedFiles ${QT_INCLUDE_DIRS}/QtGui ${QT_INCLUDE_DIRS}/QtWidgets ${QT_INCLUDE_DIRS}/QtCore)
+
   
   message("${CMAKE_CURRENT_BUILD_DIR} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${PROJECT_NAME}")
 

@@ -1,10 +1,15 @@
 #include "Treenity.h"
 #include <QtWidgets\qmessagebox.h>
+#include <RootTools/Treenity/Include/Log.h>
 
 Treenity::Treenity(QWidget *parent)
 	: QMainWindow(parent), m_running(true)
 {
 	ui.setupUi(this);
+
+	//Set some logging init things
+	Log::GetInstance()->setParent(this);
+	Log::GetInstance()->setFloating(true);
 
 	QActionGroup* group = new QActionGroup(ui.toolBar);
 
@@ -14,7 +19,8 @@ Treenity::Treenity(QWidget *parent)
 
 	ui.actionTranslate->setChecked(true);
 
-	connect(ui.actionAdd_entity, SIGNAL(triggered()), this, SLOT(CreateEntity()));
+	connect(ui.actionAdd_entity,	SIGNAL(triggered()), this,					SLOT(CreateEntity()));
+	connect(ui.actionLog,			SIGNAL(triggered()), Log::GetInstance(),	SLOT(Show()));
 }
 
 Treenity::~Treenity()
@@ -40,6 +46,5 @@ void Treenity::closeEvent(QCloseEvent *event)
 void Treenity::CreateEntity()
 {
 	ECS::Entity* e = m_engineInterface->CreateEntity();
-
-//	QMessageBox::warning(this, QString::number(e->GetId()), "Entity id in the title!", QMessageBox::NoButton, QMessageBox::NoButton);
+	Log::Write("Entity created! ID: " + QString::number(e->GetId()));
 }
