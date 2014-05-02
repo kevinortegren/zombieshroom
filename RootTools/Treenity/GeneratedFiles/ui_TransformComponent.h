@@ -63,46 +63,67 @@ public:
 
         doubleSpinBox_translationX = new QDoubleSpinBox(Transform);
         doubleSpinBox_translationX->setObjectName(QStringLiteral("doubleSpinBox_translationX"));
+        doubleSpinBox_translationX->setMinimum(-1000);
+        doubleSpinBox_translationX->setMaximum(1000);
 
         gridLayout->addWidget(doubleSpinBox_translationX, 0, 1, 1, 1);
 
         doubleSpinBox_translationY = new QDoubleSpinBox(Transform);
         doubleSpinBox_translationY->setObjectName(QStringLiteral("doubleSpinBox_translationY"));
+        doubleSpinBox_translationY->setMinimum(-1000);
+        doubleSpinBox_translationY->setMaximum(1000);
 
         gridLayout->addWidget(doubleSpinBox_translationY, 0, 2, 1, 1);
 
         doubleSpinBox_scaleZ = new QDoubleSpinBox(Transform);
         doubleSpinBox_scaleZ->setObjectName(QStringLiteral("doubleSpinBox_scaleZ"));
+        doubleSpinBox_scaleZ->setMinimum(0.01);
+        doubleSpinBox_scaleZ->setMaximum(100);
+        doubleSpinBox_scaleZ->setValue(1);
 
         gridLayout->addWidget(doubleSpinBox_scaleZ, 2, 3, 1, 1);
 
         doubleSpinBox_orientationZ = new QDoubleSpinBox(Transform);
         doubleSpinBox_orientationZ->setObjectName(QStringLiteral("doubleSpinBox_orientationZ"));
+        doubleSpinBox_orientationZ->setMinimum(-360);
+        doubleSpinBox_orientationZ->setMaximum(360);
 
         gridLayout->addWidget(doubleSpinBox_orientationZ, 1, 3, 1, 1);
 
         doubleSpinBox_translationZ = new QDoubleSpinBox(Transform);
         doubleSpinBox_translationZ->setObjectName(QStringLiteral("doubleSpinBox_translationZ"));
+        doubleSpinBox_translationZ->setMinimum(-1000);
+        doubleSpinBox_translationZ->setMaximum(1000);
 
         gridLayout->addWidget(doubleSpinBox_translationZ, 0, 3, 1, 1);
 
         doubleSpinBox_orientationY = new QDoubleSpinBox(Transform);
         doubleSpinBox_orientationY->setObjectName(QStringLiteral("doubleSpinBox_orientationY"));
+        doubleSpinBox_orientationY->setMinimum(-360);
+        doubleSpinBox_orientationY->setMaximum(360);
 
         gridLayout->addWidget(doubleSpinBox_orientationY, 1, 2, 1, 1);
 
         doubleSpinBox_scaleY = new QDoubleSpinBox(Transform);
         doubleSpinBox_scaleY->setObjectName(QStringLiteral("doubleSpinBox_scaleY"));
+        doubleSpinBox_scaleY->setMinimum(0.01);
+        doubleSpinBox_scaleY->setMaximum(100);
+        doubleSpinBox_scaleY->setValue(1);
 
         gridLayout->addWidget(doubleSpinBox_scaleY, 2, 2, 1, 1);
 
         doubleSpinBox_orientationX = new QDoubleSpinBox(Transform);
         doubleSpinBox_orientationX->setObjectName(QStringLiteral("doubleSpinBox_orientationX"));
+        doubleSpinBox_orientationX->setMinimum(-360);
+        doubleSpinBox_orientationX->setMaximum(360);
 
         gridLayout->addWidget(doubleSpinBox_orientationX, 1, 1, 1, 1);
 
         doubleSpinBox_scaleX = new QDoubleSpinBox(Transform);
         doubleSpinBox_scaleX->setObjectName(QStringLiteral("doubleSpinBox_scaleX"));
+        doubleSpinBox_scaleX->setMinimum(0.01);
+        doubleSpinBox_scaleX->setMaximum(100);
+        doubleSpinBox_scaleX->setValue(1);
 
         gridLayout->addWidget(doubleSpinBox_scaleX, 2, 1, 1, 1);
 

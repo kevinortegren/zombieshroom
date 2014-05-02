@@ -34,7 +34,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="Canvas3D" name="widget_canvas3D" native="true">
       <property name="minimumSize">
        <size>
         <width>375</width>
@@ -42,7 +42,7 @@
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: black;</string>
+       <string notr="true"/>
       </property>
      </widget>
     </item>
@@ -339,6 +339,12 @@
    <class>EntityOutliner</class>
    <extends>QTreeWidget</extends>
    <header location="global">RootTools/Treenity/include/EntityOutliner.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Canvas3D</class>
+   <extends>QWidget</extends>
+   <header location="global">RootTools/Treenity/include/Canvas3D.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

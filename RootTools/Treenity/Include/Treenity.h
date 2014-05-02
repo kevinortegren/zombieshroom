@@ -28,6 +28,7 @@ public:
 	void EntityRemoved(ECS::Entity* p_entity);
 	void ComponentCreated(ECS::Entity* p_entity, int p_componentType);
 	void ComponentRemoved(ECS::Entity* p_entity, int p_componentType);
+	void CreateOpenGLContext();
 private:
 	// Component meta-data.
 	std::map<int, QString> m_componentNames;
@@ -47,8 +48,6 @@ private:
 	void SelectEntity(ECS::Entity* p_entity);
 
 	// Component property panel
-	void UpdateTransformInformation(ECS::Entity* p_entity);
-	void UpdateRenderableInformation(ECS::Entity* p_entity);
 	void SetupUIForComponent(QWidget* p_widget, int p_componentType);
 	QWidget* GetComponentToolboxItemByType(int p_componentType);
 private slots:

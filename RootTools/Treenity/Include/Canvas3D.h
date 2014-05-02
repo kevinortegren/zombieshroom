@@ -13,6 +13,8 @@ public:
 	Canvas3D(QWidget* p_parent = 0);
 	~Canvas3D();
 
+	void CreateOpenGLContext();
+
 protected:
 	void wheelEvent(QWheelEvent* event);
 	void keyPressEvent( QKeyEvent *k );

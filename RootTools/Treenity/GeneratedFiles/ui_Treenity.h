@@ -28,6 +28,7 @@
 #include <QtWidgets/QToolBox>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <RootTools/Treenity/include/Canvas3D.h>
 #include <RootTools/Treenity/include/EntityOutliner.h>
 
 QT_BEGIN_NAMESPACE
@@ -47,7 +48,7 @@ public:
     QAction *action_renderable;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout;
-    QWidget *widget;
+    Canvas3D *widget_canvas3D;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -119,12 +120,12 @@ public:
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setMinimumSize(QSize(375, 375));
-        widget->setStyleSheet(QStringLiteral("background-color: black;"));
+        widget_canvas3D = new Canvas3D(centralWidget);
+        widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
+        widget_canvas3D->setMinimumSize(QSize(375, 375));
+        widget_canvas3D->setStyleSheet(QStringLiteral("background-color: black;"));
 
-        horizontalLayout->addWidget(widget);
+        horizontalLayout->addWidget(widget_canvas3D);
 
         TreenityClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(TreenityClass);

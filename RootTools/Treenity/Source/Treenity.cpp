@@ -4,11 +4,51 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
 
+#include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Include/GameSharedContext.h>
+extern RootEngine::GameSharedContext g_engineContext;
+
 Treenity::Treenity(QWidget *parent)
 	: QMainWindow(parent), m_running(true), m_selectedEntity(nullptr)
 {
-	m_componentNames[RootForce::ComponentType::TRANSFORM] = "Transform";
 	m_componentNames[RootForce::ComponentType::RENDERABLE] = "Renderable";
+	m_componentNames[RootForce::ComponentType::TRANSFORM] = "Transform";
+	m_componentNames[RootForce::ComponentType::POINTLIGHT] = "Point Light";
+	m_componentNames[RootForce::ComponentType::CAMERA] = "Camera";
+	m_componentNames[RootForce::ComponentType::HEALTH] = "Health";
+	m_componentNames[RootForce::ComponentType::PLAYERCONTROL] = "Player Control";
+	m_componentNames[RootForce::ComponentType::PHYSICS] = "Physics";
+	m_componentNames[RootForce::ComponentType::NETWORK] = "Network";
+	m_componentNames[RootForce::ComponentType::LOOKATBEHAVIOR] = "Look-At Behaviour";
+	m_componentNames[RootForce::ComponentType::THIRDPERSONBEHAVIOR] = "Third Person Behaviour";
+	m_componentNames[RootForce::ComponentType::SCRIPT] = "Script";
+	m_componentNames[RootForce::ComponentType::COLLISION] = "Collision";
+	m_componentNames[RootForce::ComponentType::COLLISIONRESPONDER] = "Collision Responder";
+	m_componentNames[RootForce::ComponentType::PLAYER] = "Player";
+	m_componentNames[RootForce::ComponentType::ANIMATION] = "Animation";
+	m_componentNames[RootForce::ComponentType::PARTICLE] = "Particle";
+	m_componentNames[RootForce::ComponentType::TDMRULES] = "Team-Deathmatch Rules";
+	m_componentNames[RootForce::ComponentType::PLAYERACTION] = "Player Action";
+	m_componentNames[RootForce::ComponentType::PLAYERPHYSICS] = "Player Physics";
+	m_componentNames[RootForce::ComponentType::ENTITYSTATE] = "Entity State";
+	m_componentNames[RootForce::ComponentType::SHADOWCASTER] = "Shadowcaster";
+	m_componentNames[RootForce::ComponentType::DIRECTIONALLIGHT] = "Directional Light";
+	m_componentNames[RootForce::ComponentType::SERVERINFORMATION] = "Server Information";
+	m_componentNames[RootForce::ComponentType::CLIENT] = "Client";
+	m_componentNames[RootForce::ComponentType::RAGDOLL] = "Ragdoll";
+	m_componentNames[RootForce::ComponentType::WATERCOLLIDER] = "Water Collider";
+	m_componentNames[RootForce::ComponentType::ABILITYSPAWN] = "Ability Spawn";
+	m_componentNames[RootForce::ComponentType::TRYPICKUPCOMPONENT] = "Try Pickup";
+	m_componentNames[RootForce::ComponentType::SOUND] = "Sound";
+	m_componentNames[RootForce::ComponentType::TIMER] = "Timer";
+	m_componentNames[RootForce::ComponentType::FOLLOW] = "Follow";
+	m_componentNames[RootForce::ComponentType::HOMING] = "Homing";
+	m_componentNames[RootForce::ComponentType::RAY] = "Ray";
+	m_componentNames[RootForce::ComponentType::DAMAGEANDKNOCKBACK] = "Damage and Knockback";
+	m_componentNames[RootForce::ComponentType::SCALABLE] = "Scalable";
+	m_componentNames[RootForce::ComponentType::STATCHANGE] = "Stat Change";
+	m_componentNames[RootForce::ComponentType::KILLANNOUNCEMENT] = "Kill Announcement";
+	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS] = "Controller Action";
 
 	ui.setupUi(this);
 	
@@ -99,6 +139,12 @@ void Treenity::ComponentRemoved(ECS::Entity* p_entity, int p_componentType)
 	}
 }
 
+
+void Treenity::CreateOpenGLContext()
+{
+	ui.widget_canvas3D->CreateOpenGLContext();
+	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::START_PRINT, "Creating OpenGL context in treenity.");
+}
 
 void Treenity::CreateEntity()
 {
@@ -268,6 +314,16 @@ void Treenity::SelectEntity(ECS::Entity* p_entity)
 					transformUI.doubleSpinBox_scaleX->setValue(m_engineInterface->GetScale(p_entity).x);
 					transformUI.doubleSpinBox_scaleY->setValue(m_engineInterface->GetScale(p_entity).y);
 					transformUI.doubleSpinBox_scaleZ->setValue(m_engineInterface->GetScale(p_entity).z);
+
+					connect(transformUI.doubleSpinBox_translationX, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionXChanged(double)));
+					connect(transformUI.doubleSpinBox_translationY, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionYChanged(double)));
+					connect(transformUI.doubleSpinBox_translationZ, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionZChanged(double)));
+					connect(transformUI.doubleSpinBox_orientationX, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationXChanged(double)));
+					connect(transformUI.doubleSpinBox_orientationY, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationYChanged(double)));
+					connect(transformUI.doubleSpinBox_orientationZ, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationZChanged(double)));
+					connect(transformUI.doubleSpinBox_scaleX,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleXChanged(double)));
+					connect(transformUI.doubleSpinBox_scaleY,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleYChanged(double)));
+					connect(transformUI.doubleSpinBox_scaleZ,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleZChanged(double)));
 				} break;
 
 				case RootForce::ComponentType::RENDERABLE:
@@ -275,19 +331,8 @@ void Treenity::SelectEntity(ECS::Entity* p_entity)
 
 				} break;
 			}
-			//AddComponentToPropertiesPanel(p_entity, i);
 		}
 	}
-}
-
-void Treenity::UpdateTransformInformation(ECS::Entity* p_entity)
-{
-	QWidget* widget = GetComponentToolboxItemByType(RootForce::ComponentType::TRANSFORM);
-}
-
-void Treenity::UpdateRenderableInformation(ECS::Entity* p_entity)
-{
-
 }
 
 void Treenity::SetupUIForComponent(QWidget* p_widget, int p_componentType)
