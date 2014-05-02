@@ -42,15 +42,30 @@ private:
 	Ui::TreenityClass ui;
 	Ui::Transform transformUI;
 	Ui::Renderable renderableUI;
+
+	// Utility
+	void SelectEntity(ECS::Entity* p_entity);
+
+	// Component property panel
+	void UpdateTransformInformation(ECS::Entity* p_entity);
+	void UpdateRenderableInformation(ECS::Entity* p_entity);
+	void SetupUIForComponent(QWidget* p_widget, int p_componentType);
+	QWidget* GetComponentToolboxItemByType(int p_componentType);
 private slots:
 	void CreateEntity();
 	void DestroyEntity();
 	void RenameEntity();
 	void OutlinerSelectEntity();
 	void AddRenderable();
-
-	void SelectEntity(ECS::Entity* p_entity);
-	void SetupUIForComponent(QWidget* p_widget, int p_componentType);
+	void TransformPositionXChanged(double p_value);
+	void TransformPositionYChanged(double p_value);
+	void TransformPositionZChanged(double p_value);
+	void TransformOrientationXChanged(double p_value);
+	void TransformOrientationYChanged(double p_value);
+	void TransformOrientationZChanged(double p_value);
+	void TransformScaleXChanged(double p_value);
+	void TransformScaleYChanged(double p_value);
+	void TransformScaleZChanged(double p_value);
 };
 
 #endif // TREENITY_H

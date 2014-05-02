@@ -13,10 +13,10 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -25,18 +25,18 @@ class Ui_Transform
 {
 public:
     QGridLayout *gridLayout;
-    QSpinBox *spinBox_translationX;
-    QSpinBox *spinBox_scaleY;
     QLabel *label;
-    QSpinBox *spinBox_translationY;
-    QSpinBox *spinBox_translationZ;
-    QSpinBox *spinBox_scaleX;
     QLabel *label_2;
-    QSpinBox *spinBox_scaleZ;
     QLabel *label_3;
-    QSpinBox *spinBox_orientationX;
-    QSpinBox *spinBox_orientationY;
-    QSpinBox *spinBox_orientationZ;
+    QDoubleSpinBox *doubleSpinBox_translationX;
+    QDoubleSpinBox *doubleSpinBox_translationY;
+    QDoubleSpinBox *doubleSpinBox_scaleZ;
+    QDoubleSpinBox *doubleSpinBox_orientationZ;
+    QDoubleSpinBox *doubleSpinBox_translationZ;
+    QDoubleSpinBox *doubleSpinBox_orientationY;
+    QDoubleSpinBox *doubleSpinBox_scaleY;
+    QDoubleSpinBox *doubleSpinBox_orientationX;
+    QDoubleSpinBox *doubleSpinBox_scaleX;
 
     void setupUi(QWidget *Transform)
     {
@@ -46,65 +46,65 @@ public:
         Transform->setMaximumSize(QSize(16777215, 150));
         gridLayout = new QGridLayout(Transform);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        spinBox_translationX = new QSpinBox(Transform);
-        spinBox_translationX->setObjectName(QStringLiteral("spinBox_translationX"));
-
-        gridLayout->addWidget(spinBox_translationX, 0, 1, 1, 1);
-
-        spinBox_scaleY = new QSpinBox(Transform);
-        spinBox_scaleY->setObjectName(QStringLiteral("spinBox_scaleY"));
-
-        gridLayout->addWidget(spinBox_scaleY, 2, 2, 1, 1);
-
         label = new QLabel(Transform);
         label->setObjectName(QStringLiteral("label"));
 
         gridLayout->addWidget(label, 0, 0, 1, 1);
-
-        spinBox_translationY = new QSpinBox(Transform);
-        spinBox_translationY->setObjectName(QStringLiteral("spinBox_translationY"));
-
-        gridLayout->addWidget(spinBox_translationY, 0, 2, 1, 1);
-
-        spinBox_translationZ = new QSpinBox(Transform);
-        spinBox_translationZ->setObjectName(QStringLiteral("spinBox_translationZ"));
-
-        gridLayout->addWidget(spinBox_translationZ, 0, 3, 1, 1);
-
-        spinBox_scaleX = new QSpinBox(Transform);
-        spinBox_scaleX->setObjectName(QStringLiteral("spinBox_scaleX"));
-
-        gridLayout->addWidget(spinBox_scaleX, 2, 1, 1, 1);
 
         label_2 = new QLabel(Transform);
         label_2->setObjectName(QStringLiteral("label_2"));
 
         gridLayout->addWidget(label_2, 2, 0, 1, 1);
 
-        spinBox_scaleZ = new QSpinBox(Transform);
-        spinBox_scaleZ->setObjectName(QStringLiteral("spinBox_scaleZ"));
-
-        gridLayout->addWidget(spinBox_scaleZ, 2, 3, 1, 1);
-
         label_3 = new QLabel(Transform);
         label_3->setObjectName(QStringLiteral("label_3"));
 
         gridLayout->addWidget(label_3, 1, 0, 1, 1);
 
-        spinBox_orientationX = new QSpinBox(Transform);
-        spinBox_orientationX->setObjectName(QStringLiteral("spinBox_orientationX"));
+        doubleSpinBox_translationX = new QDoubleSpinBox(Transform);
+        doubleSpinBox_translationX->setObjectName(QStringLiteral("doubleSpinBox_translationX"));
 
-        gridLayout->addWidget(spinBox_orientationX, 1, 1, 1, 1);
+        gridLayout->addWidget(doubleSpinBox_translationX, 0, 1, 1, 1);
 
-        spinBox_orientationY = new QSpinBox(Transform);
-        spinBox_orientationY->setObjectName(QStringLiteral("spinBox_orientationY"));
+        doubleSpinBox_translationY = new QDoubleSpinBox(Transform);
+        doubleSpinBox_translationY->setObjectName(QStringLiteral("doubleSpinBox_translationY"));
 
-        gridLayout->addWidget(spinBox_orientationY, 1, 2, 1, 1);
+        gridLayout->addWidget(doubleSpinBox_translationY, 0, 2, 1, 1);
 
-        spinBox_orientationZ = new QSpinBox(Transform);
-        spinBox_orientationZ->setObjectName(QStringLiteral("spinBox_orientationZ"));
+        doubleSpinBox_scaleZ = new QDoubleSpinBox(Transform);
+        doubleSpinBox_scaleZ->setObjectName(QStringLiteral("doubleSpinBox_scaleZ"));
 
-        gridLayout->addWidget(spinBox_orientationZ, 1, 3, 1, 1);
+        gridLayout->addWidget(doubleSpinBox_scaleZ, 2, 3, 1, 1);
+
+        doubleSpinBox_orientationZ = new QDoubleSpinBox(Transform);
+        doubleSpinBox_orientationZ->setObjectName(QStringLiteral("doubleSpinBox_orientationZ"));
+
+        gridLayout->addWidget(doubleSpinBox_orientationZ, 1, 3, 1, 1);
+
+        doubleSpinBox_translationZ = new QDoubleSpinBox(Transform);
+        doubleSpinBox_translationZ->setObjectName(QStringLiteral("doubleSpinBox_translationZ"));
+
+        gridLayout->addWidget(doubleSpinBox_translationZ, 0, 3, 1, 1);
+
+        doubleSpinBox_orientationY = new QDoubleSpinBox(Transform);
+        doubleSpinBox_orientationY->setObjectName(QStringLiteral("doubleSpinBox_orientationY"));
+
+        gridLayout->addWidget(doubleSpinBox_orientationY, 1, 2, 1, 1);
+
+        doubleSpinBox_scaleY = new QDoubleSpinBox(Transform);
+        doubleSpinBox_scaleY->setObjectName(QStringLiteral("doubleSpinBox_scaleY"));
+
+        gridLayout->addWidget(doubleSpinBox_scaleY, 2, 2, 1, 1);
+
+        doubleSpinBox_orientationX = new QDoubleSpinBox(Transform);
+        doubleSpinBox_orientationX->setObjectName(QStringLiteral("doubleSpinBox_orientationX"));
+
+        gridLayout->addWidget(doubleSpinBox_orientationX, 1, 1, 1, 1);
+
+        doubleSpinBox_scaleX = new QDoubleSpinBox(Transform);
+        doubleSpinBox_scaleX->setObjectName(QStringLiteral("doubleSpinBox_scaleX"));
+
+        gridLayout->addWidget(doubleSpinBox_scaleX, 2, 1, 1, 1);
 
 
         retranslateUi(Transform);

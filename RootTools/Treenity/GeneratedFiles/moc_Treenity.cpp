@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Treenity_t {
-    QByteArrayData data[11];
-    char stringdata[140];
+    QByteArrayData data[17];
+    char stringdata[328];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,15 +36,27 @@ QT_MOC_LITERAL(3, 23, 13),
 QT_MOC_LITERAL(4, 37, 12),
 QT_MOC_LITERAL(5, 50, 20),
 QT_MOC_LITERAL(6, 71, 13),
-QT_MOC_LITERAL(7, 85, 19),
-QT_MOC_LITERAL(8, 105, 8),
-QT_MOC_LITERAL(9, 114, 8),
-QT_MOC_LITERAL(10, 123, 15)
+QT_MOC_LITERAL(7, 85, 25),
+QT_MOC_LITERAL(8, 111, 7),
+QT_MOC_LITERAL(9, 119, 25),
+QT_MOC_LITERAL(10, 145, 25),
+QT_MOC_LITERAL(11, 171, 28),
+QT_MOC_LITERAL(12, 200, 28),
+QT_MOC_LITERAL(13, 229, 28),
+QT_MOC_LITERAL(14, 258, 22),
+QT_MOC_LITERAL(15, 281, 22),
+QT_MOC_LITERAL(16, 304, 22)
     },
     "Treenity\0CreateEntity\0\0DestroyEntity\0"
     "RenameEntity\0OutlinerSelectEntity\0"
-    "AddRenderable\0SetupUIForComponent\0"
-    "QWidget*\0p_widget\0p_componentType\0"
+    "AddRenderable\0TransformPositionXChanged\0"
+    "p_value\0TransformPositionYChanged\0"
+    "TransformPositionZChanged\0"
+    "TransformOrientationXChanged\0"
+    "TransformOrientationYChanged\0"
+    "TransformOrientationZChanged\0"
+    "TransformScaleXChanged\0TransformScaleYChanged\0"
+    "TransformScaleZChanged\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -54,7 +66,7 @@ static const uint qt_meta_data_Treenity[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -62,12 +74,20 @@ static const uint qt_meta_data_Treenity[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   44,    2, 0x08,
-       3,    0,   45,    2, 0x08,
-       4,    0,   46,    2, 0x08,
-       5,    0,   47,    2, 0x08,
-       6,    0,   48,    2, 0x08,
-       7,    2,   49,    2, 0x08,
+       1,    0,   84,    2, 0x08,
+       3,    0,   85,    2, 0x08,
+       4,    0,   86,    2, 0x08,
+       5,    0,   87,    2, 0x08,
+       6,    0,   88,    2, 0x08,
+       7,    1,   89,    2, 0x08,
+       9,    1,   92,    2, 0x08,
+      10,    1,   95,    2, 0x08,
+      11,    1,   98,    2, 0x08,
+      12,    1,  101,    2, 0x08,
+      13,    1,  104,    2, 0x08,
+      14,    1,  107,    2, 0x08,
+      15,    1,  110,    2, 0x08,
+      16,    1,  113,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -75,7 +95,15 @@ static const uint qt_meta_data_Treenity[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 8, QMetaType::Int,    9,   10,
+    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void, QMetaType::Double,    8,
 
        0        // eod
 };
@@ -90,19 +118,16 @@ void Treenity::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 2: _t->RenameEntity(); break;
         case 3: _t->OutlinerSelectEntity(); break;
         case 4: _t->AddRenderable(); break;
-        case 5: _t->SetupUIForComponent((*reinterpret_cast< QWidget*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 5: _t->TransformPositionXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 6: _t->TransformPositionYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 7: _t->TransformPositionZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 8: _t->TransformOrientationXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 9: _t->TransformOrientationYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 10: _t->TransformOrientationZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 11: _t->TransformScaleXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 12: _t->TransformScaleYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 13: _t->TransformScaleZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         default: ;
-        }
-    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        switch (_id) {
-        default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-        case 5:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
         }
     }
 }
@@ -132,13 +157,13 @@ int Treenity::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 6)
-            qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        if (_id < 14)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 14;
     }
     return _id;
 }

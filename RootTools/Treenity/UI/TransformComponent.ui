@@ -20,27 +20,12 @@
    <string>Transform</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <widget class="QSpinBox" name="spinBox_translationX"/>
-   </item>
-   <item row="2" column="2">
-    <widget class="QSpinBox" name="spinBox_scaleY"/>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Position</string>
      </property>
     </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QSpinBox" name="spinBox_translationY"/>
-   </item>
-   <item row="0" column="3">
-    <widget class="QSpinBox" name="spinBox_translationZ"/>
-   </item>
-   <item row="2" column="1">
-    <widget class="QSpinBox" name="spinBox_scaleX"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_2">
@@ -49,9 +34,6 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QSpinBox" name="spinBox_scaleZ"/>
-   </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
@@ -59,14 +41,32 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QSpinBox" name="spinBox_orientationX"/>
+   <item row="0" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationX"/>
    </item>
-   <item row="1" column="2">
-    <widget class="QSpinBox" name="spinBox_orientationY"/>
+   <item row="0" column="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationY"/>
+   </item>
+   <item row="2" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleZ"/>
    </item>
    <item row="1" column="3">
-    <widget class="QSpinBox" name="spinBox_orientationZ"/>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationZ"/>
+   </item>
+   <item row="0" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationZ"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationY"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleY"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationX"/>
+   </item>
+   <item row="2" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleX"/>
    </item>
   </layout>
  </widget>

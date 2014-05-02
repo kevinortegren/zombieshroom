@@ -14,7 +14,13 @@ public:
 	void DeleteEntity(ECS::Entity* p_entity);
 
 	// Transform
+	void SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position);
 	void TranslateEntity(ECS::Entity* p_entity, const glm::vec3& p_translation);
+	void SetOrientation(ECS::Entity* p_entity, const RootForce::Orientation& p_orientation);
+	void SetScale(ECS::Entity* p_entity, const glm::vec3& p_scale);
+	const glm::vec3& GetPosition(ECS::Entity* p_entity);
+	RootForce::Orientation& GetOrientation(ECS::Entity* p_entity);
+	const glm::vec3& GetScale(ECS::Entity* p_entity);
 
 	// Renderable
 	void AddRenderable(ECS::Entity* p_entity);
