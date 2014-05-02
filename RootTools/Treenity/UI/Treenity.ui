@@ -74,7 +74,8 @@
     <property name="title">
      <string>Entity</string>
     </property>
-    <addaction name="actionAdd_entity"/>
+    <addaction name="action_addEntity"/>
+    <addaction name="action_removeEntity"/>
    </widget>
    <widget class="QMenu" name="menuComponent">
     <property name="title">
@@ -188,7 +189,7 @@
        </property>
        <layout class="QFormLayout" name="formLayout">
         <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="lineEdit_entityName"/>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
@@ -237,7 +238,7 @@
    <addaction name="actionRotate"/>
    <addaction name="actionResize"/>
   </widget>
-  <action name="actionAdd_entity">
+  <action name="action_addEntity">
    <property name="text">
     <string>Add entity</string>
    </property>
@@ -312,6 +313,11 @@
    </property>
    <property name="toolTip">
     <string>Play the game</string>
+   </property>
+  </action>
+  <action name="action_removeEntity">
+   <property name="text">
+    <string>Remove entity</string>
    </property>
   </action>
  </widget>
