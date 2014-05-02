@@ -93,7 +93,20 @@ void TreenityMain::Update(float dt)
 	HandleEvents();
 
 	auto msgs = m_world.GetMessages();
-	for(auto itr = msgs.begin(); itr != msgs.end(); ++itr) {
+	for(auto itr = msgs.begin(); itr != msgs.end(); ++itr) 
+	{
+		switch (itr->m_type)
+		{
+			case ECS::MessageType::ENTITY_ADDED:
+			{
+				m_treenityEditor.EntityCreated(itr->m_entity);
+			} break;
+
+			case ECS::MessageType::ENTITY_REMOVED:
+			{
+				m_treenityEditor.EntityDestroyed(itr->m_entity);
+			} break;
+		}
 
 		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
 	}

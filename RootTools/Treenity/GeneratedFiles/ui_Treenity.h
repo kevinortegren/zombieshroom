@@ -35,7 +35,7 @@ QT_BEGIN_NAMESPACE
 class Ui_TreenityClass
 {
 public:
-    QAction *actionAdd_entity;
+    QAction *action_addEntity;
     QAction *actionExit;
     QAction *actionSave_As;
     QAction *actionSave;
@@ -43,6 +43,7 @@ public:
     QAction *actionResize;
     QAction *actionTranslate;
     QAction *actionPlay;
+    QAction *action_removeEntity;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout;
     QWidget *widget;
@@ -62,7 +63,7 @@ public:
     QVBoxLayout *verticalLayout;
     QGroupBox *groupBox;
     QFormLayout *formLayout;
-    QLineEdit *lineEdit;
+    QLineEdit *lineEdit_entityName;
     QLabel *label;
     QToolBox *toolBox;
     QWidget *page_2;
@@ -74,8 +75,8 @@ public:
             TreenityClass->setObjectName(QStringLiteral("TreenityClass"));
         TreenityClass->resize(1292, 902);
         TreenityClass->setStyleSheet(QStringLiteral(""));
-        actionAdd_entity = new QAction(TreenityClass);
-        actionAdd_entity->setObjectName(QStringLiteral("actionAdd_entity"));
+        action_addEntity = new QAction(TreenityClass);
+        action_addEntity->setObjectName(QStringLiteral("action_addEntity"));
         actionExit = new QAction(TreenityClass);
         actionExit->setObjectName(QStringLiteral("actionExit"));
         actionSave_As = new QAction(TreenityClass);
@@ -105,6 +106,8 @@ public:
         QIcon icon3;
         icon3.addFile(QStringLiteral("Resources/playButton.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionPlay->setIcon(icon3);
+        action_removeEntity = new QAction(TreenityClass);
+        action_removeEntity->setObjectName(QStringLiteral("action_removeEntity"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout = new QHBoxLayout(centralWidget);
@@ -184,10 +187,10 @@ public:
         formLayout->setSpacing(6);
         formLayout->setContentsMargins(11, 11, 11, 11);
         formLayout->setObjectName(QStringLiteral("formLayout"));
-        lineEdit = new QLineEdit(groupBox);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        lineEdit_entityName = new QLineEdit(groupBox);
+        lineEdit_entityName->setObjectName(QStringLiteral("lineEdit_entityName"));
 
-        formLayout->setWidget(0, QFormLayout::FieldRole, lineEdit);
+        formLayout->setWidget(0, QFormLayout::FieldRole, lineEdit_entityName);
 
         label = new QLabel(groupBox);
         label->setObjectName(QStringLiteral("label"));
@@ -219,7 +222,8 @@ public:
         menuFile->addAction(actionSave_As);
         menuFile->addAction(actionSave);
         menuFile->addAction(actionExit);
-        menuEntity->addAction(actionAdd_entity);
+        menuEntity->addAction(action_addEntity);
+        menuEntity->addAction(action_removeEntity);
         mainToolBar->addAction(actionPlay);
         toolBar->addAction(actionTranslate);
         toolBar->addAction(actionRotate);
@@ -236,7 +240,7 @@ public:
     void retranslateUi(QMainWindow *TreenityClass)
     {
         TreenityClass->setWindowTitle(QApplication::translate("TreenityClass", "Treenity", 0));
-        actionAdd_entity->setText(QApplication::translate("TreenityClass", "Add entity", 0));
+        action_addEntity->setText(QApplication::translate("TreenityClass", "Add entity", 0));
         actionExit->setText(QApplication::translate("TreenityClass", "Exit", 0));
         actionSave_As->setText(QApplication::translate("TreenityClass", "Save As...", 0));
         actionSave->setText(QApplication::translate("TreenityClass", "Save", 0));
@@ -256,6 +260,7 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionPlay->setToolTip(QApplication::translate("TreenityClass", "Play the game", 0));
 #endif // QT_NO_TOOLTIP
+        action_removeEntity->setText(QApplication::translate("TreenityClass", "Remove entity", 0));
         menuFile->setTitle(QApplication::translate("TreenityClass", "File", 0));
         menuEdit->setTitle(QApplication::translate("TreenityClass", "Edit", 0));
         menuEntity->setTitle(QApplication::translate("TreenityClass", "Entity", 0));
