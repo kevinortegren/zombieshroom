@@ -21,8 +21,11 @@ public:
 	bool IsRunning();
 	void closeEvent(QCloseEvent *event);
 
+	// Called by the engine.
+	void EntityCreated(ECS::Entity* p_entity);
+	void EntityDestroyed(ECS::Entity* p_entity);
 private:
-	// Project meta-data
+	// Project meta-data.
 	std::map<ECS::Entity*, QString> m_entityNames;
 	ECS::Entity* m_selectedEntity;
 
@@ -32,6 +35,9 @@ private:
 	Ui::TreenityClass ui;
 private slots:
 	void CreateEntity();
+	void DestroyEntity();
+	void RenameEntity();
+	void OutlinerSelectEntity();
 };
 
 #endif // TREENITY_H

@@ -17,4 +17,9 @@ class EntityOutliner : public QTreeWidget
 {
 public:
 	EntityOutliner(QWidget *parent);
+
+	void EntityCreated(ECS::Entity* p_entity, const QString& p_name);
+	void EntityDestroyed(ECS::Entity* p_entity);
+	void EntityRenamed(ECS::Entity* p_entity, const QString& p_name);
+	ECS::Entity* GetSelectedEntity();
 };
