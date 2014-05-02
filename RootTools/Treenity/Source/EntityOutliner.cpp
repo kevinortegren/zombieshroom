@@ -48,9 +48,9 @@ void EntityOutliner::EntityRenamed(ECS::Entity* p_entity, const QString& p_name)
 ECS::Entity* EntityOutliner::GetSelectedEntity()
 {
 	ECS::Entity* entity = nullptr;
-	if (topLevelItemCount() > 0)
+	EntityOutlinerItem* item = nullptr;
+	if ( (item = (EntityOutlinerItem*) currentItem()) != nullptr)
 	{
-		EntityOutlinerItem* item = (EntityOutlinerItem*) currentItem();
 		entity = item->GetEntity();
 	}
 	
