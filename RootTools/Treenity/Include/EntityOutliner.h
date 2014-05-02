@@ -19,7 +19,7 @@ public:
 	EntityOutliner(QWidget* p_parent);
 
 	void EntityCreated(ECS::Entity* p_entity, const QString& p_name);
-	void EntityDestroyed(ECS::Entity* p_entity);
+	void EntityRemoved(ECS::Entity* p_entity);
 	void EntityRenamed(ECS::Entity* p_entity, const QString& p_name);
 	ECS::Entity* GetSelectedEntity();
 private:

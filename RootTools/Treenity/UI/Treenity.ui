@@ -81,6 +81,13 @@
     <property name="title">
      <string>Component</string>
     </property>
+    <widget class="QMenu" name="menu_addComponent">
+     <property name="title">
+      <string>Add component</string>
+     </property>
+     <addaction name="action_renderable"/>
+    </widget>
+    <addaction name="menu_addComponent"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -202,7 +209,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolBox" name="toolBox">
+      <widget class="QToolBox" name="toolBox_components">
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -216,7 +223,7 @@
          </rect>
         </property>
         <attribute name="label">
-         <string>Renderable</string>
+         <string>Transform</string>
         </attribute>
        </widget>
       </widget>
@@ -318,6 +325,11 @@
   <action name="action_removeEntity">
    <property name="text">
     <string>Remove entity</string>
+   </property>
+  </action>
+  <action name="action_renderable">
+   <property name="text">
+    <string>Renderable</string>
    </property>
   </action>
  </widget>

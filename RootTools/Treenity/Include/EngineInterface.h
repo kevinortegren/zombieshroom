@@ -11,4 +11,8 @@ struct EngineInterface
 
 	// Transform
 	virtual void TranslateEntity(ECS::Entity* p_entity, const glm::vec3& p_translation) = 0;
+
+	// Renderable
+	virtual void AddRenderable(ECS::Entity* p_entity) = 0;
+	virtual void RemoveRenderable(ECS::Entity* p_entity) = 0;
 };

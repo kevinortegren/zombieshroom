@@ -16,6 +16,9 @@ public:
 	// Transform
 	void TranslateEntity(ECS::Entity* p_entity, const glm::vec3& p_translation);
 
+	// Renderable
+	void AddRenderable(ECS::Entity* p_entity);
+	void RemoveRenderable(ECS::Entity* p_entity);
 private:
 	ECS::World* m_world;
 };

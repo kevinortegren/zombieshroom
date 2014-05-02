@@ -1,10 +1,19 @@
 #include "Treenity.h"
 #include <QtWidgets\qmessagebox.h>
+#include <RootSystems/Include/ComponentTypes.h>
 
 Treenity::Treenity(QWidget *parent)
 	: QMainWindow(parent), m_running(true), m_selectedEntity(nullptr)
 {
+	m_componentNames[RootForce::ComponentType::TRANSFORM] = "Transform";
+	m_componentNames[RootForce::ComponentType::RENDERABLE] = "Renderable";
+
 	ui.setupUi(this);
+	
+	QWidget* transformWidget = new QWidget(ui.toolBox_components);
+	SetupUIForComponent(transformWidget, RootForce::ComponentType::TRANSFORM);
+	ui.toolBox_components->removeItem(0);
+	ui.toolBox_components->addItem(transformWidget, m_componentNames[RootForce::ComponentType::TRANSFORM]);
 
 	QActionGroup* group = new QActionGroup(ui.toolBar);
 
@@ -18,6 +27,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_removeEntity, SIGNAL(triggered()), this, SLOT(DestroyEntity()));
 	connect(ui.lineEdit_entityName, SIGNAL(editingFinished()), this, SLOT(RenameEntity()));
 	connect(ui.treeView_entityOutliner, SIGNAL(itemSelectionChanged()), this, SLOT(OutlinerSelectEntity()));
+	connect(ui.action_renderable, SIGNAL(triggered()), this, SLOT(AddRenderable()));
 }
 
 Treenity::~Treenity()
@@ -48,9 +58,34 @@ void Treenity::EntityCreated(ECS::Entity* p_entity)
 	ui.treeView_entityOutliner->EntityCreated(p_entity, m_entityNames.find(p_entity)->second);
 }
 
-void Treenity::EntityDestroyed(ECS::Entity* p_entity)
+void Treenity::EntityRemoved(ECS::Entity* p_entity)
 {
-	ui.treeView_entityOutliner->EntityDestroyed(p_entity);
+	ui.treeView_entityOutliner->EntityRemoved(p_entity);
+}
+
+void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
+{
+	if (m_selectedEntity == p_entity)
+	{
+		QWidget* widget = new QWidget(ui.toolBox_components);
+		SetupUIForComponent(widget, p_componentType);
+		ui.toolBox_components->addItem(widget, m_componentNames[p_componentType]);
+	}
+}
+
+void Treenity::ComponentRemoved(ECS::Entity* p_entity, int p_componentType)
+{
+	if (m_selectedEntity == p_entity)
+	{
+		for (int i = 0; i < ui.toolBox_components->count(); ++i)
+		{
+			if (ui.toolBox_components->widget(i)->windowTitle() == m_componentNames[p_componentType])
+			{
+				ui.toolBox_components->removeItem(i);
+				break;
+			}
+		}
+	}
 }
 
 
@@ -79,9 +114,41 @@ void Treenity::RenameEntity()
 
 void Treenity::OutlinerSelectEntity()
 {
-	m_selectedEntity = ui.treeView_entityOutliner->GetSelectedEntity();
-	QString name = m_entityNames.find(m_selectedEntity) != m_entityNames.end() ? m_entityNames.find(m_selectedEntity)->second : "";
+	SelectEntity(ui.treeView_entityOutliner->GetSelectedEntity());
+}
 
-	// Switch entity-dependent context.
+void Treenity::AddRenderable()
+{
+	if (m_selectedEntity != nullptr)
+	{
+		m_engineInterface->AddRenderable(m_selectedEntity);
+	}
+}
+
+void Treenity::SelectEntity(ECS::Entity* p_entity)
+{
+	m_selectedEntity = p_entity;
+
+	// Update the general properties.
+	QString name = m_entityNames.find(m_selectedEntity) != m_entityNames.end() ? m_entityNames.find(m_selectedEntity)->second : "";
 	ui.lineEdit_entityName->setText(name);
+
+	// Update the component toolbox.
+	
+}
+
+void Treenity::SetupUIForComponent(QWidget* p_widget, int p_componentType)
+{
+	switch (p_componentType)
+	{
+		case RootForce::ComponentType::TRANSFORM:
+		{
+			transformUI.setupUi(p_widget);
+		} break;
+
+		case RootForce::ComponentType::RENDERABLE:
+		{
+			renderableUI.setupUi(p_widget);
+		} break;
+	}
 }

@@ -104,7 +104,17 @@ void TreenityMain::Update(float dt)
 
 			case ECS::MessageType::ENTITY_REMOVED:
 			{
-				m_treenityEditor.EntityDestroyed(itr->m_entity);
+				m_treenityEditor.EntityRemoved(itr->m_entity);
+			} break;
+
+			case ECS::MessageType::COMPONENT_ADDED:
+			{
+				m_treenityEditor.ComponentCreated(itr->m_entity, itr->m_compType);
+			} break;
+			
+			case ECS::MessageType::COMPONENT_REMOVED:
+			{
+				m_treenityEditor.ComponentRemoved(itr->m_entity, itr->m_compType);
 			} break;
 		}
 
