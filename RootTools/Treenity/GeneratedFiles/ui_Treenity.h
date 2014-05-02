@@ -28,6 +28,7 @@
 #include <QtWidgets/QToolBox>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <RootTools/Treenity/include/Canvas3D.h>
 #include <RootTools/Treenity/include/EntityOutliner.h>
 
 QT_BEGIN_NAMESPACE
@@ -43,15 +44,19 @@ public:
     QAction *actionResize;
     QAction *actionTranslate;
     QAction *actionPlay;
+    QAction *actionLog;
     QAction *action_removeEntity;
+    QAction *action_renderable;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout;
-    QWidget *widget;
+    Canvas3D *widget_canvas3D;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
     QMenu *menuEntity;
     QMenu *menuComponent;
+    QMenu *menu_addComponent;
+    QMenu *menuView;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QDockWidget *dockWidget_4;
@@ -65,7 +70,7 @@ public:
     QFormLayout *formLayout;
     QLineEdit *lineEdit_entityName;
     QLabel *label;
-    QToolBox *toolBox;
+    QToolBox *toolBox_components;
     QWidget *page_2;
     QToolBar *toolBar;
 
@@ -106,8 +111,12 @@ public:
         QIcon icon3;
         icon3.addFile(QStringLiteral("Resources/playButton.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionPlay->setIcon(icon3);
+        actionLog = new QAction(TreenityClass);
+        actionLog->setObjectName(QStringLiteral("actionLog"));
         action_removeEntity = new QAction(TreenityClass);
         action_removeEntity->setObjectName(QStringLiteral("action_removeEntity"));
+        action_renderable = new QAction(TreenityClass);
+        action_renderable->setObjectName(QStringLiteral("action_renderable"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout = new QHBoxLayout(centralWidget);
@@ -115,12 +124,12 @@ public:
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setMinimumSize(QSize(375, 375));
-        widget->setStyleSheet(QStringLiteral("background-color: black;"));
+        widget_canvas3D = new Canvas3D(centralWidget);
+        widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
+        widget_canvas3D->setMinimumSize(QSize(375, 375));
+        widget_canvas3D->setStyleSheet(QStringLiteral(""));
 
-        horizontalLayout->addWidget(widget);
+        horizontalLayout->addWidget(widget_canvas3D);
 
         TreenityClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(TreenityClass);
@@ -134,6 +143,10 @@ public:
         menuEntity->setObjectName(QStringLiteral("menuEntity"));
         menuComponent = new QMenu(menuBar);
         menuComponent->setObjectName(QStringLiteral("menuComponent"));
+        menu_addComponent = new QMenu(menuComponent);
+        menu_addComponent->setObjectName(QStringLiteral("menu_addComponent"));
+        menuView = new QMenu(menuBar);
+        menuView->setObjectName(QStringLiteral("menuView"));
         TreenityClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(TreenityClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -200,14 +213,14 @@ public:
 
         verticalLayout->addWidget(groupBox);
 
-        toolBox = new QToolBox(dockWidgetContents_6);
-        toolBox->setObjectName(QStringLiteral("toolBox"));
+        toolBox_components = new QToolBox(dockWidgetContents_6);
+        toolBox_components->setObjectName(QStringLiteral("toolBox_components"));
         page_2 = new QWidget();
         page_2->setObjectName(QStringLiteral("page_2"));
         page_2->setGeometry(QRect(0, 0, 186, 701));
-        toolBox->addItem(page_2, QStringLiteral("Renderable"));
+        toolBox_components->addItem(page_2, QStringLiteral("Transform"));
 
-        verticalLayout->addWidget(toolBox);
+        verticalLayout->addWidget(toolBox_components);
 
         dockWidget_6->setWidget(dockWidgetContents_6);
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_6);
@@ -217,6 +230,7 @@ public:
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
+        menuBar->addAction(menuView->menuAction());
         menuBar->addAction(menuEntity->menuAction());
         menuBar->addAction(menuComponent->menuAction());
         menuFile->addAction(actionSave_As);
@@ -224,6 +238,9 @@ public:
         menuFile->addAction(actionExit);
         menuEntity->addAction(action_addEntity);
         menuEntity->addAction(action_removeEntity);
+        menuComponent->addAction(menu_addComponent->menuAction());
+        menu_addComponent->addAction(action_renderable);
+        menuView->addAction(actionLog);
         mainToolBar->addAction(actionPlay);
         toolBar->addAction(actionTranslate);
         toolBar->addAction(actionRotate);
@@ -231,7 +248,7 @@ public:
 
         retranslateUi(TreenityClass);
 
-        toolBox->setCurrentIndex(0);
+        toolBox_components->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(TreenityClass);
@@ -260,16 +277,20 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionPlay->setToolTip(QApplication::translate("TreenityClass", "Play the game", 0));
 #endif // QT_NO_TOOLTIP
+        actionLog->setText(QApplication::translate("TreenityClass", "Log", 0));
         action_removeEntity->setText(QApplication::translate("TreenityClass", "Remove entity", 0));
+        action_renderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
         menuFile->setTitle(QApplication::translate("TreenityClass", "File", 0));
         menuEdit->setTitle(QApplication::translate("TreenityClass", "Edit", 0));
         menuEntity->setTitle(QApplication::translate("TreenityClass", "Entity", 0));
         menuComponent->setTitle(QApplication::translate("TreenityClass", "Component", 0));
+        menu_addComponent->setTitle(QApplication::translate("TreenityClass", "Add component", 0));
+        menuView->setTitle(QApplication::translate("TreenityClass", "View", 0));
         dockWidget_4->setWindowTitle(QApplication::translate("TreenityClass", "Outline", 0));
         dockWidget_6->setWindowTitle(QApplication::translate("TreenityClass", "Properties", 0));
         groupBox->setTitle(QApplication::translate("TreenityClass", "General", 0));
         label->setText(QApplication::translate("TreenityClass", "Name", 0));
-        toolBox->setItemText(toolBox->indexOf(page_2), QApplication::translate("TreenityClass", "Renderable", 0));
+        toolBox_components->setItemText(toolBox_components->indexOf(page_2), QApplication::translate("TreenityClass", "Transform", 0));
         toolBar->setWindowTitle(QApplication::translate("TreenityClass", "toolBar", 0));
     } // retranslateUi
 

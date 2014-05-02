@@ -23,7 +23,7 @@ void EntityOutliner::EntityCreated(ECS::Entity* p_entity, const QString& p_name)
 	addTopLevelItem(new EntityOutlinerItem(this, p_entity, p_name));
 }
 
-void EntityOutliner::EntityDestroyed(ECS::Entity* p_entity)
+void EntityOutliner::EntityRemoved(ECS::Entity* p_entity)
 {
 	for (int i = 0; i < topLevelItemCount();)
 	{

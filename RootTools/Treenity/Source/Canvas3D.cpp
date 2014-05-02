@@ -70,8 +70,7 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 		std::cout << SDL_GetError() << std::endl;
 		throw std::runtime_error("Failed to create window");
 	}
-	// Setup the SDL context
-	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+
 
 	InitialiseKeymap();
 }
@@ -79,6 +78,12 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 Canvas3D::~Canvas3D()
 {
 
+}
+
+void Canvas3D::CreateOpenGLContext()
+{
+	// Setup the SDL context
+	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 }
 
 void Canvas3D::wheelEvent(QWheelEvent* event)
@@ -106,8 +111,6 @@ void Canvas3D::keyReleaseEvent( QKeyEvent *k )
 	keyEvent.key.repeat = false;
 	SDL_PushEvent(&keyEvent);
 }
-
-
 
 static void InitialiseKeymap()
 {
