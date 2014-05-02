@@ -61,8 +61,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionSave_As"/>
-    <addaction name="actionSave"/>
+    <addaction name="action_saveAs"/>
+    <addaction name="action_save"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -262,12 +262,12 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionSave_As">
+  <action name="action_saveAs">
    <property name="text">
     <string>Save As...</string>
    </property>
   </action>
-  <action name="actionSave">
+  <action name="action_save">
    <property name="text">
     <string>Save</string>
    </property>
@@ -332,7 +332,7 @@
   <action name="actionLog">
    <property name="text">
     <string>Log</string>
- </property>
+   </property>
   </action>
   <action name="action_removeEntity">
    <property name="text">

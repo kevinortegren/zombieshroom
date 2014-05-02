@@ -23,6 +23,7 @@ private:
 	ECS::World m_world;
 	Treenity m_treenityEditor;
 	EngineActions m_engineActions;	
+	ProjectManager m_projectManager;
 
 	RootForce::RenderingSystem* m_renderingSystem;
 };

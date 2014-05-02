@@ -12,9 +12,12 @@ public:
 	~ProjectManager();
 
 	const QString& GetCurrentProjectName() const;
-	const QString& GetEntityName(ECS::Entity* p_entity) const;
+	QString GetEntityName(ECS::Entity* p_entity) const;
 
 	void SetEntityName(ECS::Entity* p_entity, const QString& p_name);
+
+	void EntityAdded(ECS::Entity* p_entity);
+	void EntityRemoved(ECS::Entity* p_entity);
 
 	void Export(const QString& p_name);
 	void Import(const QString& p_name);

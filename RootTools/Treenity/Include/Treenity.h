@@ -53,6 +53,7 @@ private:
 	void SetupUIForComponent(QWidget* p_widget, int p_componentType);
 	QWidget* GetComponentToolboxItemByType(int p_componentType);
 private slots:
+	void SaveAs();
 	void CreateEntity();
 	void DestroyEntity();
 	void RenameEntity();

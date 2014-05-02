@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Treenity_t {
-    QByteArrayData data[17];
-    char stringdata[328];
+    QByteArrayData data[18];
+    char stringdata[335];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,27 +30,29 @@ struct qt_meta_stringdata_Treenity_t {
 static const qt_meta_stringdata_Treenity_t qt_meta_stringdata_Treenity = {
     {
 QT_MOC_LITERAL(0, 0, 8),
-QT_MOC_LITERAL(1, 9, 12),
-QT_MOC_LITERAL(2, 22, 0),
-QT_MOC_LITERAL(3, 23, 13),
-QT_MOC_LITERAL(4, 37, 12),
-QT_MOC_LITERAL(5, 50, 20),
-QT_MOC_LITERAL(6, 71, 13),
-QT_MOC_LITERAL(7, 85, 25),
-QT_MOC_LITERAL(8, 111, 7),
-QT_MOC_LITERAL(9, 119, 25),
-QT_MOC_LITERAL(10, 145, 25),
-QT_MOC_LITERAL(11, 171, 28),
-QT_MOC_LITERAL(12, 200, 28),
-QT_MOC_LITERAL(13, 229, 28),
-QT_MOC_LITERAL(14, 258, 22),
-QT_MOC_LITERAL(15, 281, 22),
-QT_MOC_LITERAL(16, 304, 22)
+QT_MOC_LITERAL(1, 9, 6),
+QT_MOC_LITERAL(2, 16, 0),
+QT_MOC_LITERAL(3, 17, 12),
+QT_MOC_LITERAL(4, 30, 13),
+QT_MOC_LITERAL(5, 44, 12),
+QT_MOC_LITERAL(6, 57, 20),
+QT_MOC_LITERAL(7, 78, 13),
+QT_MOC_LITERAL(8, 92, 25),
+QT_MOC_LITERAL(9, 118, 7),
+QT_MOC_LITERAL(10, 126, 25),
+QT_MOC_LITERAL(11, 152, 25),
+QT_MOC_LITERAL(12, 178, 28),
+QT_MOC_LITERAL(13, 207, 28),
+QT_MOC_LITERAL(14, 236, 28),
+QT_MOC_LITERAL(15, 265, 22),
+QT_MOC_LITERAL(16, 288, 22),
+QT_MOC_LITERAL(17, 311, 22)
     },
-    "Treenity\0CreateEntity\0\0DestroyEntity\0"
-    "RenameEntity\0OutlinerSelectEntity\0"
-    "AddRenderable\0TransformPositionXChanged\0"
-    "p_value\0TransformPositionYChanged\0"
+    "Treenity\0SaveAs\0\0CreateEntity\0"
+    "DestroyEntity\0RenameEntity\0"
+    "OutlinerSelectEntity\0AddRenderable\0"
+    "TransformPositionXChanged\0p_value\0"
+    "TransformPositionYChanged\0"
     "TransformPositionZChanged\0"
     "TransformOrientationXChanged\0"
     "TransformOrientationYChanged\0"
@@ -66,7 +68,7 @@ static const uint qt_meta_data_Treenity[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      14,   14, // methods
+      15,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -74,20 +76,21 @@ static const uint qt_meta_data_Treenity[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   84,    2, 0x08,
-       3,    0,   85,    2, 0x08,
-       4,    0,   86,    2, 0x08,
-       5,    0,   87,    2, 0x08,
-       6,    0,   88,    2, 0x08,
-       7,    1,   89,    2, 0x08,
-       9,    1,   92,    2, 0x08,
-      10,    1,   95,    2, 0x08,
-      11,    1,   98,    2, 0x08,
-      12,    1,  101,    2, 0x08,
-      13,    1,  104,    2, 0x08,
-      14,    1,  107,    2, 0x08,
-      15,    1,  110,    2, 0x08,
-      16,    1,  113,    2, 0x08,
+       1,    0,   89,    2, 0x08,
+       3,    0,   90,    2, 0x08,
+       4,    0,   91,    2, 0x08,
+       5,    0,   92,    2, 0x08,
+       6,    0,   93,    2, 0x08,
+       7,    0,   94,    2, 0x08,
+       8,    1,   95,    2, 0x08,
+      10,    1,   98,    2, 0x08,
+      11,    1,  101,    2, 0x08,
+      12,    1,  104,    2, 0x08,
+      13,    1,  107,    2, 0x08,
+      14,    1,  110,    2, 0x08,
+      15,    1,  113,    2, 0x08,
+      16,    1,  116,    2, 0x08,
+      17,    1,  119,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -95,15 +98,16 @@ static const uint qt_meta_data_Treenity[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Double,    8,
-    QMetaType::Void, QMetaType::Double,    8,
-    QMetaType::Void, QMetaType::Double,    8,
-    QMetaType::Void, QMetaType::Double,    8,
-    QMetaType::Void, QMetaType::Double,    8,
-    QMetaType::Void, QMetaType::Double,    8,
-    QMetaType::Void, QMetaType::Double,    8,
-    QMetaType::Void, QMetaType::Double,    8,
-    QMetaType::Void, QMetaType::Double,    8,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Double,    9,
+    QMetaType::Void, QMetaType::Double,    9,
+    QMetaType::Void, QMetaType::Double,    9,
+    QMetaType::Void, QMetaType::Double,    9,
+    QMetaType::Void, QMetaType::Double,    9,
+    QMetaType::Void, QMetaType::Double,    9,
+    QMetaType::Void, QMetaType::Double,    9,
+    QMetaType::Void, QMetaType::Double,    9,
+    QMetaType::Void, QMetaType::Double,    9,
 
        0        // eod
 };
@@ -113,20 +117,21 @@ void Treenity::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
     if (_c == QMetaObject::InvokeMetaMethod) {
         Treenity *_t = static_cast<Treenity *>(_o);
         switch (_id) {
-        case 0: _t->CreateEntity(); break;
-        case 1: _t->DestroyEntity(); break;
-        case 2: _t->RenameEntity(); break;
-        case 3: _t->OutlinerSelectEntity(); break;
-        case 4: _t->AddRenderable(); break;
-        case 5: _t->TransformPositionXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 6: _t->TransformPositionYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 7: _t->TransformPositionZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 8: _t->TransformOrientationXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 9: _t->TransformOrientationYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 10: _t->TransformOrientationZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 11: _t->TransformScaleXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 12: _t->TransformScaleYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 13: _t->TransformScaleZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 0: _t->SaveAs(); break;
+        case 1: _t->CreateEntity(); break;
+        case 2: _t->DestroyEntity(); break;
+        case 3: _t->RenameEntity(); break;
+        case 4: _t->OutlinerSelectEntity(); break;
+        case 5: _t->AddRenderable(); break;
+        case 6: _t->TransformPositionXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 7: _t->TransformPositionYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 8: _t->TransformPositionZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 9: _t->TransformOrientationXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 10: _t->TransformOrientationYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 11: _t->TransformOrientationZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 12: _t->TransformScaleXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 13: _t->TransformScaleYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 14: _t->TransformScaleZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -157,13 +162,13 @@ int Treenity::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 15;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 15)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 14;
+        _id -= 15;
     }
     return _id;
 }

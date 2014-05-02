@@ -38,8 +38,8 @@ class Ui_TreenityClass
 public:
     QAction *action_addEntity;
     QAction *actionExit;
-    QAction *actionSave_As;
-    QAction *actionSave;
+    QAction *action_saveAs;
+    QAction *action_save;
     QAction *actionRotate;
     QAction *actionResize;
     QAction *actionTranslate;
@@ -84,10 +84,10 @@ public:
         action_addEntity->setObjectName(QStringLiteral("action_addEntity"));
         actionExit = new QAction(TreenityClass);
         actionExit->setObjectName(QStringLiteral("actionExit"));
-        actionSave_As = new QAction(TreenityClass);
-        actionSave_As->setObjectName(QStringLiteral("actionSave_As"));
-        actionSave = new QAction(TreenityClass);
-        actionSave->setObjectName(QStringLiteral("actionSave"));
+        action_saveAs = new QAction(TreenityClass);
+        action_saveAs->setObjectName(QStringLiteral("action_saveAs"));
+        action_save = new QAction(TreenityClass);
+        action_save->setObjectName(QStringLiteral("action_save"));
         actionRotate = new QAction(TreenityClass);
         actionRotate->setObjectName(QStringLiteral("actionRotate"));
         actionRotate->setCheckable(true);
@@ -233,8 +233,8 @@ public:
         menuBar->addAction(menuView->menuAction());
         menuBar->addAction(menuEntity->menuAction());
         menuBar->addAction(menuComponent->menuAction());
-        menuFile->addAction(actionSave_As);
-        menuFile->addAction(actionSave);
+        menuFile->addAction(action_saveAs);
+        menuFile->addAction(action_save);
         menuFile->addAction(actionExit);
         menuEntity->addAction(action_addEntity);
         menuEntity->addAction(action_removeEntity);
@@ -259,8 +259,8 @@ public:
         TreenityClass->setWindowTitle(QApplication::translate("TreenityClass", "Treenity", 0));
         action_addEntity->setText(QApplication::translate("TreenityClass", "Add entity", 0));
         actionExit->setText(QApplication::translate("TreenityClass", "Exit", 0));
-        actionSave_As->setText(QApplication::translate("TreenityClass", "Save As...", 0));
-        actionSave->setText(QApplication::translate("TreenityClass", "Save", 0));
+        action_saveAs->setText(QApplication::translate("TreenityClass", "Save As...", 0));
+        action_save->setText(QApplication::translate("TreenityClass", "Save", 0));
         actionRotate->setText(QApplication::translate("TreenityClass", "Rotate", 0));
 #ifndef QT_NO_TOOLTIP
         actionRotate->setToolTip(QApplication::translate("TreenityClass", "Rotate things", 0));

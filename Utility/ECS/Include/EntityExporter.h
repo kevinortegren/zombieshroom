@@ -1,6 +1,8 @@
 #pragma once
 
+#include <map>
 #include <Utility\ECS\Include\Component.h>
+#include <Utility/ECS/Include/Entity.h>
 #include <yaml-cpp\yaml.h>
 
 namespace ECS

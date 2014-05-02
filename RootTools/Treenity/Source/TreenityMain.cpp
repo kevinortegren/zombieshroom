@@ -12,6 +12,8 @@
 #include <RootSystems/Include/Components.h>
 
 #include <RootTools/Treenity/Include/ComponentImporter.h>
+#include <RootTools/Treenity/Include/ComponentExporter.h>
+#include <QString>
 
 #undef main
 int main(int argc, char *argv[])
@@ -40,6 +42,7 @@ int main(int argc, char *argv[])
 
 TreenityMain::TreenityMain(const std::string& p_path)
 	: m_engineActions(&m_world)
+	, m_projectManager(&m_world)
 {
 	// Load & Initialize Root Engine.
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
@@ -66,6 +69,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_treenityEditor.CreateOpenGLContext();
 	m_treenityEditor.SetEngineInterface(&m_engineActions);
+	m_treenityEditor.SetProjectManager(&m_projectManager);
 
 	// Initialize components and preallocate memory.
 	RootForce::ComponentType::Initialize();
@@ -113,7 +117,11 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
 
 	m_world.GetEntityImporter()->SetImporter(Importer);
-	m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
+	m_world.GetEntityExporter()->SetExporter(Exporter);
+	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
+	//m_world.GetEntityImporter()->Import("C:\\rarosu\\test12.level");
+	//m_projectManager.Import("C:\\rarosu\\test14.level");
+	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world").c_str()));
 
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 
@@ -161,11 +169,13 @@ void TreenityMain::Update(float dt)
 		{
 			case ECS::MessageType::ENTITY_ADDED:
 			{
+				m_projectManager.EntityAdded(itr->m_entity);
 				m_treenityEditor.EntityCreated(itr->m_entity);
 			} break;
 
 			case ECS::MessageType::ENTITY_REMOVED:
 			{
+				m_projectManager.EntityRemoved(itr->m_entity);
 				m_treenityEditor.EntityRemoved(itr->m_entity);
 			} break;
 

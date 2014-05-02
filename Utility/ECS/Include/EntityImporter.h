@@ -15,7 +15,7 @@ namespace ECS
 		typedef void (*COMPIMPORT)(ECS::World*, int, Entity*, const YAML::Node&);
 		void SetImporter(COMPIMPORT p_importer);
 
-		void Import(const std::string& p_filename);
+		void Import(const std::string& p_filename, std::map<ECS::Entity*, std::string>* p_entityNames = nullptr);
 
 	private:
 		World* m_world;

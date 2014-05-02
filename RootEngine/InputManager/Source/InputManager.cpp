@@ -135,7 +135,7 @@ namespace RootEngine
 		void InputManager::LockMouseToCenter(bool p_enable)
 		{
 			m_lockMouseEnabled = p_enable;
-			//SDL_SetRelativeMouseMode((SDL_bool) p_enable);
+			SDL_SetRelativeMouseMode((SDL_bool) p_enable);
 			SDL_ShowCursor(!p_enable);
 		}
 		//Get scroll count, negative is scroll down (backwards) and positive is scroll up (forward)

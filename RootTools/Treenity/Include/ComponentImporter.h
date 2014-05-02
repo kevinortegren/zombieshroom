@@ -266,7 +266,8 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				p_node["File"] >> particleName;
 
 				particleEmitter->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(particleName, false);
-				
+				particleEmitter->m_name = particleName;
+
 				for(unsigned i = 0; i < particleEmitter->m_particleSystems.size(); i++)
 					particleEmitter->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
 			}

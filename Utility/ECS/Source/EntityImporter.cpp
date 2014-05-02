@@ -10,7 +10,7 @@ void ECS::EntityImporter::SetImporter(COMPIMPORT p_importer)
 	m_importer = p_importer;
 }
 
-void ECS::EntityImporter::Import(const std::string& p_filename)
+void ECS::EntityImporter::Import(const std::string& p_filename, std::map<ECS::Entity*, std::string>* p_entityNames)
 {
 	try
 	{
@@ -89,7 +89,24 @@ void ECS::EntityImporter::Import(const std::string& p_filename)
 				m_world->GetStorage()->SetStringValue(key, value);
 			}
 		}
-		
+
+		if (p_entityNames != nullptr)
+		{
+			if(doc.size() > 5 && doc[5].FindValue("EntityNames"))
+			{
+				const YAML::Node& names = doc[5]["EntityNames"];
+				for(unsigned int j = 0; j < names.size(); j++)
+				{
+					int id;
+					names[j]["ID"] >> id;
+
+					std::string name;
+					names[j]["Name"] >> name;
+
+					(*p_entityNames)[entitiesMap[id]] = name;
+				}
+			}
+		}
 	}
 	
 	catch(YAML::ParserException& e) {
