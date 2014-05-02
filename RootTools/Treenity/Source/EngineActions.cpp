@@ -13,7 +13,7 @@ ECS::Entity* EngineActions::CreateEntity()
 
 void EngineActions::DeleteEntity(ECS::Entity* p_entity)
 {
-
+	m_world->GetEntityManager()->RemoveEntity(p_entity);
 }
 
 // Transform

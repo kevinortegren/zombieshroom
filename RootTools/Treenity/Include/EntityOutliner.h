@@ -3,10 +3,10 @@
 #include <QtWidgets/qtreewidget.h>
 #include <Utility/ECS/Include/Entity.h>
 
-class EntityOutlinerItem
+class EntityOutlinerItem : public QTreeWidgetItem
 {
 public:
-	EntityOutlinerItem(QTreeWidget* p_parent, ECS::Entity* p_entity, QString p_name);
+	EntityOutlinerItem(QTreeWidget* p_parent, ECS::Entity* p_entity, const QString& p_name);
 
 	ECS::Entity* GetEntity();
 private:
@@ -16,10 +16,12 @@ private:
 class EntityOutliner : public QTreeWidget
 {
 public:
-	EntityOutliner(QWidget *parent);
+	EntityOutliner(QWidget* p_parent);
 
 	void EntityCreated(ECS::Entity* p_entity, const QString& p_name);
 	void EntityDestroyed(ECS::Entity* p_entity);
 	void EntityRenamed(ECS::Entity* p_entity, const QString& p_name);
 	ECS::Entity* GetSelectedEntity();
+private:
+	EntityOutlinerItem* FindItemWithEntity(ECS::Entity* p_entity);
 };

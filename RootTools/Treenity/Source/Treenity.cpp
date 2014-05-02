@@ -2,7 +2,7 @@
 #include <QtWidgets\qmessagebox.h>
 
 Treenity::Treenity(QWidget *parent)
-	: QMainWindow(parent), m_running(true)
+	: QMainWindow(parent), m_running(true), m_selectedEntity(nullptr)
 {
 	ui.setupUi(this);
 
@@ -17,6 +17,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addEntity, SIGNAL(triggered()), this, SLOT(CreateEntity()));
 	connect(ui.action_removeEntity, SIGNAL(triggered()), this, SLOT(DestroyEntity()));
 	connect(ui.lineEdit_entityName, SIGNAL(editingFinished()), this, SLOT(RenameEntity()));
+	connect(ui.treeView_entityOutliner, SIGNAL(itemSelectionChanged()), this, SLOT(OutlinerSelectEntity()));
 }
 
 Treenity::~Treenity()
@@ -79,7 +80,8 @@ void Treenity::RenameEntity()
 void Treenity::OutlinerSelectEntity()
 {
 	m_selectedEntity = ui.treeView_entityOutliner->GetSelectedEntity();
+	QString name = m_entityNames.find(m_selectedEntity) != m_entityNames.end() ? m_entityNames.find(m_selectedEntity)->second : "";
 
 	// Switch entity-dependent context.
-	ui.lineEdit_entityName->setText(m_entityNames.find(m_selectedEntity)->second);
+	ui.lineEdit_entityName->setText(name);
 }
