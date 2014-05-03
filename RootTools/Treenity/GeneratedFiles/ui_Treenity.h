@@ -215,10 +215,11 @@ public:
 
         toolBox_components = new QToolBox(dockWidgetContents_6);
         toolBox_components->setObjectName(QStringLiteral("toolBox_components"));
+        toolBox_components->setMaximumSize(QSize(16777215, 200));
         page_2 = new QWidget();
         page_2->setObjectName(QStringLiteral("page_2"));
-        page_2->setGeometry(QRect(0, 0, 186, 701));
-        toolBox_components->addItem(page_2, QStringLiteral("Transform"));
+        page_2->setGeometry(QRect(0, 0, 186, 173));
+        toolBox_components->addItem(page_2, QStringLiteral("Page 2"));
 
         verticalLayout->addWidget(toolBox_components);
 
@@ -290,7 +291,7 @@ public:
         dockWidget_6->setWindowTitle(QApplication::translate("TreenityClass", "Properties", 0));
         groupBox->setTitle(QApplication::translate("TreenityClass", "General", 0));
         label->setText(QApplication::translate("TreenityClass", "Name", 0));
-        toolBox_components->setItemText(toolBox_components->indexOf(page_2), QApplication::translate("TreenityClass", "Transform", 0));
+        toolBox_components->setItemText(toolBox_components->indexOf(page_2), QApplication::translate("TreenityClass", "Page 2", 0));
         toolBar->setWindowTitle(QApplication::translate("TreenityClass", "toolBar", 0));
     } // retranslateUi
 

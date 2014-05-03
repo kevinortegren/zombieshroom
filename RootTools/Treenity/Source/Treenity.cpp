@@ -9,6 +9,10 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <QFileDialog>
 
+#include <RootTools/Treenity/Include/ComponentView.h>
+#include <RootTools/Treenity/Include/ComponentViewItem.h>
+
+#include <QPushButton>
 extern RootEngine::GameSharedContext g_engineContext;
 
 Treenity::Treenity(QWidget *parent)
@@ -62,7 +66,7 @@ Treenity::Treenity(QWidget *parent)
 	QWidget* transformWidget = new QWidget(ui.toolBox_components);
 	SetupUIForComponent(transformWidget, RootForce::ComponentType::TRANSFORM);
 	ui.toolBox_components->removeItem(0);
-	ui.toolBox_components->addItem(transformWidget, m_componentNames[RootForce::ComponentType::TRANSFORM]);
+	//ui.toolBox_components->addItem(transformWidget, m_componentNames[RootForce::ComponentType::TRANSFORM]);
 
 	QActionGroup* group = new QActionGroup(ui.toolBar);
 
@@ -71,6 +75,15 @@ Treenity::Treenity(QWidget *parent)
 	group->addAction(ui.actionResize);
 
 	ui.actionTranslate->setChecked(true);
+
+	ComponentView* compView = new ComponentView();
+	compView->AddItem(new ComponentViewItem("Hello", transformWidget));
+	compView->AddItem(new ComponentViewItem("Hello1", new QPushButton()));
+	compView->AddItem(new ComponentViewItem("Hello2", new QPushButton()));
+
+	ui.verticalLayout->addWidget(compView);
+
+	compView->RemoveItems();
 
 	connect(ui.action_saveAs,						SIGNAL(triggered()), this,				SLOT(SaveAs()));
 	connect(ui.actionLog,							SIGNAL(triggered()), Log::GetInstance(), SLOT(Show()));
