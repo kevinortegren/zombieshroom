@@ -2,7 +2,7 @@
 
 ComponentViewItem::ComponentViewItem(const QString& p_title, QWidget* p_item, QWidget* p_parent /*= 0*/ ) : QWidget(p_parent), m_item(p_item)
 {
-	
+	m_name = p_title;
 	m_label = new QLabel(p_title, this);
 	m_label->setStyleSheet("background-color: #D9D9D9;");
 	m_layout = new QVBoxLayout(this);
@@ -27,5 +27,15 @@ void ComponentViewItem::mousePressEvent( QMouseEvent* event )
 {
 	if(m_label->geometry().contains(event->pos()))
 		m_item->setVisible(!m_item->isVisible());
+}
+
+QWidget* ComponentViewItem::GetWidget()
+{
+	return m_item;
+}
+
+const QString& ComponentViewItem::GetName()
+{
+	return m_name;
 }
 
