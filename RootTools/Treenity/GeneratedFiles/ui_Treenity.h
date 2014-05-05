@@ -147,16 +147,26 @@ public:
         pushButton_translateMode->setGeometry(QRect(0, 0, 32, 32));
         pushButton_translateMode->setMinimumSize(QSize(32, 32));
         pushButton_translateMode->setMaximumSize(QSize(32, 32));
+        pushButton_translateMode->setIcon(icon2);
+        pushButton_translateMode->setCheckable(true);
+        pushButton_translateMode->setChecked(true);
+        pushButton_translateMode->setAutoExclusive(true);
         pushButton_rotateMode = new QPushButton(treedeetoolbar);
         pushButton_rotateMode->setObjectName(QStringLiteral("pushButton_rotateMode"));
         pushButton_rotateMode->setGeometry(QRect(32, 0, 32, 32));
         pushButton_rotateMode->setMinimumSize(QSize(32, 32));
         pushButton_rotateMode->setMaximumSize(QSize(32, 32));
+        pushButton_rotateMode->setIcon(icon);
+        pushButton_rotateMode->setCheckable(true);
+        pushButton_rotateMode->setAutoExclusive(true);
         pushButton_scaleMode = new QPushButton(treedeetoolbar);
         pushButton_scaleMode->setObjectName(QStringLiteral("pushButton_scaleMode"));
         pushButton_scaleMode->setGeometry(QRect(64, 0, 32, 32));
         pushButton_scaleMode->setMinimumSize(QSize(32, 32));
         pushButton_scaleMode->setMaximumSize(QSize(32, 32));
+        pushButton_scaleMode->setIcon(icon1);
+        pushButton_scaleMode->setCheckable(true);
+        pushButton_scaleMode->setAutoExclusive(true);
         comboBox = new QComboBox(treedeetoolbar);
         comboBox->setObjectName(QStringLiteral("comboBox"));
         comboBox->setGeometry(QRect(96, 0, 70, 32));
@@ -271,6 +281,7 @@ public:
         TreenityClass->setWindowTitle(QApplication::translate("TreenityClass", "Treenity", 0));
         action_addEntity->setText(QApplication::translate("TreenityClass", "Add entity", 0));
         actionExit->setText(QApplication::translate("TreenityClass", "Exit", 0));
+        actionExit->setShortcut(QApplication::translate("TreenityClass", "Ctrl+D", 0));
         action_saveAs->setText(QApplication::translate("TreenityClass", "Save As...", 0));
         action_save->setText(QApplication::translate("TreenityClass", "Save", 0));
         actionRotate->setText(QApplication::translate("TreenityClass", "Rotate", 0));
@@ -292,9 +303,9 @@ public:
         actionLog->setText(QApplication::translate("TreenityClass", "Log", 0));
         action_removeEntity->setText(QApplication::translate("TreenityClass", "Remove entity", 0));
         action_renderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
-        pushButton_translateMode->setText(QApplication::translate("TreenityClass", "Butt", 0));
-        pushButton_rotateMode->setText(QApplication::translate("TreenityClass", "Butt", 0));
-        pushButton_scaleMode->setText(QApplication::translate("TreenityClass", "Butt", 0));
+        pushButton_translateMode->setText(QString());
+        pushButton_rotateMode->setText(QString());
+        pushButton_scaleMode->setText(QString());
         comboBox->clear();
         comboBox->insertItems(0, QStringList()
          << QApplication::translate("TreenityClass", "Global", 0)

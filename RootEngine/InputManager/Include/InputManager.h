@@ -17,6 +17,8 @@ namespace RootEngine
 			void Shutdown(void);
 			void HandleInput(SDL_Event& p_event);
 			void Reset();
+			void SetMousePos(const glm::ivec2& p_mousePos);
+
 
 			KeyState::KeyState GetKeyState(SDL_Scancode p_key);
 			KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button);

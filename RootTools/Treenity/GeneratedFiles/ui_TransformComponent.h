@@ -42,10 +42,16 @@ public:
     {
         if (Transform->objectName().isEmpty())
             Transform->setObjectName(QStringLiteral("Transform"));
-        Transform->resize(227, 146);
+        Transform->resize(297, 146);
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(Transform->sizePolicy().hasHeightForWidth());
+        Transform->setSizePolicy(sizePolicy);
         Transform->setMaximumSize(QSize(16777215, 150));
         gridLayout = new QGridLayout(Transform);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setSizeConstraint(QLayout::SetNoConstraint);
         label = new QLabel(Transform);
         label->setObjectName(QStringLiteral("label"));
 

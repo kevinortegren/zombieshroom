@@ -26,6 +26,8 @@ public:
 	~TreenityMain();
 
 	void HandleEvents();
+	void HandleAltModifier();
+	
 	void Update(float dt);
 	bool IsRunning();
 
@@ -47,8 +49,11 @@ private:
 	RootForce::TransformInterpolationSystem* m_transformInterpolationSystem;
 	RootForce::ScriptSystem* m_scriptSystem;
 	RootForce::ControllerActionSystem* m_controllerActionSystem;
-
+	RootForce::LookAtSystem* m_lookAtSystem;
 
 	ECS::Entity* m_skyBox;
 	ECS::Entity* m_cameraEntity;
+	ECS::Entity* m_aimingDevice;
+
+	bool m_altMode;
 };

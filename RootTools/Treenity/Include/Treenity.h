@@ -36,6 +36,10 @@ public:
 	void EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void CreateOpenGLContext();
+//protected:
+	//void keyPressEvent( QKeyEvent *k );
+	//void keyReleaseEvent( QKeyEvent *k);
+
 private:
 	// Component meta-data.
 	std::map<int, QString> m_componentNames;

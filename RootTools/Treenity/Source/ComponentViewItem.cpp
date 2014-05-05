@@ -4,11 +4,12 @@ ComponentViewItem::ComponentViewItem(const QString& p_title, QWidget* p_item, QW
 {
 	m_name = p_title;
 	m_label = new QLabel(p_title, this);
-	m_label->setStyleSheet("background-color: #D9D9D9;");
+	m_label->setStyleSheet("background-color: #D9D9D9;color: #000000;");
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->addWidget(m_label);
-	m_layout->addWidget(p_item);    
+	m_layout->addWidget(p_item);
+	m_layout->setSizeConstraint(QLayout::SetNoConstraint);
 	setLayout(m_layout);
 
 	p_item->setVisible(false);

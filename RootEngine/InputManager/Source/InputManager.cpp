@@ -29,6 +29,7 @@ namespace RootEngine
 		{
 			if(m_lockDownInput)
 				return;
+
 			switch(p_event.type)
 			{
 			case SDL_MOUSEWHEEL:
@@ -47,7 +48,9 @@ namespace RootEngine
 			case SDL_MOUSEBUTTONUP:
 				m_keyState[p_event.button.button-SDL_BUTTON_LEFT+MouseButton::LEFT] = KeyState::UP_EDGE;
 				break;
+
 			case SDL_MOUSEMOTION:
+
 				//m_deltaMousePos.x = p_event.motion.x - m_globMousePos.x;
 				//m_deltaMousePos.y = p_event.motion.y - m_globMousePos.y;
 				if(SDL_GetRelativeMouseMode())
@@ -68,7 +71,6 @@ namespace RootEngine
 				}
 				if(m_lockMouseEnabled)
 				{
-					
 					//int w, h;
 					//SDL_GetWindowSize(NULL, &w, &h);
 					SDL_WarpMouseInWindow(NULL, 500, 400);
@@ -77,6 +79,13 @@ namespace RootEngine
 			default:
 				g_context.m_logger->LogText(LogTag::INPUT, LogLevel::MASS_DATA_PRINT, "Event %d did not match any case", p_event.type);
 			}
+		}
+
+		void InputManager::SetMousePos(const glm::ivec2& p_mousePos)
+		{
+			m_deltaMousePos = m_globMousePos - p_mousePos;
+
+			m_globMousePos = p_mousePos;
 		}
 
 		KeyState::KeyState InputManager::GetKeyState(SDL_Scancode p_key)

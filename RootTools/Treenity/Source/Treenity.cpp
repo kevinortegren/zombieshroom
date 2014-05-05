@@ -9,7 +9,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <QFileDialog>
 
-
+#include <RootTools/Treenity/Include/KeyHelper.h>
 
 #include <QPushButton>
 extern RootEngine::GameSharedContext g_engineContext;
@@ -60,9 +60,6 @@ Treenity::Treenity(QWidget *parent)
 	m_componentNames[RootForce::ComponentType::KILLANNOUNCEMENT] = "Kill Announcement";
 	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS] = "Controller Action";
 
-
-
-
 	ui.setupUi(this);
 
 	m_compView = new ComponentView();
@@ -89,7 +86,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(transformUI.doubleSpinBox_scaleY,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleYChanged(double)));
 	connect(transformUI.doubleSpinBox_scaleZ,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleZChanged(double)));
 	
-
+	InitialiseKeymap();
 }
 
 Treenity::~Treenity()

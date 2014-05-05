@@ -15,6 +15,7 @@ function FreeFlying.Setup(self)
 	controllerActions:Bind("PitchDown", 90);
 	controllerActions:Bind("YawLeft", 92);
 	controllerActions:Bind("YawRight", 94);
+
 end
 
 function FreeFlying.OnUpdate(self)

@@ -16,6 +16,7 @@ public:
 	void EntityRemovedFromGroup(const std::string& p_group);
 
 	ECS::Entity* GetEntity();
+
 private:
 	ECS::Entity* m_entity;
 	QString m_name;

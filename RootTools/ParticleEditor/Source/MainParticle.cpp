@@ -213,6 +213,7 @@ void MainParticle::HandleEvents()
 {
 	if (g_engineContext.m_inputSys != nullptr)
 		g_engineContext.m_inputSys->Reset();
+
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{

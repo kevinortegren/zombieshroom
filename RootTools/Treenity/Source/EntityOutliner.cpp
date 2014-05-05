@@ -28,7 +28,7 @@ void EntityOutlinerItem::TagRemoved(const std::string& p_tag)
 
 void EntityOutlinerItem::EntityAddedToGroup(const std::string& p_group)
 {
-	m_groups.insert(QString(p_group.c_str()));
+	m_groups.insert(QString::fromStdString(p_group));
 	UpdateLabel();
 }
 

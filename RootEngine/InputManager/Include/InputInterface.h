@@ -29,6 +29,8 @@ namespace RootEngine
 			virtual KeyState::KeyState GetKeyState(MouseButton::MouseButton p_button) = 0;
 			virtual void LockInput(bool p_lock) = 0;
 
+			virtual void SetMousePos(const glm::ivec2& p_mousePos) = 0;
+
 			// Returns the global and delta mouse position
 			virtual glm::ivec2 GetGlobalMousePos() = 0;
 			virtual glm::ivec2 GetDeltaMousePos() = 0;

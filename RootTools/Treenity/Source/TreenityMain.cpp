@@ -167,6 +167,9 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_controllerActionSystem = new RootForce::ControllerActionSystem(&m_world);
 	m_world.GetSystemManager()->AddSystem<RootForce::ControllerActionSystem>(m_controllerActionSystem);
 
+	m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
+
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
@@ -208,13 +211,53 @@ bool TreenityMain::IsRunning()
 void TreenityMain::HandleEvents()
 {
 	if (g_engineContext.m_inputSys != nullptr)
+	{
 		g_engineContext.m_inputSys->Reset();
+		g_engineContext.m_inputSys->SetMousePos(glm::ivec2(QCursor::pos().x(), QCursor::pos().y()));
+
+		HandleAltModifier();
+	}
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event))
 	{
+		// Ignore mouse motions events while in editor mode.
+		if(event.type == SDL_MOUSEMOTION)
+			continue;
+
 		if (g_engineContext.m_inputSys != nullptr)
 			g_engineContext.m_inputSys->HandleInput(event);
+	}
+}
+
+void TreenityMain::HandleAltModifier()
+{
+	Qt::KeyboardModifiers modifers = QApplication::keyboardModifiers();
+	if(m_altMode)
+	{
+		if((modifers & Qt::AltModifier) == 0)
+		{		
+			SDL_Event keyEvent;
+			keyEvent.type = SDL_KEYUP;
+			keyEvent.key.keysym.scancode = SDL_SCANCODE_LALT;
+			keyEvent.key.repeat = false;
+			SDL_PushEvent(&keyEvent);
+
+			m_altMode = false;
+		}
+	}
+	else
+	{
+		if((modifers & Qt::AltModifier) != 0)
+		{	
+			SDL_Event keyEvent;
+			keyEvent.type = SDL_KEYDOWN;
+			keyEvent.key.keysym.scancode = SDL_SCANCODE_LALT;
+			keyEvent.key.repeat = false;
+			SDL_PushEvent(&keyEvent);
+
+			m_altMode = true;
+		}
 	}
 }
 
@@ -253,26 +296,26 @@ void TreenityMain::Update(float dt)
 
 			case ECS::MessageType::TAG_ADDED:
 			{
-				m_treenityEditor.TagAdded(itr->m_entity, itr->m_tagGroupName);
+				//m_treenityEditor.TagAdded(itr->m_entity, itr->m_tagGroupName);
 			} break;
 
 			case ECS::MessageType::TAG_REMOVED:
 			{
-				m_treenityEditor.TagRemoved(itr->m_entity, itr->m_tagGroupName);
+				//m_treenityEditor.TagRemoved(itr->m_entity, itr->m_tagGroupName);
 			} break;
 
 			case ECS::MessageType::ENTITY_ADDED_TO_GROUP:
 			{
-				m_treenityEditor.EntityAddedToGroup(itr->m_entity, itr->m_tagGroupName);
+				//m_treenityEditor.EntityAddedToGroup(itr->m_entity, itr->m_tagGroupName);
 			} break;
 
 			case ECS::MessageType::ENTITY_REMOVED_FROM_GROUP:
 			{
-				m_treenityEditor.EntityRemovedFromGroup(itr->m_entity, itr->m_tagGroupName);
+				//m_treenityEditor.EntityRemovedFromGroup(itr->m_entity, itr->m_tagGroupName);
 			} break;
 		}
 
-		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
+		//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
 	}
 
 	m_world.GetEntityManager()->CleanUp();
@@ -280,8 +323,12 @@ void TreenityMain::Update(float dt)
 	g_engineContext.m_renderer->Clear();
 
 	m_controllerActionSystem->Process();
-	m_scriptSystem->Process();
+	
+	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
+
+	m_scriptSystem->Process();
+
 	m_transformInterpolationSystem->Process();
 	m_renderingSystem->Process();
 	
@@ -355,12 +402,22 @@ void TreenityMain::CreateFreeFlyingCamera()
 {
 	m_cameraEntity = m_world.GetEntityManager()->CreateEntity();
 
+	// Setup camera entity.
 	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(m_cameraEntity);
 	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_cameraEntity);
 	RootForce::ControllerActions* controllerActions = m_world.GetEntityManager()->CreateComponent<RootForce::ControllerActions>(m_cameraEntity);
-	
+	RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(m_cameraEntity);
+	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(m_cameraEntity);
+
+	cameraLookAt->m_targetTag = "AimingDevice";
+	cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	cameraThirdPerson->m_targetTag = "AimingDevice";
+	cameraThirdPerson->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
+	cameraThirdPerson->m_distance = 10.0f;
+
 	RootForce::Script* script = m_world.GetEntityManager()->CreateComponent<RootForce::Script>(m_cameraEntity);
-	script->Name = g_engineContext.m_resourceManager->LoadScript("FreeFlying");
+	script->Name = g_engineContext.m_resourceManager->LoadScript("FreeFlyingMaya");
 	
 	g_engineContext.m_script->SetFunction(script->Name, "Setup");
 	g_engineContext.m_script->AddParameterUserData(m_cameraEntity, sizeof(ECS::Entity*), "Entity");
@@ -373,4 +430,12 @@ void TreenityMain::CreateFreeFlyingCamera()
 
 	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
 	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
+
+	// Setup aiming device.
+	m_aimingDevice = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Transform* aimingDeviceTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_aimingDevice);
+
+	m_world.GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", m_aimingDevice);
 }
