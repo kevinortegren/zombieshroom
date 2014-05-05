@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGroupBox>
@@ -23,6 +24,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
@@ -47,8 +49,13 @@ public:
     QAction *action_removeEntity;
     QAction *action_renderable;
     QWidget *centralWidget;
-    QHBoxLayout *horizontalLayout;
+    QVBoxLayout *verticalLayout_2;
     Canvas3D *widget_canvas3D;
+    QWidget *treedeetoolbar;
+    QPushButton *pushButton_translateMode;
+    QPushButton *pushButton_rotateMode;
+    QPushButton *pushButton_scaleMode;
+    QComboBox *comboBox;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -69,7 +76,6 @@ public:
     QFormLayout *formLayout;
     QLineEdit *lineEdit_entityName;
     QLabel *label;
-    QToolBar *toolBar;
 
     void setupUi(QMainWindow *TreenityClass)
     {
@@ -116,17 +122,48 @@ public:
         action_renderable->setObjectName(QStringLiteral("action_renderable"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        horizontalLayout = new QHBoxLayout(centralWidget);
-        horizontalLayout->setSpacing(0);
-        horizontalLayout->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2 = new QVBoxLayout(centralWidget);
+        verticalLayout_2->setSpacing(0);
+        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         widget_canvas3D = new Canvas3D(centralWidget);
         widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(widget_canvas3D->sizePolicy().hasHeightForWidth());
+        widget_canvas3D->setSizePolicy(sizePolicy);
         widget_canvas3D->setMinimumSize(QSize(375, 375));
         widget_canvas3D->setStyleSheet(QStringLiteral(""));
 
-        horizontalLayout->addWidget(widget_canvas3D);
+        verticalLayout_2->addWidget(widget_canvas3D);
+
+        treedeetoolbar = new QWidget(centralWidget);
+        treedeetoolbar->setObjectName(QStringLiteral("treedeetoolbar"));
+        treedeetoolbar->setMinimumSize(QSize(480, 32));
+        treedeetoolbar->setMaximumSize(QSize(16777215, 32));
+        pushButton_translateMode = new QPushButton(treedeetoolbar);
+        pushButton_translateMode->setObjectName(QStringLiteral("pushButton_translateMode"));
+        pushButton_translateMode->setGeometry(QRect(0, 0, 32, 32));
+        pushButton_translateMode->setMinimumSize(QSize(32, 32));
+        pushButton_translateMode->setMaximumSize(QSize(32, 32));
+        pushButton_rotateMode = new QPushButton(treedeetoolbar);
+        pushButton_rotateMode->setObjectName(QStringLiteral("pushButton_rotateMode"));
+        pushButton_rotateMode->setGeometry(QRect(32, 0, 32, 32));
+        pushButton_rotateMode->setMinimumSize(QSize(32, 32));
+        pushButton_rotateMode->setMaximumSize(QSize(32, 32));
+        pushButton_scaleMode = new QPushButton(treedeetoolbar);
+        pushButton_scaleMode->setObjectName(QStringLiteral("pushButton_scaleMode"));
+        pushButton_scaleMode->setGeometry(QRect(64, 0, 32, 32));
+        pushButton_scaleMode->setMinimumSize(QSize(32, 32));
+        pushButton_scaleMode->setMaximumSize(QSize(32, 32));
+        comboBox = new QComboBox(treedeetoolbar);
+        comboBox->setObjectName(QStringLiteral("comboBox"));
+        comboBox->setGeometry(QRect(96, 0, 70, 32));
+        comboBox->setMinimumSize(QSize(70, 32));
+
+        verticalLayout_2->addWidget(treedeetoolbar);
 
         TreenityClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(TreenityClass);
@@ -167,11 +204,11 @@ public:
         __qtreewidgetitem->setText(0, QStringLiteral("Entities"));
         treeView_entityOutliner->setHeaderItem(__qtreewidgetitem);
         treeView_entityOutliner->setObjectName(QStringLiteral("treeView_entityOutliner"));
-        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(treeView_entityOutliner->sizePolicy().hasHeightForWidth());
-        treeView_entityOutliner->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(treeView_entityOutliner->sizePolicy().hasHeightForWidth());
+        treeView_entityOutliner->setSizePolicy(sizePolicy1);
         treeView_entityOutliner->setMinimumSize(QSize(0, 0));
         treeView_entityOutliner->setMaximumSize(QSize(16777215, 16777215));
 
@@ -212,9 +249,6 @@ public:
 
         dockWidget_6->setWidget(dockWidgetContents_6);
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_6);
-        toolBar = new QToolBar(TreenityClass);
-        toolBar->setObjectName(QStringLiteral("toolBar"));
-        TreenityClass->addToolBar(Qt::TopToolBarArea, toolBar);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
@@ -230,9 +264,6 @@ public:
         menu_addComponent->addAction(action_renderable);
         menuView->addAction(actionLog);
         mainToolBar->addAction(actionPlay);
-        toolBar->addAction(actionTranslate);
-        toolBar->addAction(actionRotate);
-        toolBar->addAction(actionResize);
 
         retranslateUi(TreenityClass);
 
@@ -265,6 +296,14 @@ public:
         actionLog->setText(QApplication::translate("TreenityClass", "Log", 0));
         action_removeEntity->setText(QApplication::translate("TreenityClass", "Remove entity", 0));
         action_renderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
+        pushButton_translateMode->setText(QApplication::translate("TreenityClass", "Butt", 0));
+        pushButton_rotateMode->setText(QApplication::translate("TreenityClass", "Butt", 0));
+        pushButton_scaleMode->setText(QApplication::translate("TreenityClass", "Butt", 0));
+        comboBox->clear();
+        comboBox->insertItems(0, QStringList()
+         << QApplication::translate("TreenityClass", "Global", 0)
+         << QApplication::translate("TreenityClass", "Local", 0)
+        );
         menuFile->setTitle(QApplication::translate("TreenityClass", "File", 0));
         menuEdit->setTitle(QApplication::translate("TreenityClass", "Edit", 0));
         menuEntity->setTitle(QApplication::translate("TreenityClass", "Entity", 0));
@@ -275,7 +314,6 @@ public:
         dockWidget_6->setWindowTitle(QApplication::translate("TreenityClass", "Properties", 0));
         groupBox->setTitle(QApplication::translate("TreenityClass", "General", 0));
         label->setText(QApplication::translate("TreenityClass", "Name", 0));
-        toolBar->setWindowTitle(QApplication::translate("TreenityClass", "toolBar", 0));
     } // retranslateUi
 
 };

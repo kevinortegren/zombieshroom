@@ -60,6 +60,9 @@ Treenity::Treenity(QWidget *parent)
 	m_componentNames[RootForce::ComponentType::KILLANNOUNCEMENT] = "Kill Announcement";
 	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS] = "Controller Action";
 
+
+
+
 	ui.setupUi(this);
 
 	m_compView = new ComponentView();
@@ -68,14 +71,6 @@ Treenity::Treenity(QWidget *parent)
 	QWidget* transformWidget = new QWidget();
 	SetupUIForComponent(transformWidget, RootForce::ComponentType::TRANSFORM);
 	m_compView->AddItem(new ComponentViewItem(m_componentNames[RootForce::ComponentType::TRANSFORM], transformWidget));
-
-	QActionGroup* group = new QActionGroup(ui.toolBar);
-
-	group->addAction(ui.actionTranslate);
-	group->addAction(ui.actionRotate);
-	group->addAction(ui.actionResize);
-
-	ui.actionTranslate->setChecked(true);
 
 	connect(ui.action_saveAs,						SIGNAL(triggered()), this,				SLOT(SaveAs()));
 	connect(ui.actionLog,							SIGNAL(triggered()), Log::GetInstance(), SLOT(Show()));
