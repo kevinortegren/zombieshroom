@@ -175,7 +175,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
 	//m_world.GetEntityImporter()->Import("C:\\rarosu\\test12.level");
 	//m_projectManager.Import("C:\\rarosu\\test14.level");
-	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world").c_str()));
+	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\MythosV0.2.world").c_str()));
 
 	CreateSkyBox();
 
@@ -296,22 +296,22 @@ void TreenityMain::Update(float dt)
 
 			case ECS::MessageType::TAG_ADDED:
 			{
-				//m_treenityEditor.TagAdded(itr->m_entity, itr->m_tagGroupName);
+				m_treenityEditor.TagAdded(itr->m_entity, itr->m_tagGroupName);
 			} break;
 
 			case ECS::MessageType::TAG_REMOVED:
 			{
-				//m_treenityEditor.TagRemoved(itr->m_entity, itr->m_tagGroupName);
+				m_treenityEditor.TagRemoved(itr->m_entity, itr->m_tagGroupName);
 			} break;
 
 			case ECS::MessageType::ENTITY_ADDED_TO_GROUP:
 			{
-				//m_treenityEditor.EntityAddedToGroup(itr->m_entity, itr->m_tagGroupName);
+				m_treenityEditor.EntityAddedToGroup(itr->m_entity, itr->m_tagGroupName);
 			} break;
 
 			case ECS::MessageType::ENTITY_REMOVED_FROM_GROUP:
 			{
-				//m_treenityEditor.EntityRemovedFromGroup(itr->m_entity, itr->m_tagGroupName);
+				m_treenityEditor.EntityRemovedFromGroup(itr->m_entity, itr->m_tagGroupName);
 			} break;
 		}
 

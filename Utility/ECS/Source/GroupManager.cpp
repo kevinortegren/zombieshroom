@@ -8,6 +8,9 @@ ECS::GroupManager::GroupManager(World* p_world)
 
 void ECS::GroupManager::RegisterEntity(const std::string& p_group, ECS::Entity* p_entity)
 {
+	if(p_entity == nullptr)
+		return;
+
 	std::pair<std::string, ECS::Entity*> pair;
 	pair.first = p_group;
 	pair.second = p_entity;
