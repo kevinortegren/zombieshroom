@@ -17,7 +17,7 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -44,6 +44,123 @@
       <property name="styleSheet">
        <string notr="true"/>
       </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="treedeetoolbar" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>480</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>32</height>
+       </size>
+      </property>
+      <widget class="QPushButton" name="pushButton_translateMode">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>32</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Butt</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_rotateMode">
+       <property name="geometry">
+        <rect>
+         <x>32</x>
+         <y>0</y>
+         <width>32</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Butt</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_scaleMode">
+       <property name="geometry">
+        <rect>
+         <x>64</x>
+         <y>0</y>
+         <width>32</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Butt</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox">
+       <property name="geometry">
+        <rect>
+         <x>96</x>
+         <y>0</y>
+         <width>70</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>70</width>
+         <height>32</height>
+        </size>
+       </property>
+       <item>
+        <property name="text">
+         <string>Global</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Local</string>
+        </property>
+       </item>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -215,42 +332,8 @@
        </layout>
       </widget>
      </item>
-     <item>
-      <widget class="QToolBox" name="toolBox_components">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="page_2">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>186</width>
-          <height>701</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Transform</string>
-        </attribute>
-       </widget>
-      </widget>
-     </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionTranslate"/>
-   <addaction name="actionRotate"/>
-   <addaction name="actionResize"/>
   </widget>
   <action name="action_addEntity">
    <property name="text">

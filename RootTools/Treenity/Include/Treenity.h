@@ -10,7 +10,8 @@
 #include <RootTools/Treenity/Include/EngineInterface.h>
 #include <RootTools/Treenity/Include/EntityOutliner.h>
 #include <RootTools/Treenity/Include/ProjectManager.h>
-
+#include <RootTools/Treenity/Include/ComponentView.h>
+#include <RootTools/Treenity/Include/ComponentViewItem.h>
 class Treenity : public QMainWindow
 {
 	Q_OBJECT
@@ -30,6 +31,10 @@ public:
 	void EntityRemoved(ECS::Entity* p_entity);
 	void ComponentCreated(ECS::Entity* p_entity, int p_componentType);
 	void ComponentRemoved(ECS::Entity* p_entity, int p_componentType);
+	void TagAdded(ECS::Entity* p_entity, const std::string& p_tag);
+	void TagRemoved(ECS::Entity* p_entity, const std::string& p_tag);
+	void EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group);
+	void EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void CreateOpenGLContext();
 private:
 	// Component meta-data.
@@ -52,6 +57,8 @@ private:
 	// Component property panel
 	void SetupUIForComponent(QWidget* p_widget, int p_componentType);
 	QWidget* GetComponentToolboxItemByType(int p_componentType);
+
+	ComponentView* m_compView;
 private slots:
 	void SaveAs();
 	void CreateEntity();

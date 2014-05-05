@@ -14,6 +14,7 @@
 #include <RootTools/Treenity/Include/ComponentImporter.h>
 #include <RootTools/Treenity/Include/ComponentExporter.h>
 #include <QString>
+#include <QStyleFactory>
 
 #include <RootForce/Include/LuaAPI.h>
 #include <RootEngine/Script/Include/ScriptManager.h>
@@ -26,6 +27,31 @@ int main(int argc, char *argv[])
 	path = path.substr(0, path.size() - rootforcename.size());
 
 	QApplication a(argc, argv);
+	
+	a.setStyle(QStyleFactory::create("Fusion"));
+
+	QPalette darkPalette;
+	darkPalette.setColor(QPalette::Window, QColor(53,53,53));
+	darkPalette.setColor(QPalette::WindowText, Qt::white);
+	darkPalette.setColor(QPalette::Base, QColor(25,25,25));
+	darkPalette.setColor(QPalette::AlternateBase, QColor(53,53,53));
+	darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
+	darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+	darkPalette.setColor(QPalette::Text, Qt::white);
+	darkPalette.setColor(QPalette::Button, QColor(53,53,53));
+	darkPalette.setColor(QPalette::ButtonText, Qt::white);
+	darkPalette.setColor(QPalette::BrightText, Qt::red);
+	darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
+
+	darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+	darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+
+	qApp->setPalette(darkPalette);
+
+	qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
+
+
+
 	TreenityMain m(path);
 
 	uint64_t old = SDL_GetPerformanceCounter();
@@ -146,7 +172,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
 	//m_world.GetEntityImporter()->Import("C:\\rarosu\\test12.level");
 	//m_projectManager.Import("C:\\rarosu\\test14.level");
-	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCubeNames.world").c_str()));
+	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world").c_str()));
 
 	CreateSkyBox();
 
@@ -223,6 +249,26 @@ void TreenityMain::Update(float dt)
 			case ECS::MessageType::COMPONENT_REMOVED:
 			{
 				m_treenityEditor.ComponentRemoved(itr->m_entity, itr->m_compType);
+			} break;
+
+			case ECS::MessageType::TAG_ADDED:
+			{
+				m_treenityEditor.TagAdded(itr->m_entity, itr->m_tagGroupName);
+			} break;
+
+			case ECS::MessageType::TAG_REMOVED:
+			{
+				m_treenityEditor.TagRemoved(itr->m_entity, itr->m_tagGroupName);
+			} break;
+
+			case ECS::MessageType::ENTITY_ADDED_TO_GROUP:
+			{
+				m_treenityEditor.EntityAddedToGroup(itr->m_entity, itr->m_tagGroupName);
+			} break;
+
+			case ECS::MessageType::ENTITY_REMOVED_FROM_GROUP:
+			{
+				m_treenityEditor.EntityRemovedFromGroup(itr->m_entity, itr->m_tagGroupName);
 			} break;
 		}
 
