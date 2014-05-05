@@ -19,6 +19,10 @@ namespace ECS
 			ENTITY_REMOVED,
 			COMPONENT_ADDED,
 			COMPONENT_REMOVED,
+			TAG_ADDED,
+			TAG_REMOVED,
+			ENTITY_ADDED_TO_GROUP,
+			ENTITY_REMOVED_FROM_GROUP,
 			NONE
 		};
 	}
@@ -28,12 +32,14 @@ namespace ECS
 		Message() : 
 			m_type(MessageType::NONE),
 			m_entity(nullptr),
-			m_compType(-1) 
+			m_compType(-1),
+			m_tagGroupName("")
 		{}
 
 		MessageType::MessageType m_type;
 		Entity* m_entity;
 		int m_compType;
+		std::string m_tagGroupName;
 	};
 
 	/* Entity Component System context. */
@@ -42,12 +48,16 @@ namespace ECS
 	public:
 
 		friend class EntityManager;
+		friend class TagManager;
+		friend class GroupManager;
 
 		World() : 
 			m_systemManager(this),
 			m_entityManager(this),
 			m_exporter(this),
 			m_importer(this),
+			m_tagManager(this),
+			m_groupManager(this),
 			m_dt(0)
 		{}
 

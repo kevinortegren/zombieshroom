@@ -1,14 +1,94 @@
 #include <RootTools/Treenity/Include/EntityOutliner.h>
+#include <algorithm>
 
 EntityOutlinerItem::EntityOutlinerItem(QTreeWidget* p_parent, ECS::Entity* p_entity, const QString& p_name)
 	: QTreeWidgetItem(p_parent, 0), m_entity(p_entity)
 {
-	setText(0, p_name);
+	m_name = p_name;
+	UpdateLabel();
 }
+
+void EntityOutlinerItem::EntityRenamed(const QString& p_name)
+{
+	m_name = p_name;
+	UpdateLabel();
+}
+
+void EntityOutlinerItem::TagAdded(const std::string& p_tag)
+{
+	m_tags.insert(QString(p_tag.c_str()));
+	UpdateLabel();
+}
+
+void EntityOutlinerItem::TagRemoved(const std::string& p_tag)
+{
+	m_tags.erase(QString(p_tag.c_str()));
+	UpdateLabel();
+}
+
+void EntityOutlinerItem::EntityAddedToGroup(const std::string& p_group)
+{
+	m_groups.insert(QString(p_group.c_str()));
+	UpdateLabel();
+}
+
+void EntityOutlinerItem::EntityRemovedFromGroup(const std::string& p_group)
+{
+	m_groups.erase(QString(p_group.c_str()));
+	UpdateLabel();
+}
+
 
 ECS::Entity* EntityOutlinerItem::GetEntity()
 {
 	return m_entity;
+}
+
+void EntityOutlinerItem::UpdateLabel()
+{
+	QString label = m_name;
+	
+	// Add tags
+	if (m_tags.size() > 0)
+	{
+		label += " (";
+		
+		for (auto it = m_tags.begin(); it != m_tags.end(); ++it)
+		{
+			if (it != --m_tags.end())
+			{
+				label += (*it) + ", ";
+			}
+			else
+			{
+				label += (*it);
+			}
+		}
+		
+		label += ") ";
+	}
+
+	// Add groups
+	if (m_groups.size() > 0)
+	{
+		label += " [";
+		
+		for (auto it = m_groups.begin(); it != m_groups.end(); ++it)
+		{
+			if (it != --m_groups.end())
+			{
+				label += (*it) + ", ";
+			}
+			else
+			{
+				label += (*it);
+			}
+		}
+		
+		label += "] ";
+	}
+
+	setText(0, label);
 }
 
 
@@ -30,7 +110,7 @@ void EntityOutliner::EntityRemoved(ECS::Entity* p_entity)
 		EntityOutlinerItem* item = (EntityOutlinerItem*) topLevelItem(i);
 		if (item->GetEntity() == p_entity)
 		{
-			takeTopLevelItem(i);
+			delete takeTopLevelItem(i);
 		}
 		else
 		{
@@ -39,10 +119,35 @@ void EntityOutliner::EntityRemoved(ECS::Entity* p_entity)
 	}
 }
 
+void EntityOutliner::TagAdded(ECS::Entity* p_entity, const std::string& p_tag)
+{
+	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
+	item->TagAdded(p_tag);
+}
+
+void EntityOutliner::TagRemoved(ECS::Entity* p_entity, const std::string& p_tag)
+{
+	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
+	item->TagRemoved(p_tag);
+}
+
+void EntityOutliner::EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group)
+{
+	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
+	item->EntityAddedToGroup(p_group);
+}
+
+void EntityOutliner::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group)
+{
+	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
+	item->EntityRemovedFromGroup(p_group);
+}
+
+
 void EntityOutliner::EntityRenamed(ECS::Entity* p_entity, const QString& p_name)
 {
 	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
-	item->setText(0, p_name);
+	item->EntityRenamed(p_name);
 }
 
 ECS::Entity* EntityOutliner::GetSelectedEntity()

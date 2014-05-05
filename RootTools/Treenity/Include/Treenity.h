@@ -30,6 +30,10 @@ public:
 	void EntityRemoved(ECS::Entity* p_entity);
 	void ComponentCreated(ECS::Entity* p_entity, int p_componentType);
 	void ComponentRemoved(ECS::Entity* p_entity, int p_componentType);
+	void TagAdded(ECS::Entity* p_entity, const std::string& p_tag);
+	void TagRemoved(ECS::Entity* p_entity, const std::string& p_tag);
+	void EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group);
+	void EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void CreateOpenGLContext();
 private:
 	// Component meta-data.

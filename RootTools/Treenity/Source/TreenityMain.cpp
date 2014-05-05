@@ -188,6 +188,26 @@ void TreenityMain::Update(float dt)
 			{
 				m_treenityEditor.ComponentRemoved(itr->m_entity, itr->m_compType);
 			} break;
+
+			case ECS::MessageType::TAG_ADDED:
+			{
+				m_treenityEditor.TagAdded(itr->m_entity, itr->m_tagGroupName);
+			} break;
+
+			case ECS::MessageType::TAG_REMOVED:
+			{
+				m_treenityEditor.TagRemoved(itr->m_entity, itr->m_tagGroupName);
+			} break;
+
+			case ECS::MessageType::ENTITY_ADDED_TO_GROUP:
+			{
+				m_treenityEditor.EntityAddedToGroup(itr->m_entity, itr->m_tagGroupName);
+			} break;
+
+			case ECS::MessageType::ENTITY_REMOVED_FROM_GROUP:
+			{
+				m_treenityEditor.EntityRemovedFromGroup(itr->m_entity, itr->m_tagGroupName);
+			} break;
 		}
 
 		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);

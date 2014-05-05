@@ -153,6 +153,25 @@ void Treenity::ComponentRemoved(ECS::Entity* p_entity, int p_componentType)
 	}
 }
 
+void Treenity::TagAdded(ECS::Entity* p_entity, const std::string& p_tag)
+{
+	ui.treeView_entityOutliner->TagAdded(p_entity, p_tag);
+}
+
+void Treenity::TagRemoved(ECS::Entity* p_entity, const std::string& p_tag)
+{
+	ui.treeView_entityOutliner->TagRemoved(p_entity, p_tag);
+}
+
+void Treenity::EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group)
+{
+	ui.treeView_entityOutliner->EntityAddedToGroup(p_entity, p_group);
+}
+
+void Treenity::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group)
+{
+	ui.treeView_entityOutliner->EntityRemovedFromGroup(p_entity, p_group);
+}
 
 void Treenity::CreateOpenGLContext()
 {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <QtWidgets/qtreewidget.h>
 #include <Utility/ECS/Include/Entity.h>
 
@@ -8,9 +9,20 @@ class EntityOutlinerItem : public QTreeWidgetItem
 public:
 	EntityOutlinerItem(QTreeWidget* p_parent, ECS::Entity* p_entity, const QString& p_name);
 
+	void EntityRenamed(const QString& p_name);
+	void TagAdded(const std::string& p_tag);
+	void TagRemoved(const std::string& p_tag);
+	void EntityAddedToGroup(const std::string& p_group);
+	void EntityRemovedFromGroup(const std::string& p_group);
+
 	ECS::Entity* GetEntity();
 private:
 	ECS::Entity* m_entity;
+	QString m_name;
+	std::set<QString> m_tags;
+	std::set<QString> m_groups;
+
+	void UpdateLabel();
 };
 
 class EntityOutliner : public QTreeWidget
@@ -20,7 +32,14 @@ public:
 
 	void EntityCreated(ECS::Entity* p_entity, const QString& p_name);
 	void EntityRemoved(ECS::Entity* p_entity);
+
+	void TagAdded(ECS::Entity* p_entity, const std::string& p_tag);
+	void TagRemoved(ECS::Entity* p_entity, const std::string& p_tag);
+	void EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group);
+	void EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group);
+
 	void EntityRenamed(ECS::Entity* p_entity, const QString& p_name);
+
 	ECS::Entity* GetSelectedEntity();
 private:
 	EntityOutlinerItem* FindItemWithEntity(ECS::Entity* p_entity);
