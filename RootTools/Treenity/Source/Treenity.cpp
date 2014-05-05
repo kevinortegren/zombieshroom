@@ -9,6 +9,9 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <QFileDialog>
 
+
+
+#include <QPushButton>
 extern RootEngine::GameSharedContext g_engineContext;
 
 Treenity::Treenity(QWidget *parent)
@@ -58,11 +61,13 @@ Treenity::Treenity(QWidget *parent)
 	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS] = "Controller Action";
 
 	ui.setupUi(this);
-	
-	QWidget* transformWidget = new QWidget(ui.toolBox_components);
+
+	m_compView = new ComponentView();
+	ui.verticalLayout->addWidget(m_compView);
+
+	QWidget* transformWidget = new QWidget();
 	SetupUIForComponent(transformWidget, RootForce::ComponentType::TRANSFORM);
-	ui.toolBox_components->removeItem(0);
-	ui.toolBox_components->addItem(transformWidget, m_componentNames[RootForce::ComponentType::TRANSFORM]);
+	m_compView->AddItem(new ComponentViewItem(m_componentNames[RootForce::ComponentType::TRANSFORM], transformWidget));
 
 	QActionGroup* group = new QActionGroup(ui.toolBar);
 
@@ -88,6 +93,8 @@ Treenity::Treenity(QWidget *parent)
 	connect(transformUI.doubleSpinBox_scaleX,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleXChanged(double)));
 	connect(transformUI.doubleSpinBox_scaleY,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleYChanged(double)));
 	connect(transformUI.doubleSpinBox_scaleZ,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleZChanged(double)));
+	
+
 }
 
 Treenity::~Treenity()
@@ -132,9 +139,9 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 {
 	if (m_selectedEntity == p_entity)
 	{
-		QWidget* widget = new QWidget(ui.toolBox_components);
+		QWidget* widget = new QWidget();
 		SetupUIForComponent(widget, p_componentType);
-		ui.toolBox_components->addItem(widget, m_componentNames[p_componentType]);
+		m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
 	}
 }
 
@@ -142,14 +149,7 @@ void Treenity::ComponentRemoved(ECS::Entity* p_entity, int p_componentType)
 {
 	if (m_selectedEntity == p_entity)
 	{
-		for (int i = 0; i < ui.toolBox_components->count(); ++i)
-		{
-			if (ui.toolBox_components->widget(i)->windowTitle() == m_componentNames[p_componentType])
-			{
-				ui.toolBox_components->removeItem(i);
-				break;
-			}
-		}
+		m_compView->RemoveItem(m_componentNames[p_componentType]);
 	}
 }
 
@@ -321,10 +321,7 @@ void Treenity::SelectEntity(ECS::Entity* p_entity)
 	ui.lineEdit_entityName->setText(name);
 
 	// Update the component toolbox.
-	while (ui.toolBox_components->count() > 0)
-	{
-		ui.toolBox_components->removeItem(0);
-	}
+	m_compView->RemoveItems();
 
 	if (p_entity != nullptr)
 	{
@@ -334,9 +331,9 @@ void Treenity::SelectEntity(ECS::Entity* p_entity)
 			uint64_t mask = 1ULL << i;
 			if ((flag & mask) != 0)
 			{
-				QWidget* widget = new QWidget(ui.toolBox_components);
+				QWidget* widget = new QWidget();
 				SetupUIForComponent(widget, i);
-				ui.toolBox_components->addItem(widget, m_componentNames[i]);
+				m_compView->AddItem(new ComponentViewItem(m_componentNames[i], widget));
 
 				switch (i)
 				{
@@ -395,13 +392,14 @@ void Treenity::SetupUIForComponent(QWidget* p_widget, int p_componentType)
 
 QWidget* Treenity::GetComponentToolboxItemByType(int p_componentType)
 {
-	for (int i = 0; i < ui.toolBox_components->count(); ++i)
+	/*for (int i = 0; i < ui.toolBox_components->count(); ++i)
 	{
 		if (ui.toolBox_components->widget(i)->windowTitle() == m_componentNames[p_componentType])
 		{
 			return ui.toolBox_components->widget(i);
 		}
 	}
-
-	return nullptr;
+*/
+	
+	return m_compView->GetItemByName(m_componentNames[p_componentType])->GetWidget();
 }

@@ -10,7 +10,8 @@
 #include <RootTools/Treenity/Include/EngineInterface.h>
 #include <RootTools/Treenity/Include/EntityOutliner.h>
 #include <RootTools/Treenity/Include/ProjectManager.h>
-
+#include <RootTools/Treenity/Include/ComponentView.h>
+#include <RootTools/Treenity/Include/ComponentViewItem.h>
 class Treenity : public QMainWindow
 {
 	Q_OBJECT
@@ -56,6 +57,8 @@ private:
 	// Component property panel
 	void SetupUIForComponent(QWidget* p_widget, int p_componentType);
 	QWidget* GetComponentToolboxItemByType(int p_componentType);
+
+	ComponentView* m_compView;
 private slots:
 	void SaveAs();
 	void CreateEntity();
