@@ -129,7 +129,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
 	//m_world.GetEntityImporter()->Import("C:\\rarosu\\test12.level");
 	//m_projectManager.Import("C:\\rarosu\\test14.level");
-	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCubeNames.world").c_str()));
+	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world").c_str()));
 
 	CreateSkyBox();
 
