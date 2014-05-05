@@ -82,7 +82,20 @@
         </size>
        </property>
        <property name="text">
-        <string>Butt</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>Resources/translateButton.png</normaloff>Resources/translateButton.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_rotateMode">
@@ -107,7 +120,17 @@
         </size>
        </property>
        <property name="text">
-        <string>Butt</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>Resources/rotateButton.png</normaloff>Resources/rotateButton.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_scaleMode">
@@ -132,7 +155,17 @@
         </size>
        </property>
        <property name="text">
-        <string>Butt</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>Resources/resizeButton.png</normaloff>Resources/resizeButton.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QComboBox" name="comboBox">
@@ -330,6 +363,26 @@
          </widget>
         </item>
        </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolBox" name="toolBox_components">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="page_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>186</width>
+          <height>701</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Transform</string>
+        </attribute>
+       </widget>
       </widget>
      </item>
     </layout>
