@@ -162,6 +162,7 @@ MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_pa
 	aimingRenderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 	aimingRenderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("blockMana", Render::TextureType::TextureType::TEXTURE_2D);
 	
+
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 
 	// Add camera entity.	

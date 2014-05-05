@@ -114,6 +114,14 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
+	m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
+
+	m_cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
+	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
+
+	m_transformInterpolationSystem = new RootForce::TransformInterpolationSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::TransformInterpolationSystem>(m_transformInterpolationSystem);
+
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
 
 	m_world.GetEntityImporter()->SetImporter(Importer);
@@ -121,7 +129,20 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
 	//m_world.GetEntityImporter()->Import("C:\\rarosu\\test12.level");
 	//m_projectManager.Import("C:\\rarosu\\test14.level");
-	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world").c_str()));
+	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCubeNames.world").c_str()));
+
+	CreateSkyBox();
+
+	m_cameraEntity = m_world.GetEntityManager()->CreateEntity();
+	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(m_cameraEntity);
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_cameraEntity);
+	cameraTransform->m_position = glm::vec3(0);
+	camera->m_frustum.m_near = 0.1f;
+	camera->m_frustum.m_far = 1000.0f;
+	camera->m_frustum.m_fov = 45.0f;
+
+	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
 
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 
@@ -132,6 +153,8 @@ TreenityMain::TreenityMain(const std::string& p_path)
 TreenityMain::~TreenityMain()
 {
 	delete m_renderingSystem;
+	delete m_cameraSystem;
+	delete m_transformInterpolationSystem;
 
 	SDL_Quit();
 
@@ -217,9 +240,72 @@ void TreenityMain::Update(float dt)
 
 	g_engineContext.m_renderer->Clear();
 
-	//m_renderingSystem->Process();
+	m_cameraSystem->Process();
+	m_transformInterpolationSystem->Process();
+	m_renderingSystem->Process();
 	
-	//g_engineContext.m_renderer->Render();
+	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
 }
 
+void TreenityMain::CreateSkyBox()
+{
+	// Setup skybox entity.
+	m_skyBox = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Renderable* r = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(m_skyBox);
+	RootForce::Transform* t = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_skyBox);
+
+	t->m_scale = glm::vec3(-100);
+	t->m_orientation.Roll(180);
+
+	static glm::vec3 positions[8] = 
+	{
+		glm::vec3( -0.500000, -0.500000, 0.500000),
+		glm::vec3(0.500000, -0.500000, 0.500000),
+		glm::vec3(-0.500000, 0.500000, 0.500000),
+		glm::vec3(0.500000, 0.500000, 0.500000),
+		glm::vec3(-0.500000, 0.500000, -0.500000),
+		glm::vec3(0.500000, 0.500000, -0.500000),
+		glm::vec3(-0.500000, -0.500000, -0.500000),
+		glm::vec3(0.500000, -0.500000, -0.500000)
+	};
+
+	static unsigned int indices[36] =
+	{
+		0, 1, 2, 
+		2, 1, 3, 
+		2, 3, 4, 
+		4, 3, 5, 
+		4, 5, 6, 
+		6, 5, 7,
+		6, 7, 0, 
+		0, 7, 1, 
+		1, 7, 3, 
+		3, 7, 5, 
+		6, 0, 4, 
+		4, 0, 2
+	};
+
+	Render::Vertex1P vertices[8];
+	for(int i = 0; i < 8; ++i)
+	{
+		vertices[i].m_pos = positions[i];
+	}
+
+	r->m_model = g_engineContext.m_resourceManager->CreateModel("skybox");
+	r->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+	r->m_model->m_meshes[0]->SetElementBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+	r->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+	r->m_model->m_meshes[0]->CreateVertexBuffer1P(&vertices[0], 8);
+	r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], 36);
+
+	r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
+	r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
+	r->m_material = g_engineContext.m_renderer->CreateMaterial("skybox");
+	r->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Skybox");
+	r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  g_engineContext.m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
+
+	m_world.GetTagManager()->RegisterEntity("Skybox", m_skyBox);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", m_skyBox);
+}
