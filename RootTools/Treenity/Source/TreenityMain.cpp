@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
 TreenityMain::TreenityMain(const std::string& p_path)
 	: m_engineActions(&m_world)
 	, m_projectManager(&m_world)
+	, m_worldSystem(&m_world, &g_engineContext)
 {
 	g_world = &m_world;
 
@@ -107,6 +108,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	// Initialize components and preallocate memory.
 	RootForce::ComponentType::Initialize();
+
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Renderable>(5000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::Transform>(5000);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::PointLight>(5000);
@@ -170,18 +172,29 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
 
+	m_shadowSystem = new RootForce::ShadowSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem);
+
+	m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
+
+	m_directionalLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionalLightSystem);
+
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
 	//m_world.GetEntityImporter()->Import("C:\\rarosu\\test12.level");
 	//m_projectManager.Import("C:\\rarosu\\test14.level");
+
+	// When opening / creating a new project.
 	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\MythosV0.2.world").c_str()));
 
-	CreateSkyBox();
+	m_worldSystem.BuildStaticShadowMesh();
+	m_worldSystem.SetAmbientLight(m_world.GetStorage()->GetValueAsVec4("Ambient"));
+	m_worldSystem.CreateSkyBox();
 
 	CreateFreeFlyingCamera();
-
-	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 
 	// Display treenity editor.
 	m_treenityEditor.show();
@@ -197,6 +210,10 @@ TreenityMain::~TreenityMain()
 	delete m_transformInterpolationSystem;
 	delete m_scriptSystem;
 	delete m_controllerActionSystem;
+	delete m_lookAtSystem;
+	delete m_shadowSystem;
+	delete m_pointLightSystem;
+	delete m_directionalLightSystem;
 
 	SDL_Quit();
 
@@ -322,6 +339,8 @@ void TreenityMain::Update(float dt)
 
 	g_engineContext.m_renderer->Clear();
 
+	m_worldSystem.Process();
+
 	m_controllerActionSystem->Process();
 	
 	m_lookAtSystem->Process();
@@ -330,72 +349,14 @@ void TreenityMain::Update(float dt)
 	m_scriptSystem->Process();
 
 	m_transformInterpolationSystem->Process();
+
+	m_shadowSystem->Process();
+	m_directionalLightSystem->Process();
+	m_pointLightSystem->Process();
 	m_renderingSystem->Process();
 	
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
-}
-
-void TreenityMain::CreateSkyBox()
-{
-	// Setup skybox entity.
-	m_skyBox = m_world.GetEntityManager()->CreateEntity();
-
-	RootForce::Renderable* r = m_world.GetEntityManager()->CreateComponent<RootForce::Renderable>(m_skyBox);
-	RootForce::Transform* t = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_skyBox);
-
-	t->m_scale = glm::vec3(-100);
-	t->m_orientation.Roll(180);
-
-	static glm::vec3 positions[8] = 
-	{
-		glm::vec3( -0.500000, -0.500000, 0.500000),
-		glm::vec3(0.500000, -0.500000, 0.500000),
-		glm::vec3(-0.500000, 0.500000, 0.500000),
-		glm::vec3(0.500000, 0.500000, 0.500000),
-		glm::vec3(-0.500000, 0.500000, -0.500000),
-		glm::vec3(0.500000, 0.500000, -0.500000),
-		glm::vec3(-0.500000, -0.500000, -0.500000),
-		glm::vec3(0.500000, -0.500000, -0.500000)
-	};
-
-	static unsigned int indices[36] =
-	{
-		0, 1, 2, 
-		2, 1, 3, 
-		2, 3, 4, 
-		4, 3, 5, 
-		4, 5, 6, 
-		6, 5, 7,
-		6, 7, 0, 
-		0, 7, 1, 
-		1, 7, 3, 
-		3, 7, 5, 
-		6, 0, 4, 
-		4, 0, 2
-	};
-
-	Render::Vertex1P vertices[8];
-	for(int i = 0; i < 8; ++i)
-	{
-		vertices[i].m_pos = positions[i];
-	}
-
-	r->m_model = g_engineContext.m_resourceManager->CreateModel("skybox");
-	r->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
-	r->m_model->m_meshes[0]->SetElementBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
-	r->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
-	r->m_model->m_meshes[0]->CreateVertexBuffer1P(&vertices[0], 8);
-	r->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], 36);
-
-	r->m_pass = RootForce::RenderPass::RENDERPASS_SKYBOX;
-	r->m_renderFlags = Render::RenderFlags::RENDER_IGNORE_CASTSHADOW;
-	r->m_material = g_engineContext.m_renderer->CreateMaterial("skybox");
-	r->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Skybox");
-	r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] =  g_engineContext.m_resourceManager->LoadTexture("SkyBox", Render::TextureType::TEXTURE_CUBEMAP);
-
-	m_world.GetTagManager()->RegisterEntity("Skybox", m_skyBox);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", m_skyBox);
 }
 
 void TreenityMain::CreateFreeFlyingCamera()

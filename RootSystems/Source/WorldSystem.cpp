@@ -219,7 +219,7 @@ namespace RootForce
 		sundata.direction = glm::vec4(-sunTransform->m_orientation.GetFront(), 0.0f);
 		sundata.color = sunLight->m_color;
 
-		r->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(sundata), &sundata, GL_STATIC_DRAW);
+		r->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(sundata), &sundata, GL_DYNAMIC_DRAW);
 
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
@@ -296,6 +296,18 @@ namespace RootForce
 
 			g_engineContext.m_renderer->AddShadowJob(job);
 		}
+
+		RootForce::Renderable* skyboxRenderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_world->GetTagManager()->GetEntityByTag("Skybox"));
+
+		ECS::Entity* sun = m_world->GetTagManager()->GetEntityByTag("Sun");
+		RootForce::Transform* sunTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(sun);
+		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->GetComponent<RootForce::DirectionalLight>(sun);
+
+		glm::vec4 dir = glm::vec4(-sunTransform->m_orientation.GetFront(), 0.0f);
+
+		skyboxRenderable->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(dir), &dir);
+		skyboxRenderable->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(sizeof(dir), sizeof(sunLight->m_color), &sunLight->m_color);
+
 	/*
 #ifndef COMPILE_LEVEL_EDITOR
 		ECS::Entity* entity = m_world->GetTagManager()->GetEntityByTag("Camera");

@@ -7,6 +7,8 @@
 #include <RootSystems/Include/TransformInterpolationSystem.h>
 #include <RootSystems/Include/ScriptSystem.h>
 #include <RootSystems/Include/ControllerActionSystem.h>
+#include <RootSystems/Include/ShadowSystem.h>
+#include <RootSystems/Include/LightSystem.h>
 
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/Network/Client.h>
@@ -31,7 +33,6 @@ public:
 	void Update(float dt);
 	bool IsRunning();
 
-	void CreateSkyBox();
 	void CreateFreeFlyingCamera();
 
 private:
@@ -42,16 +43,20 @@ private:
 	EngineActions m_engineActions;	
 	ProjectManager m_projectManager;
 
-	RootForce::WorldSystem* m_worldSystem;
+	RootForce::WorldSystem m_worldSystem;
+
+	RootForce::ShadowSystem* m_shadowSystem;
+	RootForce::PointLightSystem* m_pointLightSystem;
+	RootForce::DirectionalLightSystem* m_directionalLightSystem;
 
 	RootForce::RenderingSystem* m_renderingSystem;
-	RootForce::CameraSystem* m_cameraSystem;
 	RootForce::TransformInterpolationSystem* m_transformInterpolationSystem;
+
+	RootForce::CameraSystem* m_cameraSystem;
 	RootForce::ScriptSystem* m_scriptSystem;
 	RootForce::ControllerActionSystem* m_controllerActionSystem;
 	RootForce::LookAtSystem* m_lookAtSystem;
 
-	ECS::Entity* m_skyBox;
 	ECS::Entity* m_cameraEntity;
 	ECS::Entity* m_aimingDevice;
 
