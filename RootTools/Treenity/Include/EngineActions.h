@@ -13,6 +13,8 @@ public:
 	ECS::Entity* CreateEntity();
 	void DeleteEntity(ECS::Entity* p_entity);
 
+	void TargetEntity(ECS::Entity* p_entity);
+
 	// Transform
 	void SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position);
 	void TranslateEntity(ECS::Entity* p_entity, const glm::vec3& p_translation);

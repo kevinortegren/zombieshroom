@@ -11,6 +11,8 @@ struct EngineInterface
 	virtual ECS::Entity* CreateEntity() = 0;
 	virtual void DeleteEntity(ECS::Entity* p_entity) = 0;
 
+	virtual void TargetEntity(ECS::Entity* p_entity) = 0;
+
 	// Transform
 	virtual void SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position) = 0;
 	virtual void TranslateEntity(ECS::Entity* p_entity, const glm::vec3& p_translation) = 0;

@@ -97,6 +97,8 @@ Treenity::~Treenity()
 void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 {
 	m_engineInterface = p_engineInterface;
+
+	ui.treeView_entityOutliner->SetEngineInterface(m_engineInterface);
 }
 
 void Treenity::SetProjectManager(ProjectManager* p_projectManager)

@@ -95,7 +95,12 @@ void EntityOutlinerItem::UpdateLabel()
 EntityOutliner::EntityOutliner(QWidget* p_parent)
 	: QTreeWidget(p_parent)
 {
+	connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(TargetEntity(QTreeWidgetItem*, int)));
+}
 
+void EntityOutliner::SetEngineInterface(EngineInterface* p_engineInterface)
+{
+	m_engineInterface = p_engineInterface;
 }
 
 void EntityOutliner::EntityCreated(ECS::Entity* p_entity, const QString& p_name)
@@ -174,4 +179,11 @@ EntityOutlinerItem* EntityOutliner::FindItemWithEntity(ECS::Entity* p_entity)
 	}
 
 	return nullptr;
+}
+
+void EntityOutliner::TargetEntity(QTreeWidgetItem* item, int column )
+{
+	ECS::Entity* entity = ((EntityOutlinerItem*)item)->GetEntity();
+
+	m_engineInterface->TargetEntity(entity);
 }

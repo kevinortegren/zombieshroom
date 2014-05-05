@@ -1,12 +1,14 @@
 --Free flying controls script. This is what a game-specific component should look like!
 
 FreeFlyingMaya = {};
-FreeFlyingMaya.MovementSpeed = 20.0;
-FreeFlyingMaya.RotateSpeed = 45.0;
+FreeFlyingMaya.MoveSpeed = 20.0;
 FreeFlyingMaya.Displacement = 100.0;
 FreeFlyingMaya.RotateSens = 0.1;
-FreeFlyingMaya.PanSens = 0.05;
+FreeFlyingMaya.PanSens = 0.08;
 FreeFlyingMaya.ZoomSens = 0.05;
+FreeFlyingMaya.Time = 1.1;
+FreeFlyingMaya.From = nil;
+FreeFlyingMaya.To = nil;
 
 function FreeFlyingMaya.Setup(self)
 	
@@ -23,11 +25,31 @@ function FreeFlyingMaya.Setup(self)
 	controllerActions:Bind("LeftClick", 490);
 	controllerActions:Bind("MiddleClick", 491);
 	controllerActions:Bind("RightClick", 492);
+    controllerActions:Bind("F", 9);
+end
+
+function FreeFlyingMaya.Target(target)
+
+   FreeFlyingMaya.From = Entity.GetEntityByTag("AimingDevice")
+   FreeFlyingMaya.To = target
+   FreeFlyingMaya.Time = 0       
+
 end
 
 function FreeFlyingMaya.OnUpdate(self)
 	local dt = Static.GetDeltaTime();
 
+    if FreeFlyingMaya.Time <= 1.0 then   
+    
+        FreeFlyingMaya.Time = FreeFlyingMaya.Time + dt
+        
+        -- lerp
+        FreeFlyingMaya.From:GetTransformation():SetPos(Vec3.New(1.0 - FreeFlyingMaya.Time, 1.0 - FreeFlyingMaya.Time, 1.0 - FreeFlyingMaya.Time) * FreeFlyingMaya.From:GetTransformation():GetPos() + Vec3.New(FreeFlyingMaya.Time, FreeFlyingMaya.Time, FreeFlyingMaya.Time) * FreeFlyingMaya.To:GetTransformation():GetPos())       
+    else             
+        FreeFlyingMaya.From = nil
+        FreeFlyingMaya.To = nil
+    end
+    
 	local transform = self:GetTransformation();
 	local controllerActions = self:GetControllerActions();
 	
@@ -65,6 +87,7 @@ function FreeFlyingMaya.OnUpdate(self)
 			end
 
 		end
-		
+        
 	end
+    
 end

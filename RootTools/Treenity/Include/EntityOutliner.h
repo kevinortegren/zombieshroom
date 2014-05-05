@@ -3,6 +3,7 @@
 #include <set>
 #include <QtWidgets/qtreewidget.h>
 #include <Utility/ECS/Include/Entity.h>
+#include <RootTools/Treenity/Include/EngineInterface.h>
 
 class EntityOutlinerItem : public QTreeWidgetItem
 {
@@ -17,6 +18,8 @@ public:
 
 	ECS::Entity* GetEntity();
 
+
+
 private:
 	ECS::Entity* m_entity;
 	QString m_name;
@@ -28,8 +31,12 @@ private:
 
 class EntityOutliner : public QTreeWidget
 {
+	Q_OBJECT
+
 public:
 	EntityOutliner(QWidget* p_parent);
+
+	void SetEngineInterface(EngineInterface* p_engineInterface);
 
 	void EntityCreated(ECS::Entity* p_entity, const QString& p_name);
 	void EntityRemoved(ECS::Entity* p_entity);
@@ -42,6 +49,11 @@ public:
 	void EntityRenamed(ECS::Entity* p_entity, const QString& p_name);
 
 	ECS::Entity* GetSelectedEntity();
+
 private:
 	EntityOutlinerItem* FindItemWithEntity(ECS::Entity* p_entity);
+	EngineInterface* m_engineInterface;
+
+private slots:
+	void TargetEntity(QTreeWidgetItem* item, int column);
 };

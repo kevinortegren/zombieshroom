@@ -1,6 +1,12 @@
 #include <RootTools/Treenity/Include/EngineActions.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
+#include <RootSystems/Include/Script.h>
+
+#include <RootEngine/Script/Include/ScriptManager.h>
+
+#include <RootEngine/Include/GameSharedContext.h>
+extern RootEngine::GameSharedContext g_engineContext;
 
 EngineActions::EngineActions(ECS::World* p_world)
 	: m_world(p_world)
@@ -15,6 +21,16 @@ ECS::Entity* EngineActions::CreateEntity()
 	RootForce::Transform* transform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(entity);
 
 	return entity;
+}
+
+void EngineActions::TargetEntity(ECS::Entity* p_entity)
+{
+	ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
+	RootForce::Script* script = m_world->GetEntityManager()->GetComponent<RootForce::Script>(cameraEntity);
+
+	g_engineContext.m_script->SetFunction(script->Name, "Target");
+	g_engineContext.m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
 }
 
 void EngineActions::DeleteEntity(ECS::Entity* p_entity)
