@@ -126,7 +126,11 @@ public:
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         widget_canvas3D = new Canvas3D(centralWidget);
         widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
-        widget_canvas3D->setMinimumSize(QSize(375, 375));
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(widget_canvas3D->sizePolicy().hasHeightForWidth());
+        widget_canvas3D->setSizePolicy(sizePolicy);
         widget_canvas3D->setStyleSheet(QStringLiteral(""));
 
         horizontalLayout->addWidget(widget_canvas3D);
@@ -170,9 +174,6 @@ public:
         __qtreewidgetitem->setText(0, QStringLiteral("Entities"));
         treeView_entityOutliner->setHeaderItem(__qtreewidgetitem);
         treeView_entityOutliner->setObjectName(QStringLiteral("treeView_entityOutliner"));
-        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(treeView_entityOutliner->sizePolicy().hasHeightForWidth());
         treeView_entityOutliner->setSizePolicy(sizePolicy);
         treeView_entityOutliner->setMinimumSize(QSize(0, 0));

@@ -27,7 +27,7 @@ static SDL_Scancode GetScanCodeFromQtKey(int key)
 	} 
 	else // misc keys & modifiers needs to be identified.
 	{
-		return s_keymap[key&0x00000011];
+		return s_keymap[key&0x000000FF];
 	}
 }
 
@@ -38,12 +38,13 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 	setUpdatesEnabled(false);
 
 	//Standard setup
-	setGeometry(QRect(2, 28, 1173, 899));
+	//setGeometry(QRect(2, 28, 1173, 899));
 	setFocusPolicy(Qt::ClickFocus);
 	show();
 	setEnabled(true);
+	setMouseTracking(true);
 
-	//Create temporary SDL window to set up correct pixel format and SDL_WINDOW_OPENGL flag
+		//Create temporary SDL window to set up correct pixel format and SDL_WINDOW_OPENGL flag
 	SDL_Window* sdlwindow = SDL_CreateWindow(
 		"Root Particle",
 		SDL_WINDOWPOS_UNDEFINED,
@@ -51,6 +52,9 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 		width(),
 		height(),
 		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
+
+	std::cout << "Width: " << width() << " Height: " << height() << std::endl;
+	std::cout << "G Width: " << geometry().width() << "G Height: " << geometry().height() << std::endl;
 
 	//Format string with adress to temporary SDL window
 	//char buffer [10];
@@ -71,7 +75,6 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 		throw std::runtime_error("Failed to create window");
 	}
 
-
 	InitialiseKeymap();
 }
 
@@ -80,8 +83,28 @@ Canvas3D::~Canvas3D()
 
 }
 
-void Canvas3D::CreateOpenGLContext()
+void Canvas3D::resizeEvent( QResizeEvent * event)
 {
+	if(g_engineContext.m_renderer == nullptr)
+	{
+		SDL_SetWindowSize(m_window.get(), event->size().width(), event->size().height());
+	}
+	else
+	{
+		g_engineContext.m_renderer->SetResolution(false, event->size().width(), event->size().height());
+	}
+	
+
+	std::cout << "Resize Width: " << event->size().width() << "Resize Height: " << event->size().height() << std::endl;
+}
+
+void Canvas3D::enterEvent( QEvent * event )
+{
+	setFocus(Qt::TabFocusReason);
+}
+
+void Canvas3D::CreateOpenGLContext()
+{	
 	// Setup the SDL context
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 }
@@ -118,7 +141,11 @@ static void InitialiseKeymap()
 	memset(s_keymap, 0, sizeof(s_keymap));
 
 	// Assign individual values.
-	s_keymap[Qt::Key_Alt&0x00000011] = SDL_SCANCODE_LALT;
+	s_keymap[Qt::Key_Alt&0x000000FF] = SDL_SCANCODE_LALT;
+	s_keymap[Qt::Key_Left&0x000000FF] = SDL_SCANCODE_LEFT;
+	s_keymap[Qt::Key_Right&0x000000FF] = SDL_SCANCODE_RIGHT;
+	s_keymap[Qt::Key_Up&0x000000FF] = SDL_SCANCODE_UP;
+	s_keymap[Qt::Key_Down&0x000000FF] = SDL_SCANCODE_DOWN;
 
 	/*Qt::Key_Escape	0x01000000	 
 		Qt::Key_Tab	0x01000001	 

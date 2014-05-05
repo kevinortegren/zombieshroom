@@ -14,12 +14,14 @@ public:
 	~Canvas3D();
 
 	void CreateOpenGLContext();
+	
 
 protected:
 	void wheelEvent(QWheelEvent* event);
 	void keyPressEvent( QKeyEvent *k );
 	void keyReleaseEvent( QKeyEvent *k );
-
+	void resizeEvent( QResizeEvent * event );
+	void enterEvent( QEvent * event );
 	
 private:
 	std::shared_ptr<SDL_Window> m_window;

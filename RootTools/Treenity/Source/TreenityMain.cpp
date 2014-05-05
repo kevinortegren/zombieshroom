@@ -15,6 +15,9 @@
 #include <RootTools/Treenity/Include/ComponentExporter.h>
 #include <QString>
 
+#include <RootForce/Include/LuaAPI.h>
+#include <RootEngine/Script/Include/ScriptManager.h>
+
 #undef main
 int main(int argc, char *argv[])
 {
@@ -44,6 +47,8 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	: m_engineActions(&m_world)
 	, m_projectManager(&m_world)
 {
+	g_world = &m_world;
+
 	// Load & Initialize Root Engine.
 	m_engineModule = DynamicLoader::LoadSharedLibrary("RootEngine.dll");
 
@@ -59,7 +64,10 @@ TreenityMain::TreenityMain(const std::string& p_path)
 		throw std::runtime_error("Failed to load RootEngine - please check your installation");
 	}
 
-	g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_INPUT | RootEngine::SubsystemInit::INIT_RENDER, p_path);
+	g_engineContext = libInitializeEngine(
+		RootEngine::SubsystemInit::INIT_INPUT |
+		RootEngine::SubsystemInit::INIT_RENDER |
+		RootEngine::SubsystemInit::INIT_SCRIPTING, p_path);
 
 	// Initialize SDL.
 	if (SDL_Init(SDL_INIT_TIMER) != 0) 
@@ -112,6 +120,9 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::StatChange>(500);
 	m_world.GetEntityManager()->GetAllocator()->CreateList<RootForce::KillAnnouncement>(10);
 
+	// Bind c++ functions and members to Lua.
+	RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
+
 	m_renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 	m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -124,6 +135,12 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
 
+	m_scriptSystem = new RootForce::ScriptSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem);
+
+	m_controllerActionSystem = new RootForce::ControllerActionSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::ControllerActionSystem>(m_controllerActionSystem);
+
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
@@ -133,21 +150,15 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	CreateSkyBox();
 
-	m_cameraEntity = m_world.GetEntityManager()->CreateEntity();
-	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(m_cameraEntity);
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_cameraEntity);
-	cameraTransform->m_position = glm::vec3(0);
-	camera->m_frustum.m_near = 0.1f;
-	camera->m_frustum.m_far = 1000.0f;
-	camera->m_frustum.m_fov = 45.0f;
-
-	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
+	CreateFreeFlyingCamera();
 
 	g_engineContext.m_renderer->SetAmbientLight(glm::vec4(1,1,1,1));
 
 	// Display treenity editor.
 	m_treenityEditor.show();
+
+	g_engineContext.m_inputSys->LockMouseToCenter(false);
+	SDL_SetRelativeMouseMode(SDL_FALSE);
 }
 
 TreenityMain::~TreenityMain()
@@ -155,6 +166,8 @@ TreenityMain::~TreenityMain()
 	delete m_renderingSystem;
 	delete m_cameraSystem;
 	delete m_transformInterpolationSystem;
+	delete m_scriptSystem;
+	delete m_controllerActionSystem;
 
 	SDL_Quit();
 
@@ -220,6 +233,8 @@ void TreenityMain::Update(float dt)
 
 	g_engineContext.m_renderer->Clear();
 
+	m_controllerActionSystem->Process();
+	m_scriptSystem->Process();
 	m_cameraSystem->Process();
 	m_transformInterpolationSystem->Process();
 	m_renderingSystem->Process();
@@ -288,4 +303,28 @@ void TreenityMain::CreateSkyBox()
 
 	m_world.GetTagManager()->RegisterEntity("Skybox", m_skyBox);
 	m_world.GetGroupManager()->RegisterEntity("NonExport", m_skyBox);
+}
+
+void TreenityMain::CreateFreeFlyingCamera()
+{
+	m_cameraEntity = m_world.GetEntityManager()->CreateEntity();
+
+	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(m_cameraEntity);
+	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_cameraEntity);
+	RootForce::ControllerActions* controllerActions = m_world.GetEntityManager()->CreateComponent<RootForce::ControllerActions>(m_cameraEntity);
+	
+	RootForce::Script* script = m_world.GetEntityManager()->CreateComponent<RootForce::Script>(m_cameraEntity);
+	script->Name = g_engineContext.m_resourceManager->LoadScript("FreeFlying");
+	
+	g_engineContext.m_script->SetFunction(script->Name, "Setup");
+	g_engineContext.m_script->AddParameterUserData(m_cameraEntity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->ExecuteScript();
+
+	cameraTransform->m_position = glm::vec3(0);
+	camera->m_frustum.m_near = 0.1f;
+	camera->m_frustum.m_far = 1000.0f;
+	camera->m_frustum.m_fov = 45.0f;
+
+	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
+	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
 }

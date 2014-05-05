@@ -5,6 +5,7 @@ FreeFlying.MovementSpeed = 20.0;
 FreeFlying.RotateSpeed = 45.0;
 
 function FreeFlying.Setup(self)
+	
 	local controllerActions = self:GetControllerActions();
 	controllerActions:Bind("Forward", 82);
 	controllerActions:Bind("Back", 81);

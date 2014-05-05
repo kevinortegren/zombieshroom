@@ -35,11 +35,11 @@
     </property>
     <item>
      <widget class="Canvas3D" name="widget_canvas3D" native="true">
-      <property name="minimumSize">
-       <size>
-        <width>375</width>
-        <height>375</height>
-       </size>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <property name="styleSheet">
        <string notr="true"/>
