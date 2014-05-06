@@ -19,6 +19,7 @@ public:
 	
 	void ClearScene();
 	void AddDefaultEntities();
+	void InitializeScene();
 
 	// Entity
 	ECS::Entity* CreateEntity();

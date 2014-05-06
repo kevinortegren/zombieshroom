@@ -24,6 +24,7 @@ void EngineActions::NewScene()
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Existing entities: %d", m_world->GetEntityManager()->GetNumEntities());
 
 	ClearScene();
+
 	AddDefaultEntities();
 }
 
@@ -42,10 +43,25 @@ void EngineActions::ClearScene()
 void EngineActions::AddDefaultEntities()
 {
 	m_treenityMain->GetWorldSystem()->CreateSkyBox();
-	m_treenityMain->GetWorldSystem()->CreateSun();
 
 	CreateFreeFlyingCamera();
- 
+
+	// Add new entities.
+	m_treenityMain->ProcessWorldMessages();
+	m_world->GetEntityManager()->CleanUp();
+}
+
+// Can only be called after a world has been imported !!
+void EngineActions::InitializeScene()
+{	
+	m_treenityMain->GetWorldSystem()->CreateSun();
+
+	m_treenityMain->GetWorldSystem()->BuildStaticShadowMesh();
+	m_treenityMain->GetWorldSystem()->SetAmbientLight(m_world->GetStorage()->GetValueAsVec4("Ambient"));
+
+	//m_treenityMain->GetWorldSystem()->CalculateWorldAABB();
+	//m_treenityMain->GetShadowSystem()->SetQuadTree(m_treenityMain->GetWorldSystem()->GetQuadTree());
+
 	// Add new entities.
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();

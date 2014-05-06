@@ -195,19 +195,9 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
-	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
-	//m_world.GetEntityImporter()->Import("C:\\rarosu\\test12.level");
-	//m_projectManager.Import("C:\\rarosu\\test14.level");
 
-	// When opening / creating a new project.
-	//m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\MythosV0.2.world").c_str()));
 
-	//m_worldSystem.BuildStaticShadowMesh();
-	//m_worldSystem.SetAmbientLight(m_world.GetStorage()->GetValueAsVec4("Ambient"));
-	
-	//m_worldSystem.CalculateWorldAABB();
 
-	//m_shadowSystem->SetQuadTree(m_worldSystem.GetQuadTree());
 
 	m_treenityEditor.CreateNewScene();
 

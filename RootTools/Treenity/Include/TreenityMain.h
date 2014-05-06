@@ -28,6 +28,7 @@ public:
 	bool IsRunning();
 
 	RootForce::WorldSystem* GetWorldSystem() { return &m_worldSystem; }
+	RootForce::ShadowSystem* GetShadowSystem() { return m_shadowSystem; }
 
 private:
 	void* m_engineModule;

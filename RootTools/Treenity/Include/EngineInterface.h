@@ -7,10 +7,11 @@
 
 struct EngineInterface
 {
-	// Project
+	// Project management
 	virtual void NewScene() = 0;
 	virtual void ClearScene() = 0;
 	virtual void AddDefaultEntities() = 0;
+	virtual void InitializeScene() = 0;
 
 	// Entity
 	virtual ECS::Entity* CreateEntity() = 0;

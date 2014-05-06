@@ -200,10 +200,11 @@ void Treenity::OpenProject()
 	UpdateWindowTitle();
 
 	m_engineInterface->ClearScene();
+	m_engineInterface->AddDefaultEntities();
 
 	m_projectManager->Import(fileName);
 
-	m_engineInterface->AddDefaultEntities();
+	m_engineInterface->InitializeScene();
 }
 
 void Treenity::Save()

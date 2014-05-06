@@ -1,7 +1,4 @@
 - Entities:
-    - 0
-    - 1
-    - 2
     - 3
     - 4
     - 5
@@ -25,10 +22,13 @@
     - 23
     - 24
     - 25
+    - 26
+    - 27
+    - 28
 - Components:
     - Type: 0
       Data:
-        - Entity: 21
+        - Entity: 24
           Model: colorCube3.0Shape
           Material:
             Name: lambert2
@@ -36,125 +36,125 @@
             Diffuse: ColorGrid
     - Type: 1
       Data:
-        - Entity: 0
+        - Entity: 3
           Position: [0, 9.34835, 0]
           Rotation: [6.61744e-024, 1.49012e-008, -4.44089e-016, 1]
           Scale: [1, 1, 1]
-        - Entity: 1
+        - Entity: 4
           Position: [-24.1224, 26.2418, 23.9302]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 2
+        - Entity: 5
           Position: [23.5989, 26.2418, 23.9302]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 3
+        - Entity: 6
           Position: [23.5989, 26.2418, -23.854]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 4
+        - Entity: 7
           Position: [-23.9084, 26.2418, -23.854]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 5
+        - Entity: 8
           Position: [-4.46443, 4.92628, 170.841]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 6
+        - Entity: 9
           Position: [168.476, 6.38947, -10.7031]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 7
+        - Entity: 10
           Position: [1.0341, 5.6255, 1.11879]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 8
+        - Entity: 11
           Position: [-170.685, 5.14577, 4.45738]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 9
+        - Entity: 12
           Position: [-51.7887, 4.4431, -3.76491]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 10
+        - Entity: 13
           Position: [-3.8762, 4.20245, 51.214]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 11
+        - Entity: 14
           Position: [51.1752, 4.38794, 3.23827]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 12
+        - Entity: 15
           Position: [3.47767, 4.35236, -51.494]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 13
+        - Entity: 16
           Position: [-49.0998, 4.33627, 16.8951]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 14
+        - Entity: 17
           Position: [16.5669, 4.23291, 48.6152]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 15
+        - Entity: 18
           Position: [48.3288, 4.25297, -17.1382]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 16
+        - Entity: 19
           Position: [-17.0434, 4.25718, -48.716]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 17
+        - Entity: 20
           Position: [-46.0505, 4.33761, -23.9915]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 18
+        - Entity: 21
           Position: [-23.8658, 4.22514, 45.4788]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 19
+        - Entity: 22
           Position: [45.6962, 4.23325, 23.2648]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 20
+        - Entity: 23
           Position: [23.6109, 4.20746, -45.8939]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 21
+        - Entity: 24
           Position: [0, 2.72062, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [0.505477, 0.505477, 0.505477]
-        - Entity: 22
+        - Entity: 25
           Position: [-375.252, 90.8842, -375.037]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 23
+        - Entity: 26
           Position: [374.61, 90.8842, -375.218]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 24
+        - Entity: 27
           Position: [375.322, 112.415, 375.011]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 25
+        - Entity: 28
           Position: [-374.342, 112.415, 374.499]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 22
+        - Entity: 25
           Attenuation: [0, 0.181818, 0]
           Color: [1, 0, 0, 1]
           Range: 10
-        - Entity: 23
+        - Entity: 26
           Attenuation: [0, 0.181818, 0]
           Color: [1, 1, 0, 1]
           Range: 10
-        - Entity: 24
+        - Entity: 27
           Attenuation: [0, 0.181818, 0]
           Color: [0, 1, 0, 1]
           Range: 10
-        - Entity: 25
+        - Entity: 28
           Attenuation: [0, 0.181818, 0]
           Color: [0, 0, 1, 1]
           Range: 10
@@ -184,7 +184,7 @@
         []
     - Type: 11
       Data:
-        - Entity: 21
+        - Entity: 24
           MeshHandle: colorCube3.0Shape0
     - Type: 12
       Data:
@@ -197,12 +197,6 @@
         []
     - Type: 15
       Data:
-        - Entity: 5
-          File: AbilitySpawn
-        - Entity: 6
-          File: AbilitySpawn
-        - Entity: 7
-          File: AbilitySpawn
         - Entity: 8
           File: AbilitySpawn
         - Entity: 9
@@ -229,6 +223,12 @@
           File: AbilitySpawn
         - Entity: 20
           File: AbilitySpawn
+        - Entity: 21
+          File: AbilitySpawn
+        - Entity: 22
+          File: AbilitySpawn
+        - Entity: 23
+          File: AbilitySpawn
     - Type: 16
       Data:
         []
@@ -243,11 +243,11 @@
         []
     - Type: 20
       Data:
-        - Entity: 0
+        - Entity: 3
           LightSlot: 0
     - Type: 21
       Data:
-        - Entity: 0
+        - Entity: 3
           Color: [0.848478, 0.848478, 0.848478, 1]
     - Type: 22
       Data:
@@ -376,15 +376,9 @@
       Data:
         []
 - Tags:
-    - Id: 0
+    - Id: 3
       Tag: Sun
 - Groups:
-    - Id: 5
-      Group: AbilitySpawnPoint
-    - Id: 6
-      Group: AbilitySpawnPoint
-    - Id: 7
-      Group: AbilitySpawnPoint
     - Id: 8
       Group: AbilitySpawnPoint
     - Id: 9
@@ -411,15 +405,21 @@
       Group: AbilitySpawnPoint
     - Id: 20
       Group: AbilitySpawnPoint
-    - Id: 1
-      Group: SpawnPoint
-    - Id: 2
-      Group: SpawnPoint
-    - Id: 3
-      Group: SpawnPoint
+    - Id: 21
+      Group: AbilitySpawnPoint
+    - Id: 22
+      Group: AbilitySpawnPoint
+    - Id: 23
+      Group: AbilitySpawnPoint
     - Id: 4
       Group: SpawnPoint
-    - Id: 21
+    - Id: 5
+      Group: SpawnPoint
+    - Id: 6
+      Group: SpawnPoint
+    - Id: 7
+      Group: SpawnPoint
+    - Id: 24
       Group: Static
 - Storage:
     - Key: Ambient
@@ -431,14 +431,8 @@
     - Key: GrassTranslucency
       Value: grass_translucency
 - EntityNames:
-    - ID: 0
-      Name: Sun
-    - ID: 1
-      Name: Unnamed
-    - ID: 2
-      Name: Unnamed
     - ID: 3
-      Name: Unnamed
+      Name: Mega uber sun!
     - ID: 4
       Name: Unnamed
     - ID: 5
@@ -482,4 +476,10 @@
     - ID: 24
       Name: Unnamed
     - ID: 25
+      Name: Unnamed
+    - ID: 26
+      Name: Unnamed
+    - ID: 27
+      Name: Unnamed
+    - ID: 28
       Name: Unnamed
