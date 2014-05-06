@@ -51,7 +51,7 @@ public:
 	bool IsRunning();
 
 	Treenity* GetEditor() { return &m_treenityEditor; }
-	RootForce::WorldSystem* GetWorldSystem() { return &m_worldSystem; }
+	RootForce::WorldSystem* GetWorldSystem() { return m_worldSystem.get(); }
 	RootForce::ShadowSystem* GetShadowSystem() { return m_shadowSystem; }
 
 private:
@@ -85,7 +85,6 @@ private:
 	RootForce::ThirdPersonBehaviorSystem*				m_thirdPersonBehaviorSystem;
 	RootForce::AnimationSystem*							m_animationSystem;
 	RootForce::RagdollSystem*							m_ragdollSystem;
-	RootForce::MatchStateSystem*						m_gameLogicSystem;
 	RootForce::WaterSystem*								m_waterSystem;
 	RootSystems::ActionSystem*							m_actionSystem;
 	RootSystems::StateSystem*							m_stateSystem;

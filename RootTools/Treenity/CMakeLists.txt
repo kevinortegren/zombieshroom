@@ -7,6 +7,7 @@ project(${PROJECT_NAME})
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 file(GLOB_RECURSE SOURCES Source/*.cpp)
@@ -45,9 +46,6 @@ endforeach()
 
 # Set search paths
 include_directories(Include GeneratedFiles ${QT_INCLUDE_DIRS}/QtGui ${QT_INCLUDE_DIRS}/QtWidgets ${QT_INCLUDE_DIRS}/QtCore)
-
-  
-  message("${CMAKE_CURRENT_BUILD_DIR} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${PROJECT_NAME}")
 
 add_executable(${PROJECT_NAME} ${UI_FILES} ${GEN_FILES} ${QRC_FILES} ${HEADERS} ${SOURCES} ${RESOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})

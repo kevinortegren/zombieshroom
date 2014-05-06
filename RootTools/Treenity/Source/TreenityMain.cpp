@@ -84,7 +84,6 @@ int main(int argc, char *argv[])
 TreenityMain::TreenityMain(const std::string& p_path)
 	: m_engineActions(&m_world, this)
 	, m_projectManager(&m_world)
-	, m_worldSystem(&m_world, &g_engineContext)
 {
 	g_world = &m_world;
 
@@ -161,45 +160,127 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	// Bind c++ functions and members to Lua.
 	RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 
+	g_engineContext.m_resourceManager->LoadScript("Global");
+	g_engineContext.m_resourceManager->LoadScript("TimerEntity");
+	g_engineContext.m_resourceManager->LoadScript("Push");
+	g_engineContext.m_resourceManager->LoadScript("Identiray");
+	g_engineContext.m_resourceManager->LoadScript("Player");
+	g_engineContext.m_resourceManager->LoadScript("Explosion");
+	g_engineContext.m_resourceManager->LoadScript("AbilitySpawnPoint");
+	g_engineContext.m_resourceManager->LoadScript("XplodingMushroomPlanted");
+	g_engineContext.m_resourceManager->LoadScript("ShroomExplosion");
+	g_engineContext.m_resourceManager->LoadScript("TotemProjectile");
+
 	// Initialize the systems.
-	m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(&m_world, &g_engineContext));
+	m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));
 
 	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 	m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
 	m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
-	m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
 	m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
+
+	m_worldSystem = std::shared_ptr<RootForce::WorldSystem>(new RootForce::WorldSystem(g_world, &g_engineContext));
+
+	m_deserializationSystem = std::shared_ptr<RootForce::DeserializationSystem>(new RootForce::DeserializationSystem(g_world));
+
+	m_abilitySpawnSystem = new RootForce::AbilitySpawnSystem(g_world, &g_engineContext, g_engineContext.m_resourceManager->GetWorkingDirectory());
+	g_world->GetSystemManager()->AddSystem<RootForce::AbilitySpawnSystem>(m_abilitySpawnSystem);
+
+	m_respawnSystem = new RootSystems::RespawnSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootSystems::RespawnSystem>(m_respawnSystem);
+
+	m_controllerActionSystem = new RootForce::ControllerActionSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::ControllerActionSystem>(m_controllerActionSystem);
+
+	m_physicsTransformCorrectionSystem = new RootForce::PhysicsTransformCorrectionSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::PhysicsTransformCorrectionSystem>(m_physicsTransformCorrectionSystem);
+
+	m_physicsSystem = new RootForce::PhysicsSystem(g_world);
+	m_physicsSystem->SetPhysicsInterface(g_engineContext.m_physics);
+	m_physicsSystem->SetLoggingInterface(g_engineContext.m_logger);
+	g_world->GetSystemManager()->AddSystem<RootForce::PhysicsSystem>(m_physicsSystem);
+
+	m_scriptSystem = new RootForce::ScriptSystem(&m_world);
+	m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem);
+
+	m_collisionSystem = new RootForce::CollisionSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::CollisionSystem>(m_collisionSystem);
+
+	m_shadowSystem = new RootForce::ShadowSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem);
 
 	m_renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 	m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
 
+	m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
+
+	m_particleSystem = new RootForce::ParticleSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::ParticleSystem>(m_particleSystem);
+
 	m_cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
 	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
-
-	m_transformInterpolationSystem = new RootForce::TransformInterpolationSystem(&m_world);
-	m_world.GetSystemManager()->AddSystem<RootForce::TransformInterpolationSystem>(m_transformInterpolationSystem);
-
-	m_world.GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
-
-	m_scriptSystem = new RootForce::ScriptSystem(&m_world);
-	m_world.GetSystemManager()->AddSystem<RootForce::ScriptSystem>(m_scriptSystem);
-
-	m_controllerActionSystem = new RootForce::ControllerActionSystem(&m_world);
-	m_world.GetSystemManager()->AddSystem<RootForce::ControllerActionSystem>(m_controllerActionSystem);
 
 	m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
 
-	m_shadowSystem = new RootForce::ShadowSystem(g_world);
-	g_world->GetSystemManager()->AddSystem<RootForce::ShadowSystem>(m_shadowSystem);
+	m_thirdPersonBehaviorSystem = new RootForce::ThirdPersonBehaviorSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::ThirdPersonBehaviorSystem>(m_thirdPersonBehaviorSystem);
 
-	m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
-	g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
+	m_animationSystem = new RootForce::AnimationSystem(g_world);
+	m_animationSystem->SetLoggingInterface(g_engineContext.m_logger);
+	m_animationSystem->SetGameSharedContext(&g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::AnimationSystem>(m_animationSystem);
+
+	m_ragdollSystem = new RootForce::RagdollSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::RagdollSystem>(m_ragdollSystem);
+
+	m_waterSystem = new RootForce::WaterSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::WaterSystem>(m_waterSystem);
+
+	m_actionSystem = new RootSystems::ActionSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootSystems::ActionSystem>(m_actionSystem);
+
+	m_stateSystem = new RootSystems::StateSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootSystems::StateSystem>(m_stateSystem);
 
 	m_directionalLightSystem = new RootForce::DirectionalLightSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::DirectionalLightSystem>(m_directionalLightSystem);
 
+	m_tryPickupResetSystem = new RootForce::TryPickupResetSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::TryPickupResetSystem>(m_tryPickupResetSystem);
+
+	m_soundSystem = new RootForce::SoundSystem(g_world, &g_engineContext);
+	g_world->GetSystemManager()->AddSystem<RootForce::SoundSystem>(m_soundSystem);
+
+	m_botanySystem = new RootForce::BotanySystem(g_world, &g_engineContext);
+
+	m_timerSystem = new RootForce::TimerSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::TimerSystem>(m_timerSystem);
+
+	m_followSystem = new RootForce::FollowSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::FollowSystem>(m_followSystem);
+
+	m_homingSystem = new RootForce::HomingSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::HomingSystem>(m_homingSystem);
+
+	m_raySystem = new RootForce::RaySystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::RaySystem>(m_raySystem);
+
+	m_transformInterpolationSystem = new RootForce::TransformInterpolationSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::TransformInterpolationSystem>(m_transformInterpolationSystem);
+
+	m_networkDebugSystem = new RootForce::Network::NetworkDebugSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::Network::NetworkDebugSystem>(m_networkDebugSystem);
+
+	m_waterDeathSystem = new RootForce::WaterDeathSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::WaterDeathSystem>(m_waterDeathSystem);
+
+	m_scaleSystem = new RootForce::ScaleSystem(g_world);
+	g_world->GetSystemManager()->AddSystem<RootForce::ScaleSystem>(m_scaleSystem);
+
+	// Set the importer/exporter
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 
@@ -352,7 +433,7 @@ void TreenityMain::Update(float dt)
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
 	
-		m_worldSystem.Process();
+		m_worldSystem->Process();
 		m_controllerActionSystem->Process();	
 		m_lookAtSystem->Process();
 		m_cameraSystem->Process();
