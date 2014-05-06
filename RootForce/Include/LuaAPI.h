@@ -96,7 +96,13 @@ namespace RootForce
 			return 0;
 		}
 
-
+		static int GetScroll(lua_State* p_luaState)
+		{
+			NumberOfArgs(0);
+			int temp = g_engineContext.m_inputSys->GetScroll();
+			lua_pushnumber(p_luaState, temp);
+			return 1;
+		}
 		//////////////////////////////////////////////////////////////////////////
 		//LOGGING
 		//////////////////////////////////////////////////////////////////////////
@@ -3189,6 +3195,7 @@ namespace RootForce
 			{"GetMousePosition", GetMousePosition},
 			{"GetMouseDelta", GetMouseDelta},
 			{"Play3DSound", Play3DSound},
+			{"GetScroll", GetScroll},
 			{NULL, NULL}
 		};
 
