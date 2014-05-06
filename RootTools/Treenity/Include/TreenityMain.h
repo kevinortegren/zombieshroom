@@ -54,4 +54,6 @@ private:
 	RootForce::LookAtSystem* m_lookAtSystem;
 
 	bool m_altMode;
+
+	Render::Material* m_selectedEntityMaterial;
 };

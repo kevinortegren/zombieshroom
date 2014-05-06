@@ -83,7 +83,7 @@ namespace Render
 		m_depthState.depthTest = true;
 		m_depthState.depthWrite = true;
 		m_viewport = glm::ivec4(0, 0, 1280, 720);
-
+		m_wireframe = false;
 	}
 
 	Program::~Program(void)
@@ -190,6 +190,15 @@ namespace Render
 		else
 		{
 			glDisable(GL_DEPTH_TEST);
+		}
+
+		if(m_wireframe)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	
+		}
+		else
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
 		// Use program.

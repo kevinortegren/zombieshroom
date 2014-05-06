@@ -129,6 +129,14 @@ namespace RootEngine
 					program->m_depthState.depthTest = depthTest != 0;
 				}
 
+				if(programs[j].FindValue("wireframe"))
+				{
+					int wf;
+					programs[j]["wireframe"] >> wf;			
+					program->m_wireframe = wf != 0;
+					
+				}
+
 				if(programs[j].FindValue("viewport"))
 				{
 					int x;

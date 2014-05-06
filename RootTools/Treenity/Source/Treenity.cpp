@@ -230,7 +230,9 @@ void Treenity::SaveAs()
 void Treenity::Select(ECS::Entity* p_entity)
 {
 	m_selectedEntities.clear();
-	m_selectedEntities.insert(p_entity);
+
+	if(p_entity != nullptr)
+		m_selectedEntities.insert(p_entity);
 
 	UpdateOnSelection();
 }

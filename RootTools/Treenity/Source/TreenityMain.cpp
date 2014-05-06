@@ -203,6 +203,9 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	SDL_SetRelativeMouseMode(SDL_FALSE);
+
+	m_selectedEntityMaterial = g_engineContext.m_renderer->CreateMaterial("SelectedMaterial");
+	m_selectedEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Selected");
 }
 
 TreenityMain::~TreenityMain()
@@ -354,6 +357,8 @@ void TreenityMain::Update(float dt)
 	m_pointLightSystem->Process();
 	m_renderingSystem->Process();
 	
+	RenderSelectedEntity();
+
 	g_engineContext.m_renderer->Clear();
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
@@ -361,5 +366,32 @@ void TreenityMain::Update(float dt)
 
 void TreenityMain::RenderSelectedEntity()
 {
-	
+	for(auto itr = m_treenityEditor.GetSelection().begin(); itr != m_treenityEditor.GetSelection().end(); ++itr)
+	{
+		ECS::Entity* entity = (*itr);
+
+		RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+		RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
+
+		if(renderable == nullptr)
+			continue;
+
+		m_renderingSystem->m_matrices[entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_interpolatedPosition);
+		m_renderingSystem->m_matrices[entity].m_model = glm::rotate(m_renderingSystem->m_matrices[entity].m_model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+		m_renderingSystem->m_matrices[entity].m_model = glm::scale(m_renderingSystem->m_matrices[entity].m_model, transform->m_scale);
+		m_renderingSystem->m_matrices[entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_renderingSystem->m_matrices[entity].m_model))));
+
+		Render::RenderJob job;	
+		job.m_mesh = renderable->m_model->m_meshes[0];
+		job.m_material = m_selectedEntityMaterial;	
+		job.m_params = renderable->m_params;
+		job.m_forward = renderable->m_forward;
+		job.m_refractive = renderable->m_refractive;
+		job.m_params[Render::Semantic::MODEL] = &m_renderingSystem->m_matrices[entity].m_model;
+		job.m_renderPass = RootForce::RenderPass::RENDERPASS_EDITOR;
+		job.m_position = transform->m_interpolatedPosition;
+
+		g_engineContext.m_renderer->AddRenderJob(job);
+
+	}
 }

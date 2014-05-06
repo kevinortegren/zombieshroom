@@ -39,6 +39,8 @@ end
 function FreeFlyingMaya.OnUpdate(self)
 	local dt = Static.GetDeltaTime();
 
+
+	
     if FreeFlyingMaya.Time <= 1.0 then   
     
         FreeFlyingMaya.Time = FreeFlyingMaya.Time + dt
@@ -88,6 +90,10 @@ function FreeFlyingMaya.OnUpdate(self)
 
 		end
         
+	end
+	
+	if controllerActions:IsActivated("F") then
+		Logging.Log(0, "F!!")
 	end
     
 end
