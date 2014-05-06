@@ -34,6 +34,7 @@ public:
 private:
 
 	void RenderSelectedEntity();
+	void RaySelect();
 
 	void* m_engineModule;
 

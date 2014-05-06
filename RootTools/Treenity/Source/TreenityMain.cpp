@@ -343,6 +343,8 @@ void TreenityMain::Update(float dt)
 
 	HandleEvents();
 
+
+
 	ProcessWorldMessages();
 	m_world.GetEntityManager()->CleanUp();
 
@@ -357,6 +359,27 @@ void TreenityMain::Update(float dt)
 	m_pointLightSystem->Process();
 	m_renderingSystem->Process();
 	
+	
+
+	std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
+
+	for(auto itr = entities.begin(); itr != entities.end(); ++itr)
+	{
+		glm::vec4 color = glm::vec4(1,0,0,1);
+		if(m_treenityEditor.GetSelection().find((*itr)) != m_treenityEditor.GetSelection().end())
+		{
+			color = glm::vec4(1,1,1,1);
+
+		}
+
+		glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
+
+		g_engineContext.m_renderer->AddLine(entityPos, entityPos + glm::vec3(0,1,0), color);
+	}
+
+	if(!m_altMode)
+	RaySelect();
+
 	RenderSelectedEntity();
 
 	g_engineContext.m_renderer->Clear();
@@ -392,6 +415,86 @@ void TreenityMain::RenderSelectedEntity()
 		job.m_position = transform->m_interpolatedPosition;
 
 		g_engineContext.m_renderer->AddRenderJob(job);
+
+	}
+}
+
+void TreenityMain::RaySelect()
+{
+	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+	{
+		float radius = 5.0f;
+		float radiusSphere2 = radius*radius;
+
+		float closestDist = 999999.0f;
+		ECS::Entity* closestEntity = nullptr;
+
+		ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
+
+		glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
+		RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
+
+		glm::ivec2 mousePos = g_engineContext.m_inputSys->GetGlobalMousePos();
+
+		glm::ivec2 position;
+		SDL_GetMouseState(&position.x, &position.y);
+
+		//Calculate NDC coords
+		float x = (2.0f * position.x) / (float)g_engineContext.m_renderer->GetWidth() - 1.0f;
+		float y = (2.0f * -position.y) / (float)g_engineContext.m_renderer->GetHeight() + 1.0f;
+
+		glm::mat4 inverseProjection = glm::inverse(g_engineContext.m_renderer->GetProjectionMatrix());
+		
+		//View space coords
+		glm::vec4 rayView = inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
+		rayView.z = -1.0f;
+		rayView.w = 0.0f;
+
+		//World space coords
+		glm::vec4 rW = glm::inverse(camera->m_viewMatrix) * rayView;
+		glm::vec3 rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
+
+		std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
+
+		for(auto itr = entities.begin(); itr != entities.end(); ++itr)
+		{
+			if(m_world.GetTagManager()->GetEntityByTag("Skybox") == (*itr))
+				continue;
+
+			if(m_world.GetTagManager()->GetEntityByTag("Camera") == (*itr))
+				continue;
+
+			/*if(m_world.GetTagManager()->GetEntityByTag("AimingDevice") == (*itr))
+				continue;*/
+
+			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
+
+			glm::vec3 L = entityPos - cameraPos;
+
+			float tca = glm::dot(L, rayWorld);
+			if(tca < 0)
+			{
+				continue;
+			}
+			float d2 = glm::dot(L, L) - tca * tca;
+			if(d2 > radiusSphere2)
+			{
+				continue;
+			}
+			float thc = glm::sqrt(radiusSphere2 - d2);
+			float t0 = tca - thc;
+
+			if(t0 < closestDist)
+			{
+				closestEntity = (*itr);
+				closestDist = t0;
+			}
+		}
+
+		m_treenityEditor.Select(closestEntity);
+
+		if(closestEntity != nullptr)
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
 
 	}
 }

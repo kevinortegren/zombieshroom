@@ -58,6 +58,8 @@ namespace Render
 		virtual void SetProjectionMatrix(glm::mat4 p_projectionMatrix) = 0;
 		virtual void SetCameraPosition(glm::vec3 p_camPos) = 0;
 
+		virtual const glm::mat4& GetProjectionMatrix() = 0;
+
 		// Shadows
 		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index) = 0;
 		virtual void AddShadowJob(Render::ShadowJob& p_shadowJob) = 0;
@@ -126,6 +128,8 @@ namespace Render
 		void SetViewMatrix(glm::mat4 p_viewMatrix);
 		void SetProjectionMatrix(glm::mat4 p_projectionMatrix);
 		void SetCameraPosition(glm::vec3 p_camPos);
+
+		const glm::mat4& GetProjectionMatrix();
 
 		// Shadows
 		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index);
