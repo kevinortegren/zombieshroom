@@ -15,7 +15,7 @@
 extern RootEngine::GameSharedContext g_engineContext;
 
 Treenity::Treenity(QWidget *parent)
-	: QMainWindow(parent), m_running(true)
+	: QMainWindow(parent), m_running(true), m_mode(EditorMode::EDITOR)
 {
 	//Set some logging init things
 	Log::GetInstance()->setParent(this);
@@ -86,6 +86,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
 	connect(ui.treeView_entityOutliner,				SIGNAL(itemSelectionChanged()), this,	SLOT(OutlinerSelectEntity()));
 	connect(ui.action_renderable,					SIGNAL(triggered()), this,				SLOT(AddRenderable()));
+	connect(ui.actionPlay,							SIGNAL(triggered()), this,				SLOT(Play()));
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
@@ -120,6 +121,11 @@ void Treenity::CreateNewScene()
 void Treenity::UpdateWindowTitle()
 {
 	setWindowTitle("Treenity - " + m_currentProjectFile);
+}
+
+EditorMode::EditorMode Treenity::GetMode() const
+{
+	return m_mode;
 }
 
 bool Treenity::IsRunning()
@@ -227,10 +233,19 @@ void Treenity::SaveAs()
 	m_projectManager->Export(fileName);
 }
 
+void Treenity::Play()
+{
+	Log::Write("Starting game session");
+
+	m_mode = EditorMode::GAME;
+}
+
 void Treenity::Select(ECS::Entity* p_entity)
 {
 	m_selectedEntities.clear();
-	m_selectedEntities.insert(p_entity);
+	
+	if (p_entity != nullptr)
+		m_selectedEntities.insert(p_entity);
 
 	UpdateOnSelection();
 }

@@ -46,6 +46,7 @@ void EngineActions::AddDefaultEntities()
 	m_treenityMain->GetWorldSystem()->CreateSkyBox();
 
 	CreateFreeFlyingCamera();
+	CreateTestSpawnpoint();
 
 	// Add new entities.
 	m_treenityMain->ProcessWorldMessages();
@@ -108,6 +109,25 @@ void EngineActions::CreateFreeFlyingCamera()
 
 	m_world->GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_aimingDevice);
+}
+
+void EngineActions::CreateTestSpawnpoint()
+{
+	m_testSpawnpoint = m_world->GetEntityManager()->CreateEntity();
+
+	RootForce::Transform* transform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_testSpawnpoint);
+	RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_testSpawnpoint);	
+
+	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("TestSpawnpoint");
+	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
+	renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture("WSGlowRed", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
+
+	m_world->GetGroupManager()->RegisterEntity("NonExport", m_testSpawnpoint);
+	m_world->GetTagManager()->RegisterEntity("TestSpawnpoint", m_testSpawnpoint);
 }
 
 // Entity

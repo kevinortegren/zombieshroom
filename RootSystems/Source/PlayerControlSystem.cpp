@@ -28,6 +28,8 @@ namespace RootForce
 		: ECS::VoidSystem(p_world) 
 		, m_clientPeer(nullptr)
 	{
+		SetDefaultKeybindings();
+
 		for(int i = 0; i < PlayerAction::END; ++i)
 		{
 			m_playerActionData[i].ActiveTime = 0.0f;
@@ -567,6 +569,11 @@ namespace RootForce
 		// Reset the current event.
 		playerComponent->AbilityState = AbilityState::OFF;
 		action->CurrentAbilityEvent = AbilityEvent();
+	}
+
+	void PlayerControlSystem::SetDefaultKeybindings()
+	{
+
 	}
 
 }

@@ -104,9 +104,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	}
 
 	g_engineContext = libInitializeEngine(
-		RootEngine::SubsystemInit::INIT_INPUT |
-		RootEngine::SubsystemInit::INIT_RENDER |
-		RootEngine::SubsystemInit::INIT_SCRIPTING, p_path);
+		RootEngine::SubsystemInit::INIT_ALL, p_path);
 
 	// Initialize SDL.
 	if (SDL_Init(SDL_INIT_TIMER) != 0) 
@@ -162,6 +160,15 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	// Bind c++ functions and members to Lua.
 	RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
+
+	// Initialize the systems.
+	m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(&m_world, &g_engineContext));
+
+	m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
+	m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
+	m_playerControlSystem->SetLoggingInterface(g_engineContext.m_logger);
+	m_playerControlSystem->SetKeybindings(m_keymapper->GetKeybindings());
+	m_playerControlSystem->SetPhysicsInterface(g_engineContext.m_physics);
 
 	m_renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
@@ -336,27 +343,39 @@ void TreenityMain::ProcessWorldMessages()
 
 void TreenityMain::Update(float dt)
 {
-	m_world.SetDelta(dt);
+	if (m_treenityEditor.GetMode() == EditorMode::EDITOR)
+	{
+		m_world.SetDelta(dt);
 
-	HandleEvents();
+		HandleEvents();
 
-	ProcessWorldMessages();
-	m_world.GetEntityManager()->CleanUp();
-
-	m_worldSystem.Process();
-	m_controllerActionSystem->Process();	
-	m_lookAtSystem->Process();
-	m_cameraSystem->Process();
-	m_scriptSystem->Process();
-	m_transformInterpolationSystem->Process();
-	m_shadowSystem->Process();
-	m_directionalLightSystem->Process();
-	m_pointLightSystem->Process();
-	m_renderingSystem->Process();
+		ProcessWorldMessages();
+		m_world.GetEntityManager()->CleanUp();
 	
-	g_engineContext.m_renderer->Clear();
-	g_engineContext.m_renderer->Render();
-	g_engineContext.m_renderer->Swap();
+		m_worldSystem.Process();
+		m_controllerActionSystem->Process();	
+		m_lookAtSystem->Process();
+		m_cameraSystem->Process();
+		m_scriptSystem->Process();
+		m_transformInterpolationSystem->Process();
+		m_shadowSystem->Process();
+		m_directionalLightSystem->Process();
+		m_pointLightSystem->Process();
+		m_renderingSystem->Process();
+
+		g_engineContext.m_renderer->Clear();
+		g_engineContext.m_renderer->Render();
+		g_engineContext.m_renderer->Swap();
+	}
+	else
+	{
+		m_world.SetDelta(dt);
+
+		ProcessWorldMessages();
+		m_world.GetEntityManager()->CleanUp();
+
+
+	}
 }
 
 void TreenityMain::RenderSelectedEntity()

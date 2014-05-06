@@ -83,6 +83,7 @@ namespace RootForce
 	private:
 		void HandleAbilityPressed(float p_dt, bool p_push);
 		void HandleAbilityReleased();
+		void SetDefaultKeybindings();
 
 		struct PlayerActionData
 		{
