@@ -256,6 +256,10 @@ const std::set<ECS::Entity*>& Treenity::GetSelection() const
 	return m_selectedEntities;
 }
 
+void Treenity::RenameEntity(ECS::Entity* p_entity, const std::string& p_name)
+{
+	ui.treeView_entityOutliner->EntityRenamed(p_entity, QString::fromStdString(p_name));
+}
 
 void Treenity::CreateEntity()
 {
@@ -294,9 +298,6 @@ void Treenity::AddRenderable()
 		m_engineInterface->AddRenderable(*m_selectedEntities.begin());
 	}
 }
-
-
-
 
 void Treenity::UpdateOnSelection()
 {
