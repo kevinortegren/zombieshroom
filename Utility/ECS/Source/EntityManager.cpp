@@ -105,14 +105,10 @@ void ECS::EntityManager::RemoveAllEntitiesAndComponents()
 	int size = m_nextID;
 	for(int i = size - 1; i > -1; i--)
 	{
-		RemoveAllComponents(&m_entities[i]);
+		RemoveEntity(&m_entities[i]);
 	}
 
-	// Clear stack.
-	while (!m_recycledIds.empty() )
-	{
-		m_recycledIds.pop();
-	}
+	ClearRecyledEntitiesStack();
 
 	m_nextID = 0;
 }
@@ -173,5 +169,14 @@ const std::set<int> ECS::EntityManager::GetEntitiesToBeRemoved() const
 	}
 
 	return entityIds;
+}
+
+void ECS::EntityManager::ClearRecyledEntitiesStack()
+{
+	// Clear stack.
+	while (!m_recycledIds.empty() )
+	{
+		m_recycledIds.pop();
+	}
 }
 

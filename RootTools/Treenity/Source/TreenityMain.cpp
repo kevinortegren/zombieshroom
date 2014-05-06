@@ -19,6 +19,18 @@
 #include <RootForce/Include/LuaAPI.h>
 #include <RootEngine/Script/Include/ScriptManager.h>
 
+#include <Utility/ECS/Include/World.h>
+#include <RootEngine/Include/GameSharedContext.h>
+
+#include <RootSystems/Include/Network/NetworkTypes.h>
+#include <RootSystems/Include/Network/Client.h>
+#include <RootSystems/Include/Network/MessageHandlers.h>
+
+RootEngine::GameSharedContext g_engineContext;
+ECS::World* g_world;
+RootForce::Network::NetworkEntityMap g_networkEntityMap;
+RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
+
 #undef main
 int main(int argc, char *argv[])
 {
@@ -70,7 +82,7 @@ int main(int argc, char *argv[])
 }
 
 TreenityMain::TreenityMain(const std::string& p_path)
-	: m_engineActions(&m_world)
+	: m_engineActions(&m_world, this)
 	, m_projectManager(&m_world)
 	, m_worldSystem(&m_world, &g_engineContext)
 {
@@ -105,7 +117,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_treenityEditor.CreateOpenGLContext();
 	m_treenityEditor.SetEngineInterface(&m_engineActions);
 	m_treenityEditor.SetProjectManager(&m_projectManager);
-
+	
 	// Initialize components and preallocate memory.
 	RootForce::ComponentType::Initialize();
 
@@ -151,6 +163,8 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	// Bind c++ functions and members to Lua.
 	RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 
+	g_engineContext.m_resourceManager->LoadScript("Global");
+
 	m_renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 	m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
@@ -183,24 +197,17 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
-	//m_world.GetEntityImporter()->Import(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\ColorCube3.0.world");
-	//m_world.GetEntityImporter()->Import("C:\\rarosu\\test12.level");
-	//m_projectManager.Import("C:\\rarosu\\test14.level");
 
-	// When opening / creating a new project.
-	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\MythosV0.2.world").c_str()));
-
-	m_worldSystem.BuildStaticShadowMesh();
-	m_worldSystem.SetAmbientLight(m_world.GetStorage()->GetValueAsVec4("Ambient"));
-	m_worldSystem.CreateSkyBox();
-
-	CreateFreeFlyingCamera();
+	m_treenityEditor.CreateNewScene();
 
 	// Display treenity editor.
 	m_treenityEditor.show();
 
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	SDL_SetRelativeMouseMode(SDL_FALSE);
+
+	m_selectedEntityMaterial = g_engineContext.m_renderer->CreateMaterial("SelectedMaterial");
+	m_selectedEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Selected");
 }
 
 TreenityMain::~TreenityMain()
@@ -278,12 +285,8 @@ void TreenityMain::HandleAltModifier()
 	}
 }
 
-void TreenityMain::Update(float dt)
+void TreenityMain::ProcessWorldMessages()
 {
-	m_world.SetDelta(dt);
-
-	HandleEvents();
-
 	auto msgs = m_world.GetMessages();
 	for(auto itr = msgs.begin(); itr != msgs.end(); ++itr) 
 	{
@@ -332,71 +335,65 @@ void TreenityMain::Update(float dt)
 			} break;
 		}
 
-		//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
 	}
+}
 
+void TreenityMain::Update(float dt)
+{
+	m_world.SetDelta(dt);
+
+	HandleEvents();
+
+	ProcessWorldMessages();
 	m_world.GetEntityManager()->CleanUp();
 
-	g_engineContext.m_renderer->Clear();
-
 	m_worldSystem.Process();
-
-	m_controllerActionSystem->Process();
-	
+	m_controllerActionSystem->Process();	
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
-
 	m_scriptSystem->Process();
-
 	m_transformInterpolationSystem->Process();
-
 	m_shadowSystem->Process();
 	m_directionalLightSystem->Process();
 	m_pointLightSystem->Process();
 	m_renderingSystem->Process();
 	
+	RenderSelectedEntity();
+
+	g_engineContext.m_renderer->Clear();
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
 }
 
-void TreenityMain::CreateFreeFlyingCamera()
+void TreenityMain::RenderSelectedEntity()
 {
-	m_cameraEntity = m_world.GetEntityManager()->CreateEntity();
+	for(auto itr = m_treenityEditor.GetSelection().begin(); itr != m_treenityEditor.GetSelection().end(); ++itr)
+	{
+		ECS::Entity* entity = (*itr);
 
-	// Setup camera entity.
-	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(m_cameraEntity);
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_cameraEntity);
-	RootForce::ControllerActions* controllerActions = m_world.GetEntityManager()->CreateComponent<RootForce::ControllerActions>(m_cameraEntity);
-	RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(m_cameraEntity);
-	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(m_cameraEntity);
+		RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+		RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
 
-	cameraLookAt->m_targetTag = "AimingDevice";
-	cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
+		if(renderable == nullptr)
+			continue;
 
-	cameraThirdPerson->m_targetTag = "AimingDevice";
-	cameraThirdPerson->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
-	cameraThirdPerson->m_distance = 10.0f;
+		m_renderingSystem->m_matrices[entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_interpolatedPosition);
+		m_renderingSystem->m_matrices[entity].m_model = glm::rotate(m_renderingSystem->m_matrices[entity].m_model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+		m_renderingSystem->m_matrices[entity].m_model = glm::scale(m_renderingSystem->m_matrices[entity].m_model, transform->m_scale);
+		m_renderingSystem->m_matrices[entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_renderingSystem->m_matrices[entity].m_model))));
 
-	RootForce::Script* script = m_world.GetEntityManager()->CreateComponent<RootForce::Script>(m_cameraEntity);
-	script->Name = g_engineContext.m_resourceManager->LoadScript("FreeFlyingMaya");
-	
-	g_engineContext.m_script->SetFunction(script->Name, "Setup");
-	g_engineContext.m_script->AddParameterUserData(m_cameraEntity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+		Render::RenderJob job;	
+		job.m_mesh = renderable->m_model->m_meshes[0];
+		job.m_material = m_selectedEntityMaterial;	
+		job.m_params = renderable->m_params;
+		job.m_forward = renderable->m_forward;
+		job.m_refractive = renderable->m_refractive;
+		job.m_params[Render::Semantic::MODEL] = &m_renderingSystem->m_matrices[entity].m_model;
+		job.m_renderPass = RootForce::RenderPass::RENDERPASS_EDITOR;
+		job.m_position = transform->m_interpolatedPosition;
 
-	cameraTransform->m_position = glm::vec3(0);
-	camera->m_frustum.m_near = 0.1f;
-	camera->m_frustum.m_far = 1000.0f;
-	camera->m_frustum.m_fov = 45.0f;
+		g_engineContext.m_renderer->AddRenderJob(job);
 
-	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
-
-	// Setup aiming device.
-	m_aimingDevice = m_world.GetEntityManager()->CreateEntity();
-
-	RootForce::Transform* aimingDeviceTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_aimingDevice);
-
-	m_world.GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", m_aimingDevice);
+	}
 }

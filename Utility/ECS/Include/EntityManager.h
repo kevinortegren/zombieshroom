@@ -144,6 +144,9 @@ namespace ECS
 		std::vector<ECS::Entity*> GetAllEntities();
 
 		const std::set<int> GetEntitiesToBeRemoved() const;
+
+		void ClearRecyledEntitiesStack();
+
 	private:
 
 		//EntitySystemManager* m_systemManager;

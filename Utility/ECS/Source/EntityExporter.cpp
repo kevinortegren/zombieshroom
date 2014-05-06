@@ -36,8 +36,8 @@ void ECS::EntityExporter::Export(const std::string& p_filepath, std::map<ECS::En
 	{
 		if(m_world->GetEntityManager()->m_entities[i].m_id == -1)
 			continue;
-
-		if(nonExportIds[m_world->GetEntityManager()->m_entities[i].m_id])
+		int id = m_world->GetEntityManager()->m_entities[i].m_id;
+		if(nonExportIds[id])
 			continue;
 
 		out << m_world->GetEntityManager()->m_entities[i].m_id;

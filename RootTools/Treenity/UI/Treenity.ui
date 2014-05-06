@@ -211,6 +211,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen_Project"/>
     <addaction name="action_saveAs"/>
     <addaction name="action_save"/>
     <addaction name="actionExit"/>
@@ -461,6 +463,16 @@
   <action name="action_renderable">
    <property name="text">
     <string>Renderable</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project ...</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
    </property>
   </action>
  </widget>

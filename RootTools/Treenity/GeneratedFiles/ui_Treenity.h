@@ -48,6 +48,8 @@ public:
     QAction *actionLog;
     QAction *action_removeEntity;
     QAction *action_renderable;
+    QAction *actionOpen_Project;
+    QAction *actionNew;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     Canvas3D *widget_canvas3D;
@@ -120,6 +122,10 @@ public:
         action_removeEntity->setObjectName(QStringLiteral("action_removeEntity"));
         action_renderable = new QAction(TreenityClass);
         action_renderable->setObjectName(QStringLiteral("action_renderable"));
+        actionOpen_Project = new QAction(TreenityClass);
+        actionOpen_Project->setObjectName(QStringLiteral("actionOpen_Project"));
+        actionNew = new QAction(TreenityClass);
+        actionNew->setObjectName(QStringLiteral("actionNew"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -261,6 +267,8 @@ public:
         menuBar->addAction(menuView->menuAction());
         menuBar->addAction(menuEntity->menuAction());
         menuBar->addAction(menuComponent->menuAction());
+        menuFile->addAction(actionNew);
+        menuFile->addAction(actionOpen_Project);
         menuFile->addAction(action_saveAs);
         menuFile->addAction(action_save);
         menuFile->addAction(actionExit);
@@ -303,6 +311,8 @@ public:
         actionLog->setText(QApplication::translate("TreenityClass", "Log", 0));
         action_removeEntity->setText(QApplication::translate("TreenityClass", "Remove entity", 0));
         action_renderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
+        actionOpen_Project->setText(QApplication::translate("TreenityClass", "Open Project ...", 0));
+        actionNew->setText(QApplication::translate("TreenityClass", "New", 0));
         pushButton_translateMode->setText(QString());
         pushButton_rotateMode->setText(QString());
         pushButton_scaleMode->setText(QString());
