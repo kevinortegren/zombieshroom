@@ -27,6 +27,7 @@ public:
 	void Update(float dt);
 	bool IsRunning();
 
+	Treenity* GetEditor() { return &m_treenityEditor; }
 	RootForce::WorldSystem* GetWorldSystem() { return &m_worldSystem; }
 	RootForce::ShadowSystem* GetShadowSystem() { return m_shadowSystem; }
 

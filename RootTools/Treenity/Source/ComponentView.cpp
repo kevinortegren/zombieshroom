@@ -44,7 +44,7 @@ ComponentViewItem* ComponentView::GetItemByName( const QString& p_name )
 	for (int i = 0; i < m_layout->count(); ++i)
 	{
 		ComponentViewItem* temp = (ComponentViewItem*)m_layout->itemAt(i)->widget();
-		if (temp->GetName() == p_name)
+		if (temp->GetItem()->GetComponentName() == p_name)
 		{
 			return temp;
 		}
@@ -59,7 +59,7 @@ void ComponentView::RemoveItem( const QString& p_name )
 	{
 		QLayoutItem* item = m_layout->itemAt(i);
 		ComponentViewItem* temp = (ComponentViewItem*)item->widget();
-		if (temp->GetName() == p_name)
+		if (temp->GetItem()->GetComponentName() == p_name)
 		{
 			m_layout->removeItem(item);
 			delete temp;

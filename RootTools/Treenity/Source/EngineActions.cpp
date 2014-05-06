@@ -30,6 +30,7 @@ void EngineActions::NewScene()
 
 void EngineActions::ClearScene()
 {
+	m_treenityMain->GetEditor()->ClearSelection();
 	m_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
 	m_world->GetTagManager()->UnregisterAll();
 	m_world->GetGroupManager()->UnregisterAll();

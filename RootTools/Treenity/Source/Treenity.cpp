@@ -15,12 +15,13 @@
 extern RootEngine::GameSharedContext g_engineContext;
 
 Treenity::Treenity(QWidget *parent)
-	: QMainWindow(parent), m_running(true), m_selectedEntity(nullptr)
+	: QMainWindow(parent), m_running(true)
 {
 	//Set some logging init things
 	Log::GetInstance()->setParent(this);
 	Log::GetInstance()->setFloating(true);
 
+	// Setup component names in the editor.
 	m_componentNames[RootForce::ComponentType::RENDERABLE] = "Renderable";
 	m_componentNames[RootForce::ComponentType::TRANSFORM] = "Transform";
 	m_componentNames[RootForce::ComponentType::POINTLIGHT] = "Point Light";
@@ -60,15 +61,20 @@ Treenity::Treenity(QWidget *parent)
 	m_componentNames[RootForce::ComponentType::KILLANNOUNCEMENT] = "Kill Announcement";
 	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS] = "Controller Action";
 
+	// Setup the main UI.
 	ui.setupUi(this);
 
+	// Setup the component view and its items.
 	m_compView = new ComponentView();
 	ui.verticalLayout->addWidget(m_compView);
+	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView(this);
 
-	QWidget* transformWidget = new QWidget();
-	SetupUIForComponent(transformWidget, RootForce::ComponentType::TRANSFORM);
-	m_compView->AddItem(new ComponentViewItem(m_componentNames[RootForce::ComponentType::TRANSFORM], transformWidget));
-
+	for (auto it : m_componentViews)
+	{
+		it.second->SetEditorInterface(this);
+	}
+	
+	// Match signals with slots.
 	connect(ui.actionNew,							SIGNAL(triggered()), this,				SLOT(New()));
 	connect(ui.actionOpen_Project,					SIGNAL(triggered()), this,				SLOT(OpenProject()));
 	connect(ui.action_saveAs,						SIGNAL(triggered()), this,				SLOT(SaveAs()));
@@ -80,16 +86,8 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
 	connect(ui.treeView_entityOutliner,				SIGNAL(itemSelectionChanged()), this,	SLOT(OutlinerSelectEntity()));
 	connect(ui.action_renderable,					SIGNAL(triggered()), this,				SLOT(AddRenderable()));
-	connect(transformUI.doubleSpinBox_translationX, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionXChanged(double)));
-	connect(transformUI.doubleSpinBox_translationY, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionYChanged(double)));
-	connect(transformUI.doubleSpinBox_translationZ, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionZChanged(double)));
-	connect(transformUI.doubleSpinBox_orientationX, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationXChanged(double)));
-	connect(transformUI.doubleSpinBox_orientationY, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationYChanged(double)));
-	connect(transformUI.doubleSpinBox_orientationZ, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationZChanged(double)));
-	connect(transformUI.doubleSpinBox_scaleX,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleXChanged(double)));
-	connect(transformUI.doubleSpinBox_scaleY,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleYChanged(double)));
-	connect(transformUI.doubleSpinBox_scaleZ,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleZChanged(double)));
 	
+	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
 }
 
@@ -103,6 +101,10 @@ void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 	m_engineInterface = p_engineInterface;
 
 	ui.treeView_entityOutliner->SetEngineInterface(m_engineInterface);
+	for (auto it : m_componentViews)
+	{
+		it.second->SetEngineInterface(p_engineInterface);
+	}
 }
 
 void Treenity::SetProjectManager(ProjectManager* p_projectManager)
@@ -144,17 +146,19 @@ void Treenity::EntityRemoved(ECS::Entity* p_entity)
 
 void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 {
-	if (m_selectedEntity == p_entity)
+	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
-		QWidget* widget = new QWidget();
-		SetupUIForComponent(widget, p_componentType);
-		m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
+		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+
+		//QWidget* widget = new QWidget();
+		//SetupUIForComponent(widget, p_componentType);
+		//m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
 	}
 }
 
 void Treenity::ComponentRemoved(ECS::Entity* p_entity, int p_componentType)
 {
-	if (m_selectedEntity == p_entity)
+	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
 		m_compView->RemoveItem(m_componentNames[p_componentType]);
 	}
@@ -223,6 +227,34 @@ void Treenity::SaveAs()
 	m_projectManager->Export(fileName);
 }
 
+void Treenity::Select(ECS::Entity* p_entity)
+{
+	m_selectedEntities.clear();
+	m_selectedEntities.insert(p_entity);
+
+	UpdateOnSelection();
+}
+
+void Treenity::AddToSelection(ECS::Entity* p_entity)
+{
+	m_selectedEntities.insert(p_entity);
+
+	UpdateOnSelection();
+}
+
+void Treenity::ClearSelection()
+{
+	m_selectedEntities.clear();
+
+	UpdateOnSelection();
+}
+
+const std::set<ECS::Entity*>& Treenity::GetSelection() const
+{
+	return m_selectedEntities;
+}
+
+
 void Treenity::CreateEntity()
 {
 	ECS::Entity* e = m_engineInterface->CreateEntity();
@@ -230,214 +262,84 @@ void Treenity::CreateEntity()
 
 void Treenity::DestroyEntity()
 {
-	if (m_selectedEntity != nullptr)
+	for (auto entity : m_selectedEntities)
 	{
-		m_engineInterface->DeleteEntity(m_selectedEntity);
+		m_engineInterface->DeleteEntity(entity);
 	}
+
+	ClearSelection();
 }
 
 void Treenity::RenameEntity()
 {
-	if (m_selectedEntity != nullptr)
+	for (auto entity : m_selectedEntities)
 	{
-		m_projectManager->SetEntityName(m_selectedEntity, ui.lineEdit_entityName->text());
-
-		ui.treeView_entityOutliner->EntityRenamed(m_selectedEntity, ui.lineEdit_entityName->text());
+		m_projectManager->SetEntityName(entity, ui.lineEdit_entityName->text());
+		
+		ui.treeView_entityOutliner->EntityRenamed(entity, ui.lineEdit_entityName->text());
 	}
 }
 
 void Treenity::OutlinerSelectEntity()
 {
-	SelectEntity(ui.treeView_entityOutliner->GetSelectedEntity());
+	Select(ui.treeView_entityOutliner->GetSelectedEntity());
 }
 
 void Treenity::AddRenderable()
 {
-	if (m_selectedEntity != nullptr)
+	if (m_selectedEntities.size() == 1)
 	{
-		m_engineInterface->AddRenderable(m_selectedEntity);
-	}
-}
-
-void Treenity::TransformPositionXChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 position = m_engineInterface->GetPosition(m_selectedEntity);
-		position.x = p_value;
-		m_engineInterface->SetPosition(m_selectedEntity, position);
-	}
-}
-
-void Treenity::TransformPositionYChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 position = m_engineInterface->GetPosition(m_selectedEntity);
-		position.y = p_value;
-		m_engineInterface->SetPosition(m_selectedEntity, position);
-	}
-}
-
-void Treenity::TransformPositionZChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 position = m_engineInterface->GetPosition(m_selectedEntity);
-		position.z = p_value;
-		m_engineInterface->SetPosition(m_selectedEntity, position);
-	}
-}
-
-void Treenity::TransformOrientationXChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(m_selectedEntity).GetQuaternion());
-		euler.x = p_value;
-		m_engineInterface->SetOrientation(m_selectedEntity, RootForce::Orientation(euler.x, euler.y, euler.z));
-	}
-}
-
-void Treenity::TransformOrientationYChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(m_selectedEntity).GetQuaternion());
-		euler.y = p_value;
-		m_engineInterface->SetOrientation(m_selectedEntity, RootForce::Orientation(euler.x, euler.y, euler.z));
-	}
-}
-
-void Treenity::TransformOrientationZChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(m_selectedEntity).GetQuaternion());
-		euler.z = p_value;
-		m_engineInterface->SetOrientation(m_selectedEntity, RootForce::Orientation(euler.x, euler.y, euler.z));
-	}
-}
-
-void Treenity::TransformScaleXChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 scale = m_engineInterface->GetPosition(m_selectedEntity);
-		scale.x = p_value;
-		m_engineInterface->SetPosition(m_selectedEntity, scale);
-	}
-}
-
-void Treenity::TransformScaleYChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 scale = m_engineInterface->GetPosition(m_selectedEntity);
-		scale.y = p_value;
-		m_engineInterface->SetPosition(m_selectedEntity, scale);
-	}
-}
-
-void Treenity::TransformScaleZChanged(double p_value)
-{
-	if (m_selectedEntity != nullptr)
-	{
-		glm::vec3 scale = m_engineInterface->GetPosition(m_selectedEntity);
-		scale.z = p_value;
-		m_engineInterface->SetPosition(m_selectedEntity, scale);
+		m_engineInterface->AddRenderable(*m_selectedEntities.begin());
 	}
 }
 
 
-void Treenity::SelectEntity(ECS::Entity* p_entity)
+
+
+void Treenity::UpdateOnSelection()
 {
-	m_selectedEntity = p_entity;
-
-	// Update the general properties.
-	QString name = m_projectManager->GetEntityName(m_selectedEntity);
-	ui.lineEdit_entityName->setText(name);
-
-	// Update the component toolbox.
-	m_compView->RemoveItems();
-
-	if (p_entity != nullptr)
+	if (m_selectedEntities.size() == 0)
 	{
-		uint64_t flag = p_entity->GetFlag();
+		// Disable name entry.
+		ui.lineEdit_entityName->setText("");
+		ui.lineEdit_entityName->setEnabled(false);
+
+		// Clear component list.
+		m_compView->RemoveItems();
+	}
+	else if (m_selectedEntities.size() == 1)
+	{
+		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
+
+		// Enable and print name.
+		QString name = m_projectManager->GetEntityName(selectedEntity);
+		ui.lineEdit_entityName->setEnabled(true);
+		ui.lineEdit_entityName->setText(name);
+
+		// Show all components in the component list.
+		m_compView->RemoveItems();
+
+		uint64_t flag = selectedEntity->GetFlag();
 		for (int i = 0; i < 64; ++i)
 		{
 			uint64_t mask = 1ULL << i;
 			if ((flag & mask) != 0)
 			{
-				QWidget* widget = new QWidget();
-				SetupUIForComponent(widget, i);
-				m_compView->AddItem(new ComponentViewItem(m_componentNames[i], widget));
-
-				switch (i)
+				if (m_componentViews.find(i) != m_componentViews.end())
 				{
-					case RootForce::ComponentType::TRANSFORM:
-					{
-						transformUI.doubleSpinBox_translationX->setValue(m_engineInterface->GetPosition(p_entity).x);
-						transformUI.doubleSpinBox_translationY->setValue(m_engineInterface->GetPosition(p_entity).y);
-						transformUI.doubleSpinBox_translationZ->setValue(m_engineInterface->GetPosition(p_entity).z);
-
-						glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(p_entity).GetQuaternion());
-
-						transformUI.doubleSpinBox_orientationX->setValue(euler.x);
-						transformUI.doubleSpinBox_orientationY->setValue(euler.y);
-						transformUI.doubleSpinBox_orientationZ->setValue(euler.z);
-
-						transformUI.doubleSpinBox_scaleX->setValue(m_engineInterface->GetScale(p_entity).x);
-						transformUI.doubleSpinBox_scaleY->setValue(m_engineInterface->GetScale(p_entity).y);
-						transformUI.doubleSpinBox_scaleZ->setValue(m_engineInterface->GetScale(p_entity).z);
-
-						connect(transformUI.doubleSpinBox_translationX, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionXChanged(double)));
-						connect(transformUI.doubleSpinBox_translationY, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionYChanged(double)));
-						connect(transformUI.doubleSpinBox_translationZ, SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionZChanged(double)));
-						connect(transformUI.doubleSpinBox_orientationX, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationXChanged(double)));
-						connect(transformUI.doubleSpinBox_orientationY, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationYChanged(double)));
-						connect(transformUI.doubleSpinBox_orientationZ, SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationZChanged(double)));
-						connect(transformUI.doubleSpinBox_scaleX,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleXChanged(double)));
-						connect(transformUI.doubleSpinBox_scaleY,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleYChanged(double)));
-						connect(transformUI.doubleSpinBox_scaleZ,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleZChanged(double)));
-					} break;
-
-					case RootForce::ComponentType::RENDERABLE:
-					{
-
-					} break;
+					m_compView->AddItem(new ComponentViewItem(m_componentViews[i]));
+					m_componentViews[i]->DisplayEntity(selectedEntity);
 				}
 			}
 		}
 	}
-}
-
-void Treenity::SetupUIForComponent(QWidget* p_widget, int p_componentType)
-{
-	switch (p_componentType)
+	else if (m_selectedEntities.size() > 1)
 	{
-		case RootForce::ComponentType::TRANSFORM:
-		{
-			transformUI.setupUi(p_widget);
-		} break;
+		// Enable name, allow all names to be changed.
+		ui.lineEdit_entityName->setText("");
+		ui.lineEdit_entityName->setEnabled(true);
 
-		case RootForce::ComponentType::RENDERABLE:
-		{
-			renderableUI.setupUi(p_widget);
-		} break;
+		// Clear component list (potential change in future, show transforms).
+		m_compView->RemoveItems();
 	}
-}
-
-QWidget* Treenity::GetComponentToolboxItemByType(int p_componentType)
-{
-	/*for (int i = 0; i < ui.toolBox_components->count(); ++i)
-	{
-		if (ui.toolBox_components->widget(i)->windowTitle() == m_componentNames[p_componentType])
-		{
-			return ui.toolBox_components->widget(i);
-		}
-	}
-*/
-	
-	return m_compView->GetItemByName(m_componentNames[p_componentType])->GetWidget();
 }

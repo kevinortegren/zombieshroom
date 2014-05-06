@@ -12,7 +12,10 @@
 #include <RootTools/Treenity/Include/ProjectManager.h>
 #include <RootTools/Treenity/Include/ComponentView.h>
 #include <RootTools/Treenity/Include/ComponentViewItem.h>
-class Treenity : public QMainWindow
+#include <RootTools/Treenity/Include/Components/TransformView.h>
+#include <RootTools/Treenity/Include/EditorInterface.h>
+
+class Treenity : public QMainWindow, public EditorInterface
 {
 	Q_OBJECT
 
@@ -39,10 +42,11 @@ public:
 	void EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void CreateOpenGLContext();
 
-//protected:
-	//void keyPressEvent( QKeyEvent *k );
-	//void keyReleaseEvent( QKeyEvent *k);
-
+	// Implemented from EditorInterface
+	void Select(ECS::Entity* p_entity);
+	void AddToSelection(ECS::Entity* p_entity);
+	void ClearSelection();
+	const std::set<ECS::Entity*>& GetSelection() const;
 private:
 	// Component meta-data.
 	std::map<int, QString> m_componentNames;
@@ -50,24 +54,18 @@ private:
 	// Project meta-data.
 	QString m_currentProjectFile;
 	ProjectManager* m_projectManager;
-	ECS::Entity* m_selectedEntity;
+	std::set<ECS::Entity*> m_selectedEntities;
 
 	EngineInterface* m_engineInterface;
 
 	bool m_running;
 	Ui::TreenityClass ui;
-	Ui::Transform transformUI;
-	Ui::Renderable renderableUI;
 
 	// Utility
-	void SelectEntity(ECS::Entity* p_entity);
-
-	// Component property panel
-	void SetupUIForComponent(QWidget* p_widget, int p_componentType);
-	QWidget* GetComponentToolboxItemByType(int p_componentType);
+	void UpdateOnSelection();
 
 	ComponentView* m_compView;
-
+	std::map<int, AbstractComponentView*> m_componentViews;
 private slots:
 	void New();
 	void OpenProject();
@@ -78,15 +76,7 @@ private slots:
 	void RenameEntity();
 	void OutlinerSelectEntity();
 	void AddRenderable();
-	void TransformPositionXChanged(double p_value);
-	void TransformPositionYChanged(double p_value);
-	void TransformPositionZChanged(double p_value);
-	void TransformOrientationXChanged(double p_value);
-	void TransformOrientationYChanged(double p_value);
-	void TransformOrientationZChanged(double p_value);
-	void TransformScaleXChanged(double p_value);
-	void TransformScaleYChanged(double p_value);
-	void TransformScaleZChanged(double p_value);
+	
 };
 
 #endif // TREENITY_H
