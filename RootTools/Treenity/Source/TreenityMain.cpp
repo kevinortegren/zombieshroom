@@ -361,5 +361,5 @@ void TreenityMain::Update(float dt)
 
 void TreenityMain::RenderSelectedEntity()
 {
-	m_treenityEditor.Get
+	
 }
