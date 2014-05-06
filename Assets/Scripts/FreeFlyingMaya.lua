@@ -25,11 +25,6 @@ function FreeFlyingMaya.Setup(self)
 	controllerActions:Bind("LeftClick", 490);
 	controllerActions:Bind("MiddleClick", 491);
 	controllerActions:Bind("RightClick", 492);
-    controllerActions:Bind("F", 9);
-    controllerActions:Bind("ScrollForward", 0);
-    controllerActions:Bind("ScrollBackward", 0);
-
-
 end
 
 function FreeFlyingMaya.Target(target)
@@ -93,7 +88,7 @@ function FreeFlyingMaya.OnUpdate(self)
 		end
         
 	end
-
 	FreeFlyingMaya.Displacement = FreeFlyingMaya.Displacement - Static.GetScroll() * speedZoomFactor;
+
     
 end

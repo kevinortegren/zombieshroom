@@ -18,8 +18,6 @@ public:
 
 	ECS::Entity* GetEntity();
 
-
-
 private:
 	ECS::Entity* m_entity;
 	QString m_name;
