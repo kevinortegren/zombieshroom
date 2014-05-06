@@ -25,7 +25,6 @@ function FreeFlyingMaya.Setup(self)
 	controllerActions:Bind("LeftClick", 490);
 	controllerActions:Bind("MiddleClick", 491);
 	controllerActions:Bind("RightClick", 492);
-    controllerActions:Bind("F", 9);
 end
 
 function FreeFlyingMaya.Target(target)
@@ -39,8 +38,8 @@ end
 function FreeFlyingMaya.OnUpdate(self)
 	local dt = Static.GetDeltaTime();
 
+	local speedZoomFactor = FreeFlyingMaya.Displacement / 50.0;
 
-	
     if FreeFlyingMaya.Time <= 1.0 then   
     
         FreeFlyingMaya.Time = FreeFlyingMaya.Time + dt
@@ -80,8 +79,6 @@ function FreeFlyingMaya.OnUpdate(self)
 		
 		elseif controllerActions:IsActivated("RightClick") then
 
-			local speedZoomFactor = FreeFlyingMaya.Displacement / 50.0;
-			
 			if math.abs(mouseDelta.y) > math.abs(mouseDelta.x) then
 				FreeFlyingMaya.Displacement = FreeFlyingMaya.Displacement + mouseDelta.y * FreeFlyingMaya.ZoomSens * speedZoomFactor;
 			else
@@ -91,9 +88,7 @@ function FreeFlyingMaya.OnUpdate(self)
 		end
         
 	end
-	
-	if controllerActions:IsActivated("F") then
-		Logging.Log(0, "F!!")
-	end
+	FreeFlyingMaya.Displacement = FreeFlyingMaya.Displacement - Static.GetScroll() * speedZoomFactor;
+
     
 end

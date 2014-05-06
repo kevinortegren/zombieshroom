@@ -68,6 +68,10 @@ private:
 
 	ComponentView* m_compView;
 	std::map<int, AbstractComponentView*> m_componentViews;
+protected:
+	void keyPressEvent(QKeyEvent* event);
+	void keyReleaseEvent(QKeyEvent* event);
+
 private slots:
 	void New();
 	void OpenProject();

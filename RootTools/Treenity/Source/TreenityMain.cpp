@@ -163,6 +163,8 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	// Bind c++ functions and members to Lua.
 	RootForce::LuaAPI::RegisterLuaTypes(g_engineContext.m_script->GetLuaState());
 
+	g_engineContext.m_resourceManager->LoadScript("Global");
+
 	m_renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 	m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);

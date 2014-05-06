@@ -346,3 +346,18 @@ void Treenity::UpdateOnSelection()
 		m_compView->RemoveItems();
 	}
 }
+
+void Treenity::keyPressEvent( QKeyEvent* event )
+{
+	if(event->key() == 70)
+	{
+		if(m_selectedEntities.size() > 0)
+		m_engineInterface->TargetEntity(*m_selectedEntities.begin());
+	}
+	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
+}
+
+void Treenity::keyReleaseEvent( QKeyEvent* event )
+{
+	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::HELP_PRINT, "Key released: %d", event->key() );
+}
