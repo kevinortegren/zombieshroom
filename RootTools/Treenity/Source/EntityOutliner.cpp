@@ -88,6 +88,8 @@ void EntityOutlinerItem::UpdateLabel()
 		label += "] ";
 	}
 
+	label += " " + QString::number(m_entity->GetId());
+
 	setText(0, label);
 }
 

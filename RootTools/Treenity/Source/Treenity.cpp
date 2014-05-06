@@ -135,9 +135,11 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 {
 	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
-		QWidget* widget = new QWidget();
-		SetupUIForComponent(widget, p_componentType);
-		m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
+		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+
+		//QWidget* widget = new QWidget();
+		//SetupUIForComponent(widget, p_componentType);
+		//m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
 	}
 }
 
@@ -283,7 +285,7 @@ void Treenity::UpdateOnSelection()
 			{
 				if (m_componentViews.find(i) != m_componentViews.end())
 				{
-					m_compView->AddItem(new ComponentViewItem(m_componentViews[i]->GetComponentName(), m_componentViews[i]));
+					m_compView->AddItem(new ComponentViewItem(m_componentViews[i]));
 					m_componentViews[i]->DisplayEntity(selectedEntity);
 				}
 			}

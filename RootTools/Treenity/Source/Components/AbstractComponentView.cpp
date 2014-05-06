@@ -4,7 +4,9 @@ AbstractComponentView::AbstractComponentView(QWidget* p_parent)
 	: QWidget(p_parent)
 	, m_engineInterface(nullptr)
 	, m_editorInterface(nullptr)
-{}
+{
+	setVisible(false);
+}
 
 AbstractComponentView::~AbstractComponentView()
 {}

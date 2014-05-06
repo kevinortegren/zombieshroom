@@ -24,9 +24,13 @@ const QString& TransformView::GetComponentName() const
 
 void TransformView::DisplayEntity(ECS::Entity* p_entity)
 {
+	glm::vec3 position = m_engineInterface->GetPosition(p_entity);
+
 	ui.doubleSpinBox_translationX->setValue(m_engineInterface->GetPosition(p_entity).x);
 	ui.doubleSpinBox_translationY->setValue(m_engineInterface->GetPosition(p_entity).y);
 	ui.doubleSpinBox_translationZ->setValue(m_engineInterface->GetPosition(p_entity).z);
+
+	position = m_engineInterface->GetPosition(p_entity);
 
 	glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(p_entity).GetQuaternion());
 
@@ -34,9 +38,13 @@ void TransformView::DisplayEntity(ECS::Entity* p_entity)
 	ui.doubleSpinBox_orientationY->setValue(euler.y);
 	ui.doubleSpinBox_orientationZ->setValue(euler.z);
 
+	position = m_engineInterface->GetPosition(p_entity);
+
 	ui.doubleSpinBox_scaleX->setValue(m_engineInterface->GetScale(p_entity).x);
 	ui.doubleSpinBox_scaleY->setValue(m_engineInterface->GetScale(p_entity).y);
 	ui.doubleSpinBox_scaleZ->setValue(m_engineInterface->GetScale(p_entity).z);
+
+	position = m_engineInterface->GetPosition(p_entity);
 }
 
 void TransformView::TransformPositionXChanged(double p_value)
@@ -117,9 +125,9 @@ void TransformView::TransformScaleXChanged(double p_value)
 	{
 		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
 
-		glm::vec3 scale = m_engineInterface->GetPosition(selectedEntity);
+		glm::vec3 scale = m_engineInterface->GetScale(selectedEntity);
 		scale.x = p_value;
-		m_engineInterface->SetPosition(selectedEntity, scale);
+		m_engineInterface->SetScale(selectedEntity, scale);
 	}
 }
 
@@ -129,9 +137,9 @@ void TransformView::TransformScaleYChanged(double p_value)
 	{
 		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
 
-		glm::vec3 scale = m_engineInterface->GetPosition(selectedEntity);
+		glm::vec3 scale = m_engineInterface->GetScale(selectedEntity);
 		scale.y = p_value;
-		m_engineInterface->SetPosition(selectedEntity, scale);
+		m_engineInterface->SetScale(selectedEntity, scale);
 	}
 }
 
@@ -141,8 +149,8 @@ void TransformView::TransformScaleZChanged(double p_value)
 	{
 		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
 
-		glm::vec3 scale = m_engineInterface->GetPosition(selectedEntity);
+		glm::vec3 scale = m_engineInterface->GetScale(selectedEntity);
 		scale.z = p_value;
-		m_engineInterface->SetPosition(selectedEntity, scale);
+		m_engineInterface->SetScale(selectedEntity, scale);
 	}
 }
