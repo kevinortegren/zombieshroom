@@ -196,9 +196,6 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_world.GetEntityImporter()->SetImporter(Importer);
 	m_world.GetEntityExporter()->SetExporter(Exporter);
 
-
-
-
 	m_treenityEditor.CreateNewScene();
 
 	// Display treenity editor.
@@ -344,27 +341,25 @@ void TreenityMain::Update(float dt)
 	HandleEvents();
 
 	ProcessWorldMessages();
-
 	m_world.GetEntityManager()->CleanUp();
 
-	g_engineContext.m_renderer->Clear();
-
 	m_worldSystem.Process();
-
-	m_controllerActionSystem->Process();
-	
+	m_controllerActionSystem->Process();	
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
-
 	m_scriptSystem->Process();
-
 	m_transformInterpolationSystem->Process();
-
 	m_shadowSystem->Process();
 	m_directionalLightSystem->Process();
 	m_pointLightSystem->Process();
 	m_renderingSystem->Process();
 	
+	g_engineContext.m_renderer->Clear();
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
+}
+
+void TreenityMain::RenderSelectedEntity()
+{
+	m_treenityEditor.Get
 }

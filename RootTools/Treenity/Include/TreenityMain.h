@@ -31,6 +31,9 @@ public:
 	RootForce::ShadowSystem* GetShadowSystem() { return m_shadowSystem; }
 
 private:
+
+	void RenderSelectedEntity();
+
 	void* m_engineModule;
 
 	ECS::World m_world;
