@@ -33,6 +33,11 @@ namespace RootForce
 	}
 #endif
 
+	void WorldSystem::CalculateWorldAABB()
+	{
+		m_quadTree.Initialize(m_engineContext, m_world, "Static", "Static_Split", true);
+	}
+
 	void WorldSystem::BuildStaticShadowMesh()
 	{
 		if(m_staticMesh != nullptr)
@@ -102,7 +107,9 @@ namespace RootForce
 
 				}
 				glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-			}		
+			}	
+
+
 		}
 
 		m_staticMesh = g_engineContext.m_renderer->CreateMesh();
@@ -132,20 +139,40 @@ namespace RootForce
 
 	void WorldSystem::CreateSun()
 	{
-		// Setup sun entity.
-		ECS::Entity* sun = m_world->GetEntityManager()->CreateEntity();
+		ECS::Entity* sun = m_world->GetTagManager()->GetEntityByTag("Sun");
+		if(sun == nullptr)
+		{
+			// Setup sun entity.
+			sun = m_world->GetEntityManager()->CreateEntity();
 		
-		RootForce::Transform* sunTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(sun);
-		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
-		RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
+			RootForce::Transform* sunTransform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(sun);
+			RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->CreateComponent<RootForce::DirectionalLight>(sun);
+			RootForce::Shadowcaster* sunShadowcaster = m_world->GetEntityManager()->CreateComponent<RootForce::Shadowcaster>(sun);
 
-		sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
-		sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
-		sunTransform->m_position = -300.0f * sunTransform->m_orientation.GetFront();
+			sunLight->m_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
+			sunTransform->m_orientation.LookAt(glm::vec3(0.61f, -0.46f, 0.63f), glm::vec3(0.0f, 1.0f, 0.0f));
+			sunTransform->m_position = -300.0f * sunTransform->m_orientation.GetFront();
 		
-		sunShadowcaster->m_directionalLightSlot = 0;
+			sunShadowcaster->m_directionalLightSlot = 0;
 
-		m_world->GetTagManager()->RegisterEntity("Sun", sun);
+			m_world->GetTagManager()->RegisterEntity("Sun", sun);
+		}
+
+		RootForce::Transform* sunTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(sun);
+		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->GetComponent<RootForce::DirectionalLight>(sun);
+
+		RootForce::Renderable* r = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_world->GetTagManager()->GetEntityByTag("Skybox"));
+
+		struct sunstruct
+		{
+			glm::vec4 direction;
+			glm::vec4 color;
+		};
+		sunstruct sundata;
+		sundata.direction = glm::vec4(-sunTransform->m_orientation.GetFront(), 0.0f);
+		sundata.color = sunLight->m_color;
+
+		r->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(sundata), &sundata, GL_DYNAMIC_DRAW);
 	}
 
 	void WorldSystem::CreateSkyBox()
@@ -206,21 +233,6 @@ namespace RootForce
 		r->m_material = m_engineContext->m_renderer->CreateMaterial("skybox");
 		r->m_material->m_effect = m_engineContext->m_resourceManager->LoadEffect("Skybox");
 		
-		ECS::Entity* sun = m_world->GetTagManager()->GetEntityByTag("Sun");
-		RootForce::Transform* sunTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(sun);
-		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->GetComponent<RootForce::DirectionalLight>(sun);
-
-		struct sunstruct
-		{
-			glm::vec4 direction;
-			glm::vec4 color;
-		};
-		sunstruct sundata;
-		sundata.direction = glm::vec4(-sunTransform->m_orientation.GetFront(), 0.0f);
-		sundata.color = sunLight->m_color;
-
-		r->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(sundata), &sundata, GL_DYNAMIC_DRAW);
-
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
 	}
@@ -300,13 +312,16 @@ namespace RootForce
 		RootForce::Renderable* skyboxRenderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_world->GetTagManager()->GetEntityByTag("Skybox"));
 
 		ECS::Entity* sun = m_world->GetTagManager()->GetEntityByTag("Sun");
-		RootForce::Transform* sunTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(sun);
-		RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->GetComponent<RootForce::DirectionalLight>(sun);
+		if(sun != nullptr)
+		{
+			RootForce::Transform* sunTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(sun);
+			RootForce::DirectionalLight* sunLight = m_world->GetEntityManager()->GetComponent<RootForce::DirectionalLight>(sun);
 
-		glm::vec4 dir = glm::vec4(-sunTransform->m_orientation.GetFront(), 0.0f);
+			glm::vec4 dir = glm::vec4(-sunTransform->m_orientation.GetFront(), 0.0f);
 
-		skyboxRenderable->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(dir), &dir);
-		skyboxRenderable->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(sizeof(dir), sizeof(sunLight->m_color), &sunLight->m_color);
+			skyboxRenderable->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(0, sizeof(dir), &dir);
+			skyboxRenderable->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferSubData(sizeof(dir), sizeof(sunLight->m_color), &sunLight->m_color);
+		}
 
 	/*
 #ifndef COMPILE_LEVEL_EDITOR

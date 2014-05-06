@@ -7,6 +7,11 @@
 
 struct EngineInterface
 {
+	// Project
+	virtual void NewScene() = 0;
+	virtual void ClearScene() = 0;
+	virtual void AddDefaultEntities() = 0;
+
 	// Entity
 	virtual ECS::Entity* CreateEntity() = 0;
 	virtual void DeleteEntity(ECS::Entity* p_entity) = 0;

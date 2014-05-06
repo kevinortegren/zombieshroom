@@ -1,7 +1,6 @@
 #pragma once
-#include <Utility/ECS/Include/World.h>
-#include <RootEngine/Include/GameSharedContext.h>
 
+// Root Systems
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/TransformInterpolationSystem.h>
@@ -10,16 +9,10 @@
 #include <RootSystems/Include/ShadowSystem.h>
 #include <RootSystems/Include/LightSystem.h>
 
-#include <RootSystems/Include/Network/NetworkTypes.h>
-#include <RootSystems/Include/Network/Client.h>
-#include <RootSystems/Include/Network/MessageHandlers.h>
-
+// Treenity
 #include <RootTools/Treenity/Include/EngineActions.h>
-
-RootEngine::GameSharedContext g_engineContext;
-ECS::World* g_world;
-RootForce::Network::NetworkEntityMap g_networkEntityMap;
-RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
+#include <RootTools/Treenity/Include/Treenity.h>
+#include <RootTools/Treenity/Include/ProjectManager.h>
 
 class TreenityMain
 {
@@ -28,12 +21,13 @@ public:
 	~TreenityMain();
 
 	void HandleEvents();
+	void ProcessWorldMessages();
 	void HandleAltModifier();
 	
 	void Update(float dt);
 	bool IsRunning();
 
-	void CreateFreeFlyingCamera();
+	RootForce::WorldSystem* GetWorldSystem() { return &m_worldSystem; }
 
 private:
 	void* m_engineModule;
@@ -44,21 +38,15 @@ private:
 	ProjectManager m_projectManager;
 
 	RootForce::WorldSystem m_worldSystem;
-
 	RootForce::ShadowSystem* m_shadowSystem;
 	RootForce::PointLightSystem* m_pointLightSystem;
 	RootForce::DirectionalLightSystem* m_directionalLightSystem;
-
 	RootForce::RenderingSystem* m_renderingSystem;
 	RootForce::TransformInterpolationSystem* m_transformInterpolationSystem;
-
 	RootForce::CameraSystem* m_cameraSystem;
 	RootForce::ScriptSystem* m_scriptSystem;
 	RootForce::ControllerActionSystem* m_controllerActionSystem;
 	RootForce::LookAtSystem* m_lookAtSystem;
-
-	ECS::Entity* m_cameraEntity;
-	ECS::Entity* m_aimingDevice;
 
 	bool m_altMode;
 };

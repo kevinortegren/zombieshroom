@@ -19,6 +19,18 @@
 #include <RootForce/Include/LuaAPI.h>
 #include <RootEngine/Script/Include/ScriptManager.h>
 
+#include <Utility/ECS/Include/World.h>
+#include <RootEngine/Include/GameSharedContext.h>
+
+#include <RootSystems/Include/Network/NetworkTypes.h>
+#include <RootSystems/Include/Network/Client.h>
+#include <RootSystems/Include/Network/MessageHandlers.h>
+
+RootEngine::GameSharedContext g_engineContext;
+ECS::World* g_world;
+RootForce::Network::NetworkEntityMap g_networkEntityMap;
+RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
+
 #undef main
 int main(int argc, char *argv[])
 {
@@ -70,7 +82,7 @@ int main(int argc, char *argv[])
 }
 
 TreenityMain::TreenityMain(const std::string& p_path)
-	: m_engineActions(&m_world)
+	: m_engineActions(&m_world, this)
 	, m_projectManager(&m_world)
 	, m_worldSystem(&m_world, &g_engineContext)
 {
@@ -105,7 +117,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_treenityEditor.CreateOpenGLContext();
 	m_treenityEditor.SetEngineInterface(&m_engineActions);
 	m_treenityEditor.SetProjectManager(&m_projectManager);
-
+	
 	// Initialize components and preallocate memory.
 	RootForce::ComponentType::Initialize();
 
@@ -188,13 +200,16 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	//m_projectManager.Import("C:\\rarosu\\test14.level");
 
 	// When opening / creating a new project.
-	m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\MythosV0.2.world").c_str()));
+	//m_projectManager.Import(QString((g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets\\Levels\\MythosV0.2.world").c_str()));
 
-	m_worldSystem.BuildStaticShadowMesh();
-	m_worldSystem.SetAmbientLight(m_world.GetStorage()->GetValueAsVec4("Ambient"));
-	m_worldSystem.CreateSkyBox();
+	//m_worldSystem.BuildStaticShadowMesh();
+	//m_worldSystem.SetAmbientLight(m_world.GetStorage()->GetValueAsVec4("Ambient"));
+	
+	//m_worldSystem.CalculateWorldAABB();
 
-	CreateFreeFlyingCamera();
+	//m_shadowSystem->SetQuadTree(m_worldSystem.GetQuadTree());
+
+	m_treenityEditor.CreateNewScene();
 
 	// Display treenity editor.
 	m_treenityEditor.show();
@@ -278,12 +293,8 @@ void TreenityMain::HandleAltModifier()
 	}
 }
 
-void TreenityMain::Update(float dt)
+void TreenityMain::ProcessWorldMessages()
 {
-	m_world.SetDelta(dt);
-
-	HandleEvents();
-
 	auto msgs = m_world.GetMessages();
 	for(auto itr = msgs.begin(); itr != msgs.end(); ++itr) 
 	{
@@ -332,8 +343,17 @@ void TreenityMain::Update(float dt)
 			} break;
 		}
 
-		//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
 	}
+}
+
+void TreenityMain::Update(float dt)
+{
+	m_world.SetDelta(dt);
+
+	HandleEvents();
+
+	ProcessWorldMessages();
 
 	m_world.GetEntityManager()->CleanUp();
 
@@ -357,46 +377,4 @@ void TreenityMain::Update(float dt)
 	
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
-}
-
-void TreenityMain::CreateFreeFlyingCamera()
-{
-	m_cameraEntity = m_world.GetEntityManager()->CreateEntity();
-
-	// Setup camera entity.
-	RootForce::Camera* camera = m_world.GetEntityManager()->CreateComponent<RootForce::Camera>(m_cameraEntity);
-	RootForce::Transform* cameraTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_cameraEntity);
-	RootForce::ControllerActions* controllerActions = m_world.GetEntityManager()->CreateComponent<RootForce::ControllerActions>(m_cameraEntity);
-	RootForce::LookAtBehavior* cameraLookAt = m_world.GetEntityManager()->CreateComponent<RootForce::LookAtBehavior>(m_cameraEntity);
-	RootForce::ThirdPersonBehavior* cameraThirdPerson = m_world.GetEntityManager()->CreateComponent<RootForce::ThirdPersonBehavior>(m_cameraEntity);
-
-	cameraLookAt->m_targetTag = "AimingDevice";
-	cameraLookAt->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	cameraThirdPerson->m_targetTag = "AimingDevice";
-	cameraThirdPerson->m_displacement = glm::vec3(0.0f, 0.0f, 0.0f);
-	cameraThirdPerson->m_distance = 10.0f;
-
-	RootForce::Script* script = m_world.GetEntityManager()->CreateComponent<RootForce::Script>(m_cameraEntity);
-	script->Name = g_engineContext.m_resourceManager->LoadScript("FreeFlyingMaya");
-	
-	g_engineContext.m_script->SetFunction(script->Name, "Setup");
-	g_engineContext.m_script->AddParameterUserData(m_cameraEntity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
-
-	cameraTransform->m_position = glm::vec3(0);
-	camera->m_frustum.m_near = 0.1f;
-	camera->m_frustum.m_far = 1000.0f;
-	camera->m_frustum.m_fov = 45.0f;
-
-	m_world.GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
-
-	// Setup aiming device.
-	m_aimingDevice = m_world.GetEntityManager()->CreateEntity();
-
-	RootForce::Transform* aimingDeviceTransform = m_world.GetEntityManager()->CreateComponent<RootForce::Transform>(m_aimingDevice);
-
-	m_world.GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
-	m_world.GetGroupManager()->RegisterEntity("NonExport", m_aimingDevice);
 }

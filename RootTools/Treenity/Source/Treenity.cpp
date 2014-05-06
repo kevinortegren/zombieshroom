@@ -69,7 +69,11 @@ Treenity::Treenity(QWidget *parent)
 	SetupUIForComponent(transformWidget, RootForce::ComponentType::TRANSFORM);
 	m_compView->AddItem(new ComponentViewItem(m_componentNames[RootForce::ComponentType::TRANSFORM], transformWidget));
 
+	connect(ui.actionNew,							SIGNAL(triggered()), this,				SLOT(New()));
+	connect(ui.actionOpen_Project,					SIGNAL(triggered()), this,				SLOT(OpenProject()));
 	connect(ui.action_saveAs,						SIGNAL(triggered()), this,				SLOT(SaveAs()));
+	connect(ui.action_save,							SIGNAL(triggered()), this,				SLOT(Save()));
+	connect(ui.actionExit,							SIGNAL(triggered()), this,				SLOT(close()));
 	connect(ui.actionLog,							SIGNAL(triggered()), Log::GetInstance(), SLOT(Show()));
 	connect(ui.action_addEntity,					SIGNAL(triggered()), this,				SLOT(CreateEntity()));
 	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
@@ -106,6 +110,16 @@ void Treenity::SetProjectManager(ProjectManager* p_projectManager)
 	m_projectManager = p_projectManager;
 }
 
+void Treenity::CreateNewScene()
+{
+	New();
+}
+
+void Treenity::UpdateWindowTitle()
+{
+	setWindowTitle("Treenity - " + m_currentProjectFile);
+}
+
 bool Treenity::IsRunning()
 {
 	return m_running;
@@ -115,7 +129,6 @@ void Treenity::closeEvent(QCloseEvent *event)
 {
 	m_running = false;
 }
-
 
 void Treenity::EntityCreated(ECS::Entity* p_entity)
 {
@@ -173,9 +186,39 @@ void Treenity::CreateOpenGLContext()
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::START_PRINT, "Creating OpenGL context in treenity.");
 }
 
+void Treenity::New()
+{
+	m_engineInterface->NewScene();
+}
+
+void Treenity::OpenProject()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, "Open Project", "", "World File (*.world)");
+
+	m_currentProjectFile = fileName;
+
+	UpdateWindowTitle();
+
+	m_engineInterface->ClearScene();
+
+	m_projectManager->Import(fileName);
+
+	m_engineInterface->AddDefaultEntities();
+}
+
+void Treenity::Save()
+{
+	m_projectManager->Export(m_currentProjectFile);
+}
+
 void Treenity::SaveAs()
 {
 	QString fileName = QFileDialog::getSaveFileName(this, "Save Project", "", "World File (*.world)");
+
+	m_currentProjectFile = fileName;
+
+	UpdateWindowTitle();
+
 	m_projectManager->Export(fileName);
 }
 

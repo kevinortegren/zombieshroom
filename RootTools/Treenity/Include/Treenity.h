@@ -22,6 +22,9 @@ public:
 
 	void SetEngineInterface(EngineInterface* p_engineInterface);
 	void SetProjectManager(ProjectManager* p_projectManager);
+	void CreateNewScene();
+
+	void UpdateWindowTitle();
 
 	bool IsRunning();
 	void closeEvent(QCloseEvent *event);
@@ -45,6 +48,7 @@ private:
 	std::map<int, QString> m_componentNames;
 
 	// Project meta-data.
+	QString m_currentProjectFile;
 	ProjectManager* m_projectManager;
 	ECS::Entity* m_selectedEntity;
 
@@ -63,7 +67,11 @@ private:
 	QWidget* GetComponentToolboxItemByType(int p_componentType);
 
 	ComponentView* m_compView;
+
 private slots:
+	void New();
+	void OpenProject();
+	void Save();
 	void SaveAs();
 	void CreateEntity();
 	void DestroyEntity();

@@ -1,13 +1,24 @@
 #pragma once
 
 #include <RootTools/Treenity/Include/EngineInterface.h>
+
 #include <Utility/ECS/Include/World.h>
+#include <RootSystems/Include/WorldSystem.h>
+
+class TreenityMain;
 
 class EngineActions : public EngineInterface
 {
 
 public:
-	EngineActions(ECS::World* p_world);
+	EngineActions(ECS::World* p_world, TreenityMain* p_treenityMain);
+
+	// Project startup
+	void NewScene();
+	void CreateFreeFlyingCamera();
+	
+	void ClearScene();
+	void AddDefaultEntities();
 
 	// Entity
 	ECS::Entity* CreateEntity();
@@ -28,5 +39,10 @@ public:
 	void AddRenderable(ECS::Entity* p_entity);
 	void RemoveRenderable(ECS::Entity* p_entity);
 private:
+
+	TreenityMain* m_treenityMain;
 	ECS::World* m_world;
+
+	ECS::Entity* m_cameraEntity;
+	ECS::Entity* m_aimingDevice;
 };

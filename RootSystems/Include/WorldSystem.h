@@ -20,7 +20,7 @@ namespace RootForce
 		void LoadWorld(const std::string& p_worldName);
 		void CreatePlayerCamera();
 #endif
-
+		void CalculateWorldAABB();
 		void SubdivideTree();
 
 		void SetAmbientLight(glm::vec4 p_ambient);
