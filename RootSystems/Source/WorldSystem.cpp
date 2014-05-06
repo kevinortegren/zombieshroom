@@ -20,6 +20,8 @@ namespace RootForce
 
 		// Create constant entities.
 		CreateSkyBox();
+		CreateSun();
+
 		CreatePlayerCamera();
 
 		// Put the static entities into a spatial quad tree.

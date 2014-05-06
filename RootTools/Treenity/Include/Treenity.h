@@ -23,7 +23,6 @@ public:
 	void SetEngineInterface(EngineInterface* p_engineInterface);
 	void SetProjectManager(ProjectManager* p_projectManager);
 	void CreateNewScene();
-
 	void UpdateWindowTitle();
 
 	bool IsRunning();
@@ -39,6 +38,7 @@ public:
 	void EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void CreateOpenGLContext();
+
 //protected:
 	//void keyPressEvent( QKeyEvent *k );
 	//void keyReleaseEvent( QKeyEvent *k);
