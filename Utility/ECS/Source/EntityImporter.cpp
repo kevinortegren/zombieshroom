@@ -20,7 +20,7 @@ void ECS::EntityImporter::Import(const std::string& p_filename, std::map<ECS::En
 			//g_logger.LogText(LogTag::GENERAL, LogLevel::FATAL_ERROR, "Failed to load yaml file: %s", filepath.c_str());
 		}
 		YAML::Parser parser(file);
-
+		
 		YAML::Node doc;
 		parser.GetNextDocument(doc);
 	

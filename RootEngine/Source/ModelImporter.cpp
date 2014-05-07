@@ -19,8 +19,7 @@ namespace RootEngine
 	}
 
 	Model* ModelImporter::LoadModel(const std::string p_fileName, bool p_noRender)
-	{
-		
+	{	
 		m_noRender = p_noRender;
 		m_model = new Model(); //Owned by ResourceManager
 		
@@ -231,6 +230,12 @@ namespace RootEngine
 				m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
 				m_model->m_physicsMeshes.push_back(pmesh);
 			}
+		}
+
+		// Construct OBB.
+		for(auto itr = positions.begin(); itr != positions.end(); ++itr)
+		{
+			m_model->m_obb.Expand((*itr));
 		}
 
 		mesh->SetPrimitiveType(GL_TRIANGLES);

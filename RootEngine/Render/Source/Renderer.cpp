@@ -983,6 +983,11 @@ namespace Render
 		return m_cameraVars.m_projection;
 	}
 
+	const glm::mat4& GLRenderer::GetViewMatrix()
+	{
+		return m_cameraVars.m_view;
+	}
+
 	void GLRenderer::GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)
 	{
 		m_resources.PrintResourceUsage(p_bufferUsage, p_textureUsage, p_numBuffers, p_numTextures);

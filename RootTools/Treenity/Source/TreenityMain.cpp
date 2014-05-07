@@ -400,6 +400,7 @@ void TreenityMain::RenderSelectedEntity()
 
 		g_engineContext.m_renderer->AddRenderJob(job);
 
+		Debug(&renderable->m_model->m_obb, m_renderingSystem->m_matrices[entity].m_model, glm::vec3(0,1,0));
 	}
 }
 
@@ -407,34 +408,15 @@ void TreenityMain::RaySelect()
 {
 	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 	{
-		static float radius = 5.0f;
-		float radiusSphere2 = radius*radius;
-		float closestDist = 999999.0f;
-		ECS::Entity* closestEntity = nullptr;
-
 		// Get camera entity
 		ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
 		glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
-		RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
-		
-		// Get mouse pos relative to window
-		glm::ivec2 position;
-		SDL_GetMouseState(&position.x, &position.y);
 
-		// Calculate NDC coords
-		float x = (2.0f * position.x) / (float)g_engineContext.m_renderer->GetWidth() - 1.0f;
-		float y = (2.0f * -position.y) / (float)g_engineContext.m_renderer->GetHeight() + 1.0f;
+		// Construct ray.
+		const glm::vec3& ray = glm::normalize(ConstructRay());
 
-		glm::mat4 inverseProjection = glm::inverse(g_engineContext.m_renderer->GetProjectionMatrix());
-		
-		// View space coords
-		glm::vec4 rayView = inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
-		rayView.z = -1.0f;
-		rayView.w = 0.0f;
-
-		// World space coords
-		glm::vec4 rW = glm::inverse(camera->m_viewMatrix) * rayView;
-		glm::vec3 rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
+		float closestDist = 999999.0f;
+		ECS::Entity* closestEntity = nullptr;
 
 		std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
 		for(auto itr = entities.begin(); itr != entities.end(); ++itr)
@@ -449,25 +431,33 @@ void TreenityMain::RaySelect()
 				continue;
 
 			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
-			glm::vec3 direction = entityPos - cameraPos;
 
-			float tca = glm::dot(direction, rayWorld);
-			if(tca < 0)
-			{
-				continue;
-			}
-			float d2 = glm::dot(direction, direction) - tca * tca;
-			if(d2 > radiusSphere2)
-			{
-				continue;
-			}
-			float thc = glm::sqrt(radiusSphere2 - d2);
-			float t0 = tca - thc;
+			glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
 
-			if(t0 < closestDist)
+			RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));
+			if(renderable != nullptr)
 			{
-				closestEntity = (*itr);
-				closestDist = t0;
+				float t = 99999;
+				RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t);
+
+				if(t < closestDist)
+				{
+					closestEntity = (*itr);
+					closestDist = t;
+				}
+			}
+			else
+			{
+				static float radius = 5.0f;
+
+				float t = 999999;
+				RayVsSphere(cameraPos, ray, entityPos, radius, t);
+
+				if(t < closestDist)
+				{
+					closestEntity = (*itr);
+					closestDist = t;
+				}
 			}
 		}
 
@@ -475,5 +465,157 @@ void TreenityMain::RaySelect()
 
 		if(closestEntity != nullptr)
 		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
+	}
+}
+
+const glm::vec3& TreenityMain::ConstructRay()
+{
+	// Get mouse pos relative to window
+	glm::ivec2 position;
+	SDL_GetMouseState(&position.x, &position.y);
+
+	// Calculate NDC coords
+	float x = (2.0f * position.x) / (float)g_engineContext.m_renderer->GetWidth() - 1.0f;
+	float y = (2.0f * -position.y) / (float)g_engineContext.m_renderer->GetHeight() + 1.0f;
+
+	glm::mat4 inverseProjection = glm::inverse(g_engineContext.m_renderer->GetProjectionMatrix());
+	glm::mat4 inverseView = glm::inverse(g_engineContext.m_renderer->GetViewMatrix());
+
+	// View space coords
+	glm::vec4 rayView = inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
+	rayView.z = -1.0f;
+	rayView.w = 0.0f;
+
+	// World space coords
+	glm::vec4 rW = inverseView * rayView;
+	const glm::vec3& rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
+
+	return rayWorld;
+}
+
+bool TreenityMain::RayVsSphere(const glm::vec3& cameraPos, const glm::vec3& ray, const glm::vec3& center, float radius, float& t)
+{
+	glm::vec3 entityPos = center;
+	glm::vec3 direction = entityPos - cameraPos;
+	
+	float radiusSq = radius*radius;
+
+	float tca = glm::dot(direction, ray);
+	if(tca < 0)
+	{
+		return false;
+	}
+	float d2 = glm::dot(direction, direction) - tca * tca;
+	if(d2 > radiusSq)
+	{
+		return false;
+	}
+	float thc = glm::sqrt(radiusSq - d2);
+	float t0 = tca - thc;
+
+	t = t0;
+
+	return true;
+}
+
+bool TreenityMain::RayVsOBB(const glm::vec3& cameraPos, const glm::vec3& ray, RootEngine::OBB* obb, const glm::mat4x4& transform, float& t)
+{
+	float tMin = -99999.9f;
+	float tMax = 99999.9f;
+
+	// OBB Positions.
+	glm::vec4 positions[8];
+	positions[0] = transform * glm::vec4(obb->m_minX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[1] = transform * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[2] = transform * glm::vec4(obb->m_minX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[3] = transform * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[4] = transform * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[5] = transform * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[6] = transform * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_maxZ, 1.0f);
+	positions[7] = transform * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_maxZ, 1.0f);
+
+	glm::vec4 normalX = positions[1] - positions[0];
+	glm::vec4 normalY = positions[4] - positions[0];
+	glm::vec4 normalZ = positions[2] - positions[0];
+
+	glm::vec4 center = positions[0] + (normalX / 2) + (normalY / 2) + (normalZ / 2); 
+
+	glm::vec3 normals[3];
+	normals[0] = glm::normalize(glm::vec3(normalX.x, normalX.y, normalX.z));
+	normals[1] = glm::normalize(glm::vec3(normalY.x, normalY.y, normalY.z));
+	normals[2] = glm::normalize(glm::vec3(normalZ.x, normalZ.y, normalZ.z));
+
+	float distances[3];
+	distances[0] = glm::length(normalX);
+	distances[1] = glm::length(normalY);
+	distances[2] = glm::length(normalZ);
+
+	glm::vec3 direction = glm::vec3(center.x, center.y, center.z) - cameraPos;
+
+	for(int i=0; i<3; i++)
+	{
+		float e = glm::dot(normals[i], direction);
+		float f = glm::dot(normals[i], ray);
+
+		if(abs(f) > 0.000001f)
+		{
+			float t1 = (e + distances[i]) / f;
+			float t2 = (e - distances[i]) / f;
+
+			if(t1>t2)
+			{
+				float temp = t1;
+				t1 = t2;
+				t2 = temp;
+			}
+
+			if(t1 > tMin) tMin = t1;
+			if(t2 < tMax) tMax = t2;
+
+			if(tMin > tMax) return false;
+			if(tMax < 0) return false;
+		}
+		else if(-e-distances[i] > 0 || -e+distances[i] < 0) return false;		
+	}
+
+	if(tMin > 0) 
+	{
+		t = tMin;
+		return true;
+	}
+	else
+	{
+		t = tMax;
+		return true;
+	}
+
+	return false;
+}
+
+void TreenityMain::Debug(RootEngine::OBB* obb, const glm::mat4x4& p_space, const glm::vec3& p_color)
+{
+	glm::vec4 positions[8];
+	positions[0] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[1] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[2] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[3] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[4] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[5] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[6] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_maxZ, 1.0f);
+	positions[7] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_maxZ, 1.0f);
+
+	unsigned int indices[] = 
+	{ 
+		0, 2, 2, 3, 3, 1, 1, 0,
+		4, 6, 6, 7, 7, 5, 5, 4,
+		0, 4, 2, 6, 3, 7, 1, 5 
+	};
+
+	for(int i = 0; i < 24; i += 2)
+	{
+		glm::vec3 pos1, pos2;
+		pos1 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i]]);
+		pos2 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i+1]]);
+		g_engineContext.m_renderer->AddLine(pos1, pos2, glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
 	}
 }
