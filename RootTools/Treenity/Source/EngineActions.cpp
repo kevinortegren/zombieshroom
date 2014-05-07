@@ -45,6 +45,7 @@ void EngineActions::ClearScene()
 void EngineActions::AddDefaultEntities()
 {
 	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
+	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
 
 	CreateFreeFlyingCamera();
 
@@ -53,6 +54,7 @@ void EngineActions::AddDefaultEntities()
 	m_world->GetEntityManager()->CleanUp();
 
 	m_treenityMain->GetEditor()->RenameEntity(skybox, "Skybox");
+	m_treenityMain->GetEditor()->RenameEntity(sun, "Sun");
 	m_treenityMain->GetEditor()->RenameEntity(m_cameraEntity, "Main Camera");
 	m_treenityMain->GetEditor()->RenameEntity(m_aimingDevice, "Aiming Device");
 }
@@ -60,8 +62,6 @@ void EngineActions::AddDefaultEntities()
 // Can only be called after a world has been imported !!
 void EngineActions::InitializeScene()
 {	
-	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
-	
 	m_treenityMain->GetWorldSystem()->BuildStaticShadowMesh();
 	m_treenityMain->GetWorldSystem()->SetAmbientLight(m_world->GetStorage()->GetValueAsVec4("Ambient"));
 
@@ -72,7 +72,6 @@ void EngineActions::InitializeScene()
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
 
-	m_treenityMain->GetEditor()->RenameEntity(sun, "Sun");
 }
 
 void EngineActions::CreateFreeFlyingCamera()

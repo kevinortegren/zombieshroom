@@ -417,7 +417,11 @@ void TreenityMain::RaySelect()
 			if(renderable != nullptr)
 			{
 				float t = 999999.0f;
-				RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t);
+				bool hit = RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t);
+				if(hit)
+				{
+
+				}
 
 				if(t < closestDist)
 				{
