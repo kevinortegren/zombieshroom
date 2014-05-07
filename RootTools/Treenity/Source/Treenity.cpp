@@ -68,12 +68,17 @@ Treenity::Treenity(QWidget *parent)
 	m_compView = new ComponentView();
 	ui.verticalLayout->addWidget(m_compView);
 	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView(this);
+	m_componentViews[RootForce::ComponentType::RENDERABLE] = new RenderableView(this);
+	m_componentViews[RootForce::ComponentType::PHYSICS] = new PhysicsView(this);
+
 
 	for (auto it : m_componentViews)
 	{
 		it.second->SetEditorInterface(this);
 	}
 	
+	ui.treeView_entityOutliner->SetEditorInterface(this);
+
 	// Match signals with slots.
 	connect(ui.actionNew,							SIGNAL(triggered()), this,				SLOT(New()));
 	connect(ui.actionOpen_Project,					SIGNAL(triggered()), this,				SLOT(OpenProject()));
@@ -85,7 +90,8 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
 	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
 	connect(ui.treeView_entityOutliner,				SIGNAL(itemSelectionChanged()), this,	SLOT(OutlinerSelectEntity()));
-	connect(ui.action_renderable,					SIGNAL(triggered()), this,				SLOT(AddRenderable()));
+	connect(ui.action_addRenderable,				SIGNAL(triggered()), this,				SLOT(AddRenderable()));
+	connect(ui.action_addPhysics,					SIGNAL(triggered()), this,				SLOT(AddPhysics()));
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
@@ -237,6 +243,13 @@ void Treenity::Select(ECS::Entity* p_entity)
 	UpdateOnSelection();
 }
 
+void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
+{
+	m_selectedEntities = p_entities;
+
+	UpdateOnSelection();
+}
+
 void Treenity::AddToSelection(ECS::Entity* p_entity)
 {
 	m_selectedEntities.insert(p_entity);
@@ -286,16 +299,19 @@ void Treenity::RenameEntity()
 	}
 }
 
-void Treenity::OutlinerSelectEntity()
-{
-	Select(ui.treeView_entityOutliner->GetSelectedEntity());
-}
-
 void Treenity::AddRenderable()
 {
 	if (m_selectedEntities.size() == 1)
 	{
 		m_engineInterface->AddRenderable(*m_selectedEntities.begin());
+	}
+}
+
+void Treenity::AddPhysics()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddPhysics(*m_selectedEntities.begin());
 	}
 }
 
@@ -313,6 +329,8 @@ void Treenity::UpdateOnSelection()
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
+
+		//ui.treeView_entityOutliner->setS
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);

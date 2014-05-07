@@ -37,7 +37,7 @@ public:
     {
         if (Renderable->objectName().isEmpty())
             Renderable->setObjectName(QStringLiteral("Renderable"));
-        Renderable->resize(400, 149);
+        Renderable->resize(296, 149);
         Renderable->setMaximumSize(QSize(16777215, 150));
         gridLayout = new QGridLayout(Renderable);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));

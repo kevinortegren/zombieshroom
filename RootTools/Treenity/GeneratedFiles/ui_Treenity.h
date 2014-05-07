@@ -47,9 +47,10 @@ public:
     QAction *actionPlay;
     QAction *actionLog;
     QAction *action_removeEntity;
-    QAction *action_renderable;
-    QAction *actionOpen_Project;
+    QAction *action_addRenderable;
+    QAction *action_addPhysics;
     QAction *actionNew;
+    QAction *actionOpen_Project;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     Canvas3D *widget_canvas3D;
@@ -120,12 +121,14 @@ public:
         actionLog->setObjectName(QStringLiteral("actionLog"));
         action_removeEntity = new QAction(TreenityClass);
         action_removeEntity->setObjectName(QStringLiteral("action_removeEntity"));
-        action_renderable = new QAction(TreenityClass);
-        action_renderable->setObjectName(QStringLiteral("action_renderable"));
-        actionOpen_Project = new QAction(TreenityClass);
-        actionOpen_Project->setObjectName(QStringLiteral("actionOpen_Project"));
+        action_addRenderable = new QAction(TreenityClass);
+        action_addRenderable->setObjectName(QStringLiteral("action_addRenderable"));
+        action_addPhysics = new QAction(TreenityClass);
+        action_addPhysics->setObjectName(QStringLiteral("action_addPhysics"));
         actionNew = new QAction(TreenityClass);
         actionNew->setObjectName(QStringLiteral("actionNew"));
+        actionOpen_Project = new QAction(TreenityClass);
+        actionOpen_Project->setObjectName(QStringLiteral("actionOpen_Project"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -170,6 +173,7 @@ public:
         pushButton_scaleMode->setGeometry(QRect(64, 0, 32, 32));
         pushButton_scaleMode->setMinimumSize(QSize(32, 32));
         pushButton_scaleMode->setMaximumSize(QSize(32, 32));
+        pushButton_scaleMode->setStyleSheet(QStringLiteral(""));
         pushButton_scaleMode->setIcon(icon1);
         pushButton_scaleMode->setCheckable(true);
         pushButton_scaleMode->setAutoExclusive(true);
@@ -177,6 +181,7 @@ public:
         comboBox->setObjectName(QStringLiteral("comboBox"));
         comboBox->setGeometry(QRect(96, 0, 70, 32));
         comboBox->setMinimumSize(QSize(70, 32));
+        comboBox->setStyleSheet(QStringLiteral(""));
 
         verticalLayout_2->addWidget(treedeetoolbar);
 
@@ -223,6 +228,7 @@ public:
         treeView_entityOutliner->setSizePolicy(sizePolicy);
         treeView_entityOutliner->setMinimumSize(QSize(0, 0));
         treeView_entityOutliner->setMaximumSize(QSize(16777215, 16777215));
+        treeView_entityOutliner->setSelectionMode(QAbstractItemView::MultiSelection);
 
         horizontalLayout_3->addWidget(treeView_entityOutliner);
 
@@ -275,7 +281,8 @@ public:
         menuEntity->addAction(action_addEntity);
         menuEntity->addAction(action_removeEntity);
         menuComponent->addAction(menu_addComponent->menuAction());
-        menu_addComponent->addAction(action_renderable);
+        menu_addComponent->addAction(action_addRenderable);
+        menu_addComponent->addAction(action_addPhysics);
         menuView->addAction(actionLog);
         mainToolBar->addAction(actionPlay);
 
@@ -310,9 +317,16 @@ public:
 #endif // QT_NO_TOOLTIP
         actionLog->setText(QApplication::translate("TreenityClass", "Log", 0));
         action_removeEntity->setText(QApplication::translate("TreenityClass", "Remove entity", 0));
-        action_renderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
-        actionOpen_Project->setText(QApplication::translate("TreenityClass", "Open Project ...", 0));
+        action_addRenderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
+#ifndef QT_NO_TOOLTIP
+        action_addRenderable->setToolTip(QApplication::translate("TreenityClass", "Add a Renderable component to the selected entity.", 0));
+#endif // QT_NO_TOOLTIP
+        action_addPhysics->setText(QApplication::translate("TreenityClass", "Physics", 0));
+#ifndef QT_NO_TOOLTIP
+        action_addPhysics->setToolTip(QApplication::translate("TreenityClass", "Add mass and velocity to the selected entity.", 0));
+#endif // QT_NO_TOOLTIP
         actionNew->setText(QApplication::translate("TreenityClass", "New", 0));
+        actionOpen_Project->setText(QApplication::translate("TreenityClass", "Open Project...", 0));
         pushButton_translateMode->setText(QString());
         pushButton_rotateMode->setText(QString());
         pushButton_scaleMode->setText(QString());

@@ -13,6 +13,7 @@
 #include <RootTools/Treenity/Include/EngineActions.h>
 #include <RootTools/Treenity/Include/Treenity.h>
 #include <RootTools/Treenity/Include/ProjectManager.h>
+#include <RootTools/Treenity/Include/GlobalKeys.h>
 
 class TreenityMain
 {
@@ -48,6 +49,7 @@ private:
 	Treenity m_treenityEditor;
 	EngineActions m_engineActions;	
 	ProjectManager m_projectManager;
+	GlobalKeys m_globalKeys;
 
 	RootForce::WorldSystem m_worldSystem;
 	RootForce::ShadowSystem* m_shadowSystem;
@@ -60,7 +62,6 @@ private:
 	RootForce::ControllerActionSystem* m_controllerActionSystem;
 	RootForce::LookAtSystem* m_lookAtSystem;
 
-	bool m_altMode;
-
 	Render::Material* m_selectedEntityMaterial;
+	std::set<ECS::Entity*> m_pickedEntities;
 };

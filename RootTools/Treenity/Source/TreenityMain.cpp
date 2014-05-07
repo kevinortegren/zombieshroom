@@ -206,8 +206,16 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 
+	// Selected mesh material.
 	m_selectedEntityMaterial = g_engineContext.m_renderer->CreateMaterial("SelectedMaterial");
 	m_selectedEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Selected");
+
+	// Register listeners for global modifer keys.
+	GlobalKeys::InitializeKeyMap();
+
+	m_globalKeys.RegisterModifier(Qt::AltModifier);
+	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
+
 }
 
 TreenityMain::~TreenityMain()
@@ -234,12 +242,12 @@ bool TreenityMain::IsRunning()
 
 void TreenityMain::HandleEvents()
 {
+	m_globalKeys.Update();
+
 	if (g_engineContext.m_inputSys != nullptr)
 	{
 		g_engineContext.m_inputSys->Reset();
 		g_engineContext.m_inputSys->SetMousePos(glm::ivec2(QCursor::pos().x(), QCursor::pos().y()));
-
-		HandleAltModifier();
 	}
 
 	SDL_Event event;
@@ -251,37 +259,6 @@ void TreenityMain::HandleEvents()
 
 		if (g_engineContext.m_inputSys != nullptr)
 			g_engineContext.m_inputSys->HandleInput(event);
-	}
-}
-
-void TreenityMain::HandleAltModifier()
-{
-	Qt::KeyboardModifiers modifers = QApplication::keyboardModifiers();
-	if(m_altMode)
-	{
-		if((modifers & Qt::AltModifier) == 0)
-		{		
-			SDL_Event keyEvent;
-			keyEvent.type = SDL_KEYUP;
-			keyEvent.key.keysym.scancode = SDL_SCANCODE_LALT;
-			keyEvent.key.repeat = false;
-			SDL_PushEvent(&keyEvent);
-
-			m_altMode = false;
-		}
-	}
-	else
-	{
-		if((modifers & Qt::AltModifier) != 0)
-		{	
-			SDL_Event keyEvent;
-			keyEvent.type = SDL_KEYDOWN;
-			keyEvent.key.keysym.scancode = SDL_SCANCODE_LALT;
-			keyEvent.key.repeat = false;
-			SDL_PushEvent(&keyEvent);
-
-			m_altMode = true;
-		}
 	}
 }
 
@@ -345,8 +322,6 @@ void TreenityMain::Update(float dt)
 
 	HandleEvents();
 
-
-
 	ProcessWorldMessages();
 	m_world.GetEntityManager()->CleanUp();
 
@@ -361,7 +336,7 @@ void TreenityMain::Update(float dt)
 	m_pointLightSystem->Process();
 	m_renderingSystem->Process();
 	
-	if(!m_altMode)
+	if (!g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT))
 		RaySelect();
 
 	RenderSelectedEntity();
@@ -381,6 +356,10 @@ void TreenityMain::RenderSelectedEntity()
 		RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
 
 		if(renderable == nullptr)
+			continue;
+		if(renderable->m_model == nullptr)
+			continue;
+		if(renderable->m_material == nullptr)
 			continue;
 
 		m_renderingSystem->m_matrices[entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_interpolatedPosition);
@@ -461,10 +440,19 @@ void TreenityMain::RaySelect()
 			}
 		}
 
-		m_treenityEditor.Select(closestEntity);
-
 		if(closestEntity != nullptr)
-		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
+		{
+			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
+
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LSHIFT))
+			{
+				m_treenityEditor.AddToSelection(closestEntity);
+			}
+			else
+			{
+				m_treenityEditor.Select(closestEntity);
+			}
+		}
 	}
 }
 
