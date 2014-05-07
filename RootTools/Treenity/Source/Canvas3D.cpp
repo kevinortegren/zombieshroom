@@ -90,3 +90,4 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 	scrollEvent.wheel.y = event->delta() / 100;
 	SDL_PushEvent(&scrollEvent);
 }
+

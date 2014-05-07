@@ -14,6 +14,7 @@
 #include <RootTools/Treenity/Include/ComponentViewItem.h>
 #include <RootTools/Treenity/Include/Components/TransformView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
+#include <qpiemenu.h>
 
 class Treenity : public QMainWindow, public EditorInterface
 {
@@ -72,7 +73,7 @@ private:
 protected:
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);
-
+	void mousePressEvent(QMouseEvent* event);
 private slots:
 	void New();
 	void OpenProject();
