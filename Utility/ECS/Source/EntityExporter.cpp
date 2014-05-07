@@ -41,7 +41,7 @@ std::string ECS::EntityExporter::Export(std::map<ECS::Entity*, std::string>* p_e
 	out << YAML::Key << "Entities";
 	out << YAML::Value << YAML::BeginSeq;
 
-	for(unsigned int i = 0; i < m_world->GetEntityManager()->m_entities.size(); i++)
+	for(int i = 0; i < m_world->GetEntityManager()->m_nextID; i++)
 	{
 		if(m_world->GetEntityManager()->m_entities[i].m_id == -1)
 			continue;
@@ -148,7 +148,7 @@ std::string ECS::EntityExporter::Export(std::map<ECS::Entity*, std::string>* p_e
 		out << YAML::BeginMap;
 		out << YAML::Key << "EntityNames" << YAML::Value << YAML::BeginSeq;
 		
-		for(unsigned int i = 0; i < m_world->GetEntityManager()->m_entities.size(); i++)
+		for(int i = 0; i < m_world->GetEntityManager()->m_nextID; i++)
 		{
 			if(m_world->GetEntityManager()->m_entities[i].m_id == -1)
 				continue;

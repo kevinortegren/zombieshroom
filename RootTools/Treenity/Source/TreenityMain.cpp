@@ -328,6 +328,16 @@ bool TreenityMain::IsRunning()
 	return m_treenityEditor.IsRunning();
 }
 
+void TreenityMain::EnterPlayMode()
+{
+
+}
+
+void TreenityMain::ExitPlayMode()
+{
+
+}
+
 void TreenityMain::HandleEditorEvents()
 {
 	m_globalKeys.Update();
@@ -457,14 +467,20 @@ void TreenityMain::Update(float dt)
 		m_world.SetDelta(dt);
 
 		HandleIngameEvents();
-		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-		{
-			Log::Write("Stopping game session. Restoring world.");
-			m_engineActions.ExitPlayMode();
-		}
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
+
+		m_worldSystem->Process();
+		m_controllerActionSystem->Process();	
+		m_lookAtSystem->Process();
+		m_cameraSystem->Process();
+		m_scriptSystem->Process();
+		m_transformInterpolationSystem->Process();
+		m_shadowSystem->Process();
+		m_directionalLightSystem->Process();
+		m_pointLightSystem->Process();
+		m_renderingSystem->Process();
 
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();

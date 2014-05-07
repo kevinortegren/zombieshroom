@@ -12,6 +12,7 @@
 #include <RootTools/Treenity/Include/KeyHelper.h>
 
 #include <QPushButton>
+
 extern RootEngine::GameSharedContext g_engineContext;
 
 Treenity::Treenity(QWidget *parent)
@@ -67,9 +68,9 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the component view and its items.
 	m_compView = new ComponentView();
 	ui.verticalLayout->addWidget(m_compView);
-	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView(this);
-	m_componentViews[RootForce::ComponentType::RENDERABLE] = new RenderableView(this);
-	m_componentViews[RootForce::ComponentType::PHYSICS] = new PhysicsView(this);
+	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView();
+	m_componentViews[RootForce::ComponentType::RENDERABLE] = new RenderableView();
+	m_componentViews[RootForce::ComponentType::PHYSICS] = new PhysicsView();
 
 
 	for (auto it : m_componentViews)
@@ -89,7 +90,6 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addEntity,					SIGNAL(triggered()), this,				SLOT(CreateEntity()));
 	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
 	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
-	connect(ui.treeView_entityOutliner,				SIGNAL(itemSelectionChanged()), this,	SLOT(OutlinerSelectEntity()));
 	connect(ui.action_addRenderable,				SIGNAL(triggered()), this,				SLOT(AddRenderable()));
 	connect(ui.action_addPhysics,					SIGNAL(triggered()), this,				SLOT(AddPhysics()));
 	connect(ui.actionPlay,							SIGNAL(triggered()), this,				SLOT(Play()));
@@ -206,16 +206,19 @@ void Treenity::OpenProject()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, "Open Project", "", "World File (*.world)");
 
-	m_currentProjectFile = fileName;
+	if (fileName != "")
+	{
+		m_currentProjectFile = fileName;
 
-	UpdateWindowTitle();
+		UpdateWindowTitle();
 
-	m_engineInterface->ClearScene();
-	m_engineInterface->AddDefaultEntities();
+		m_engineInterface->ClearScene();
+		m_engineInterface->AddDefaultEntities();
 
-	m_projectManager->Import(fileName);
+		m_projectManager->Import(fileName);
 
-	m_engineInterface->InitializeScene();
+		m_engineInterface->InitializeScene();
+	}
 }
 
 void Treenity::Save()
@@ -227,11 +230,14 @@ void Treenity::SaveAs()
 {
 	QString fileName = QFileDialog::getSaveFileName(this, "Save Project", "", "World File (*.world)");
 
-	m_currentProjectFile = fileName;
+	if (fileName != "")
+	{
+		m_currentProjectFile = fileName;
 
-	UpdateWindowTitle();
+		UpdateWindowTitle();
 
-	m_projectManager->Export(fileName);
+		m_projectManager->Export(fileName);
+	}
 }
 
 void Treenity::Play()
@@ -277,9 +283,11 @@ const std::set<ECS::Entity*>& Treenity::GetSelection() const
 	return m_selectedEntities;
 }
 
-void Treenity::RenameEntity(ECS::Entity* p_entity, const std::string& p_name)
+void Treenity::RenameEntity(ECS::Entity* p_entity, const QString& p_name)
 {
-	ui.treeView_entityOutliner->EntityRenamed(p_entity, QString::fromStdString(p_name));
+	m_projectManager->SetEntityName(p_entity, p_name);
+
+	ui.treeView_entityOutliner->EntityRenamed(p_entity, p_name);
 }
 
 void Treenity::CreateEntity()
@@ -301,9 +309,7 @@ void Treenity::RenameEntity()
 {
 	for (auto entity : m_selectedEntities)
 	{
-		m_projectManager->SetEntityName(entity, ui.lineEdit_entityName->text());
-		
-		ui.treeView_entityOutliner->EntityRenamed(entity, ui.lineEdit_entityName->text());
+		RenameEntity(entity, ui.lineEdit_entityName->text());
 	}
 }
 
@@ -379,6 +385,14 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 	{
 		if(m_selectedEntities.size() > 0)
 		m_engineInterface->TargetEntity(*m_selectedEntities.begin());
+	}
+	if (event->key() == Qt::Key_Escape)
+	{
+		if (m_engineInterface->GetMode() == EditorMode::GAME)
+		{
+			Log::Write("Stopping game session. Restoring world.");
+			m_engineInterface->ExitPlayMode();
+		}
 	}
 	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
 }

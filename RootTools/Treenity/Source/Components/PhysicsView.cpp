@@ -6,10 +6,10 @@ PhysicsView::PhysicsView(QWidget* p_parent)
 {
 	ui.setupUi(this);
 
-	connect(ui.doubleSpinBox_velocityX,	SIGNAL(valueChanged(double)), this,		SLOT(PhysicsVelocityXChanged(double)));
-	connect(ui.doubleSpinBox_velocityY,	SIGNAL(valueChanged(double)), this,		SLOT(PhysicsVelocityYChanged(double)));
-	connect(ui.doubleSpinBox_velocityZ,	SIGNAL(valueChanged(double)), this,		SLOT(PhysicsVelocityZChanged(double)));
-	connect(ui.doubleSpinBox_mass,		SIGNAL(valueChanged(double)), this,		SLOT(PhysicsMassChanged(double)));
+	connect(ui.doubleSpinBox_velocityX,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityXChanged(double)));
+	connect(ui.doubleSpinBox_velocityY,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityYChanged(double)));
+	connect(ui.doubleSpinBox_velocityZ,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityZChanged(double)));
+	connect(ui.doubleSpinBox_mass,		SIGNAL(valueChanged(double)), this,		SLOT(MassChanged(double)));
 }
 
 const QString& PhysicsView::GetComponentName() const

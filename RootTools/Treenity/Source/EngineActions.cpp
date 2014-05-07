@@ -14,6 +14,7 @@
 
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
+extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
 EngineActions::EngineActions(ECS::World* p_world, TreenityMain* p_treenityMain)
 	: m_world(p_world), m_treenityMain(p_treenityMain), m_editorMode(EditorMode::EDITOR)
@@ -57,6 +58,7 @@ void EngineActions::AddDefaultEntities()
 	m_treenityMain->GetEditor()->RenameEntity(skybox, "Skybox");
 	m_treenityMain->GetEditor()->RenameEntity(m_cameraEntity, "Main Camera");
 	m_treenityMain->GetEditor()->RenameEntity(m_aimingDevice, "Aiming Device");
+	m_treenityMain->GetEditor()->RenameEntity(m_testSpawnpoint, "Test Spawnpoint");
 }
 
 // Can only be called after a world has been imported !!
@@ -147,12 +149,38 @@ void EngineActions::EnterPlayMode()
 	// Save the current world state.
 	m_editorLevelState = m_world->GetEntityExporter()->Export(nullptr);
 
+	// Get the spawn position/orientation.
+	RootForce::Transform* spawnTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("TestSpawnpoint"));
+
 	// Remove the test spawnpoint, the editor camera and the editor spawnpoint.
 	m_world->GetEntityManager()->RemoveEntity(m_cameraEntity);
 	m_world->GetEntityManager()->RemoveEntity(m_aimingDevice);
 	m_world->GetEntityManager()->RemoveEntity(m_testSpawnpoint);
 
-	// TODO: Create a player, its aiming device and its camera.
+	// Create a camera.
+	m_treenityMain->GetWorldSystem()->CreatePlayerCamera();
+
+	// Create a player.
+	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
+
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnCreate");
+	g_engineContext.m_script->AddParameterNumber(0);
+	g_engineContext.m_script->AddParameterNumber(RootForce::Network::ReservedActionID::CONNECT);
+	g_engineContext.m_script->ExecuteScript();
+
+	ECS::Entity* playerEntity = m_world->GetTagManager()->GetEntityByTag("Player");
+
+	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
+	g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
+	g_engineContext.m_script->AddParameterNumber(1);
+	g_engineContext.m_script->ExecuteScript();
+
+	// Set the player's position to the test spawnpoint.
+	RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(playerEntity);
+	transform->m_position = spawnTransform->m_position;
+	transform->m_orientation = spawnTransform->m_orientation;
+
+	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Entered play mode");
 }
 
 void EngineActions::ExitPlayMode()
@@ -167,6 +195,8 @@ void EngineActions::ExitPlayMode()
 	InitializeScene();
 
 	m_editorMode = EditorMode::EDITOR;
+
+	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Exited play mode");
 }
 
 EditorMode::EditorMode EngineActions::GetMode()

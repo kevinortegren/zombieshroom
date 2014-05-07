@@ -55,7 +55,10 @@ public:
 	Treenity* GetEditor() { return &m_treenityEditor; }
 	RootForce::WorldSystem* GetWorldSystem() { return m_worldSystem.get(); }
 	RootForce::ShadowSystem* GetShadowSystem() { return m_shadowSystem; }
-
+	
+	// These will set up/reset systems needed for playing.
+	void EnterPlayMode();
+	void ExitPlayMode();
 private:
 
 	void RenderSelectedEntity();
