@@ -213,7 +213,7 @@ std::string EngineActions::GetRenderableMaterialName( ECS::Entity* p_entity )
 void EngineActions::SetRenderableModelName( ECS::Entity* p_entity, std::string p_modelName )
 {
 	RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
-	renderable->m_model = g_engineContext.m_resourceManager->GetModel(p_modelName);
+	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada(p_modelName);
 }
 
 void EngineActions::SetRenderableMaterialName( ECS::Entity* p_entity, std::string p_materialName )

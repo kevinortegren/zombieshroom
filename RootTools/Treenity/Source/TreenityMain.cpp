@@ -416,26 +416,30 @@ void TreenityMain::RaySelect()
 			RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));
 			if(renderable != nullptr)
 			{
-				float t = 99999;
+				float t = 999999.0f;
 				RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t);
 
 				if(t < closestDist)
 				{
 					closestEntity = (*itr);
 					closestDist = t;
+					g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
+
 				}
 			}
 			else
 			{
 				static float radius = 5.0f;
 
-				float t = 999999;
+				float t = 999999.0f;
 				RayVsSphere(cameraPos, ray, entityPos, radius, t);
 
 				if(t < closestDist)
 				{
 					closestEntity = (*itr);
 					closestDist = t;
+					g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
+
 				}
 			}
 		}
@@ -452,6 +456,10 @@ void TreenityMain::RaySelect()
 			{
 				m_treenityEditor.Select(closestEntity);
 			}
+		}
+		else
+		{
+			m_treenityEditor.Select(nullptr);
 		}
 	}
 }
