@@ -257,9 +257,6 @@ namespace RootForce
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 		}
 
-		// Give the player control system access to the HUD.
-		m_playerControlSystem->SetHUD(m_hud.get());
-
 		// Initialize the debug, setting the html view
 #ifdef _DEBUG
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
