@@ -4,6 +4,7 @@
 #include <QtWidgets/qtreewidget.h>
 #include <Utility/ECS/Include/Entity.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>
+#include <RootTools/Treenity/Include/EditorInterface.h>
 
 class EntityOutlinerItem : public QTreeWidgetItem
 {
@@ -35,6 +36,7 @@ public:
 	EntityOutliner(QWidget* p_parent);
 
 	void SetEngineInterface(EngineInterface* p_engineInterface);
+	void SetEditorInterface(EditorInterface* p_editorInterface);
 
 	void EntityCreated(ECS::Entity* p_entity, const QString& p_name);
 	void EntityRemoved(ECS::Entity* p_entity);
@@ -51,7 +53,9 @@ public:
 private:
 	EntityOutlinerItem* FindItemWithEntity(ECS::Entity* p_entity);
 	EngineInterface* m_engineInterface;
+	EditorInterface* m_editorInterface;
 
 private slots:
 	void TargetEntity(QTreeWidgetItem* item, int column);
+	void SelectionChanged();
 };

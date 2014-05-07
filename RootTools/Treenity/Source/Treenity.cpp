@@ -74,6 +74,8 @@ Treenity::Treenity(QWidget *parent)
 		it.second->SetEditorInterface(this);
 	}
 	
+	ui.treeView_entityOutliner->SetEditorInterface(this);
+
 	// Match signals with slots.
 	connect(ui.actionNew,							SIGNAL(triggered()), this,				SLOT(New()));
 	connect(ui.actionOpen_Project,					SIGNAL(triggered()), this,				SLOT(OpenProject()));
@@ -84,7 +86,6 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addEntity,					SIGNAL(triggered()), this,				SLOT(CreateEntity()));
 	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
 	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
-	connect(ui.treeView_entityOutliner,				SIGNAL(itemSelectionChanged()), this,	SLOT(OutlinerSelectEntity()));
 	connect(ui.action_renderable,					SIGNAL(triggered()), this,				SLOT(AddRenderable()));
 	
 	// Setup Qt-to-SDL keymatching.
@@ -237,6 +238,13 @@ void Treenity::Select(ECS::Entity* p_entity)
 	UpdateOnSelection();
 }
 
+void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
+{
+	m_selectedEntities = p_entities;
+
+	UpdateOnSelection();
+}
+
 void Treenity::AddToSelection(ECS::Entity* p_entity)
 {
 	m_selectedEntities.insert(p_entity);
@@ -286,11 +294,6 @@ void Treenity::RenameEntity()
 	}
 }
 
-void Treenity::OutlinerSelectEntity()
-{
-	Select(ui.treeView_entityOutliner->GetSelectedEntity());
-}
-
 void Treenity::AddRenderable()
 {
 	if (m_selectedEntities.size() == 1)
@@ -313,6 +316,8 @@ void Treenity::UpdateOnSelection()
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
+
+		//ui.treeView_entityOutliner->setS
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);

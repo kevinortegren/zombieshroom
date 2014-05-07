@@ -345,8 +345,6 @@ void TreenityMain::Update(float dt)
 
 	HandleEvents();
 
-
-
 	ProcessWorldMessages();
 	m_world.GetEntityManager()->CleanUp();
 
