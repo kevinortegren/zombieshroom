@@ -341,6 +341,8 @@ void TreenityMain::Update(float dt)
 
 	RenderSelectedEntity();
 
+	g_engineContext.m_renderer->AddLine(debugCameraPos, debugCameraPos + (debugRay * 500.0f), glm::vec4(1,0,0,1));
+
 	g_engineContext.m_renderer->Clear();
 	g_engineContext.m_renderer->Render();
 	g_engineContext.m_renderer->Swap();
@@ -379,7 +381,7 @@ void TreenityMain::RenderSelectedEntity()
 
 		g_engineContext.m_renderer->AddRenderJob(job);
 
-		//Debug(&renderable->m_model->m_obb, m_renderingSystem->m_matrices[entity].m_model, glm::vec3(0,1,0));
+		Debug(&renderable->m_model->m_obb, m_renderingSystem->m_matrices[entity].m_model, glm::vec3(0,1,0));
 	}
 }
 
@@ -393,6 +395,9 @@ void TreenityMain::RaySelect()
 
 		// Construct ray.
 		const glm::vec3& ray = glm::normalize(ConstructRay());
+
+		debugRay = ray;
+		debugCameraPos = cameraPos;
 
 		float closestDist = 999999.0f;
 		ECS::Entity* closestEntity = nullptr;
@@ -551,9 +556,9 @@ bool TreenityMain::RayVsOBB(const glm::vec3& cameraPos, const glm::vec3& ray, Ro
 	normals[2] = glm::normalize(glm::vec3(normalZ.x, normalZ.y, normalZ.z));
 
 	float distances[3];
-	distances[0] = glm::length(normalX);
-	distances[1] = glm::length(normalY);
-	distances[2] = glm::length(normalZ);
+	distances[0] = glm::length(normalX) / 2;
+	distances[1] = glm::length(normalY) / 2;
+	distances[2] = glm::length(normalZ) / 2;
 
 	glm::vec3 direction = glm::vec3(center.x, center.y, center.z) - cameraPos;
 

@@ -51,6 +51,9 @@ private:
 	ProjectManager m_projectManager;
 	GlobalKeys m_globalKeys;
 
+	glm::vec3 debugRay;
+	glm::vec3 debugCameraPos;
+
 	RootForce::WorldSystem m_worldSystem;
 	RootForce::ShadowSystem* m_shadowSystem;
 	RootForce::PointLightSystem* m_pointLightSystem;

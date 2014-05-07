@@ -1,17 +1,32 @@
 - Entities:
-    - 3
+    - 0
+    - 2
+    - 5
 - Components:
     - Type: 0
       Data:
-        - Entity: 3
+        - Entity: 0
+          Model: testchar
+          Material:
+            Name: skybox
+            Effect: Skybox
+        - Entity: 5
           Model: testchar
           Material:
             Name: skybox
             Effect: Skybox
     - Type: 1
       Data:
-        - Entity: 3
+        - Entity: 0
           Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 2
+          Position: [-184.801, 139.358, -190.86]
+          Rotation: [0.221731, 0.364328, -0.0897563, 0.900025]
+          Scale: [1, 1, 1]
+        - Entity: 5
+          Position: [0, 0, 17]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
     - Type: 2
@@ -70,10 +85,12 @@
         []
     - Type: 20
       Data:
-        []
+        - Entity: 2
+          LightSlot: 0
     - Type: 21
       Data:
-        []
+        - Entity: 2
+          Color: [0.8, 0.8, 0.8, 1]
     - Type: 22
       Data:
         []
@@ -201,11 +218,17 @@
       Data:
         []
 - Tags:
-    []
+    - Id: 2
+      Tag: Sun
 - Groups:
     []
 - Storage:
-    []
+    - Key: Ambient
+      Value: 1 1 1 1
 - EntityNames:
-    - ID: 3
+    - ID: 0
+      Name: Unnamed
+    - ID: 2
+      Name: Unnamed
+    - ID: 5
       Name: Unnamed
