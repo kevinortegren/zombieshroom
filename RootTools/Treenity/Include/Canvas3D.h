@@ -22,7 +22,7 @@ protected:
 	//void keyReleaseEvent( QKeyEvent *k );
 	void resizeEvent( QResizeEvent * event );
 	//void enterEvent( QEvent * event );
-
+	void mousePressEvent(QMouseEvent* event);
 	
 private:
 	std::shared_ptr<SDL_Window> m_window;

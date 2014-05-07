@@ -74,6 +74,8 @@ public:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*);
 public:
 	void setSize(int size);
+	void setAngle(int angle);
+	void setAngleSpan(int angleSpan);
 public slots:
 	void hide();
 signals:
@@ -83,6 +85,8 @@ protected:
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *e);
 private:
 	QPixmap m_Pixmap;
+	int m_Angle;
+	int m_AngleSpan;
 	int m_Size;
 };
 

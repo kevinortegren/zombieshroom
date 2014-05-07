@@ -67,7 +67,9 @@ void QClickablePixmapGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *eve
 
 QButtonGraphicsItem::QButtonGraphicsItem(const QPixmap &pixmap):
 	m_Pixmap(pixmap),
-	m_Size(48)
+	m_Size(48),
+	m_Angle(0),
+	m_AngleSpan(5760)
 {
 	//setAcceptsHoverEvents(true);
 }
@@ -92,7 +94,9 @@ void QButtonGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
 	grad.setColorAt(down ? 0 : 1, Qt::darkGray);
 	painter->setPen(Qt::darkGray);
 	painter->setBrush(grad);
-	painter->drawEllipse(boundingRect());
+	//painter->drawEllipse(boundingRect());
+	painter->drawPie(boundingRect(), m_Angle, m_AngleSpan);
+	
 
 	grad.setColorAt(down ? 1 : 0, Qt::darkGray);
 	grad.setColorAt(down ? 0 : 1, Qt::lightGray);
@@ -102,7 +106,7 @@ void QButtonGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
 	{
 		painter->translate(1, 1);
 	}
-	painter->drawEllipse(boundingRect().adjusted(3, 3, -3, -3));
+	//painter->drawEllipse(boundingRect().adjusted(3, 3, -3, -3));
 
 	painter->drawPixmap(-m_Pixmap.width() / 2, -m_Pixmap.height() / 2, m_Pixmap);
 }
@@ -128,6 +132,18 @@ void QButtonGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 	emit clicked();
 	update();
 }
+
+void QButtonGraphicsItem::setAngleSpan( int angleSpan )
+{
+	m_AngleSpan = angleSpan;
+}
+
+void QButtonGraphicsItem::setAngle( int angle )
+{
+	m_Angle = angle;
+}
+
+
 
 //
 // QPieMenu
@@ -279,6 +295,11 @@ void QPieMenu::placeEntries(int radius)
 		// int y = m_CenterPos.y() +
 		int y = (int)(radius * sin(i * 2 * 3.14 / count - 3.14 / 2));
 
+		int angle = -(i * 5760 / count) + 5760 / 4;
+		int spanAngle = 5760 / count;
+		m_Entries[i]->setAngle(angle);
+		m_Entries[i]->setAngleSpan(spanAngle);
+
 		// QSize hint = m_Entries[i]->sizeHint();
 		// int size = hint.width() > hint.height() ? hint.width() : hint.height();
 		// m_Entries[i]->setGeometry(x - m_MaxSize / 2, y - m_MaxSize / 2, m_MaxSize, m_MaxSize); //  hint.width() / 2, y - hint.height() / 2, hint.width(), hint.height());
@@ -289,20 +310,20 @@ void QPieMenu::placeEntries(int radius)
 			// skip
 		// } else
 		// {
-		QPropertyAnimation *a = new QPropertyAnimation(m_Entries[i], "pos");
-		a->setEasingCurve(m_EasingCurve);
-		if (radius > 0)
-		{
-			a->setStartValue(QPointF(0, 0));
-		}
-		a->setEndValue(QPointF(x, y));
-		//a->setDuration(m_AnimDuration + i * 50);
-		a->setDuration(m_AnimDuration * 0.5);
+		//QPropertyAnimation *a = new QPropertyAnimation(m_Entries[i], "pos");
+		//a->setEasingCurve(m_EasingCurve);
+		//if (radius > 0)
+		//{
+		//	a->setStartValue(QPointF(0, 0));
+		//}
+		//a->setEndValue(QPointF(x, y));
+		////a->setDuration(m_AnimDuration + i * 50);
+		//a->setDuration(m_AnimDuration * 0.5);
 
-		m_Animation->addAnimation(a);
-		// }
+		//m_Animation->addAnimation(a);
+		//// }
 	}
-	m_Animation->start();
+	/*m_Animation->start();
 	QObject::disconnect(m_Animation, SIGNAL(finished()), 0, 0);
 	if (radius == 0)
 	{
@@ -313,6 +334,19 @@ void QPieMenu::placeEntries(int radius)
 			QObject::connect(m_Animation, SIGNAL(finished()), this, SLOT(showNextMenu()));
 		}
 		QObject::connect(m_Animation, SIGNAL(finished()), this, SIGNAL(hidden()));
+	}*/
+
+	if (radius == 0)
+	{
+
+		m_View->hide();
+		m_CheckActiveWindowTimer->stop();
+		if (m_NextMenu != 0)
+		{
+
+			showNextMenu();
+		}
+		hidden();
 	}
 }
 
@@ -338,10 +372,16 @@ void QPieMenu::showMenuNow()
 	m_BgPixmapItem->setPos(-bg.width() / 2, -bg.height() / 2);
 	m_BgPixmapItem->setZValue(-1);
 	// m_Scene->addItem(pi);
-	m_View->setSceneRect(-bgRadius, -bgRadius, bgRadius * 2, bgRadius * 2);
+	QRect bgRect(-bgRadius, -bgRadius, bgRadius * 2, bgRadius * 2);
+	m_View->setSceneRect(bgRect);
 	m_View->setGeometry(m_CenterPos.x() - bgRadius, m_CenterPos.y() - bgRadius, bgRadius * 2, bgRadius * 2);
 	m_View->show();
 	//m_View->activateWindow();
+
+	for (int i = 0; i < m_Entries.count(); ++i)
+	{
+		m_Entries[i]->setSize(bgRadius);
+	}
 
 	placeEntries(m_DestRadius);
 

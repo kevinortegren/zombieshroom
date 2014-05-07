@@ -73,7 +73,7 @@ private:
 protected:
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);
-	void mousePressEvent(QMouseEvent* event);
+	
 private slots:
 	void New();
 	void OpenProject();

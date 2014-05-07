@@ -367,19 +367,3 @@ void Treenity::keyReleaseEvent( QKeyEvent* event )
 	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::HELP_PRINT, "Key released: %d", event->key() );
 }
 
-void Treenity::mousePressEvent( QMouseEvent * event )
-{
-	if (event->button() == Qt::RightButton) {
-		QPieMenu* paj = new QPieMenu(this);
-		paj->setIconSize(QSize(40,40));
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->showMenu();
-	}
-}

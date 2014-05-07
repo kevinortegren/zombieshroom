@@ -91,3 +91,20 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 	SDL_PushEvent(&scrollEvent);
 }
 
+void Canvas3D::mousePressEvent( QMouseEvent* event )
+{
+	if (event->button() == Qt::RightButton) {
+		QPieMenu* paj = new QPieMenu(nullptr);
+		paj->setIconSize(QSize(40,40));
+		paj->addAction("", QIcon("Resources/resizeButton.png"), nullptr, nullptr);
+		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
+		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
+		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
+		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
+		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
+		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
+		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
+		paj->showMenu();
+	}
+}
+
