@@ -12,14 +12,15 @@ void ECS::EntityImporter::SetImporter(COMPIMPORT p_importer)
 
 void ECS::EntityImporter::Import(const std::string& p_filename, std::map<ECS::Entity*, std::string>* p_entityNames)
 {
+	std::ifstream file(p_filename, std::ifstream::in);
+	Import(file, p_entityNames);
+}
+
+void ECS::EntityImporter::Import(std::istream& p_stream, std::map<ECS::Entity*, std::string>* p_entityNames)
+{
 	try
 	{
-		std::ifstream file(p_filename, std::ifstream::in);
-		if(!file.good())
-		{
-			//g_logger.LogText(LogTag::GENERAL, LogLevel::FATAL_ERROR, "Failed to load yaml file: %s", filepath.c_str());
-		}
-		YAML::Parser parser(file);
+		YAML::Parser parser(p_stream);
 
 		YAML::Node doc;
 		parser.GetNextDocument(doc);

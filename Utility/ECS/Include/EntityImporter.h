@@ -16,7 +16,7 @@ namespace ECS
 		void SetImporter(COMPIMPORT p_importer);
 
 		void Import(const std::string& p_filename, std::map<ECS::Entity*, std::string>* p_entityNames = nullptr);
-
+		void Import(std::istream& p_stream, std::map<ECS::Entity*, std::string>* p_entityNames = nullptr);
 	private:
 		World* m_world;
 		COMPIMPORT m_importer;

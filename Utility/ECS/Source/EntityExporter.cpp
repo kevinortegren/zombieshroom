@@ -12,6 +12,15 @@ void ECS::EntityExporter::SetExporter(COMPEXPORT p_exporter)
 
 void ECS::EntityExporter::Export(const std::string& p_filepath, std::map<ECS::Entity*, std::string>* p_entityNames)
 {
+	std::string content = Export(p_entityNames);
+
+	std::ofstream file;
+	file.open(p_filepath);
+	file << content.c_str();
+}
+
+std::string ECS::EntityExporter::Export(std::map<ECS::Entity*, std::string>* p_entityNames)
+{
 	std::vector<bool> nonExportIds;
 	nonExportIds.resize(m_world->GetEntityManager()->GetNumEntities());
 
@@ -159,7 +168,5 @@ void ECS::EntityExporter::Export(const std::string& p_filepath, std::map<ECS::En
 
 	out << YAML::EndSeq;
 
-	std::ofstream file;
-	file.open(p_filepath);
-	file << out.c_str();
+	return std::string(out.c_str());
 }

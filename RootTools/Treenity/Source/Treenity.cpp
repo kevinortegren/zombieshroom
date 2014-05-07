@@ -15,7 +15,7 @@
 extern RootEngine::GameSharedContext g_engineContext;
 
 Treenity::Treenity(QWidget *parent)
-	: QMainWindow(parent), m_running(true), m_mode(EditorMode::EDITOR)
+	: QMainWindow(parent), m_running(true)
 {
 	//Set some logging init things
 	Log::GetInstance()->setParent(this);
@@ -121,11 +121,6 @@ void Treenity::CreateNewScene()
 void Treenity::UpdateWindowTitle()
 {
 	setWindowTitle("Treenity - " + m_currentProjectFile);
-}
-
-EditorMode::EditorMode Treenity::GetMode() const
-{
-	return m_mode;
 }
 
 bool Treenity::IsRunning()
@@ -237,7 +232,7 @@ void Treenity::Play()
 {
 	Log::Write("Starting game session");
 
-	m_mode = EditorMode::GAME;
+	m_engineInterface->EnterPlayMode();
 }
 
 void Treenity::Select(ECS::Entity* p_entity)

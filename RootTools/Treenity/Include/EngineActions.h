@@ -22,6 +22,13 @@ public:
 	void AddDefaultEntities();
 	void InitializeScene();
 
+	// Mode switching
+	void EnterPlayMode();
+	void ExitPlayMode();
+	EditorMode::EditorMode GetMode();
+	void LoadWorld(ECS::World* p_world);
+	ECS::ComponentInterface* CreateComponentByType(ECS::World* p_world, ECS::Entity* p_entity, unsigned int p_componentType);
+
 	// Entity
 	ECS::Entity* CreateEntity();
 	void DeleteEntity(ECS::Entity* p_entity);
@@ -44,6 +51,8 @@ private:
 
 	TreenityMain* m_treenityMain;
 	ECS::World* m_world;
+	EditorMode::EditorMode m_editorMode;
+	std::string m_editorLevelState;
 
 	ECS::Entity* m_cameraEntity;
 	ECS::Entity* m_aimingDevice;

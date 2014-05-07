@@ -1,9 +1,12 @@
+
 #include <RootTools/Treenity/Include/EngineActions.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/ControllerActions.h>
+
+#include <sstream>
 
 #include <Utility/ECS/Include/World.h>
 #include <RootEngine/Script/Include/ScriptManager.h>
@@ -14,7 +17,7 @@
 extern RootEngine::GameSharedContext g_engineContext;
 
 EngineActions::EngineActions(ECS::World* p_world, TreenityMain* p_treenityMain)
-	: m_world(p_world), m_treenityMain(p_treenityMain)
+	: m_world(p_world), m_treenityMain(p_treenityMain), m_editorMode(EditorMode::EDITOR)
 {
 
 }
@@ -129,6 +132,43 @@ void EngineActions::CreateTestSpawnpoint()
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_testSpawnpoint);
 	m_world->GetTagManager()->RegisterEntity("TestSpawnpoint", m_testSpawnpoint);
 }
+
+
+// Mode switching
+void EngineActions::EnterPlayMode()
+{
+	m_editorMode = EditorMode::GAME;
+
+	// Save the current world state.
+	m_editorLevelState = m_world->GetEntityExporter()->Export(nullptr);
+
+	// Remove the test spawnpoint, the editor camera and the editor spawnpoint.
+	m_world->GetEntityManager()->RemoveEntity(m_cameraEntity);
+	m_world->GetEntityManager()->RemoveEntity(m_aimingDevice);
+	m_world->GetEntityManager()->RemoveEntity(m_testSpawnpoint);
+
+	// TODO: Create a player, its aiming device and its camera.
+}
+
+void EngineActions::ExitPlayMode()
+{
+	// Clear whatever happened within the game session.
+	ClearScene();
+
+	// Restore the old world state.
+	std::stringstream ss(m_editorLevelState);
+	m_world->GetEntityImporter()->Import(ss, nullptr);
+	AddDefaultEntities();
+	InitializeScene();
+
+	m_editorMode = EditorMode::EDITOR;
+}
+
+EditorMode::EditorMode EngineActions::GetMode()
+{
+	return m_editorMode;
+}
+
 
 // Entity
 ECS::Entity* EngineActions::CreateEntity()

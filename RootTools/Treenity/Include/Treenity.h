@@ -15,15 +15,6 @@
 #include <RootTools/Treenity/Include/Components/TransformView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
 
-namespace EditorMode
-{
-	enum EditorMode
-	{
-		EDITOR,
-		GAME
-	};
-}
-
 class Treenity : public QMainWindow, public EditorInterface
 {
 	Q_OBJECT
@@ -37,7 +28,6 @@ public:
 	void CreateNewScene();
 	void UpdateWindowTitle();
 
-	EditorMode::EditorMode GetMode() const;
 	bool IsRunning();
 	void closeEvent(QCloseEvent *event);
 
@@ -68,7 +58,6 @@ private:
 
 	// Editor state
 	bool m_running;
-	EditorMode::EditorMode m_mode;
 
 	EngineInterface* m_engineInterface;
 	Ui::TreenityClass ui;

@@ -43,7 +43,8 @@ public:
 	TreenityMain(const std::string& p_path);
 	~TreenityMain();
 
-	void HandleEvents();
+	void HandleEditorEvents();
+	void HandleIngameEvents();
 	void ProcessWorldMessages();
 	void HandleAltModifier();
 	

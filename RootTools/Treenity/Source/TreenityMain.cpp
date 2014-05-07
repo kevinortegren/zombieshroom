@@ -25,6 +25,7 @@
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
+#include <RootTools/Treenity/Include/Log.h>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
@@ -212,6 +213,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_renderingSystem = new RootForce::RenderingSystem(&m_world);
 	m_renderingSystem->SetRendererInterface(g_engineContext.m_renderer);
 	m_renderingSystem->SetLoggingInterface(g_engineContext.m_logger);
+	g_world->GetSystemManager()->AddSystem<RootForce::RenderingSystem>(m_renderingSystem);
 
 	m_pointLightSystem = new RootForce::PointLightSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::PointLightSystem>(m_pointLightSystem);
@@ -315,7 +317,7 @@ bool TreenityMain::IsRunning()
 	return m_treenityEditor.IsRunning();
 }
 
-void TreenityMain::HandleEvents()
+void TreenityMain::HandleEditorEvents()
 {
 	if (g_engineContext.m_inputSys != nullptr)
 	{
@@ -332,6 +334,21 @@ void TreenityMain::HandleEvents()
 		if(event.type == SDL_MOUSEMOTION)
 			continue;
 
+		if (g_engineContext.m_inputSys != nullptr)
+			g_engineContext.m_inputSys->HandleInput(event);
+	}
+}
+
+void TreenityMain::HandleIngameEvents()
+{
+	if (g_engineContext.m_inputSys != nullptr)
+	{
+		g_engineContext.m_inputSys->Reset();
+	}
+
+	SDL_Event event;
+	while(SDL_PollEvent(&event))
+	{
 		if (g_engineContext.m_inputSys != nullptr)
 			g_engineContext.m_inputSys->HandleInput(event);
 	}
@@ -424,11 +441,11 @@ void TreenityMain::ProcessWorldMessages()
 
 void TreenityMain::Update(float dt)
 {
-	if (m_treenityEditor.GetMode() == EditorMode::EDITOR)
+	if (m_engineActions.GetMode() == EditorMode::EDITOR)
 	{
 		m_world.SetDelta(dt);
 
-		HandleEvents();
+		HandleEditorEvents();
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
@@ -448,14 +465,23 @@ void TreenityMain::Update(float dt)
 		g_engineContext.m_renderer->Render();
 		g_engineContext.m_renderer->Swap();
 	}
-	else
+	else if (m_engineActions.GetMode() == EditorMode::GAME)
 	{
 		m_world.SetDelta(dt);
+
+		HandleIngameEvents();
+		if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_ESCAPE) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			Log::Write("Stopping game session. Restoring world.");
+			m_engineActions.ExitPlayMode();
+		}
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
 
-
+		g_engineContext.m_renderer->Clear();
+		g_engineContext.m_renderer->Render();
+		g_engineContext.m_renderer->Swap();
 	}
 }
 

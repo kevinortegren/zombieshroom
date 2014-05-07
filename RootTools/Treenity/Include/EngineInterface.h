@@ -5,6 +5,15 @@
 #include <RootSystems/Include/Orientation.h>
 #include <glm/glm.hpp>
 
+namespace EditorMode
+{
+	enum EditorMode
+	{
+		EDITOR,
+		GAME
+	};
+}
+
 struct EngineInterface
 {
 	// Project management
@@ -12,6 +21,11 @@ struct EngineInterface
 	virtual void ClearScene() = 0;
 	virtual void AddDefaultEntities() = 0;
 	virtual void InitializeScene() = 0;
+
+	// Mode switching
+	virtual void EnterPlayMode() = 0;
+	virtual void ExitPlayMode() = 0;
+	virtual EditorMode::EditorMode GetMode() = 0;
 
 	// Entity
 	virtual ECS::Entity* CreateEntity() = 0;

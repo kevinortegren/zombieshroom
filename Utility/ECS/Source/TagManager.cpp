@@ -16,6 +16,27 @@ void ECS::TagManager::RegisterEntity(const std::string& p_tag, Entity* p_entity)
 	m_world->m_messages.push_back(m);
 }
 
+void ECS::TagManager::Unregister(ECS::Entity* p_entity)
+{
+	for (auto it = m_tags.begin(); it != m_tags.end();)
+	{
+		if (it->second == p_entity)
+		{
+			Message m;
+			m.m_type = MessageType::TAG_REMOVED;
+			m.m_entity = it->second;
+			m.m_tagGroupName = it->first;
+			m_world->m_messages.push_back(m);
+			
+			it = m_tags.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
+}
+
 void ECS::TagManager::Unregister(const std::string& p_tag)
 {
 	if (m_tags.find(p_tag) != m_tags.end())

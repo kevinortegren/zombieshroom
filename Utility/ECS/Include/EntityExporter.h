@@ -18,7 +18,7 @@ namespace ECS
 
 		void SetExporter(COMPEXPORT p_exporter);
 		void Export(const std::string& p_filepath, std::map<ECS::Entity*, std::string>* p_entityNames = nullptr);
-
+		std::string Export(std::map<ECS::Entity*, std::string>* p_entityNames = nullptr);
 	private:
 		World* m_world;
 		COMPEXPORT m_exporter;
