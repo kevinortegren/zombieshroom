@@ -1,6 +1,7 @@
 #include <RootTools/Treenity/Include/EngineActions.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
+#include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/ControllerActions.h>
@@ -185,3 +186,65 @@ void EngineActions::RemoveRenderable(ECS::Entity* p_entity)
 {
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>(p_entity);
 }
+
+std::string EngineActions::GetRenderableModelName( ECS::Entity* p_entity )
+{
+	auto model = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity)->m_model;
+	return g_engineContext.m_resourceManager->ResolveStringFromModel(model);
+}
+
+std::string EngineActions::GetRenderableMaterialName( ECS::Entity* p_entity )
+{
+	auto material = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity)->m_material;
+	if(material)
+	{
+		return g_engineContext.m_renderer->GetStringFromMaterial(material);
+	}
+	return "";
+}
+
+void EngineActions::SetRenderableModelName( ECS::Entity* p_entity, std::string p_modelName )
+{
+	RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
+	renderable->m_model = g_engineContext.m_resourceManager->GetModel(p_modelName);
+}
+
+void EngineActions::SetRenderableMaterialName( ECS::Entity* p_entity, std::string p_materialName )
+{
+	RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
+	renderable->m_material = g_engineContext.m_renderer->CreateMaterial(p_materialName);
+}
+
+//Physics
+float EngineActions::GetMass(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity)->m_mass;
+}
+
+glm::vec3& EngineActions::GetVelocity( ECS::Entity* p_entity )
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity)->m_velocity;
+}
+
+void EngineActions::SetMass( ECS::Entity* p_entity, float p_mass)
+{
+	RootForce::Physics* physics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
+	physics->m_mass = p_mass;
+}
+
+void EngineActions::SetVelocity( ECS::Entity* p_entity, glm::vec3& p_velocity )
+{
+	RootForce::Physics* physics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
+	physics->m_velocity = p_velocity;
+}
+
+void EngineActions::AddPhysics( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
+}
+
+void EngineActions::RemovePhysics( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(p_entity);
+}
+

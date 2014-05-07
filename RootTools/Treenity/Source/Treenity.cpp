@@ -68,6 +68,9 @@ Treenity::Treenity(QWidget *parent)
 	m_compView = new ComponentView();
 	ui.verticalLayout->addWidget(m_compView);
 	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView(this);
+	m_componentViews[RootForce::ComponentType::RENDERABLE] = new RenderableView(this);
+	m_componentViews[RootForce::ComponentType::PHYSICS] = new PhysicsView(this);
+
 
 	for (auto it : m_componentViews)
 	{
@@ -85,7 +88,8 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
 	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
 	connect(ui.treeView_entityOutliner,				SIGNAL(itemSelectionChanged()), this,	SLOT(OutlinerSelectEntity()));
-	connect(ui.action_renderable,					SIGNAL(triggered()), this,				SLOT(AddRenderable()));
+	connect(ui.action_addRenderable,				SIGNAL(triggered()), this,				SLOT(AddRenderable()));
+	connect(ui.action_addPhysics,					SIGNAL(triggered()), this,				SLOT(AddPhysics()));
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
@@ -295,7 +299,13 @@ void Treenity::AddRenderable()
 	}
 }
 
-
+void Treenity::AddPhysics()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddPhysics(*m_selectedEntities.begin());
+	}
+}
 
 
 void Treenity::UpdateOnSelection()

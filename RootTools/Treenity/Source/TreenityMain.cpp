@@ -377,6 +377,10 @@ void TreenityMain::RenderSelectedEntity()
 
 		if(renderable == nullptr)
 			continue;
+		if(renderable->m_model == nullptr)
+			continue;
+		if(renderable->m_material == nullptr)
+			continue;
 
 		m_renderingSystem->m_matrices[entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_interpolatedPosition);
 		m_renderingSystem->m_matrices[entity].m_model = glm::rotate(m_renderingSystem->m_matrices[entity].m_model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());

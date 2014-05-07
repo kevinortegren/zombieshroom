@@ -33,4 +33,17 @@ struct EngineInterface
 	// Renderable
 	virtual void AddRenderable(ECS::Entity* p_entity) = 0;
 	virtual void RemoveRenderable(ECS::Entity* p_entity) = 0;
+	virtual std::string GetRenderableModelName(ECS::Entity* p_entity) = 0;
+	virtual std::string GetRenderableMaterialName(ECS::Entity* p_entity) = 0;
+	virtual void SetRenderableModelName(ECS::Entity* p_entity, std::string p_modelName) = 0;
+	virtual void SetRenderableMaterialName(ECS::Entity* p_entity, std::string p_materialName) = 0;
+
+	//Physics
+	virtual void AddPhysics(ECS::Entity* p_entity) = 0;
+	virtual void RemovePhysics(ECS::Entity* p_entity) = 0;
+	virtual float GetMass(ECS::Entity* p_entity) = 0;
+	virtual glm::vec3& GetVelocity(ECS::Entity* p_entity) = 0;
+	virtual void SetMass(ECS::Entity* p_entity, float p_mass) = 0;
+	virtual void SetVelocity(ECS::Entity* p_entity, glm::vec3& p_velocity) = 0;
+
 };

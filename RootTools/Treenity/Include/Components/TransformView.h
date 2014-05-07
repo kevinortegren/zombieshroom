@@ -16,13 +16,13 @@ private:
 	QString m_name;
 	Ui::Transform ui;
 private slots:
-	void TransformPositionXChanged(double p_value);
-	void TransformPositionYChanged(double p_value);
-	void TransformPositionZChanged(double p_value);
-	void TransformOrientationXChanged(double p_value);
-	void TransformOrientationYChanged(double p_value);
-	void TransformOrientationZChanged(double p_value);
-	void TransformScaleXChanged(double p_value);
-	void TransformScaleYChanged(double p_value);
-	void TransformScaleZChanged(double p_value);
+	void PositionXChanged(double p_value);
+	void PositionYChanged(double p_value);
+	void PositionZChanged(double p_value);
+	void OrientationXChanged(double p_value);
+	void OrientationYChanged(double p_value);
+	void OrientationZChanged(double p_value);
+	void ScaleXChanged(double p_value);
+	void ScaleYChanged(double p_value);
+	void ScaleZChanged(double p_value);
 };
