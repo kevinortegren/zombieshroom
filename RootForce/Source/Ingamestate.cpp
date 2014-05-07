@@ -55,6 +55,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::KillAnnouncement>(10);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
+		m_hudManager = std::shared_ptr<RootForce::HUDManager>(new HUDManager(m_displayIngameMenu));
 	}
 
 	void IngameState::Initialize()
@@ -266,7 +267,6 @@ namespace RootForce
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
 
-		m_sharedSystems.m_matchStateSystem->SetHUD(m_hud.get());
 		m_sharedSystems.m_matchStateSystem->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
 
 		// Reset the ingame menu before we start the match
@@ -319,6 +319,12 @@ namespace RootForce
 
 		g_engineContext.m_sound->PlayBackgroundSound("gustav4_2.mp3");
 		//g_engineContext->m_resourceManager->LoadSoundAudio("gustav4_2.mp3", SOUND_LOOP_NORMAL | )
+
+		// Setup the HUD manager.
+		m_hudManager->SetHUD(m_hud.get());
+		m_hudManager->SetIngameMenu(m_ingameMenu.get());
+		m_hudManager->SetMatchStateSystem(m_sharedSystems.m_matchStateSystem.get());
+		m_sharedSystems.m_matchStateSystem->AddListener(m_hudManager.get());
 	}
 
 	void IngameState::Exit()
@@ -339,6 +345,12 @@ namespace RootForce
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 #endif
 		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
+
+		// Unset the variables stored by the HUD manager.
+		m_hudManager->SetHUD(nullptr);
+		m_hudManager->SetIngameMenu(nullptr);
+		m_hudManager->SetMatchStateSystem(nullptr);
+		m_sharedSystems.m_matchStateSystem->RemoveListener(m_hudManager.get());
 
 		// Remove all entities.
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
@@ -438,7 +450,8 @@ namespace RootForce
 		}
 		
 		// Update the HUD values.
-		UpdateHUD();
+		//UpdateHUD();
+		m_hudManager->UpdateHUD();
 		
 		// Update the console commands.
 		GameStates::GameStates consoleGameState = UpdateConsole();
@@ -834,7 +847,7 @@ namespace RootForce
 				HealthComponent* healthComponent = g_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 				PlayerActionComponent* playerActionComponent = g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 
-				// TODO: Update the charge bar
+				// Update the charge bar
 				if (playerComponent->AbilityState != AbilityState::OFF)
 				{
 					float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", playerActionComponent->CurrentAbilityEvent.ActiveAbilityScript.C_String());
@@ -854,6 +867,15 @@ namespace RootForce
 				}
 
 				// TODO: Update countdown and announcement depending on game state
+				ECS::Entity* matchState = g_world->GetTagManager()->GetEntityByTag("MatchState");
+				TDMRuleSet* ruleSet = g_world->GetEntityManager()->GetComponent<TDMRuleSet>(matchState);
+				KillAnnouncement* killAnnouncement = g_world->GetEntityManager()->GetComponent<KillAnnouncement>(matchState);
+				
+				if (ruleSet->CurrentState == MatchState::Warmup)
+				{
+					m_hud->GetView()->BufferJavascript("Announce('Waiting for players...', -1);");
+				}
+				
 
 				//Update all the data that is displayed in the HUD
 				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
