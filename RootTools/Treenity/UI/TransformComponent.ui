@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>351</width>
+    <width>227</width>
     <height>146</height>
    </rect>
   </property>
@@ -29,126 +29,6 @@
    <property name="sizeConstraint">
     <enum>QLayout::SetNoConstraint</enum>
    </property>
-   <item row="2" column="2">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationY">
-     <property name="minimum">
-      <double>-360.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>360.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleY">
-     <property name="minimum">
-      <double>0.010000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>100.000000000000000</double>
-     </property>
-     <property name="value">
-      <double>1.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationX">
-     <property name="minimum">
-      <double>-360.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>360.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleX">
-     <property name="minimum">
-      <double>0.010000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>100.000000000000000</double>
-     </property>
-     <property name="value">
-      <double>1.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleZ">
-     <property name="minimum">
-      <double>0.010000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>100.000000000000000</double>
-     </property>
-     <property name="value">
-      <double>1.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationZ">
-     <property name="minimum">
-      <double>-360.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>360.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationZ">
-     <property name="minimum">
-      <double>-1000.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Scale</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Orientation</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationX">
-     <property name="minimum">
-      <double>-1000.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationY">
-     <property name="minimum">
-      <double>-1000.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Position</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="1">
     <widget class="QLabel" name="label_4">
      <property name="maximumSize">
@@ -182,6 +62,240 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Rotation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationX">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>-1000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationY">
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>-1000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Position</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationZ">
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>-360.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>360.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_translationZ">
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>-1000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Scale</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleY">
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>100.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationX">
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>-360.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>360.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleX">
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>100.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleZ">
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>100.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationY">
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="minimum">
+      <double>-360.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>360.000000000000000</double>
      </property>
     </widget>
    </item>

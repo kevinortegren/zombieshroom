@@ -6,15 +6,15 @@ TransformView::TransformView(QWidget* p_parent)
 {
 	ui.setupUi(this);
 
-	connect(ui.doubleSpinBox_translationX,	SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionXChanged(double)));
-	connect(ui.doubleSpinBox_translationY,	SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionYChanged(double)));
-	connect(ui.doubleSpinBox_translationZ,	SIGNAL(valueChanged(double)), this,		SLOT(TransformPositionZChanged(double)));
-	connect(ui.doubleSpinBox_orientationX,	SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationXChanged(double)));
-	connect(ui.doubleSpinBox_orientationY,	SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationYChanged(double)));
-	connect(ui.doubleSpinBox_orientationZ,	SIGNAL(valueChanged(double)), this,		SLOT(TransformOrientationZChanged(double)));
-	connect(ui.doubleSpinBox_scaleX,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleXChanged(double)));
-	connect(ui.doubleSpinBox_scaleY,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleYChanged(double)));
-	connect(ui.doubleSpinBox_scaleZ,		SIGNAL(valueChanged(double)), this,		SLOT(TransformScaleZChanged(double)));
+	connect(ui.doubleSpinBox_translationX,	SIGNAL(valueChanged(double)), this,		SLOT(PositionXChanged(double)));
+	connect(ui.doubleSpinBox_translationY,	SIGNAL(valueChanged(double)), this,		SLOT(PositionYChanged(double)));
+	connect(ui.doubleSpinBox_translationZ,	SIGNAL(valueChanged(double)), this,		SLOT(PositionZChanged(double)));
+	connect(ui.doubleSpinBox_orientationX,	SIGNAL(valueChanged(double)), this,		SLOT(OrientationXChanged(double)));
+	connect(ui.doubleSpinBox_orientationY,	SIGNAL(valueChanged(double)), this,		SLOT(OrientationYChanged(double)));
+	connect(ui.doubleSpinBox_orientationZ,	SIGNAL(valueChanged(double)), this,		SLOT(OrientationZChanged(double)));
+	connect(ui.doubleSpinBox_scaleX,		SIGNAL(valueChanged(double)), this,		SLOT(ScaleXChanged(double)));
+	connect(ui.doubleSpinBox_scaleY,		SIGNAL(valueChanged(double)), this,		SLOT(ScaleYChanged(double)));
+	connect(ui.doubleSpinBox_scaleZ,		SIGNAL(valueChanged(double)), this,		SLOT(ScaleZChanged(double)));
 }
 
 const QString& TransformView::GetComponentName() const
