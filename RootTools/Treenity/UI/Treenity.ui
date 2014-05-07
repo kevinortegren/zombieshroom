@@ -321,6 +321,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::MultiSelection</enum>
+       </property>
        <column>
         <property name="text">
          <string notr="true">Entities</string>

@@ -24,8 +24,9 @@ namespace RootForce
 		void SubdivideTree();
 
 		void SetAmbientLight(glm::vec4 p_ambient);
-		void CreateSun();
-		void CreateSkyBox();
+
+		ECS::Entity* CreateSun();
+		ECS::Entity* CreateSkyBox();
 		
 		void BuildStaticShadowMesh();
 		void AddStaticEntitiesToPhysics();

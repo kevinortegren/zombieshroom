@@ -77,6 +77,8 @@ Treenity::Treenity(QWidget *parent)
 		it.second->SetEditorInterface(this);
 	}
 	
+	ui.treeView_entityOutliner->SetEditorInterface(this);
+
 	// Match signals with slots.
 	connect(ui.actionNew,							SIGNAL(triggered()), this,				SLOT(New()));
 	connect(ui.actionOpen_Project,					SIGNAL(triggered()), this,				SLOT(OpenProject()));
@@ -241,6 +243,13 @@ void Treenity::Select(ECS::Entity* p_entity)
 	UpdateOnSelection();
 }
 
+void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
+{
+	m_selectedEntities = p_entities;
+
+	UpdateOnSelection();
+}
+
 void Treenity::AddToSelection(ECS::Entity* p_entity)
 {
 	m_selectedEntities.insert(p_entity);
@@ -260,6 +269,10 @@ const std::set<ECS::Entity*>& Treenity::GetSelection() const
 	return m_selectedEntities;
 }
 
+void Treenity::RenameEntity(ECS::Entity* p_entity, const std::string& p_name)
+{
+	ui.treeView_entityOutliner->EntityRenamed(p_entity, QString::fromStdString(p_name));
+}
 
 void Treenity::CreateEntity()
 {
@@ -286,11 +299,6 @@ void Treenity::RenameEntity()
 	}
 }
 
-void Treenity::OutlinerSelectEntity()
-{
-	Select(ui.treeView_entityOutliner->GetSelectedEntity());
-}
-
 void Treenity::AddRenderable()
 {
 	if (m_selectedEntities.size() == 1)
@@ -307,7 +315,6 @@ void Treenity::AddPhysics()
 	}
 }
 
-
 void Treenity::UpdateOnSelection()
 {
 	if (m_selectedEntities.size() == 0)
@@ -322,6 +329,8 @@ void Treenity::UpdateOnSelection()
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
+
+		//ui.treeView_entityOutliner->setS
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);

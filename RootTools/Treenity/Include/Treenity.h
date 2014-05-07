@@ -47,9 +47,12 @@ public:
 
 	// Implemented from EditorInterface
 	void Select(ECS::Entity* p_entity);
+	void Select(const std::set<ECS::Entity*>& p_entities);
 	void AddToSelection(ECS::Entity* p_entity);
 	void ClearSelection();
 	const std::set<ECS::Entity*>& GetSelection() const;
+	void RenameEntity(ECS::Entity* p_entity, const std::string& p_name);
+
 private:
 	// Component meta-data.
 	std::map<int, QString> m_componentNames;
@@ -81,7 +84,6 @@ private slots:
 	void CreateEntity();
 	void DestroyEntity();
 	void RenameEntity();
-	void OutlinerSelectEntity();
 	void AddRenderable();
 	void AddPhysics();
 	
