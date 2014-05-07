@@ -1336,8 +1336,8 @@ int ParticleEditor::CheckRayVsObject( glm::ivec2 p_mousePos, glm::vec3 p_camPos,
 	int closestEmitter = -1;
 
 	//Calculate NDC coords
-	float x = (2.0f * -p_mousePos.x) / (float)m_canvas->width() - 1.0f;
-	float y = (2.0f * p_mousePos.y) / (float)m_canvas->height() + 1.0f;
+	float x = ((2.0f * -p_mousePos.x) / (float)m_canvas->width()) - 1.0f;
+	float y = ((2.0f * p_mousePos.y) / (float)m_canvas->height()) + 1.0f;
 	//View space coords
 	glm::vec4 rayView = m_inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
 	rayView = glm::vec4(rayView.x, rayView.y, -1.0f, 0.0f);

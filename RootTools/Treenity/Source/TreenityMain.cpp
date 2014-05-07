@@ -293,6 +293,17 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	SDL_SetRelativeMouseMode(SDL_FALSE);
+
+	// Selected mesh material.
+	m_selectedEntityMaterial = g_engineContext.m_renderer->CreateMaterial("SelectedMaterial");
+	m_selectedEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Selected");
+
+	// Register listeners for global modifer keys.
+	GlobalKeys::InitializeKeyMap();
+
+	m_globalKeys.RegisterModifier(Qt::AltModifier);
+	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
+
 }
 
 TreenityMain::~TreenityMain()
@@ -319,12 +330,12 @@ bool TreenityMain::IsRunning()
 
 void TreenityMain::HandleEditorEvents()
 {
+	m_globalKeys.Update();
+
 	if (g_engineContext.m_inputSys != nullptr)
 	{
 		g_engineContext.m_inputSys->Reset();
 		g_engineContext.m_inputSys->SetMousePos(glm::ivec2(QCursor::pos().x(), QCursor::pos().y()));
-
-		HandleAltModifier();
 	}
 
 	SDL_Event event;
@@ -341,6 +352,8 @@ void TreenityMain::HandleEditorEvents()
 
 void TreenityMain::HandleIngameEvents()
 {
+	m_globalKeys.Update();
+
 	if (g_engineContext.m_inputSys != nullptr)
 	{
 		g_engineContext.m_inputSys->Reset();
@@ -351,37 +364,6 @@ void TreenityMain::HandleIngameEvents()
 	{
 		if (g_engineContext.m_inputSys != nullptr)
 			g_engineContext.m_inputSys->HandleInput(event);
-	}
-}
-
-void TreenityMain::HandleAltModifier()
-{
-	Qt::KeyboardModifiers modifers = QApplication::keyboardModifiers();
-	if(m_altMode)
-	{
-		if((modifers & Qt::AltModifier) == 0)
-		{		
-			SDL_Event keyEvent;
-			keyEvent.type = SDL_KEYUP;
-			keyEvent.key.keysym.scancode = SDL_SCANCODE_LALT;
-			keyEvent.key.repeat = false;
-			SDL_PushEvent(&keyEvent);
-
-			m_altMode = false;
-		}
-	}
-	else
-	{
-		if((modifers & Qt::AltModifier) != 0)
-		{	
-			SDL_Event keyEvent;
-			keyEvent.type = SDL_KEYDOWN;
-			keyEvent.key.keysym.scancode = SDL_SCANCODE_LALT;
-			keyEvent.key.repeat = false;
-			SDL_PushEvent(&keyEvent);
-
-			m_altMode = true;
-		}
 	}
 }
 
@@ -449,7 +431,7 @@ void TreenityMain::Update(float dt)
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
-	
+
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();	
 		m_lookAtSystem->Process();
@@ -460,6 +442,11 @@ void TreenityMain::Update(float dt)
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
 		m_renderingSystem->Process();
+		
+		if (!g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT))
+		RaySelect();
+
+		RenderSelectedEntity();
 
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();
@@ -487,5 +474,120 @@ void TreenityMain::Update(float dt)
 
 void TreenityMain::RenderSelectedEntity()
 {
-	
+	for(auto itr = m_treenityEditor.GetSelection().begin(); itr != m_treenityEditor.GetSelection().end(); ++itr)
+	{
+		ECS::Entity* entity = (*itr);
+
+		RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(entity);
+		RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
+
+		if(renderable == nullptr)
+			continue;
+		if(renderable->m_model == nullptr)
+			continue;
+		if(renderable->m_material == nullptr)
+			continue;
+
+		m_renderingSystem->m_matrices[entity].m_model = glm::translate(glm::mat4(1.0f), transform->m_interpolatedPosition);
+		m_renderingSystem->m_matrices[entity].m_model = glm::rotate(m_renderingSystem->m_matrices[entity].m_model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
+		m_renderingSystem->m_matrices[entity].m_model = glm::scale(m_renderingSystem->m_matrices[entity].m_model, transform->m_scale);
+		m_renderingSystem->m_matrices[entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_renderingSystem->m_matrices[entity].m_model))));
+
+		Render::RenderJob job;	
+		job.m_mesh = renderable->m_model->m_meshes[0];
+		job.m_material = m_selectedEntityMaterial;	
+		job.m_params = renderable->m_params;
+		job.m_forward = renderable->m_forward;
+		job.m_refractive = renderable->m_refractive;
+		job.m_params[Render::Semantic::MODEL] = &m_renderingSystem->m_matrices[entity].m_model;
+		job.m_renderPass = RootForce::RenderPass::RENDERPASS_EDITOR;
+		job.m_position = transform->m_interpolatedPosition;
+
+		g_engineContext.m_renderer->AddRenderJob(job);
+
+	}
+}
+
+void TreenityMain::RaySelect()
+{
+	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+	{
+		static float radius = 5.0f;
+		float radiusSphere2 = radius*radius;
+		float closestDist = 999999.0f;
+		ECS::Entity* closestEntity = nullptr;
+
+		// Get camera entity
+		ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
+		glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
+		RootForce::Camera* camera = m_world.GetEntityManager()->GetComponent<RootForce::Camera>(cameraEntity);
+		
+		// Get mouse pos relative to window
+		glm::ivec2 position;
+		SDL_GetMouseState(&position.x, &position.y);
+
+		// Calculate NDC coords
+		float x = (2.0f * position.x) / (float)g_engineContext.m_renderer->GetWidth() - 1.0f;
+		float y = (2.0f * -position.y) / (float)g_engineContext.m_renderer->GetHeight() + 1.0f;
+
+		glm::mat4 inverseProjection = glm::inverse(g_engineContext.m_renderer->GetProjectionMatrix());
+		
+		// View space coords
+		glm::vec4 rayView = inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
+		rayView.z = -1.0f;
+		rayView.w = 0.0f;
+
+		// World space coords
+		glm::vec4 rW = glm::inverse(camera->m_viewMatrix) * rayView;
+		glm::vec3 rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
+
+		std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
+		for(auto itr = entities.begin(); itr != entities.end(); ++itr)
+		{
+			if(m_world.GetTagManager()->GetEntityByTag("Skybox") == (*itr))
+				continue;
+
+			if(m_world.GetTagManager()->GetEntityByTag("Camera") == (*itr))
+				continue;
+
+			if(m_world.GetTagManager()->GetEntityByTag("AimingDevice") == (*itr))
+				continue;
+
+			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
+			glm::vec3 direction = entityPos - cameraPos;
+
+			float tca = glm::dot(direction, rayWorld);
+			if(tca < 0)
+			{
+				continue;
+			}
+			float d2 = glm::dot(direction, direction) - tca * tca;
+			if(d2 > radiusSphere2)
+			{
+				continue;
+			}
+			float thc = glm::sqrt(radiusSphere2 - d2);
+			float t0 = tca - thc;
+
+			if(t0 < closestDist)
+			{
+				closestEntity = (*itr);
+				closestDist = t0;
+			}
+		}
+
+		if(closestEntity != nullptr)
+		{
+			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
+
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LSHIFT))
+			{
+				m_treenityEditor.AddToSelection(closestEntity);
+			}
+			else
+			{
+				m_treenityEditor.Select(closestEntity);
+			}
+		}
+	}
 }

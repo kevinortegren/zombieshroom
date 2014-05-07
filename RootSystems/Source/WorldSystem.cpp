@@ -139,7 +139,7 @@ namespace RootForce
 		m_world->GetStorage()->SetValue("Ambient", p_ambient);
 	}
 
-	void WorldSystem::CreateSun()
+	ECS::Entity* WorldSystem::CreateSun()
 	{
 		ECS::Entity* sun = m_world->GetTagManager()->GetEntityByTag("Sun");
 		if(sun == nullptr)
@@ -175,9 +175,11 @@ namespace RootForce
 		sundata.color = sunLight->m_color;
 
 		r->m_material->m_effect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(sundata), &sundata, GL_DYNAMIC_DRAW);
+
+		return sun;
 	}
 
-	void WorldSystem::CreateSkyBox()
+	ECS::Entity* WorldSystem::CreateSkyBox()
 	{
 		// Setup skybox entity.
 		ECS::Entity* skybox = m_world->GetEntityManager()->CreateEntity();
@@ -237,6 +239,8 @@ namespace RootForce
 		
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
+
+		return skybox;
 	}
 
 #ifndef COMPILE_LEVEL_EDITOR

@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_TransformView_t {
     QByteArrayData data[12];
-    char stringdata[258];
+    char stringdata[177];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,26 +30,23 @@ struct qt_meta_stringdata_TransformView_t {
 static const qt_meta_stringdata_TransformView_t qt_meta_stringdata_TransformView = {
     {
 QT_MOC_LITERAL(0, 0, 13),
-QT_MOC_LITERAL(1, 14, 25),
-QT_MOC_LITERAL(2, 40, 0),
-QT_MOC_LITERAL(3, 41, 7),
-QT_MOC_LITERAL(4, 49, 25),
-QT_MOC_LITERAL(5, 75, 25),
-QT_MOC_LITERAL(6, 101, 28),
-QT_MOC_LITERAL(7, 130, 28),
-QT_MOC_LITERAL(8, 159, 28),
-QT_MOC_LITERAL(9, 188, 22),
-QT_MOC_LITERAL(10, 211, 22),
-QT_MOC_LITERAL(11, 234, 22)
+QT_MOC_LITERAL(1, 14, 16),
+QT_MOC_LITERAL(2, 31, 0),
+QT_MOC_LITERAL(3, 32, 7),
+QT_MOC_LITERAL(4, 40, 16),
+QT_MOC_LITERAL(5, 57, 16),
+QT_MOC_LITERAL(6, 74, 19),
+QT_MOC_LITERAL(7, 94, 19),
+QT_MOC_LITERAL(8, 114, 19),
+QT_MOC_LITERAL(9, 134, 13),
+QT_MOC_LITERAL(10, 148, 13),
+QT_MOC_LITERAL(11, 162, 13)
     },
-    "TransformView\0TransformPositionXChanged\0"
-    "\0p_value\0TransformPositionYChanged\0"
-    "TransformPositionZChanged\0"
-    "TransformOrientationXChanged\0"
-    "TransformOrientationYChanged\0"
-    "TransformOrientationZChanged\0"
-    "TransformScaleXChanged\0TransformScaleYChanged\0"
-    "TransformScaleZChanged\0"
+    "TransformView\0PositionXChanged\0\0p_value\0"
+    "PositionYChanged\0PositionZChanged\0"
+    "OrientationXChanged\0OrientationYChanged\0"
+    "OrientationZChanged\0ScaleXChanged\0"
+    "ScaleYChanged\0ScaleZChanged\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -96,15 +93,15 @@ void TransformView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
     if (_c == QMetaObject::InvokeMetaMethod) {
         TransformView *_t = static_cast<TransformView *>(_o);
         switch (_id) {
-        case 0: _t->TransformPositionXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 1: _t->TransformPositionYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 2: _t->TransformPositionZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 3: _t->TransformOrientationXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 4: _t->TransformOrientationYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 5: _t->TransformOrientationZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 6: _t->TransformScaleXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 7: _t->TransformScaleYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 8: _t->TransformScaleZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 0: _t->PositionXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 1: _t->PositionYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 2: _t->PositionZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 3: _t->OrientationXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 4: _t->OrientationYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 5: _t->OrientationZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 6: _t->ScaleXChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 7: _t->ScaleYChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 8: _t->ScaleZChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         default: ;
         }
     }

@@ -37,16 +37,16 @@ namespace RootEngine
 				break;
 			case SDL_KEYDOWN:
 				if(!p_event.key.repeat)
-					m_keyState[p_event.key.keysym.scancode] = KeyState::DOWN_EDGE;
+					m_keyState[p_event.key.keysym.scancode] = KeyState::DOWN;
 				break;
 			case SDL_KEYUP:
-				m_keyState[p_event.key.keysym.scancode] = KeyState::UP_EDGE;
+				m_keyState[p_event.key.keysym.scancode] = KeyState::UP;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				m_keyState[p_event.button.button-SDL_BUTTON_LEFT+MouseButton::LEFT] = KeyState::DOWN_EDGE;
+				m_keyState[p_event.button.button-SDL_BUTTON_LEFT+MouseButton::LEFT] = KeyState::DOWN;
 				break;
 			case SDL_MOUSEBUTTONUP:
-				m_keyState[p_event.button.button-SDL_BUTTON_LEFT+MouseButton::LEFT] = KeyState::UP_EDGE;
+				m_keyState[p_event.button.button-SDL_BUTTON_LEFT+MouseButton::LEFT] = KeyState::UP;
 				break;
 
 			case SDL_MOUSEMOTION:
@@ -90,19 +90,31 @@ namespace RootEngine
 
 		KeyState::KeyState InputManager::GetKeyState(SDL_Scancode p_key)
 		{
-			if(m_keyState[p_key] == KeyState::DOWN_EDGE)
+			if(m_keyState[p_key] == KeyState::DOWN)
 			{
-				m_keyState[p_key] = KeyState::DOWN;
-				return KeyState::DOWN_EDGE;
+				if(m_prevKeyState[p_key] == KeyState::DOWN)
+				{
+					return KeyState::DOWN;
+				}
+				else if(m_prevKeyState[p_key] == KeyState::UP)
+				{
+					return KeyState::DOWN_EDGE;
+				}
+			}
+			else if(m_keyState[p_key] == KeyState::UP)
+			{
+				if(m_prevKeyState[p_key] == KeyState::DOWN)
+				{
+					return KeyState::UP_EDGE;
+				}
+				else if(m_prevKeyState[p_key] == KeyState::UP)
+				{
+					return KeyState::UP;
+				}
 			}
 
-			if(m_keyState[p_key] == KeyState::UP_EDGE)
-			{
-				m_keyState[p_key] = KeyState::UP;
-				return KeyState::UP_EDGE;
-			}
-
-			return m_keyState[p_key];
+			assert(false);
+			return KeyState::UP;
 		}
 
 		KeyState::KeyState InputManager::GetKeyState(MouseButton::MouseButton p_button)
@@ -137,9 +149,9 @@ namespace RootEngine
 		{
 			m_deltaMousePos = glm::vec2(0, 0);
 			m_scroll = 0;
-		}
 
-		
+			memcpy(m_prevKeyState, m_keyState, sizeof(KeyState::KeyState) * MAX_KEYS);
+		}
 
 		void InputManager::LockMouseToCenter(bool p_enable)
 		{

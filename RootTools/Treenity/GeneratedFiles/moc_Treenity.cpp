@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Treenity_t {
     QByteArrayData data[12];
-    char stringdata[119];
+    char stringdata[109];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -39,13 +39,12 @@ QT_MOC_LITERAL(6, 38, 4),
 QT_MOC_LITERAL(7, 43, 12),
 QT_MOC_LITERAL(8, 56, 13),
 QT_MOC_LITERAL(9, 70, 12),
-QT_MOC_LITERAL(10, 83, 20),
-QT_MOC_LITERAL(11, 104, 13)
+QT_MOC_LITERAL(10, 83, 13),
+QT_MOC_LITERAL(11, 97, 10)
     },
     "Treenity\0New\0\0OpenProject\0Save\0SaveAs\0"
     "Play\0CreateEntity\0DestroyEntity\0"
-    "RenameEntity\0OutlinerSelectEntity\0"
-    "AddRenderable\0"
+    "RenameEntity\0AddRenderable\0AddPhysics\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -102,8 +101,8 @@ void Treenity::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 5: _t->CreateEntity(); break;
         case 6: _t->DestroyEntity(); break;
         case 7: _t->RenameEntity(); break;
-        case 8: _t->OutlinerSelectEntity(); break;
-        case 9: _t->AddRenderable(); break;
+        case 8: _t->AddRenderable(); break;
+        case 9: _t->AddPhysics(); break;
         default: ;
         }
     }

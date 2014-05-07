@@ -36,6 +36,7 @@
 #include <RootTools/Treenity/Include/EngineActions.h>
 #include <RootTools/Treenity/Include/Treenity.h>
 #include <RootTools/Treenity/Include/ProjectManager.h>
+#include <RootTools/Treenity/Include/GlobalKeys.h>
 
 class TreenityMain
 {
@@ -58,6 +59,7 @@ public:
 private:
 
 	void RenderSelectedEntity();
+	void RaySelect();
 
 	void* m_engineModule;
 
@@ -65,6 +67,7 @@ private:
 	Treenity m_treenityEditor;
 	EngineActions m_engineActions;	
 	ProjectManager m_projectManager;
+	GlobalKeys m_globalKeys;
 
 	std::shared_ptr<RootForce::MatchStateSystem>		m_matchStateSystem;
 	std::shared_ptr<RootForce::PlayerControlSystem>		m_playerControlSystem;
@@ -102,5 +105,6 @@ private:
 	RootForce::WaterDeathSystem*						m_waterDeathSystem;
 	RootForce::ScaleSystem*								m_scaleSystem;
 
-	bool m_altMode;
+	Render::Material* m_selectedEntityMaterial;
+	std::set<ECS::Entity*> m_pickedEntities;
 };

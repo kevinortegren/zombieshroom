@@ -154,6 +154,9 @@
          <height>32</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -182,6 +185,9 @@
          <width>70</width>
          <height>32</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
        </property>
        <item>
         <property name="text">
@@ -237,7 +243,8 @@
      <property name="title">
       <string>Add component</string>
      </property>
-     <addaction name="action_renderable"/>
+     <addaction name="action_addRenderable"/>
+     <addaction name="action_addPhysics"/>
     </widget>
     <addaction name="menu_addComponent"/>
    </widget>
@@ -313,6 +320,9 @@
          <width>16777215</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::MultiSelection</enum>
        </property>
        <column>
         <property name="text">
@@ -460,19 +470,30 @@
     <string>Remove entity</string>
    </property>
   </action>
-  <action name="action_renderable">
+  <action name="action_addRenderable">
    <property name="text">
     <string>Renderable</string>
    </property>
+   <property name="toolTip">
+    <string>Add a Renderable component to the selected entity.</string>
+   </property>
   </action>
-  <action name="actionOpen_Project">
+  <action name="action_addPhysics">
    <property name="text">
-    <string>Open Project ...</string>
+    <string>Physics</string>
+   </property>
+   <property name="toolTip">
+    <string>Add mass and velocity to the selected entity.</string>
    </property>
   </action>
   <action name="actionNew">
    <property name="text">
     <string>New</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project...</string>
    </property>
   </action>
  </widget>

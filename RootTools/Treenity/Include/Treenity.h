@@ -6,6 +6,7 @@
 #include "ui_Treenity.h"
 #include <RootTools/Treenity/GeneratedFiles/ui_TransformComponent.h>
 #include <RootTools/Treenity/GeneratedFiles/ui_RenderableComponent.h>
+#include <RootTools/Treenity/GeneratedFiles/ui_PhysicsComponent.h>
 #include <Utility/ECS/include/World.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>
 #include <RootTools/Treenity/Include/EntityOutliner.h>
@@ -13,6 +14,8 @@
 #include <RootTools/Treenity/Include/ComponentView.h>
 #include <RootTools/Treenity/Include/ComponentViewItem.h>
 #include <RootTools/Treenity/Include/Components/TransformView.h>
+#include <RootTools/Treenity/Include/Components/PhysicsView.h>
+#include <RootTools/Treenity/Include/Components/RenderableView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
 
 class Treenity : public QMainWindow, public EditorInterface
@@ -44,9 +47,12 @@ public:
 
 	// Implemented from EditorInterface
 	void Select(ECS::Entity* p_entity);
+	void Select(const std::set<ECS::Entity*>& p_entities);
 	void AddToSelection(ECS::Entity* p_entity);
 	void ClearSelection();
 	const std::set<ECS::Entity*>& GetSelection() const;
+	void RenameEntity(ECS::Entity* p_entity, const std::string& p_name);
+
 private:
 	// Component meta-data.
 	std::map<int, QString> m_componentNames;
@@ -67,6 +73,10 @@ private:
 
 	ComponentView* m_compView;
 	std::map<int, AbstractComponentView*> m_componentViews;
+protected:
+	void keyPressEvent(QKeyEvent* event);
+	void keyReleaseEvent(QKeyEvent* event);
+
 private slots:
 	void New();
 	void OpenProject();
@@ -76,8 +86,8 @@ private slots:
 	void CreateEntity();
 	void DestroyEntity();
 	void RenameEntity();
-	void OutlinerSelectEntity();
 	void AddRenderable();
+	void AddPhysics();
 	
 };
 

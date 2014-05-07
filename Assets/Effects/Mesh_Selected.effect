@@ -1,0 +1,26 @@
+- name: Mesh_Selected
+  techniques:
+    - name: Mesh_Selected
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      uniforms:
+          - sem: MODEL
+            offset: 0
+          - sem: NORMAL
+            offset: 64      
+      flags:
+        - name: Forward
+      programs:
+        - name: Mesh
+          shaders:
+            - name: Selected
+              type: vertex
+            - name: Selected
+              type: fragment
+              
+          wireframe: 1
+              
+

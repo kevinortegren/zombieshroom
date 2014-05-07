@@ -95,14 +95,20 @@ void EntityOutlinerItem::UpdateLabel()
 
 
 EntityOutliner::EntityOutliner(QWidget* p_parent)
-	: QTreeWidget(p_parent)
+	: QTreeWidget(p_parent), m_engineInterface(nullptr), m_editorInterface(nullptr)
 {
 	connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(TargetEntity(QTreeWidgetItem*, int)));
+	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(SelectionChanged()));
 }
 
 void EntityOutliner::SetEngineInterface(EngineInterface* p_engineInterface)
 {
 	m_engineInterface = p_engineInterface;
+}
+
+void EntityOutliner::SetEditorInterface(EditorInterface* p_editorInterface)
+{
+	m_editorInterface = p_editorInterface;
 }
 
 void EntityOutliner::EntityCreated(ECS::Entity* p_entity, const QString& p_name)
@@ -188,4 +194,17 @@ void EntityOutliner::TargetEntity(QTreeWidgetItem* item, int column )
 	ECS::Entity* entity = ((EntityOutlinerItem*)item)->GetEntity();
 
 	m_engineInterface->TargetEntity(entity);
+}
+
+void EntityOutliner::SelectionChanged()
+{
+	QList<QTreeWidgetItem *> selected = selectedItems();
+
+	std::set<ECS::Entity*> entities;
+	for(auto item : selected)
+	{
+		entities.insert(((EntityOutlinerItem*)item)->GetEntity());
+	}
+
+	m_editorInterface->Select(entities);
 }

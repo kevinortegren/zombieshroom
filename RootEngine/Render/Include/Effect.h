@@ -69,6 +69,7 @@ namespace Render
 		DepthState m_depthState;
 		FillMode m_fillMode;
 		glm::ivec4 m_viewport;
+		bool m_wireframe;
 
 	private:
 		GLuint m_glHandle;

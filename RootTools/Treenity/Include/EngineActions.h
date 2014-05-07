@@ -47,6 +47,19 @@ public:
 	// Renderable
 	void AddRenderable(ECS::Entity* p_entity);
 	void RemoveRenderable(ECS::Entity* p_entity);
+	std::string GetRenderableModelName(ECS::Entity* p_entity);
+	std::string GetRenderableMaterialName(ECS::Entity* p_entity);
+	void SetRenderableModelName(ECS::Entity* p_entity, std::string p_modelName);
+	void SetRenderableMaterialName(ECS::Entity* p_entity, std::string p_materialName);
+
+	//Physics
+	virtual void AddPhysics(ECS::Entity* p_entity);
+	virtual void RemovePhysics(ECS::Entity* p_entity);
+	virtual float GetMass(ECS::Entity* p_entity);
+	virtual glm::vec3& GetVelocity(ECS::Entity* p_entity);
+	virtual void SetMass(ECS::Entity* p_entity, float p_mass);
+	virtual void SetVelocity(ECS::Entity* p_entity, glm::vec3& p_velocity);
+
 private:
 
 	TreenityMain* m_treenityMain;

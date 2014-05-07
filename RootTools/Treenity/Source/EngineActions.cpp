@@ -1,4 +1,3 @@
-
 #include <RootTools/Treenity/Include/EngineActions.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
@@ -46,7 +45,7 @@ void EngineActions::ClearScene()
 
 void EngineActions::AddDefaultEntities()
 {
-	m_treenityMain->GetWorldSystem()->CreateSkyBox();
+	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
 
 	CreateFreeFlyingCamera();
 	CreateTestSpawnpoint();
@@ -54,13 +53,17 @@ void EngineActions::AddDefaultEntities()
 	// Add new entities.
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
+
+	m_treenityMain->GetEditor()->RenameEntity(skybox, "Skybox");
+	m_treenityMain->GetEditor()->RenameEntity(m_cameraEntity, "Main Camera");
+	m_treenityMain->GetEditor()->RenameEntity(m_aimingDevice, "Aiming Device");
 }
 
 // Can only be called after a world has been imported !!
 void EngineActions::InitializeScene()
 {	
-	m_treenityMain->GetWorldSystem()->CreateSun();
-
+	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
+	
 	m_treenityMain->GetWorldSystem()->BuildStaticShadowMesh();
 	m_treenityMain->GetWorldSystem()->SetAmbientLight(m_world->GetStorage()->GetValueAsVec4("Ambient"));
 
@@ -70,6 +73,8 @@ void EngineActions::InitializeScene()
 	// Add new entities.
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
+
+	m_treenityMain->GetEditor()->RenameEntity(sun, "Sun");
 }
 
 void EngineActions::CreateFreeFlyingCamera()
@@ -244,4 +249,65 @@ void EngineActions::AddRenderable(ECS::Entity* p_entity)
 void EngineActions::RemoveRenderable(ECS::Entity* p_entity)
 {
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Renderable>(p_entity);
+}
+
+std::string EngineActions::GetRenderableModelName( ECS::Entity* p_entity )
+{
+	auto model = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity)->m_model;
+	return g_engineContext.m_resourceManager->ResolveStringFromModel(model);
+}
+
+std::string EngineActions::GetRenderableMaterialName( ECS::Entity* p_entity )
+{
+	auto material = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity)->m_material;
+	if(material)
+	{
+		return g_engineContext.m_renderer->GetStringFromMaterial(material);
+	}
+	return "";
+}
+
+void EngineActions::SetRenderableModelName( ECS::Entity* p_entity, std::string p_modelName )
+{
+	RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
+	renderable->m_model = g_engineContext.m_resourceManager->GetModel(p_modelName);
+}
+
+void EngineActions::SetRenderableMaterialName( ECS::Entity* p_entity, std::string p_materialName )
+{
+	RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
+	renderable->m_material = g_engineContext.m_renderer->CreateMaterial(p_materialName);
+}
+
+//Physics
+float EngineActions::GetMass(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity)->m_mass;
+}
+
+glm::vec3& EngineActions::GetVelocity( ECS::Entity* p_entity )
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity)->m_velocity;
+}
+
+void EngineActions::SetMass( ECS::Entity* p_entity, float p_mass)
+{
+	RootForce::Physics* physics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
+	physics->m_mass = p_mass;
+}
+
+void EngineActions::SetVelocity( ECS::Entity* p_entity, glm::vec3& p_velocity )
+{
+	RootForce::Physics* physics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
+	physics->m_velocity = p_velocity;
+}
+
+void EngineActions::AddPhysics( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
+}
+
+void EngineActions::RemovePhysics( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(p_entity);
 }
