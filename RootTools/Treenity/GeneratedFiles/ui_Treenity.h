@@ -17,7 +17,6 @@
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
@@ -70,8 +69,11 @@ public:
     QStatusBar *statusBar;
     QDockWidget *dockWidget_4;
     QWidget *dockWidgetContents_4;
-    QHBoxLayout *horizontalLayout_3;
+    QVBoxLayout *verticalLayout_3;
     EntityOutliner *treeView_entityOutliner;
+    QWidget *widget;
+    QPushButton *pushButton_addEntity;
+    QPushButton *pushButton_removeEntity;
     QDockWidget *dockWidget_6;
     QWidget *dockWidgetContents_6;
     QVBoxLayout *verticalLayout;
@@ -84,7 +86,7 @@ public:
     {
         if (TreenityClass->objectName().isEmpty())
             TreenityClass->setObjectName(QStringLiteral("TreenityClass"));
-        TreenityClass->resize(1292, 902);
+        TreenityClass->resize(1292, 878);
         TreenityClass->setStyleSheet(QStringLiteral(""));
         action_addEntity = new QAction(TreenityClass);
         action_addEntity->setObjectName(QStringLiteral("action_addEntity"));
@@ -143,7 +145,7 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(widget_canvas3D->sizePolicy().hasHeightForWidth());
         widget_canvas3D->setSizePolicy(sizePolicy);
-        widget_canvas3D->setStyleSheet(QStringLiteral(""));
+        widget_canvas3D->setStyleSheet(QStringLiteral("background-color: #000000;"));
 
         verticalLayout_2->addWidget(widget_canvas3D);
 
@@ -214,11 +216,11 @@ public:
         dockWidget_4->setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
         dockWidgetContents_4 = new QWidget();
         dockWidgetContents_4->setObjectName(QStringLiteral("dockWidgetContents_4"));
-        horizontalLayout_3 = new QHBoxLayout(dockWidgetContents_4);
-        horizontalLayout_3->setSpacing(0);
-        horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_3 = new QVBoxLayout(dockWidgetContents_4);
+        verticalLayout_3->setSpacing(0);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         treeView_entityOutliner = new EntityOutliner(dockWidgetContents_4);
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
         __qtreewidgetitem->setText(0, QStringLiteral("Entities"));
@@ -230,7 +232,24 @@ public:
         treeView_entityOutliner->setMaximumSize(QSize(16777215, 16777215));
         treeView_entityOutliner->setSelectionMode(QAbstractItemView::MultiSelection);
 
-        horizontalLayout_3->addWidget(treeView_entityOutliner);
+        verticalLayout_3->addWidget(treeView_entityOutliner);
+
+        widget = new QWidget(dockWidgetContents_4);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setMinimumSize(QSize(64, 32));
+        widget->setMaximumSize(QSize(16777215, 32));
+        pushButton_addEntity = new QPushButton(widget);
+        pushButton_addEntity->setObjectName(QStringLiteral("pushButton_addEntity"));
+        pushButton_addEntity->setGeometry(QRect(0, 0, 32, 32));
+        pushButton_addEntity->setMinimumSize(QSize(32, 32));
+        pushButton_addEntity->setMaximumSize(QSize(32, 32));
+        pushButton_removeEntity = new QPushButton(widget);
+        pushButton_removeEntity->setObjectName(QStringLiteral("pushButton_removeEntity"));
+        pushButton_removeEntity->setGeometry(QRect(32, 0, 32, 32));
+        pushButton_removeEntity->setMinimumSize(QSize(32, 32));
+        pushButton_removeEntity->setMaximumSize(QSize(32, 32));
+
+        verticalLayout_3->addWidget(widget);
 
         dockWidget_4->setWidget(dockWidgetContents_4);
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockWidget_4);
@@ -342,6 +361,8 @@ public:
         menu_addComponent->setTitle(QApplication::translate("TreenityClass", "Add component", 0));
         menuView->setTitle(QApplication::translate("TreenityClass", "View", 0));
         dockWidget_4->setWindowTitle(QApplication::translate("TreenityClass", "Outline", 0));
+        pushButton_addEntity->setText(QApplication::translate("TreenityClass", "+", 0));
+        pushButton_removeEntity->setText(QApplication::translate("TreenityClass", "-", 0));
         dockWidget_6->setWindowTitle(QApplication::translate("TreenityClass", "Properties", 0));
         groupBox->setTitle(QApplication::translate("TreenityClass", "General", 0));
         label->setText(QApplication::translate("TreenityClass", "Name", 0));
