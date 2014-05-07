@@ -460,14 +460,6 @@ namespace RootForce
 		float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
 		float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
 
-		// Update the HUD (charging/channeling bar). TODO: Perhaps move this outside?
-		if(action->CurrentAbilityEvent.Time <= abilityChargeTime)
-            m_hud->SetValue("ChargeBarValue", std::to_string(action->CurrentAbilityEvent.Time/abilityChargeTime));
-        else if(abilityChannelingTime > 0)
-            m_hud->SetValue("ChargeBarValue", std::to_string((abilityChargeTime + abilityChannelingTime - action->CurrentAbilityEvent.Time)/abilityChannelingTime));
-        else if(abilityChargeTime > 0) // Make sure the charge bar reaches the end before fading out
-            m_hud->SetValue("ChargeBarValue", "1");
-
 		// Check to see if the charge time is up.
 		if (action->CurrentAbilityEvent.Time >= abilityChargeTime && playerComponent->AbilityState == AbilityState::CHARGING)
 		{
@@ -518,8 +510,6 @@ namespace RootForce
 		PlayerActionComponent* action = m_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player);
 		HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
-
-        m_hud->SetValue("ChargeBarValue", "0");
 
 		switch (playerComponent->AbilityState)
 		{

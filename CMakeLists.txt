@@ -10,9 +10,6 @@ project(${ROOT_PROJECT_NAME})
 # Check if we want to compile just the level editor.
 option(COMPILE_LEVEL_EDITOR "Should we compile level editor?" OFF)
 
-# Check if we want to compile Treenity (this will exclude HUD from systems)
-option(COMPILE_TREENITY "Should we compile Treenity?" OFF)
-
 # Check if we want to compile release build
 option(COMPILE_RELEASE_BUILD "Release Build" OFF)
 

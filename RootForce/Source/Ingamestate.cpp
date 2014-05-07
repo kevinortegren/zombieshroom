@@ -837,6 +837,27 @@ namespace RootForce
 				HealthComponent* healthComponent = g_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 				PlayerActionComponent* playerActionComponent = g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
 
+				// TODO: Update the charge bar
+				if (playerComponent->AbilityState != AbilityState::OFF)
+				{
+					float abilityChargeTime = (float) g_engineContext.m_script->GetGlobalNumber("chargeTime", playerActionComponent->CurrentAbilityEvent.ActiveAbilityScript.C_String());
+					float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", playerActionComponent->CurrentAbilityEvent.ActiveAbilityScript.C_String());
+					float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerActionComponent->CurrentAbilityEvent.ActiveAbilityScript.C_String());
+
+					if(playerActionComponent->CurrentAbilityEvent.Time <= abilityChargeTime)
+						m_hud->SetValue("ChargeBarValue", std::to_string(playerActionComponent->CurrentAbilityEvent.Time/abilityChargeTime));
+					else if(abilityChannelingTime > 0)
+						m_hud->SetValue("ChargeBarValue", std::to_string((abilityChargeTime + abilityChannelingTime - playerActionComponent->CurrentAbilityEvent.Time)/abilityChannelingTime));
+					else if(abilityChargeTime > 0) // Make sure the charge bar reaches the end before fading out
+						m_hud->SetValue("ChargeBarValue", "1");
+				}
+				else
+				{
+					m_hud->SetValue("ChargeBarValue", "0");
+				}
+
+				// TODO: Update countdown and announcement depending on game state
+
 				//Update all the data that is displayed in the HUD
 				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
 				m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
