@@ -134,7 +134,7 @@ public:
         doubleSpinBox_scaleY->setObjectName(QStringLiteral("doubleSpinBox_scaleY"));
         doubleSpinBox_scaleY->setMinimumSize(QSize(20, 0));
         doubleSpinBox_scaleY->setMaximumSize(QSize(50, 16777215));
-        doubleSpinBox_scaleY->setMinimum(0.01);
+        doubleSpinBox_scaleY->setMinimum(-10000);
         doubleSpinBox_scaleY->setMaximum(10000);
         doubleSpinBox_scaleY->setValue(1);
 
@@ -153,7 +153,7 @@ public:
         doubleSpinBox_scaleX->setObjectName(QStringLiteral("doubleSpinBox_scaleX"));
         doubleSpinBox_scaleX->setMinimumSize(QSize(20, 0));
         doubleSpinBox_scaleX->setMaximumSize(QSize(50, 16777215));
-        doubleSpinBox_scaleX->setMinimum(0.01);
+        doubleSpinBox_scaleX->setMinimum(-10000);
         doubleSpinBox_scaleX->setMaximum(10000);
         doubleSpinBox_scaleX->setValue(1);
 
@@ -163,7 +163,7 @@ public:
         doubleSpinBox_scaleZ->setObjectName(QStringLiteral("doubleSpinBox_scaleZ"));
         doubleSpinBox_scaleZ->setMinimumSize(QSize(20, 0));
         doubleSpinBox_scaleZ->setMaximumSize(QSize(50, 16777215));
-        doubleSpinBox_scaleZ->setMinimum(0.01);
+        doubleSpinBox_scaleZ->setMinimum(-10000);
         doubleSpinBox_scaleZ->setMaximum(10000);
         doubleSpinBox_scaleZ->setValue(1);
 

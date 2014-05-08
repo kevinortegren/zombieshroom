@@ -67,9 +67,9 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the component view and its items.
 	m_compView = new ComponentView();
 	ui.verticalLayout->addWidget(m_compView);
-	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView(this);
-	m_componentViews[RootForce::ComponentType::RENDERABLE] = new RenderableView(this);
-	m_componentViews[RootForce::ComponentType::PHYSICS] = new PhysicsView(this);
+	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView();
+	m_componentViews[RootForce::ComponentType::RENDERABLE] = new RenderableView();
+	m_componentViews[RootForce::ComponentType::PHYSICS] = new PhysicsView();
 
 
 	for (auto it : m_componentViews)
@@ -213,6 +213,7 @@ void Treenity::OpenProject()
 	
 	m_projectManager->Import(fileName);
 
+
 	m_engineInterface->AddDefaultEntities();
 	m_engineInterface->InitializeScene();
 }
@@ -317,6 +318,8 @@ void Treenity::AddPhysics()
 
 void Treenity::UpdateOnSelection()
 {
+	ui.treeView_entityOutliner->SetCurrentItems(m_selectedEntities);
+
 	if (m_selectedEntities.size() == 0)
 	{
 		// Disable name entry.
@@ -325,6 +328,9 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list.
 		m_compView->RemoveItems();
+
+		ui.treeView_entityOutliner->clearSelection();
+
 	}
 	else if (m_selectedEntities.size() == 1)
 	{

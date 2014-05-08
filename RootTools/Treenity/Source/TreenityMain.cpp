@@ -341,7 +341,7 @@ void TreenityMain::Update(float dt)
 
 	RenderSelectedEntity();
 
-	g_engineContext.m_renderer->AddLine(debugCameraPos, debugCameraPos + (debugRay * 500.0f), glm::vec4(1,0,0,1));
+	//g_engineContext.m_renderer->AddLine(debugCameraPos, debugCameraPos + (debugRay * 500.0f), glm::vec4(1,0,0,1));
 
 	g_engineContext.m_renderer->Clear();
 	g_engineContext.m_renderer->Render();
@@ -543,13 +543,7 @@ bool TreenityMain::RayVsOBB(const glm::vec3& cameraPos, const glm::vec3& ray, Ro
 	glm::vec4 normalY = positions[4] - positions[0];
 	glm::vec4 normalZ = positions[2] - positions[0];
 
-	g_engineContext.m_renderer->AddLine(glm::vec3(positions[0].x, positions[0].y, positions[0].z), glm::vec3(positions[1].x, positions[1].y, positions[1].z), glm::vec4(1,0,0,1));
-	g_engineContext.m_renderer->AddLine(glm::vec3(positions[0].x, positions[0].y, positions[0].z), glm::vec3(positions[4].x, positions[4].y, positions[4].z), glm::vec4(0,1,0,1));
-	g_engineContext.m_renderer->AddLine(glm::vec3(positions[0].x, positions[0].y, positions[0].z), glm::vec3(positions[2].x, positions[2].y, positions[2].z), glm::vec4(0,0,1,1));
-
 	glm::vec4 center = positions[0] + (normalX / 2) + (normalY / 2) + (normalZ / 2); 
-
-	g_engineContext.m_renderer->AddLine(glm::vec3(center.x, center.y, center.z), glm::vec3(center.x, center.y + 0.1, center.z), glm::vec4(1,0,0,1));
 
 	glm::vec3 normals[3];
 	normals[0] = glm::normalize(glm::vec3(normalX.x, normalX.y, normalX.z));

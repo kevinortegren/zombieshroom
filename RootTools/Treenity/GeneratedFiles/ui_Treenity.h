@@ -230,7 +230,7 @@ public:
         treeView_entityOutliner->setSizePolicy(sizePolicy);
         treeView_entityOutliner->setMinimumSize(QSize(0, 0));
         treeView_entityOutliner->setMaximumSize(QSize(16777215, 16777215));
-        treeView_entityOutliner->setSelectionMode(QAbstractItemView::MultiSelection);
+        treeView_entityOutliner->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
         verticalLayout_3->addWidget(treeView_entityOutliner);
 

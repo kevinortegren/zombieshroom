@@ -46,6 +46,7 @@ public:
 	void CreateOpenGLContext();
 
 	// Implemented from EditorInterface
+	void SelectInOutliner(const std::set<ECS::Entity*>& p_entities);
 	void Select(ECS::Entity* p_entity);
 	void Select(const std::set<ECS::Entity*>& p_entities);
 	void AddToSelection(ECS::Entity* p_entity);

@@ -44,19 +44,21 @@ void EngineActions::ClearScene()
 
 void EngineActions::AddDefaultEntities()
 {
-	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
-	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
+	m_treenityMain->ProcessWorldMessages();
 
+	// Add non-editable entities.
+	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
 	CreateFreeFlyingCamera();
 
-	// Add new entities.
+	m_world->GetEntityManager()->CleanUp();
+
+	// Add editable entities.
+	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
+
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
 
-	m_treenityMain->GetEditor()->RenameEntity(skybox, "Skybox");
 	m_treenityMain->GetEditor()->RenameEntity(sun, "Sun");
-	m_treenityMain->GetEditor()->RenameEntity(m_cameraEntity, "Main Camera");
-	m_treenityMain->GetEditor()->RenameEntity(m_aimingDevice, "Aiming Device");
 }
 
 // Can only be called after a world has been imported !!
