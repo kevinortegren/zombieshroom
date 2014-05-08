@@ -318,7 +318,10 @@ void Treenity::AddPhysics()
 
 void Treenity::UpdateOnSelection()
 {
+	ui.treeView_entityOutliner->blockSignals(true);
+	ui.treeView_entityOutliner->clearSelection();
 	ui.treeView_entityOutliner->SetCurrentItems(m_selectedEntities);
+	ui.treeView_entityOutliner->blockSignals(false);
 
 	if (m_selectedEntities.size() == 0)
 	{
@@ -328,8 +331,6 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list.
 		m_compView->RemoveItems();
-
-		ui.treeView_entityOutliner->clearSelection();
 
 	}
 	else if (m_selectedEntities.size() == 1)
