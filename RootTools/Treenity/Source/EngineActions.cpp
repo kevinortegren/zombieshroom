@@ -145,6 +145,8 @@ void EngineActions::CreateTestSpawnpoint()
 void EngineActions::EnterPlayMode()
 {
 	m_editorMode = EditorMode::GAME;
+	//g_engineContext.m_inputSys->LockMouseToCenter(true);
+	//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	// Save the current world state.
 	m_editorLevelState = m_world->GetEntityExporter()->Export(nullptr);
@@ -160,8 +162,13 @@ void EngineActions::EnterPlayMode()
 	// Create a camera.
 	m_treenityMain->GetWorldSystem()->CreatePlayerCamera();
 
+	// Initialize the physics.
+	m_treenityMain->GetWorldSystem()->AddStaticEntitiesToPhysics();
+	g_engineContext.m_physics->EnableDebugDraw(true);
+
 	// Create a player.
 	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
+	g_engineContext.m_script->SetGlobalBoolean("IsClient", true);
 
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnCreate");
 	g_engineContext.m_script->AddParameterNumber(0);
@@ -180,13 +187,14 @@ void EngineActions::EnterPlayMode()
 	transform->m_position = spawnTransform->m_position;
 	transform->m_orientation = spawnTransform->m_orientation;
 
-	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Entered play mode");
+	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Entered play mode");	
 }
 
 void EngineActions::ExitPlayMode()
 {
 	// Clear whatever happened within the game session.
 	ClearScene();
+	g_engineContext.m_physics->RemoveAll();
 
 	// Restore the old world state.
 	std::stringstream ss(m_editorLevelState);
@@ -194,6 +202,8 @@ void EngineActions::ExitPlayMode()
 	AddDefaultEntities();
 	InitializeScene();
 
+	//SDL_SetRelativeMouseMode(SDL_FALSE);
+	//g_engineContext.m_inputSys->LockMouseToCenter(false);
 	m_editorMode = EditorMode::EDITOR;
 
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Exited play mode");

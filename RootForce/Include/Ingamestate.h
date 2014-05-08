@@ -105,7 +105,6 @@ namespace RootForce
 		Keymapper* m_keymapper;
 
 		GameStates::GameStates UpdateConsole();
-		void UpdateHUD();
 		void PrintGlobalCommandHelp();
 	};
 }

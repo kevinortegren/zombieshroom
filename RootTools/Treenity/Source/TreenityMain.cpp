@@ -330,7 +330,7 @@ bool TreenityMain::IsRunning()
 
 void TreenityMain::EnterPlayMode()
 {
-
+	
 }
 
 void TreenityMain::ExitPlayMode()
@@ -362,7 +362,7 @@ void TreenityMain::HandleEditorEvents()
 
 void TreenityMain::HandleIngameEvents()
 {
-	m_globalKeys.Update();
+	//m_globalKeys.Update();
 
 	if (g_engineContext.m_inputSys != nullptr)
 	{
@@ -471,11 +471,28 @@ void TreenityMain::Update(float dt)
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
 
+		// Update on player controls.
+		m_playerControlSystem->Process();
+		m_actionSystem->Process();
+
+		// Update the physics.
+		m_physicsTransformCorrectionSystem->Process();
+		g_engineContext.m_physics->Update(m_world.GetDelta());
+		m_physicsSystem->Process();
+
+		// Update collision
+		//m_collisionSystem->Process();
+
+		// Update the scripts?
+		//m_controllerActionSystem->Process();	
+		//m_scriptSystem->Process();
+
+		// Update the rendering.
 		m_worldSystem->Process();
-		m_controllerActionSystem->Process();	
+		m_actionSystem->UpdateAimingDevice(false);
+		m_thirdPersonBehaviorSystem->Process();
 		m_lookAtSystem->Process();
 		m_cameraSystem->Process();
-		m_scriptSystem->Process();
 		m_transformInterpolationSystem->Process();
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
