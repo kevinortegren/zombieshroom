@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	QPalette darkPalette;
 	darkPalette.setColor(QPalette::Window, QColor(53,53,53));
 	darkPalette.setColor(QPalette::WindowText, Qt::white);
-	darkPalette.setColor(QPalette::Base, QColor(25,25,25));
+	darkPalette.setColor(QPalette::Base, QColor(15,15,15));
 	darkPalette.setColor(QPalette::AlternateBase, QColor(53,53,53));
 	darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
 	darkPalette.setColor(QPalette::ToolTipText, Qt::white);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	darkPalette.setColor(QPalette::BrightText, Qt::red);
 	darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
 
-	darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+	darkPalette.setColor(QPalette::Highlight, QColor(255,140,0));
 	darkPalette.setColor(QPalette::HighlightedText, Qt::black);
 
 	qApp->setPalette(darkPalette);
@@ -113,7 +113,8 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	{
 		throw std::runtime_error("Failed to initialize SDL");
 	}
-
+	//Init Treenity QMainWindow and all UIs
+	m_treenityEditor.Init();
 	m_treenityEditor.CreateOpenGLContext();
 	m_treenityEditor.SetEngineInterface(&m_engineActions);
 	m_treenityEditor.SetProjectManager(&m_projectManager);

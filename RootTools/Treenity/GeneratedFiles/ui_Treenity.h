@@ -81,6 +81,10 @@ public:
     QFormLayout *formLayout;
     QLineEdit *lineEdit_entityName;
     QLabel *label;
+    QDockWidget *dockWidget_assetManager;
+    QWidget *dockWidgetContents;
+    QVBoxLayout *verticalLayout_5;
+    QVBoxLayout *verticalLayout_assetManager;
 
     void setupUi(QMainWindow *TreenityClass)
     {
@@ -286,6 +290,23 @@ public:
 
         dockWidget_6->setWidget(dockWidgetContents_6);
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_6);
+        dockWidget_assetManager = new QDockWidget(TreenityClass);
+        dockWidget_assetManager->setObjectName(QStringLiteral("dockWidget_assetManager"));
+        dockWidget_assetManager->setAllowedAreas(Qt::BottomDockWidgetArea);
+        dockWidgetContents = new QWidget();
+        dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
+        verticalLayout_5 = new QVBoxLayout(dockWidgetContents);
+        verticalLayout_5->setSpacing(6);
+        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        verticalLayout_assetManager = new QVBoxLayout();
+        verticalLayout_assetManager->setSpacing(6);
+        verticalLayout_assetManager->setObjectName(QStringLiteral("verticalLayout_assetManager"));
+
+        verticalLayout_5->addLayout(verticalLayout_assetManager);
+
+        dockWidget_assetManager->setWidget(dockWidgetContents);
+        TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget_assetManager);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());

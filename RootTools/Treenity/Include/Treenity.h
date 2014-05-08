@@ -17,6 +17,7 @@
 #include <RootTools/Treenity/Include/Components/PhysicsView.h>
 #include <RootTools/Treenity/Include/Components/RenderableView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
+#include <RootTools/Treenity/Include/AssetManagerWidget.h>
 
 class Treenity : public QMainWindow, public EditorInterface
 {
@@ -54,6 +55,9 @@ public:
 	const std::set<ECS::Entity*>& GetSelection() const;
 	void RenameEntity(ECS::Entity* p_entity, const std::string& p_name);
 
+	//Called after RootEngine has been loaded from TreenityMain!
+	void Init();
+
 private:
 	// Component meta-data.
 	std::map<int, QString> m_componentNames;
@@ -73,6 +77,9 @@ private:
 
 	ComponentView* m_compView;
 	std::map<int, AbstractComponentView*> m_componentViews;
+
+	//Asset management
+	AssetManagerWidget* m_assetManagerWidget;
 protected:
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);

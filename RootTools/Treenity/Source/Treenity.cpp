@@ -89,7 +89,6 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addEntity,					SIGNAL(triggered()), this,				SLOT(CreateEntity()));
 	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
 	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
-	connect(ui.treeView_entityOutliner,				SIGNAL(itemSelectionChanged()), this,	SLOT(OutlinerSelectEntity()));
 	connect(ui.action_addRenderable,				SIGNAL(triggered()), this,				SLOT(AddRenderable()));
 	connect(ui.action_addPhysics,					SIGNAL(triggered()), this,				SLOT(AddPhysics()));
 	
@@ -385,4 +384,10 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 void Treenity::keyReleaseEvent( QKeyEvent* event )
 {
 	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::HELP_PRINT, "Key released: %d", event->key() );
+}
+
+void Treenity::Init()
+{
+	m_assetManagerWidget = new AssetManagerWidget();
+	ui.verticalLayout_assetManager->addWidget(m_assetManagerWidget);
 }
