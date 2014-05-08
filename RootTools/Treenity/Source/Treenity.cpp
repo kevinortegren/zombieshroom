@@ -273,6 +273,7 @@ const std::set<ECS::Entity*>& Treenity::GetSelection() const
 void Treenity::RenameEntity(ECS::Entity* p_entity, const std::string& p_name)
 {
 	ui.treeView_entityOutliner->EntityRenamed(p_entity, QString::fromStdString(p_name));
+	m_projectManager->SetEntityName(p_entity, QString::fromStdString(p_name));
 }
 
 void Treenity::CreateEntity()

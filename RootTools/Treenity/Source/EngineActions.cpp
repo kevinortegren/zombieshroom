@@ -44,6 +44,7 @@ void EngineActions::ClearScene()
 
 void EngineActions::AddDefaultEntities()
 {
+	// Process entities from world import.
 	m_treenityMain->ProcessWorldMessages();
 
 	// Add non-editable entities.
