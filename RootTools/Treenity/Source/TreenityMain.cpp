@@ -422,16 +422,17 @@ void TreenityMain::RaySelect()
 			if(renderable != nullptr)
 			{
 				float t = 999999.0f;
-				bool hit = RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t);
-				if(hit)
+				if(RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t))
 				{
-					std::cout << "hit!" << std::endl;
-
-					if(t < closestDist)
+					float newt = 9999999.0f;
+					if(RayVsTriangle(cameraPos, ray, renderable->m_model, transform, newt))
 					{
-						closestEntity = (*itr);
-						closestDist = t;
-						g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
+						if(newt < closestDist)
+						{
+							closestEntity = (*itr);
+							closestDist = newt;
+							g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
+						}
 					}
 				}
 			}
@@ -597,6 +598,48 @@ bool TreenityMain::RayVsOBB(const glm::vec3& cameraPos, const glm::vec3& ray, Ro
 	{
 		t = tMax;
 		return true;
+	}
+
+	return false;
+}
+
+bool TreenityMain::RayVsTriangle(const glm::vec3& cameraPos, const glm::vec3& ray, const RootEngine::Model* model, const glm::mat4x4& transform, float& t)
+{
+	std::cout << model->m_indices.size() << std::endl;
+	std::cout << model->m_positions.size() << std::endl;
+
+	glm::mat4x4 inverseWorld = glm::inverse(transform);
+
+	glm::vec4 rayLocal = inverseWorld * glm::vec4(ray.x, ray.y, ray.z, 0.0f);
+	glm::vec4 cameraLocal = inverseWorld * glm::vec4(cameraPos.x, cameraPos.y, cameraPos.z, 1.0f);
+
+	for(size_t i = 0; i < model->m_indices.size(); i += 3)
+	{
+		glm::vec3 result;
+
+		glm::vec3 A = model->m_positions[model->m_indices[i]];
+		glm::vec3 B = model->m_positions[model->m_indices[i+1]];
+		glm::vec3 C = model->m_positions[model->m_indices[i+2]];
+
+		glm::vec3 e1 = B - A;
+		glm::vec3 e2 = C - A;
+
+		glm::vec3 q = glm::cross(glm::vec3(rayLocal.x, rayLocal.y, rayLocal.z), e2);
+		float a = glm::dot(e1, q);
+		float f = 1.0f / a;
+
+		glm::vec3 s = glm::vec3(cameraLocal.x, cameraLocal.y, cameraLocal.z) - A;
+		result.x = f * glm::dot(s, q);
+
+		glm::vec3 j = glm::cross(s, e1);
+		result.y = f * glm::dot(glm::vec3(rayLocal.x, rayLocal.y, rayLocal.z), j);
+		result.z = f * glm::dot(e2, j);
+
+		if(result.x > 0 && result.x < 1.0f && result.y > 0 && result.y < 1.0f && (result.x + result.y) > 0 && (result.x + result.y) < 1.0f)
+		{
+			t = result.z;
+			return true;
+		}
 	}
 
 	return false;

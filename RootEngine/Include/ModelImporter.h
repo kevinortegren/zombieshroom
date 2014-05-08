@@ -36,6 +36,9 @@ namespace RootEngine
 		glm::mat4x4 m_transform;
 		RootEngine::OBB m_obb;
 
+		std::vector<unsigned int> m_indices;
+		std::vector<glm::vec3> m_positions;
+
 		Model()
 #ifndef COMPILE_LEVEL_EDITOR
 			: m_animation(nullptr)
