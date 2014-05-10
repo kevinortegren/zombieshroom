@@ -16,9 +16,11 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
 
@@ -32,14 +34,16 @@ public:
     QGridLayout *gridLayout;
     QLineEdit *lineEdit_assetSearch;
     QPushButton *pushButton_back;
-    QListView *listView_fileBrowser;
     QPushButton *pushButton_forward;
+    QListView *listView_fileBrowser;
+    QSlider *horizontalSlider_icon;
+    QLabel *label;
 
     void setupUi(QWidget *AssetManagerUi)
     {
         if (AssetManagerUi->objectName().isEmpty())
             AssetManagerUi->setObjectName(QStringLiteral("AssetManagerUi"));
-        AssetManagerUi->resize(1078, 286);
+        AssetManagerUi->resize(1005, 286);
         horizontalLayout = new QHBoxLayout(AssetManagerUi);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
@@ -75,15 +79,6 @@ public:
 
         gridLayout->addWidget(pushButton_back, 0, 0, 1, 1);
 
-        listView_fileBrowser = new QListView(AssetManagerUi);
-        listView_fileBrowser->setObjectName(QStringLiteral("listView_fileBrowser"));
-        listView_fileBrowser->setIconSize(QSize(50, 50));
-        listView_fileBrowser->setMovement(QListView::Static);
-        listView_fileBrowser->setGridSize(QSize(80, 80));
-        listView_fileBrowser->setViewMode(QListView::IconMode);
-
-        gridLayout->addWidget(listView_fileBrowser, 1, 0, 1, 3);
-
         pushButton_forward = new QPushButton(AssetManagerUi);
         pushButton_forward->setObjectName(QStringLiteral("pushButton_forward"));
         pushButton_forward->setMinimumSize(QSize(25, 25));
@@ -93,6 +88,32 @@ public:
 "}"));
 
         gridLayout->addWidget(pushButton_forward, 0, 1, 1, 1);
+
+        listView_fileBrowser = new QListView(AssetManagerUi);
+        listView_fileBrowser->setObjectName(QStringLiteral("listView_fileBrowser"));
+        listView_fileBrowser->setIconSize(QSize(50, 50));
+        listView_fileBrowser->setTextElideMode(Qt::ElideMiddle);
+        listView_fileBrowser->setMovement(QListView::Static);
+        listView_fileBrowser->setGridSize(QSize(80, 80));
+        listView_fileBrowser->setViewMode(QListView::IconMode);
+
+        gridLayout->addWidget(listView_fileBrowser, 1, 0, 1, 3);
+
+        horizontalSlider_icon = new QSlider(AssetManagerUi);
+        horizontalSlider_icon->setObjectName(QStringLiteral("horizontalSlider_icon"));
+        horizontalSlider_icon->setMaximumSize(QSize(150, 16777215));
+        horizontalSlider_icon->setMinimum(25);
+        horizontalSlider_icon->setMaximum(100);
+        horizontalSlider_icon->setValue(50);
+        horizontalSlider_icon->setOrientation(Qt::Horizontal);
+        horizontalSlider_icon->setTickPosition(QSlider::NoTicks);
+
+        gridLayout->addWidget(horizontalSlider_icon, 2, 2, 1, 1);
+
+        label = new QLabel(AssetManagerUi);
+        label->setObjectName(QStringLiteral("label"));
+
+        gridLayout->addWidget(label, 2, 0, 1, 2);
 
 
         horizontalLayout->addLayout(gridLayout);
@@ -109,6 +130,7 @@ public:
         lineEdit_assetSearch->setPlaceholderText(QApplication::translate("AssetManagerUi", "Search assets...", 0));
         pushButton_back->setText(QApplication::translate("AssetManagerUi", "<", 0));
         pushButton_forward->setText(QApplication::translate("AssetManagerUi", ">", 0));
+        label->setText(QApplication::translate("AssetManagerUi", "Icon size:", 0));
     } // retranslateUi
 
 };

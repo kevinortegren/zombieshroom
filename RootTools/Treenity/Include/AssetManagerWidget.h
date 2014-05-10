@@ -23,4 +23,5 @@ private slots:
 	void FileSelected(const QModelIndex& p_val);
 	void NavigateBack();
 	void NavigateForward();
+	void IconSizeChanged(int p_val);
 };

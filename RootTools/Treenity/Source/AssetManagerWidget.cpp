@@ -15,6 +15,7 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	connect(ui.treeView_assetFileBrowser,		SIGNAL(clicked(const QModelIndex&)),			this,				SLOT(FolderSelected(const QModelIndex&)));
 	connect(ui.listView_fileBrowser,			SIGNAL(doubleClicked(const QModelIndex&)),		this,				SLOT(FileSelected(const QModelIndex&)));
 	connect(ui.pushButton_back,					SIGNAL(clicked()),								this,				SLOT(NavigateBack()));
+	connect(ui.horizontalSlider_icon,			SIGNAL(valueChanged(int)),						this,				SLOT(IconSizeChanged(int)));
 
 	//Create folder model for tree view
 	m_assetFolderModel = new QFileSystemModel();
@@ -45,6 +46,20 @@ AssetManagerWidget::~AssetManagerWidget()
 	delete m_assetFolderModel;
 }
 
+/*		Blue print of Asset browser
+________________________________________________________
+|				|_______________Search bar______________|
+|				|										|
+|				|										|
+|				|										|
+|   Tree view	|			List view					|
+|				|										|
+|				|										|
+|               |										|
+|               |										|
+________________________________________________________
+
+*/
 //When typing in the search box
 void AssetManagerWidget::SearchLineChanged( const QString& p_val )
 {
@@ -91,7 +106,7 @@ void AssetManagerWidget::FileSelected( const QModelIndex& p_val )
 	{
 		//This opens a file with the default program. If no program is selected it will prompt the user to find a program. Very nice... very nice indeed!
 		QString temp = "file:///" + fileInfo.filePath();
-		QDesktopServices::openUrl(QUrl(temp, QUrl::TolerantMode));
+		QDesktopServices::openUrl(QUrl(temp, QUrl::TolerantMode)); //Don't know if QDesktopServices is included in our external libs. If this is causing compile problems, comment it out!
 	}
 
 }
@@ -123,5 +138,23 @@ void AssetManagerWidget::NavigateBack()
 void AssetManagerWidget::NavigateForward()
 {
 
+}
+
+void AssetManagerWidget::IconSizeChanged( int p_val )
+{
+	//In slider is all the way to the left we switch to list mode!
+	if(p_val == ui.horizontalSlider_icon->minimum())
+	{
+		ui.listView_fileBrowser->setViewMode(QListView::ListMode);
+		ui.listView_fileBrowser->setIconSize(QSize(15, 15));
+		ui.listView_fileBrowser->setGridSize(QSize(15, 15));	
+	}
+	else
+	{
+		ui.listView_fileBrowser->setViewMode(QListView::IconMode);
+		ui.listView_fileBrowser->setIconSize(QSize(p_val, p_val));	
+		ui.listView_fileBrowser->setGridSize(QSize(p_val + 10, p_val + 15));	
+	}
+	
 }
 
