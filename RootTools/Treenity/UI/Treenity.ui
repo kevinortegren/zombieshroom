@@ -446,6 +446,21 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="dockWidget_assetManager">
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea</set>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_assetManager"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="action_addEntity">
    <property name="text">
     <string>Add entity</string>
