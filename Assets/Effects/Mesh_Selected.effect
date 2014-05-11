@@ -7,10 +7,8 @@
         - name: PerObject
           slot: 1
       uniforms:
-          - sem: MODEL
-            offset: 0
-          - sem: NORMAL
-            offset: 64      
+        - sem: MODEL
+          offset: 0
       flags:
         - name: Forward
       programs:

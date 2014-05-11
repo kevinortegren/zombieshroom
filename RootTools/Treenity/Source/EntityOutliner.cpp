@@ -177,10 +177,14 @@ ECS::Entity* EntityOutliner::GetSelectedEntity()
 
 void EntityOutliner::SetCurrentItems(const std::set<ECS::Entity*> p_selected)
 {
+	blockSignals(true);
+
 	for(ECS::Entity* entity : p_selected)
 	{
 		FindItemWithEntity(entity)->setSelected(true);
 	}
+
+	blockSignals(false);
 }
 
 EntityOutlinerItem* EntityOutliner::FindItemWithEntity(ECS::Entity* p_entity)

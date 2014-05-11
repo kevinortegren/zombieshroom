@@ -21,6 +21,7 @@ namespace RootForce
 	void RenderingSystem::Begin()
 	{
 		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
+		m_matrices.clear();
 	}
 
 	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -113,7 +114,7 @@ namespace RootForce
 
 	void RenderingSystem::End()
 	{
-
+		
 	}
 
 	void RenderingSystem::SetRendererInterface(Render::RendererInterface* p_renderer)

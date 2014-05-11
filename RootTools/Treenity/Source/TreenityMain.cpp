@@ -372,7 +372,6 @@ void TreenityMain::RenderSelectedEntity()
 		Render::RenderJob job;	
 		job.m_mesh = renderable->m_model->m_meshes[0];
 		job.m_material = m_selectedEntityMaterial;	
-		job.m_params = renderable->m_params;
 		job.m_forward = renderable->m_forward;
 		job.m_refractive = renderable->m_refractive;
 		job.m_params[Render::Semantic::MODEL] = &m_renderingSystem->m_matrices[entity].m_model;
@@ -405,6 +404,9 @@ void TreenityMain::RaySelect()
 		std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
 		for(auto itr = entities.begin(); itr != entities.end(); ++itr)
 		{
+			if((*itr)->GetFlag() == 0)
+				continue;
+
 			if(m_world.GetTagManager()->GetEntityByTag("Skybox") == (*itr))
 				continue;
 

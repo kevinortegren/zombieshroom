@@ -139,17 +139,17 @@ void ECS::EntityExporter::Export(const std::string& p_filepath, std::map<ECS::En
 		out << YAML::BeginMap;
 		out << YAML::Key << "EntityNames" << YAML::Value << YAML::BeginSeq;
 		
-		for(unsigned int i = 0; i < m_world->GetEntityManager()->m_entities.size(); i++)
+		for(auto itr = p_entityNames->begin(); itr != p_entityNames->end(); ++itr)
 		{
-			if(m_world->GetEntityManager()->m_entities[i].m_id == -1)
+			if(itr->first->GetId() == -1)
 				continue;
 
-			if(nonExportIds[m_world->GetEntityManager()->m_entities[i].m_id])
+			if(nonExportIds[itr->first->GetId()])
 				continue;
 
 			out << YAML::BeginMap;
-			out << YAML::Key << "ID" << YAML::Value << m_world->GetEntityManager()->m_entities[i].m_id;
-			out << YAML::Key << "Name" << YAML::Value << p_entityNames->find(&m_world->GetEntityManager()->m_entities[i])->second.c_str();
+			out << YAML::Key << "ID" << YAML::Value << itr->first->GetId();
+			out << YAML::Key << "Name" << YAML::Value << itr->second.c_str();
 			out << YAML::EndMap;
 		}
 
