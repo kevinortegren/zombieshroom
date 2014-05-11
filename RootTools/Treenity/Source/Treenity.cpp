@@ -318,10 +318,7 @@ void Treenity::AddPhysics()
 
 void Treenity::UpdateOnSelection()
 {
-	ui.treeView_entityOutliner->blockSignals(true);
-	ui.treeView_entityOutliner->clearSelection();
 	ui.treeView_entityOutliner->SetCurrentItems(m_selectedEntities);
-	ui.treeView_entityOutliner->blockSignals(false);
 
 	if (m_selectedEntities.size() == 0)
 	{
@@ -336,8 +333,6 @@ void Treenity::UpdateOnSelection()
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
-
-		//ui.treeView_entityOutliner->setS
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);
