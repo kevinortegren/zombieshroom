@@ -5,11 +5,11 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/WorldSystem.h>
 
+
 class TreenityMain;
 
 class EngineActions : public EngineInterface
 {
-
 public:
 	EngineActions(ECS::World* p_world, TreenityMain* p_treenityMain);
 
@@ -61,4 +61,5 @@ private:
 
 	ECS::Entity* m_cameraEntity;
 	ECS::Entity* m_aimingDevice;
+
 };

@@ -363,10 +363,12 @@ void TreenityMain::Update(float dt)
 	m_world.GetEntityManager()->CleanUp();
 
 	m_worldSystem.Process();
-	m_controllerActionSystem->Process();	
+	m_controllerActionSystem->Process();
+	m_scriptSystem->Process();
+	
 	m_lookAtSystem->Process();
 	m_cameraSystem->Process();
-	m_scriptSystem->Process();
+
 	m_transformInterpolationSystem->Process();
 	m_shadowSystem->Process();
 	m_directionalLightSystem->Process();
