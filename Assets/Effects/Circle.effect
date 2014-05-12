@@ -1,0 +1,28 @@
+- name: Circle
+  techniques:
+    - name: Circle
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      uniforms:
+        - sem: MODEL
+          offset: 0
+        - sem: NORMAL
+          offset: 64
+        - sem: COLOR
+          offset: 128
+      flags:
+        - name: Forward
+      programs:
+        - name: Circle
+          shaders:
+           - name: Circle
+             type: vertex
+           - name: Circle
+             type: fragment
+          depth:
+            test: 1
+            write: 0
+          blend: 0

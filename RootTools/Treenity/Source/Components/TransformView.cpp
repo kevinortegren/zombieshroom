@@ -1,4 +1,5 @@
 #include <RootTools/Treenity/Include/Components/TransformView.h>
+#include <glm/gtx/euler_angles.hpp>
 
 TransformView::TransformView(QWidget* p_parent)
 	: AbstractComponentView(p_parent)
@@ -28,11 +29,20 @@ void TransformView::DisplayEntity(ECS::Entity* p_entity)
 	ui.doubleSpinBox_translationY->setValue(m_engineInterface->GetPosition(p_entity).y);
 	ui.doubleSpinBox_translationZ->setValue(m_engineInterface->GetPosition(p_entity).z);
 
-	glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(p_entity).GetQuaternion());
+	glm::quat q = m_engineInterface->GetOrientation(p_entity).GetQuaternion();
 
+	glm::vec3 euler = glm::eulerAngles(q);
 	ui.doubleSpinBox_orientationX->setValue(euler.x);
 	ui.doubleSpinBox_orientationY->setValue(euler.y);
 	ui.doubleSpinBox_orientationZ->setValue(euler.z);
+
+	/*float roll  = atan2f(2*q.y*q.w - 2*q.x*q.z, 1 - 2*q.y*q.y - 2*q.z*q.z);
+	float pitch = atan2f(2*q.x*q.w - 2*q.y*q.z, 1 - 2*q.x*q.x - 2*q.z*q.z);
+	float yaw   = asinf(2*q.x*q.y + 2*q.z*q.w);
+	glm::vec3 euler = glm::vec3(roll, yaw, pitch);
+	ui.doubleSpinBox_orientationX->setValue(glm::degrees(euler.x));
+	ui.doubleSpinBox_orientationY->setValue(glm::degrees(euler.y));
+	ui.doubleSpinBox_orientationZ->setValue(glm::degrees(euler.z));*/
 
 	ui.doubleSpinBox_scaleX->setValue(m_engineInterface->GetScale(p_entity).x);
 	ui.doubleSpinBox_scaleY->setValue(m_engineInterface->GetScale(p_entity).y);

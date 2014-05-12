@@ -68,4 +68,13 @@ private:
 
 	Render::Material* m_selectedEntityMaterial;
 	std::set<ECS::Entity*> m_pickedEntities;
+
+	ECS::Entity* m_circleEntity0;
+	ECS::Entity* m_circleEntity1;
+	ECS::Entity* m_circleEntity2;
+	Render::Material* m_circleMaterial;
+
+	glm::vec4 m_testColor0;
+	glm::vec4 m_testColor1;
+	glm::vec4 m_testColor2;
 };
