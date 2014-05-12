@@ -2,6 +2,7 @@
 
 #include <QWidget>
 #include <QFileSystemModel>
+#include <QMenu>
 
 #include <RootTools/Treenity/GeneratedFiles/ui_AssetManager.h>
 
@@ -17,6 +18,12 @@ private:
 	QFileSystemModel* m_assetFolderModel;
 	QFileSystemModel* m_assetFileModel;
 
+	QMenu* m_fileContextMenu;
+
+	QStringList m_currentFilter;
+
+	void SetFolderSpecificFilters(const QString& p_folderName);
+
 private slots:
 	void SearchLineChanged(const QString& p_val);
 	void FolderSelected(const QModelIndex& p_val);
@@ -24,4 +31,5 @@ private slots:
 	void NavigateBack();
 	void NavigateForward();
 	void IconSizeChanged(int p_val);
+	void TreeListContextMenu(const QPoint& p_val);
 };

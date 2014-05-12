@@ -4,6 +4,7 @@
 #include <Utility/ECS/Include/Entity.h>
 #include <RootSystems/Include/Orientation.h>
 #include <glm/glm.hpp>
+#include <QString>
 
 struct EngineInterface
 {
@@ -12,6 +13,7 @@ struct EngineInterface
 	virtual void ClearScene() = 0;
 	virtual void AddDefaultEntities() = 0;
 	virtual void InitializeScene() = 0;
+	virtual void LoadScene(const QString& p_filePath) = 0;
 
 	// Entity
 	virtual ECS::Entity* CreateEntity() = 0;

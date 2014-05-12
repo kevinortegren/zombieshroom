@@ -257,3 +257,11 @@ void EngineActions::RemovePhysics( ECS::Entity* p_entity )
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(p_entity);
 }
 
+void EngineActions::LoadScene( const QString& p_filePath )
+{
+	ClearScene();
+	m_treenityMain->GetProjectManager()->Import(p_filePath);
+	AddDefaultEntities();
+	InitializeScene();
+}
+

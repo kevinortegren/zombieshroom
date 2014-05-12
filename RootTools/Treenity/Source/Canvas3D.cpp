@@ -10,6 +10,8 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
 
+#include <RootTools/Treenity/Include/Log.h>
+
 extern RootEngine::GameSharedContext g_engineContext;
 
 Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
@@ -17,7 +19,7 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 	//Flicker fix
 	setAttribute(Qt::WA_PaintOnScreen);
 	setUpdatesEnabled(false);
-
+	setAcceptDrops(true);
 	//Standard setup
 	//setGeometry(QRect(2, 28, 1173, 899));
 	setFocusPolicy(Qt::ClickFocus);
@@ -89,4 +91,38 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 	scrollEvent.type = SDL_MOUSEWHEEL;
 	scrollEvent.wheel.y = event->delta() / 100;
 	SDL_PushEvent(&scrollEvent);
+}
+
+void Canvas3D::dragEnterEvent( QDragEnterEvent *event )
+{
+	if (event->mimeData()->hasText())
+		event->acceptProposedAction();
+}
+
+void Canvas3D::dropEvent( QDropEvent *event )
+{	
+	QFileInfo fileInfo(event->mimeData()->text());
+
+	//if statements with logic for dropping specific files
+	if(fileInfo.suffix() == "world")
+	{
+		//A little sting manuipulation to remove the "file:///"-prefix on the file path if dragged from asset browser
+		QString filePath;
+		if (fileInfo.filePath().startsWith(QLatin1String("file:///")))
+		{
+			filePath =  fileInfo.filePath().mid(8);
+		}
+		else
+		{
+			filePath =  fileInfo.filePath();	
+		}
+		
+		//Load new scene!
+		m_engineInterface->LoadScene(filePath);
+	}
+}
+
+void Canvas3D::SetEngineInterface( EngineInterface* p_engineInterface )
+{
+	m_engineInterface = p_engineInterface;
 }

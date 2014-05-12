@@ -21,6 +21,8 @@ public:
 	void AddDefaultEntities();
 	void InitializeScene();
 
+	void LoadScene(const QString& p_filePath);
+
 	// Entity
 	ECS::Entity* CreateEntity();
 	void DeleteEntity(ECS::Entity* p_entity);

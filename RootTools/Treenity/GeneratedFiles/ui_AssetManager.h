@@ -91,6 +91,7 @@ public:
 
         listView_fileBrowser = new QListView(AssetManagerUi);
         listView_fileBrowser->setObjectName(QStringLiteral("listView_fileBrowser"));
+        listView_fileBrowser->setDragDropMode(QAbstractItemView::DragOnly);
         listView_fileBrowser->setIconSize(QSize(50, 50));
         listView_fileBrowser->setTextElideMode(Qt::ElideMiddle);
         listView_fileBrowser->setMovement(QListView::Static);
