@@ -175,6 +175,18 @@ ECS::Entity* EntityOutliner::GetSelectedEntity()
 	return entity;
 }
 
+void EntityOutliner::SetCurrentItems(const std::set<ECS::Entity*> p_selected)
+{
+	blockSignals(true);
+
+	for(ECS::Entity* entity : p_selected)
+	{
+		FindItemWithEntity(entity)->setSelected(true);
+	}
+
+	blockSignals(false);
+}
+
 EntityOutlinerItem* EntityOutliner::FindItemWithEntity(ECS::Entity* p_entity)
 {
 	for (int i = 0; i < topLevelItemCount(); ++i)
@@ -208,3 +220,5 @@ void EntityOutliner::SelectionChanged()
 
 	m_editorInterface->Select(entities);
 }
+
+

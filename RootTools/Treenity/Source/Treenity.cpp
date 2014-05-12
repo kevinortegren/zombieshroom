@@ -213,10 +213,11 @@ void Treenity::OpenProject()
 		UpdateWindowTitle();
 
 		m_engineInterface->ClearScene();
-		m_engineInterface->AddDefaultEntities();
-
+	
 		m_projectManager->Import(fileName);
 
+
+		m_engineInterface->AddDefaultEntities();
 		m_engineInterface->InitializeScene();
 	}
 }
@@ -285,9 +286,8 @@ const std::set<ECS::Entity*>& Treenity::GetSelection() const
 
 void Treenity::RenameEntity(ECS::Entity* p_entity, const QString& p_name)
 {
-	m_projectManager->SetEntityName(p_entity, p_name);
-
 	ui.treeView_entityOutliner->EntityRenamed(p_entity, p_name);
+	m_projectManager->SetEntityName(p_entity, p_name);
 }
 
 void Treenity::CreateEntity()
@@ -331,6 +331,8 @@ void Treenity::AddPhysics()
 
 void Treenity::UpdateOnSelection()
 {
+	ui.treeView_entityOutliner->SetCurrentItems(m_selectedEntities);
+
 	if (m_selectedEntities.size() == 0)
 	{
 		// Disable name entry.
@@ -339,12 +341,11 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list.
 		m_compView->RemoveItems();
+
 	}
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
-
-		//ui.treeView_entityOutliner->setS
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);
@@ -400,4 +401,10 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 void Treenity::keyReleaseEvent( QKeyEvent* event )
 {
 	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::HELP_PRINT, "Key released: %d", event->key() );
+}
+
+void Treenity::Init()
+{
+	m_assetManagerWidget = new AssetManagerWidget();
+	ui.verticalLayout_assetManager->addWidget(m_assetManagerWidget);
 }

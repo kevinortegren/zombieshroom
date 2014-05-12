@@ -1,6 +1,7 @@
 #include <RootTools/Treenity/Include/EngineActions.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
+#include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/CameraSystem.h>
 #include <RootSystems/Include/ControllerActions.h>
@@ -46,26 +47,30 @@ void EngineActions::ClearScene()
 
 void EngineActions::AddDefaultEntities()
 {
+	// Process entities from world import.
+    m_treenityMain->ProcessWorldMessages();
+ 
+    // Add non-editable entities.
 	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
 
 	CreateFreeFlyingCamera();
-	CreateTestSpawnpoint();
-
-	// Add new entities.
-	m_treenityMain->ProcessWorldMessages();
+	
 	m_world->GetEntityManager()->CleanUp();
 
-	m_treenityMain->GetEditor()->RenameEntity(skybox, "Skybox");
-	m_treenityMain->GetEditor()->RenameEntity(m_cameraEntity, "Main Camera");
-	m_treenityMain->GetEditor()->RenameEntity(m_aimingDevice, "Aiming Device");
+	// Add editable entities.
+    ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
+	CreateTestSpawnpoint();
+
+	m_treenityMain->ProcessWorldMessages();
+	m_world->GetEntityManager()->CleanUp();
+	
+	m_treenityMain->GetEditor()->RenameEntity(sun, "Sun");
 	m_treenityMain->GetEditor()->RenameEntity(m_testSpawnpoint, "Test Spawnpoint");
 }
 
 // Can only be called after a world has been imported !!
 void EngineActions::InitializeScene()
-{	
-	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
-	
+{
 	m_treenityMain->GetWorldSystem()->BuildStaticShadowMesh();
 	m_treenityMain->GetWorldSystem()->SetAmbientLight(m_world->GetStorage()->GetValueAsVec4("Ambient"));
 
@@ -75,8 +80,6 @@ void EngineActions::InitializeScene()
 	// Add new entities.
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
-
-	m_treenityMain->GetEditor()->RenameEntity(sun, "Sun");
 }
 
 void EngineActions::CreateFreeFlyingCamera()
@@ -310,7 +313,7 @@ std::string EngineActions::GetRenderableMaterialName( ECS::Entity* p_entity )
 void EngineActions::SetRenderableModelName( ECS::Entity* p_entity, std::string p_modelName )
 {
 	RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
-	renderable->m_model = g_engineContext.m_resourceManager->GetModel(p_modelName);
+	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada(p_modelName);
 }
 
 void EngineActions::SetRenderableMaterialName( ECS::Entity* p_entity, std::string p_materialName )

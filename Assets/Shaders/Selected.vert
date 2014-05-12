@@ -10,12 +10,12 @@ layout(std140) uniform PerFrame
 
 layout(std140) uniform PerObject
 {
-	mat4 modelMatrix;
+    mat4 modelMatrix;
 };
 
 out vec4 vert_color;
 
 void main()
 {
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 }

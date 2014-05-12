@@ -17,8 +17,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-
+#include <RootEngine/Include/OBB.h>
 
 namespace RootEngine
 {
@@ -35,6 +34,10 @@ namespace RootEngine
 #endif
 		std::string m_textureHandles[3];
 		glm::mat4x4 m_transform;
+		RootEngine::OBB m_obb;
+
+		std::vector<unsigned int> m_indices;
+		std::vector<glm::vec3> m_positions;
 
 		Model()
 #ifndef COMPILE_LEVEL_EDITOR

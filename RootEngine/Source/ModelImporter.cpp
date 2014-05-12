@@ -19,8 +19,7 @@ namespace RootEngine
 	}
 
 	Model* ModelImporter::LoadModel(const std::string p_fileName, bool p_noRender)
-	{
-		
+	{	
 		m_noRender = p_noRender;
 		m_model = new Model(); //Owned by ResourceManager
 		
@@ -108,7 +107,7 @@ namespace RootEngine
 		mesh->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
 		mesh->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
 
-		std::vector<glm::vec3> positions;
+
 		if(p_aiMesh->HasBones())
 		{
 			LoadBones(p_aiMesh);
@@ -132,7 +131,7 @@ namespace RootEngine
 				v.m_weights		= glm::vec4(m_boneData[i].m_weightList[0], m_boneData[i].m_weightList[1], m_boneData[i].m_weightList[2], m_boneData[i].m_weightList[3]);
 
 				vertices.push_back(v);
-				positions.push_back(v.m_pos);
+				m_model->m_positions.push_back(v.m_pos);
 			}
 
 			m_boneData.clear();
@@ -158,7 +157,7 @@ namespace RootEngine
 				v.m_bitangent = glm::vec3(pBitangent->x, pBitangent->y, pBitangent->z);
 
 				vertices.push_back(v);
-				positions.push_back(v.m_pos);
+				m_model->m_positions.push_back(v.m_pos);
 			}
 
 			mesh->CreateVertexBuffer1P1N1UV1T1BT(&vertices[0], vertices.size());	
@@ -178,7 +177,7 @@ namespace RootEngine
 				v.m_UV		= glm::vec2(pTexCoord->x, pTexCoord->y);
 
 				vertices.push_back(v);
-				positions.push_back(v.m_pos);
+				m_model->m_positions.push_back(v.m_pos);
 			}
 
 			mesh->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());	
@@ -196,7 +195,7 @@ namespace RootEngine
 				v.m_UV		= glm::vec2(pTexCoord->x, pTexCoord->y);
 
 				vertices.push_back(v);
-				positions.push_back(v.m_pos);
+				m_model->m_positions.push_back(v.m_pos);
 			}
 
 			mesh->CreateVertexBuffer1P1UV(&vertices[0], vertices.size());	
@@ -206,31 +205,36 @@ namespace RootEngine
 		{
 			mesh->SetElementBuffer(m_context->m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 
-			std::vector<unsigned int> indices;
 			for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)
 			{
 				const aiFace& Face = p_aiMesh->mFaces[i];
 				if(Face.mNumIndices != 3)
 				{
-					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 m_model->m_indices!", p_index, i);
 				}
-				indices.push_back(Face.mIndices[0]);
-				indices.push_back(Face.mIndices[1]);
-				indices.push_back(Face.mIndices[2]);
+				m_model->m_indices.push_back(Face.mIndices[0]);
+				m_model->m_indices.push_back(Face.mIndices[1]);
+				m_model->m_indices.push_back(Face.mIndices[2]);
 			}
 		
-			mesh->CreateIndexBuffer(&indices[0], indices.size());
+			mesh->CreateIndexBuffer(&m_model->m_indices[0], m_model->m_indices.size());
 
 			// Create physics mesh.
 			if(m_context->m_physics)
 			{
 				std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
 
-				pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
+				pmesh->Init(m_model->m_positions, (int)m_model->m_positions.size(), m_model->m_indices, (int)m_model->m_indices.size(), p_aiMesh->mNumFaces);
 
 				m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
 				m_model->m_physicsMeshes.push_back(pmesh);
 			}
+		}
+
+		// Construct OBB.
+		for(auto itr = m_model->m_positions.begin(); itr != m_model->m_positions.end(); ++itr)
+		{
+			m_model->m_obb.Expand((*itr));
 		}
 
 		mesh->SetPrimitiveType(GL_TRIANGLES);
@@ -244,7 +248,7 @@ namespace RootEngine
 		Render::MeshInterface* mesh1P = m_context->m_renderer->CreateMesh();
 		mesh1P->SetVertexBuffer(m_context->m_renderer->CreateBuffer(GL_ARRAY_BUFFER));	
 		mesh1P->SetVertexAttribute(m_context->m_renderer->CreateVertexAttributes());
-		mesh1P->CreateVertexBuffer1P((Render::Vertex1P*)(&positions[0]), positions.size());
+		mesh1P->CreateVertexBuffer1P((Render::Vertex1P*)(&m_model->m_positions[0]), m_model->m_positions.size());
 		mesh1P->SetElementBuffer(mesh->GetElementBuffer());
 		mesh1P->SetPrimitiveType(GL_TRIANGLES);
 
@@ -263,7 +267,7 @@ namespace RootEngine
 				return;
 			}
 
-			//Read vertex positions from mesh
+			//Read vertex m_model->m_positions from mesh
 			std::vector<glm::vec3> positions;
 			for (unsigned int i = 0 ; i < p_aiMesh->mNumVertices ; i++) 
 			{
@@ -271,14 +275,14 @@ namespace RootEngine
 				glm::vec3 pos			= glm::vec3(pPos->x, pPos->y, pPos->z);
 				positions.push_back(pos);
 			}
-			//Read indices from mesh
+			//Read m_model->m_indices from mesh
 			std::vector<unsigned int> indices;
 			for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)
 			{
 				const aiFace& Face = p_aiMesh->mFaces[i];
 				if(Face.mNumIndices != 3)
 				{
-					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 indices!", p_index, i);
+					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 m_model->m_indices!", p_index, i);
 				}
 				indices.push_back(Face.mIndices[0]);
 				indices.push_back(Face.mIndices[1]);
@@ -287,7 +291,7 @@ namespace RootEngine
 
 			std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
 
-			pmesh->Init(positions, (int)positions.size(), indices, (int)indices.size(), p_aiMesh->mNumFaces);
+			pmesh->Init(m_model->m_positions, (int)m_model->m_positions.size(), m_model->m_indices, (int)m_model->m_indices.size(), p_aiMesh->mNumFaces);
 
 			m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
 			m_model->m_physicsMeshes.push_back(pmesh);

@@ -114,7 +114,7 @@ namespace RootForce
 
 		}
 
-		if (vertices.size() > 0)
+		if(vertices.size() > 0)
 		{
 			m_staticMesh = g_engineContext.m_renderer->CreateMesh();
 			m_staticMesh->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));

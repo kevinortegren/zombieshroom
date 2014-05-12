@@ -24,7 +24,6 @@ void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 	ui.doubleSpinBox_velocityZ->setValue(m_engineInterface->GetVelocity(p_entity).z);
 
 	ui.doubleSpinBox_mass->setValue(m_engineInterface->GetMass(p_entity));
-
 }
 
 void PhysicsView::VelocityXChanged(double p_value)

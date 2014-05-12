@@ -21,6 +21,7 @@ namespace RootForce
 	void RenderingSystem::Begin()
 	{
 		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
+		m_matrices.clear();
 	}
 
 	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -59,7 +60,8 @@ namespace RootForce
 		m_matrices[p_entity].m_model = glm::scale(m_matrices[p_entity].m_model, transform->m_scale);
 		m_matrices[p_entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_matrices[p_entity].m_model))));
 
-		
+		renderable->m_model->m_obb.m_transform = m_matrices[p_entity].m_model;
+	
 		Render::RenderJob job;	
 		job.m_mesh = renderable->m_model->m_meshes[0];
 		job.m_shadowMesh = renderable->m_model->m_meshes[0];
@@ -112,7 +114,7 @@ namespace RootForce
 
 	void RenderingSystem::End()
 	{
-
+		
 	}
 
 	void RenderingSystem::SetRendererInterface(Render::RendererInterface* p_renderer)
