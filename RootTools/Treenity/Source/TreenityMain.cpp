@@ -85,6 +85,7 @@ int main(int argc, char *argv[])
 TreenityMain::TreenityMain(const std::string& p_path)
 	: m_engineActions(&m_world, this)
 	, m_projectManager(&m_world)
+	, m_previousEditorMode(EditorMode::EDITOR)
 {
 	g_world = &m_world;
 
@@ -436,6 +437,14 @@ void TreenityMain::ProcessWorldMessages()
 
 void TreenityMain::Update(float dt)
 {
+	if (m_previousEditorMode == EditorMode::EDITOR && m_engineActions.GetMode() == EditorMode::GAME)
+	{
+		// Reset the time the loading for going in-game took.
+		dt = 0.0f;
+	}
+	m_previousEditorMode = m_engineActions.GetMode();
+
+
 	if (m_engineActions.GetMode() == EditorMode::EDITOR)
 	{
 		m_world.SetDelta(dt);

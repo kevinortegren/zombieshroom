@@ -569,43 +569,44 @@ namespace RootForce
 		kb.Edge = false;
 		kb.ActionUp = PlayerAction::NONE;
 		kb.Action = PlayerAction::MOVE_FORWARDS;
-		kb.Bindings.push_back(SDL_Scancode(26));
+		kb.Bindings.push_back(SDL_SCANCODE_W);
 		m_keybindings.push_back(kb);
 		
 		kb.Edge = false;
 		kb.ActionUp = PlayerAction::NONE;
 		kb.Action = PlayerAction::MOVE_BACKWARDS;
-		kb.Bindings.push_back(SDL_Scancode(22));
+		kb.Bindings.push_back(SDL_SCANCODE_S);
 		m_keybindings.push_back(kb);
 		
 		kb.Edge = false;
 		kb.ActionUp = PlayerAction::NONE;
 		kb.Action = PlayerAction::STRAFE_RIGHT;
-		kb.Bindings.push_back(SDL_Scancode(7));
+		kb.Bindings.push_back(SDL_SCANCODE_D);
 		m_keybindings.push_back(kb);
 
 		kb.Edge = false;
 		kb.ActionUp = PlayerAction::NONE;
 		kb.Action = PlayerAction::STRAFE_LEFT;
-		kb.Bindings.push_back(SDL_Scancode(4));
+		kb.Bindings.push_back(SDL_SCANCODE_A);
 		m_keybindings.push_back(kb);
 
+		/*
 		kb.Edge = false;
 		kb.ActionUp = PlayerAction::NONE;
 		kb.Action = PlayerAction::SELECT_ABILITY1;
-		kb.Bindings.push_back(SDL_Scancode(30));
+		kb.Bindings.push_back(SDL_SCANCODE_1);
 		m_keybindings.push_back(kb);
 
 		kb.Edge = false;
 		kb.ActionUp = PlayerAction::NONE;
 		kb.Action = PlayerAction::SELECT_ABILITY2;
-		kb.Bindings.push_back(SDL_Scancode(31));
+		kb.Bindings.push_back(SDL_SCANCODE_2);
 		m_keybindings.push_back(kb);
 
 		kb.Edge = false;
 		kb.ActionUp = PlayerAction::NONE;
 		kb.Action = PlayerAction::SELECT_ABILITY3;
-		kb.Bindings.push_back(SDL_Scancode(32));
+		kb.Bindings.push_back(SDL_SCANCODE_3);
 		m_keybindings.push_back(kb);
 
 		kb.Edge = false;
@@ -649,6 +650,7 @@ namespace RootForce
 		kb.Action = PlayerAction::SCROLL_ABILITY_BACKWARD;
 		kb.Bindings.push_back(SDL_Scancode(494));
 		m_keybindings.push_back(kb);
+		*/
 	}
 
 }

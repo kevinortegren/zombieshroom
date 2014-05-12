@@ -217,7 +217,6 @@ EditorMode::EditorMode EngineActions::GetMode()
 	return m_editorMode;
 }
 
-
 // Entity
 ECS::Entity* EngineActions::CreateEntity()
 {

@@ -79,6 +79,8 @@ private:
 	ProjectManager m_projectManager;
 	GlobalKeys m_globalKeys;
 
+	EditorMode::EditorMode m_previousEditorMode;
+
 	glm::vec3 debugRay;
 	glm::vec3 debugCameraPos;
 
