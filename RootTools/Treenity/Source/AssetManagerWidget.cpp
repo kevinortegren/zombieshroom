@@ -18,12 +18,17 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	connect(ui.listView_fileBrowser,			SIGNAL(doubleClicked(const QModelIndex&)),		this,				SLOT(FileSelected(const QModelIndex&)));
 	connect(ui.listView_fileBrowser,			SIGNAL(customContextMenuRequested(const QPoint &)),	this,				SLOT(TreeListContextMenu(const QPoint &)));
 	connect(ui.pushButton_back,					SIGNAL(clicked()),								this,				SLOT(NavigateBack()));
+	connect(ui.pushButton_collapseall,			SIGNAL(clicked()),								this,				SLOT(CollapseAll()));
+	connect(ui.pushButton_expandall,			SIGNAL(clicked()),								this,				SLOT(ExpandAll()));
 	connect(ui.horizontalSlider_icon,			SIGNAL(valueChanged(int)),						this,				SLOT(IconSizeChanged(int)));
+
 
 	//Create folder model for tree view
 	m_assetFolderModel = new QFileSystemModel();
 	m_assetFolderModel->setRootPath(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/"));
 	m_assetFolderModel->setFilter(QDir::Dirs|QDir::Drives|QDir::NoDotAndDotDot|QDir::AllDirs);
+	
+	connect(m_assetFolderModel,					SIGNAL(directoryLoaded ( const QString & )),	this,				SLOT(FolderLoaded(const QString&)));
 
 	//Set up tree view and add folder file model
 	ui.treeView_assetFileBrowser->setModel(m_assetFolderModel);
@@ -33,6 +38,7 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	ui.treeView_assetFileBrowser->hideColumn(3);
 	ui.treeView_assetFileBrowser->setRootIndex(m_assetFolderModel->index(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/")));
 
+
 	//Set up list widget
 	m_assetFileModel = new QFileSystemModel();
 	m_assetFileModel->setRootPath(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/"));
@@ -41,10 +47,13 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	ui.listView_fileBrowser->setModel(m_assetFileModel);
 	ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/")));
 	ui.listView_fileBrowser->setDragDropMode(QAbstractItemView::DragOnly);
+	ui.listView_fileBrowser->setToolTip("krödda");
 
 	//Set up context menues
 	m_fileContextMenu = new QMenu("File context", this);
 	m_fileContextMenu->addAction(new QAction("Open externally", this));
+
+	IconSizeChanged(ui.listView_fileBrowser->iconSize().height());
 }
 
 AssetManagerWidget::~AssetManagerWidget()
@@ -170,7 +179,8 @@ void AssetManagerWidget::IconSizeChanged( int p_val )
 	{
 		ui.listView_fileBrowser->setViewMode(QListView::IconMode);
 		ui.listView_fileBrowser->setIconSize(QSize(p_val, p_val));	
-		ui.listView_fileBrowser->setGridSize(QSize(p_val + 10, p_val + 15));	
+		ui.listView_fileBrowser->setGridSize(QSize(p_val + 10, p_val + 25));	
+		ui.listView_fileBrowser->setWordWrap(true);
 	}
 	//Reset drag mode(It got removed when changing view mode)
 	ui.listView_fileBrowser->setDragDropMode(QAbstractItemView::DragOnly);
@@ -234,4 +244,20 @@ void AssetManagerWidget::SetFolderSpecificFilters( const QString& p_folderName )
 
 	//Update filter
 	SearchLineChanged("");
+}
+
+void AssetManagerWidget::FolderLoaded( const QString & p_path )
+{
+	//ui.treeView_assetFileBrowser->expandAll();
+	//ui.treeView_assetFileBrowser->collapseAll();
+}
+
+void AssetManagerWidget::CollapseAll()
+{
+	ui.treeView_assetFileBrowser->collapseAll();
+}
+
+void AssetManagerWidget::ExpandAll()
+{
+	ui.treeView_assetFileBrowser->expandAll();
 }
