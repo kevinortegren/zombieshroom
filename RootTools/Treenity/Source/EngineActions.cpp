@@ -12,12 +12,14 @@
 #include <RootTools/Treenity/Include/TreenityMain.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
+
+#include <RootTools/Treenity/Include/Log.h>
+
 extern RootEngine::GameSharedContext g_engineContext;
 
 EngineActions::EngineActions(ECS::World* p_world, TreenityMain* p_treenityMain)
 	: m_world(p_world), m_treenityMain(p_treenityMain)
 {
-
 }
 
 void EngineActions::NewScene()
@@ -260,6 +262,7 @@ void EngineActions::RemovePhysics( ECS::Entity* p_entity )
 void EngineActions::LoadScene( const QString& p_filePath )
 {
 	ClearScene();
+	//Log::RunWithProgressBar(QtConcurrent::run(m_treenityMain->GetProjectManager(), &ProjectManager::Import, p_filePath));
 	m_treenityMain->GetProjectManager()->Import(p_filePath);
 	AddDefaultEntities();
 	InitializeScene();

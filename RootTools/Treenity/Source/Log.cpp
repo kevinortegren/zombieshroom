@@ -72,6 +72,10 @@ Log::Log( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
 
 	//Put the content widget in the dockable window
 	setWidget(m_contentWidget);
+
+	//Set up progress dialog 
+	m_progressDialog = new QProgressDialog();
+	connect(&m_futureWatcher, SIGNAL(finished()), m_progressDialog , SLOT(cancel()));
 }
 
 void Log::WriteToConsole( const QString& p_text )
@@ -82,5 +86,20 @@ void Log::WriteToConsole( const QString& p_text )
 void Log::Show()
 {
 	show();
+}
+
+void Log::RunWithProgressBar( QFuture<void> p_future )
+{
+	GetInstance()->Run(p_future);
+}
+
+void Log::Run(  QFuture<void> p_future )
+{
+	// Start the computation.
+	m_futureWatcher.setFuture(p_future);
+	m_progressDialog->setMinimum(0);
+	m_progressDialog->setMaximum(0);
+	m_progressDialog->setWindowModality(Qt::WindowModal);
+	m_progressDialog->exec();
 }
 

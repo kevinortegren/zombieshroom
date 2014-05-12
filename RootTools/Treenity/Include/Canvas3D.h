@@ -7,7 +7,7 @@
 #include <QMimeData>
 #include <QFileInfo>
 #include <QDir>
-#include <QProgressDialog>
+
 #include <memory>
 #include <SDL2/SDL.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>
@@ -35,4 +35,5 @@ protected:
 private:
 	std::shared_ptr<SDL_Window> m_window;
 	EngineInterface* m_engineInterface;
+
 };
