@@ -184,7 +184,6 @@ const glm::vec3& EngineActions::GetScale(ECS::Entity* p_entity)
 	return m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity)->m_scale;
 }
 
-
 // Renderable
 void EngineActions::AddRenderable(ECS::Entity* p_entity)
 {

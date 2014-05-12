@@ -222,10 +222,11 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_circleMaterial = g_engineContext.m_renderer->CreateMaterial("CircleMaterial");
 	m_circleMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Circle");
 	
+	selectedAxis = -1;
+
 	m_testColor0 = glm::vec4(1,0,0,1);
 	m_testColor1 = glm::vec4(0,1,0,1);
 	m_testColor2 = glm::vec4(0,0,1,1);
-
 
 	m_circleEntity0 = g_world->GetEntityManager()->CreateEntity();
 	RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity0);
@@ -253,6 +254,8 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	r2->m_material = m_circleMaterial;
 	r2->m_params[Render::Semantic::COLOR] = &m_testColor2;
 	r2->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
+
+	dangle0 = dangle1 = dangle2 = 0;
 }
 
 TreenityMain::~TreenityMain()
@@ -378,6 +381,8 @@ void TreenityMain::Update(float dt)
 
 	RenderSelectedEntity();
 
+
+
 	//g_engineContext.m_renderer->AddLine(debugCameraPos, debugCameraPos + (debugRay * 500.0f), glm::vec4(1,0,0,1));
 
 	g_engineContext.m_renderer->Clear();
@@ -423,8 +428,160 @@ void TreenityMain::RenderSelectedEntity()
 
 void TreenityMain::RaySelect()
 {
-	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+	m_testColor0 = glm::vec4(1,0,0,1);
+	m_testColor1 = glm::vec4(0,1,0,1);
+	m_testColor2 = glm::vec4(0,0,1,1);
+
+	// Get camera entity
+	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
+	glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
+
+	// Construct ray.
+	const glm::vec3& ray = glm::normalize(ConstructRay());
+
+	float bestDist = 0.0f;
+	int axis = -1;
+	
+	glm::vec3 p;
+	float t = 999999.0f;;
+	if(RayVsPlane(glm::vec3(0,0,0), glm::vec3(1,0,0), cameraPos, ray, t))
 	{
+		p = cameraPos + t * ray;
+
+		float dist = glm::distance(glm::vec3(0,0,0), p);
+		if(dist < 1.0f && dist > 0.5f && dist > bestDist)
+		{
+			/*std::cout << "X dist " << dist << std::endl;
+			std::cout << "X plane " << glm::degrees(atan2f(p.y, p.z)) << std::endl << std::endl;*/
+
+			
+			bestDist = dist;
+			axis = 1;
+		}
+			
+	}
+
+	glm::vec3 p1;
+	float t1 = 999999.0f;;
+	if(RayVsPlane(glm::vec3(0,0,0), glm::vec3(0,1,0), cameraPos, ray, t1))
+	{
+		p1 = cameraPos + t1 * ray;
+		float dist = glm::distance(glm::vec3(0,0,0), p1);
+		if(dist < 1.0f && dist > 0.5f && dist > bestDist)
+		{
+			/*std::cout << "Y dist " << dist << std::endl;
+			std::cout << "Y plane " << glm::degrees(atan2f(p1.z, p1.x)) << std::endl << std::endl;*/
+
+			
+			bestDist = dist;
+			axis = 0;
+		}		
+	}
+		
+	glm::vec3 p2;
+	float t2 = 999999.0f;;
+	if(RayVsPlane(glm::vec3(0,0,0), glm::vec3(0,0,1), cameraPos, ray, t2))
+	{
+		p2 = cameraPos + t2 * ray;
+
+		float dist = glm::distance(glm::vec3(0,0,0), p2);
+		if(dist < 1.0f && dist > 0.5f && dist > bestDist)
+		{
+			/*std::cout << "Z dist " << dist << std::endl;
+			std::cout << "Z plane " << glm::degrees(atan2f(p2.y, p2.x)) << std::endl << std::endl;*/
+
+			
+			bestDist = dist;
+			axis = 2;
+
+		}	
+	}
+
+	switch (axis)
+	{
+	case 0:
+		m_testColor0 = glm::vec4(1,1,0,1);
+		break;
+		
+	case 1:
+		m_testColor1 = glm::vec4(1,1,0,1);
+		break;
+		
+	case 2:
+		m_testColor2 = glm::vec4(1,1,0,1);
+		break;
+
+	default:
+		break;
+	}
+
+	switch (selectedAxis)
+	{
+	case 0:
+		m_testColor0 = glm::vec4(1,1,0,1);
+		break;
+		
+	case 1:
+		m_testColor1 = glm::vec4(1,1,0,1);
+		break;
+		
+	case 2:
+		m_testColor2 = glm::vec4(1,1,0,1);
+		break;
+
+	default:
+		break;
+	}
+
+	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE && axis != -1 && axis != selectedAxis )
+	{
+		selectedAxis = axis;
+	}
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN && selectedAxis != -1)
+	{
+		switch (selectedAxis)
+		{
+		case 0:
+			{
+				RootForce::Transform* t0 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1);
+				RootForce::Transform* t1 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2);
+
+				float angle = atan2f(p1.z, p1.x);
+
+				std::cout << "Y plane " << glm::degrees(angle) << std::endl << std::endl;
+			}
+			break;
+		
+		case 1:
+			{
+				RootForce::Transform* t0 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0);
+				RootForce::Transform* t1 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2);
+
+				float angle = atan2f(p.y, p.z);
+
+				std::cout << "X plane " << glm::degrees(angle) << std::endl << std::endl;
+			}
+			break;
+		
+		case 2:
+			{
+				RootForce::Transform* t0 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0);
+				RootForce::Transform* t1 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1);
+
+				float angle = atan2f(p2.y, p2.x);
+
+				std::cout << "Z plane " << glm::degrees(angle) << std::endl << std::endl;
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+	{
+		selectedAxis = -1;
+
 		// Get camera entity
 		ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
 		glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
@@ -706,5 +863,22 @@ void TreenityMain::Debug(RootEngine::OBB* obb, const glm::mat4x4& p_space, const
 		pos1 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i]]);
 		pos2 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i+1]]);
 		g_engineContext.m_renderer->AddLine(pos1, pos2, glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
+	}
+}
+
+bool TreenityMain::RayVsPlane(const glm::vec3& center, const glm::vec3& normal, const glm::vec3& cameraPos, const glm::vec3& ray, float& t)
+{
+	t = -glm::dot(normal, cameraPos) / glm::dot(normal, ray);
+
+	glm::vec3 p = cameraPos + t * ray;
+
+	float d = glm::dot(p, normal);
+	if(d > 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
 	}
 }

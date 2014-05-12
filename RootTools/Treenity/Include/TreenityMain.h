@@ -44,6 +44,8 @@ private:
 
 	void Debug(RootEngine::OBB* obb, const glm::mat4x4& p_space, const glm::vec3& p_color);
 
+	bool RayVsPlane(const glm::vec3& center, const glm::vec3& normal, const glm::vec3& cameraPos, const glm::vec3& ray, float& t);
+
 	void* m_engineModule;
 
 	ECS::World m_world;
@@ -77,4 +79,11 @@ private:
 	glm::vec4 m_testColor0;
 	glm::vec4 m_testColor1;
 	glm::vec4 m_testColor2;
+
+	int selectedAxis;
+
+	float dangle0;
+	float dangle1;
+	float dangle2;
+
 };
