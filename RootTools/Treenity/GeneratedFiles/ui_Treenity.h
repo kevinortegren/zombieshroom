@@ -294,15 +294,16 @@ public:
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_6);
         dockWidget_assetManager = new QDockWidget(TreenityClass);
         dockWidget_assetManager->setObjectName(QStringLiteral("dockWidget_assetManager"));
-        dockWidget_assetManager->setAllowedAreas(Qt::BottomDockWidgetArea);
+        dockWidget_assetManager->setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
         verticalLayout_5 = new QVBoxLayout(dockWidgetContents);
-        verticalLayout_5->setSpacing(6);
+        verticalLayout_5->setSpacing(0);
         verticalLayout_5->setContentsMargins(11, 11, 11, 11);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        verticalLayout_5->setContentsMargins(0, 0, 0, 0);
         verticalLayout_assetManager = new QVBoxLayout();
-        verticalLayout_assetManager->setSpacing(6);
+        verticalLayout_assetManager->setSpacing(0);
         verticalLayout_assetManager->setObjectName(QStringLiteral("verticalLayout_assetManager"));
 
         verticalLayout_5->addLayout(verticalLayout_assetManager);
@@ -383,12 +384,14 @@ public:
         menuComponent->setTitle(QApplication::translate("TreenityClass", "Component", 0));
         menu_addComponent->setTitle(QApplication::translate("TreenityClass", "Add component", 0));
         menuView->setTitle(QApplication::translate("TreenityClass", "View", 0));
+        mainToolBar->setWindowTitle(QApplication::translate("TreenityClass", "Play toolbar", 0));
         dockWidget_4->setWindowTitle(QApplication::translate("TreenityClass", "Outline", 0));
         pushButton_addEntity->setText(QApplication::translate("TreenityClass", "+", 0));
         pushButton_removeEntity->setText(QApplication::translate("TreenityClass", "-", 0));
         dockWidget_6->setWindowTitle(QApplication::translate("TreenityClass", "Properties", 0));
         groupBox->setTitle(QApplication::translate("TreenityClass", "General", 0));
         label->setText(QApplication::translate("TreenityClass", "Name", 0));
+        dockWidget_assetManager->setWindowTitle(QApplication::translate("TreenityClass", "Asset browser", 0));
     } // retranslateUi
 
 };

@@ -32,4 +32,7 @@ private slots:
 	void NavigateForward();
 	void IconSizeChanged(int p_val);
 	void TreeListContextMenu(const QPoint& p_val);
+	void FolderLoaded(const QString & p_path);
+	void CollapseAll();
+	void ExpandAll();
 };

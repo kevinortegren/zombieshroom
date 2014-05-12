@@ -7,6 +7,7 @@
 #include <QMimeData>
 #include <QFileInfo>
 #include <QDir>
+#include <QProgressDialog>
 #include <memory>
 #include <SDL2/SDL.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>

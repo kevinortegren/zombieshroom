@@ -30,10 +30,14 @@ class Ui_AssetManagerUi
 {
 public:
     QHBoxLayout *horizontalLayout;
+    QGridLayout *gridLayout_2;
     QTreeView *treeView_assetFileBrowser;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *pushButton_expandall;
+    QPushButton *pushButton_collapseall;
     QGridLayout *gridLayout;
-    QLineEdit *lineEdit_assetSearch;
     QPushButton *pushButton_back;
+    QLineEdit *lineEdit_assetSearch;
     QPushButton *pushButton_forward;
     QListView *listView_fileBrowser;
     QSlider *horizontalSlider_icon;
@@ -48,15 +52,50 @@ public:
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        gridLayout_2 = new QGridLayout();
+        gridLayout_2->setSpacing(0);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setSizeConstraint(QLayout::SetMaximumSize);
         treeView_assetFileBrowser = new QTreeView(AssetManagerUi);
         treeView_assetFileBrowser->setObjectName(QStringLiteral("treeView_assetFileBrowser"));
         treeView_assetFileBrowser->setMaximumSize(QSize(200, 16777215));
 
-        horizontalLayout->addWidget(treeView_assetFileBrowser);
+        gridLayout_2->addWidget(treeView_assetFileBrowser, 1, 1, 1, 1);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(0);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        pushButton_expandall = new QPushButton(AssetManagerUi);
+        pushButton_expandall->setObjectName(QStringLiteral("pushButton_expandall"));
+        pushButton_expandall->setMaximumSize(QSize(16777215, 16777215));
+
+        horizontalLayout_2->addWidget(pushButton_expandall);
+
+        pushButton_collapseall = new QPushButton(AssetManagerUi);
+        pushButton_collapseall->setObjectName(QStringLiteral("pushButton_collapseall"));
+        pushButton_collapseall->setMaximumSize(QSize(16777215, 16777215));
+
+        horizontalLayout_2->addWidget(pushButton_collapseall);
+
+
+        gridLayout_2->addLayout(horizontalLayout_2, 2, 1, 1, 1);
+
+
+        horizontalLayout->addLayout(gridLayout_2);
 
         gridLayout = new QGridLayout();
+        gridLayout->setSpacing(6);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        gridLayout->setVerticalSpacing(6);
+        pushButton_back = new QPushButton(AssetManagerUi);
+        pushButton_back->setObjectName(QStringLiteral("pushButton_back"));
+        pushButton_back->setMinimumSize(QSize(25, 25));
+        pushButton_back->setMaximumSize(QSize(25, 25));
+        pushButton_back->setStyleSheet(QLatin1String("QPushButton{\n"
+"	color: #FF8C00;\n"
+"}"));
+
+        gridLayout->addWidget(pushButton_back, 0, 0, 1, 1);
+
         lineEdit_assetSearch = new QLineEdit(AssetManagerUi);
         lineEdit_assetSearch->setObjectName(QStringLiteral("lineEdit_assetSearch"));
         lineEdit_assetSearch->setStyleSheet(QLatin1String("QLineEdit {\n"
@@ -68,16 +107,6 @@ public:
         lineEdit_assetSearch->setClearButtonEnabled(false);
 
         gridLayout->addWidget(lineEdit_assetSearch, 0, 2, 1, 1);
-
-        pushButton_back = new QPushButton(AssetManagerUi);
-        pushButton_back->setObjectName(QStringLiteral("pushButton_back"));
-        pushButton_back->setMinimumSize(QSize(25, 25));
-        pushButton_back->setMaximumSize(QSize(25, 25));
-        pushButton_back->setStyleSheet(QLatin1String("QPushButton{\n"
-"	color: #FF8C00;\n"
-"}"));
-
-        gridLayout->addWidget(pushButton_back, 0, 0, 1, 1);
 
         pushButton_forward = new QPushButton(AssetManagerUi);
         pushButton_forward->setObjectName(QStringLiteral("pushButton_forward"));
@@ -91,12 +120,15 @@ public:
 
         listView_fileBrowser = new QListView(AssetManagerUi);
         listView_fileBrowser->setObjectName(QStringLiteral("listView_fileBrowser"));
-        listView_fileBrowser->setDragDropMode(QAbstractItemView::DragOnly);
+        listView_fileBrowser->setDragDropMode(QAbstractItemView::NoDragDrop);
         listView_fileBrowser->setIconSize(QSize(50, 50));
-        listView_fileBrowser->setTextElideMode(Qt::ElideMiddle);
+        listView_fileBrowser->setTextElideMode(Qt::ElideRight);
+        listView_fileBrowser->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        listView_fileBrowser->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
         listView_fileBrowser->setMovement(QListView::Static);
         listView_fileBrowser->setGridSize(QSize(80, 80));
         listView_fileBrowser->setViewMode(QListView::IconMode);
+        listView_fileBrowser->setWordWrap(true);
 
         gridLayout->addWidget(listView_fileBrowser, 1, 0, 1, 3);
 
@@ -128,8 +160,10 @@ public:
     void retranslateUi(QWidget *AssetManagerUi)
     {
         AssetManagerUi->setWindowTitle(QApplication::translate("AssetManagerUi", "Form", 0));
-        lineEdit_assetSearch->setPlaceholderText(QApplication::translate("AssetManagerUi", "Search assets...", 0));
+        pushButton_expandall->setText(QApplication::translate("AssetManagerUi", "Expand all", 0));
+        pushButton_collapseall->setText(QApplication::translate("AssetManagerUi", "Collapse all", 0));
         pushButton_back->setText(QApplication::translate("AssetManagerUi", "<", 0));
+        lineEdit_assetSearch->setPlaceholderText(QApplication::translate("AssetManagerUi", "Search assets...", 0));
         pushButton_forward->setText(QApplication::translate("AssetManagerUi", ">", 0));
         label->setText(QApplication::translate("AssetManagerUi", "Icon size:", 0));
     } // retranslateUi
