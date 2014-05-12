@@ -28,6 +28,7 @@ public:
 	void Update(float dt);
 	bool IsRunning();
 
+	ProjectManager* GetProjectManager() { return &m_projectManager; }
 	Treenity* GetEditor() { return &m_treenityEditor; }
 	RootForce::WorldSystem* GetWorldSystem() { return &m_worldSystem; }
 	RootForce::ShadowSystem* GetShadowSystem() { return m_shadowSystem; }

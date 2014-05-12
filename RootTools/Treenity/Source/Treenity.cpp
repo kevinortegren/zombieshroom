@@ -111,6 +111,7 @@ void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 	{
 		it.second->SetEngineInterface(p_engineInterface);
 	}
+	ui.widget_canvas3D->SetEngineInterface(p_engineInterface);
 }
 
 void Treenity::SetProjectManager(ProjectManager* p_projectManager)
