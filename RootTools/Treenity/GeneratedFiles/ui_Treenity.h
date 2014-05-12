@@ -92,6 +92,8 @@ public:
             TreenityClass->setObjectName(QStringLiteral("TreenityClass"));
         TreenityClass->resize(1292, 878);
         TreenityClass->setStyleSheet(QStringLiteral(""));
+        TreenityClass->setTabShape(QTabWidget::Rounded);
+        TreenityClass->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
         action_addEntity = new QAction(TreenityClass);
         action_addEntity->setObjectName(QStringLiteral("action_addEntity"));
         actionExit = new QAction(TreenityClass);

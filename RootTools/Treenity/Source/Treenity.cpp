@@ -94,6 +94,7 @@ Treenity::Treenity(QWidget *parent)
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
+
 }
 
 Treenity::~Treenity()
@@ -193,6 +194,10 @@ void Treenity::CreateOpenGLContext()
 {
 	ui.widget_canvas3D->CreateOpenGLContext();
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::START_PRINT, "Creating OpenGL context in treenity.");
+
+	//Set application full screen 
+	showFullScreen();
+	showMaximized();
 }
 
 void Treenity::New()
