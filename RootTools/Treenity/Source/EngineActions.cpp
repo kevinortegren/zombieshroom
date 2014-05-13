@@ -87,6 +87,12 @@ void EngineActions::InitializeScene()
 
 void EngineActions::LoadScene( const QString& p_filePath )
 {
+	
+	QProgressDialog prog( "Loading", "", 0, 0, nullptr,  0);
+	prog.setCancelButton(0);
+	prog.show();
+	qApp->processEvents(QEventLoop::AllEvents);
+
     ClearScene();
     //Utils::RunWithProgressBar(QtConcurrent::run(m_treenityMain->GetProjectManager(), &ProjectManager::Import, p_filePath));
     m_treenityMain->GetProjectManager()->Import(p_filePath);
@@ -215,6 +221,11 @@ void EngineActions::EnterPlayMode()
 
 void EngineActions::ExitPlayMode()
 {
+	QProgressDialog prog( "Loading", "", 0, 0, nullptr,  0);
+	prog.setCancelButton(0);
+	prog.show();
+	qApp->processEvents(QEventLoop::AllEvents);
+
 	// Stop the animation system.
 	m_treenityMain->GetAnimationSystem()->Terminate();
 
