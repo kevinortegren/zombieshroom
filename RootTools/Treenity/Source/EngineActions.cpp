@@ -211,6 +211,9 @@ void EngineActions::EnterPlayMode()
 	// Process the messages.
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
+	
+	// Focus the 3D canvas.
+	m_treenityMain->GetEditor()->GetUi().widget_canvas3D->setFocus(Qt::FocusReason::NoFocusReason);
 
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Entered play mode");	
 }
@@ -220,6 +223,8 @@ void EngineActions::ExitPlayMode()
 	// Clear whatever happened within the game session.
 	ClearScene();
 	g_engineContext.m_physics->RemoveAll();
+	g_networkEntityMap.clear();
+	RootForce::Network::NetworkComponent::ResetSequenceForUser(0);
 
 	// Restore the old world state.
 	std::stringstream ss(m_editorLevelState);

@@ -203,10 +203,17 @@ void Treenity::CreateOpenGLContext()
 	showMaximized();
 }
 
+Ui::TreenityClass& Treenity::GetUi()
+{
+	return ui;
+}
+
+/*
 QPoint Treenity::GetCanvasCenter() const
 {
 	return ui.widget_canvas3D->geometry().center();
 }
+*/
 
 void Treenity::New()
 {

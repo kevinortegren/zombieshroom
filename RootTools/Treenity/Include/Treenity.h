@@ -45,7 +45,8 @@ public:
 	void EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void CreateOpenGLContext();
-	QPoint GetCanvasCenter() const;
+	Ui::TreenityClass& GetUi();
+	//QPoint GetCanvasCenter() const;
 
 	// Implemented from EditorInterface
 	void SelectInOutliner(const std::set<ECS::Entity*>& p_entities);
