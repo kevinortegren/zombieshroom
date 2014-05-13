@@ -18,7 +18,7 @@ extern RootEngine::GameSharedContext g_engineContext;
 Treenity::Treenity(QWidget *parent)
 	: QMainWindow(parent), m_running(true)
 {
-	//Set some logging init things
+	//Set some utility init things
 	Utils::GetInstance()->setParent(this);
 	Utils::GetInstance()->setFloating(true);
 

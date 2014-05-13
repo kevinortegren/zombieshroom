@@ -76,7 +76,7 @@ void Canvas3D::resizeEvent( QResizeEvent * event)
 	}
 	
 
-	std::cout << "Resize Width: " << event->size().width() << "Resize Height: " << event->size().height() << std::endl;
+	//std::cout << "Resize Width: " << event->size().width() << "Resize Height: " << event->size().height() << std::endl;
 }
 
 void Canvas3D::CreateOpenGLContext()

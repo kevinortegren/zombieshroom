@@ -32,7 +32,7 @@ Utils::Utils( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
 {
 	setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
 	setGeometry(10, 25, 300, 700);
-	setWindowTitle("Utils");
+	setWindowTitle("Log");
 	hide();
 	
 	//Create a widget to hold all content
@@ -41,9 +41,6 @@ Utils::Utils( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
 	//Create a text browser
 	m_textBrowser = new QTextBrowser(m_contentWidget);
 
-	//Add input field
-	m_lineEdit = new QLineEdit(m_contentWidget);
-
 	//Create layout for content
 	m_layout = new QVBoxLayout(m_contentWidget);
 	m_layout->setContentsMargins(0, 0, 0, 0);
@@ -51,8 +48,6 @@ Utils::Utils( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
 
 	//Add text browser to layout
 	m_layout->addWidget(m_textBrowser);
-	m_layout->addWidget(m_lineEdit);
-	
 
 	//Put the content widget in the dockable window
 	setWidget(m_contentWidget);

@@ -33,7 +33,6 @@ private:
 	QTextBrowser*	m_textBrowser;
 	QWidget*		m_contentWidget;
 	QVBoxLayout*	m_layout;
-	QLineEdit*		m_lineEdit;
 
 	QFutureWatcher<void> m_futureWatcher;
 	QProgressDialog* m_progressDialog;

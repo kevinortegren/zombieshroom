@@ -18,3 +18,14 @@ find_library(QTPROPWIDGET_LIBRARY
 find_library(QTCOLORTRIANGLE_LIBRARY
     NAMES QtSolutions_ColorTriangle-2.6d
     HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Debug")
+
+#RELEASE FINDS
+find_library(QTGUI_LIBRARY_RELEASE
+    NAMES Qt5Gui
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Release")
+find_library(QTCORE_LIBRARY_RELEASE
+    NAMES Qt5Core
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Release")
+find_library(QTWIDGETS_LIBRARY_RELEASE
+    NAMES Qt5Widgets
+    HINTS "${CMAKE_SOURCE_DIR}/External/Lib/x86/Release")

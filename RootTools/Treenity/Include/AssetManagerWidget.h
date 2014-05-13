@@ -4,7 +4,10 @@
 #include <QFileSystemModel>
 #include <QMenu>
 #include <QPixmap>
+#include <QImage>
+#include <QImageReader>
 #include <RootTools/Treenity/GeneratedFiles/ui_AssetManager.h>
+#include <RootTools/Treenity/Include/DDSHelper/qddshandler.h>
 
 class AssetManagerWidget : public QWidget
 {
@@ -22,6 +25,8 @@ private:
 	QMenu* m_offsideContextMenu;
 
 	QStringList m_currentFilter;
+
+	QDDSHandler* m_ddsHandler;
 
 	void SetFolderSpecificFilters(const QString& p_folderName);
 

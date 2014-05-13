@@ -34,6 +34,9 @@ RootForce::Network::DeletedNetworkEntityList g_networkDeletedList;
 #undef main
 int main(int argc, char *argv[])
 {
+#ifndef _DEBUG
+	FreeConsole();
+#endif
 	std::string path(argv[0]);
 	std::string rootforcename = "Treenity.exe";
 	path = path.substr(0, path.size() - rootforcename.size());

@@ -57,6 +57,8 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	m_offsideContextMenu->addAction(new QAction("Create folder", this));
 
 	IconSizeChanged(ui.listView_fileBrowser->iconSize().height());
+
+	m_ddsHandler = new QDDSHandler();
 }
 
 AssetManagerWidget::~AssetManagerWidget()
@@ -277,6 +279,7 @@ void AssetManagerWidget::FileClicked( const QModelIndex& p_val )
 
 	//Reset preview image
 	ui.widget_pictureFrame->setStyleSheet("");
+	ui.widget_pictureFrame->setPixmap(QPixmap());
 
 	if(fileInfo.isFile())
 	{
@@ -301,9 +304,44 @@ void AssetManagerWidget::FileClicked( const QModelIndex& p_val )
 			}
 			
 		}
-		else if(fileInfo.suffix() == "png" || fileInfo.suffix() == "jpg" || fileInfo.suffix() == "dds")
+		else if(fileInfo.suffix() == "png" || fileInfo.suffix() == "jpg")
 		{
 			ui.widget_pictureFrame->setStyleSheet("border-image: url(" + fileInfo.filePath() + ")");
+		}
+		else if(fileInfo.suffix() == "dds")
+		{
+			QImageReader hello(fileInfo.filePath());
+
+			QFile imagefile(fileInfo.filePath());
+
+			if(imagefile.open(QIODevice::ReadOnly))
+				Utils::Write("Could not open DDS-file");
+
+			m_ddsHandler->setDevice(&imagefile);
+			m_ddsHandler->setFormat(QByteArray());
+
+			if(!m_ddsHandler->canRead())
+			{
+				Utils::Write("DDS handler cannot read!");
+				return;
+			}
+			else
+			{
+				QImage image;
+				if(m_ddsHandler->read(&image))
+				{
+					Utils::Write("DDS loaded succesfully");
+				}
+				else
+				{
+					Utils::Write("DDS NOT loaded!");
+				}
+				imagefile.close();
+				
+				Utils::Write(QString::number(m_ddsHandler->imageCount()));
+				Utils::Write("DDS x,y: " + QString::number(image.size().width()) + ", " + QString::number(image.size().height()));
+				ui.widget_pictureFrame->setPixmap(QPixmap::fromImage(image));
+			}
 		}
 	}
 }

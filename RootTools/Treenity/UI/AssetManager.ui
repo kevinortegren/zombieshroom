@@ -275,8 +275,8 @@
         <number>0</number>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_fn">
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_cc">
           <property name="maximumSize">
            <size>
             <width>50</width>
@@ -284,7 +284,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Name:</string>
+           <string>Created:</string>
           </property>
          </widget>
         </item>
@@ -304,19 +304,6 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_cc">
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Created:</string>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_ss">
           <property name="maximumSize">
@@ -327,6 +314,19 @@
           </property>
           <property name="text">
            <string>Size:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_fn">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Name:</string>
           </property>
          </widget>
         </item>
@@ -365,18 +365,15 @@
         <item row="0" column="0" colspan="2">
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0">
-           <widget class="QWidget" name="widget_pictureFrame" native="true">
+           <widget class="QLabel" name="widget_pictureFrame">
             <property name="maximumSize">
              <size>
               <width>180</width>
               <height>180</height>
              </size>
             </property>
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="styleSheet">
-             <string notr="true"/>
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
