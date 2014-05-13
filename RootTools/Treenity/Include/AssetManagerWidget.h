@@ -3,7 +3,7 @@
 #include <QWidget>
 #include <QFileSystemModel>
 #include <QMenu>
-
+#include <QPixmap>
 #include <RootTools/Treenity/GeneratedFiles/ui_AssetManager.h>
 
 class AssetManagerWidget : public QWidget
@@ -29,6 +29,7 @@ private slots:
 	void SearchLineChanged(const QString& p_val);
 	void FolderSelected(const QModelIndex& p_val);
 	void FileSelected(const QModelIndex& p_val);
+	void FileClicked(const QModelIndex& p_val);
 	void NavigateBack();
 	void NavigateForward();
 	void IconSizeChanged(int p_val);

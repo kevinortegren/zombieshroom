@@ -16,7 +16,8 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	connect(ui.lineEdit_assetSearch,			SIGNAL(textEdited(const QString &)),			this,				SLOT(SearchLineChanged(const QString&)));
 	connect(ui.treeView_assetFileBrowser,		SIGNAL(doubleClicked(const QModelIndex&)),		this,				SLOT(FolderSelected(const QModelIndex&)));
 	connect(ui.listView_fileBrowser,			SIGNAL(doubleClicked(const QModelIndex&)),		this,				SLOT(FileSelected(const QModelIndex&)));
-	connect(ui.listView_fileBrowser,			SIGNAL(customContextMenuRequested(const QPoint &)),	this,				SLOT(TreeListContextMenu(const QPoint &)));
+	connect(ui.listView_fileBrowser,			SIGNAL(clicked(const QModelIndex&)),			this,				SLOT(FileClicked(const QModelIndex&)));
+	connect(ui.listView_fileBrowser,			SIGNAL(customContextMenuRequested(const QPoint &)),	this,			SLOT(TreeListContextMenu(const QPoint &)));
 	connect(ui.pushButton_back,					SIGNAL(clicked()),								this,				SLOT(NavigateBack()));
 	connect(ui.pushButton_collapseall,			SIGNAL(clicked()),								this,				SLOT(CollapseAll()));
 	connect(ui.pushButton_expandall,			SIGNAL(clicked()),								this,				SLOT(ExpandAll()));
@@ -263,4 +264,46 @@ void AssetManagerWidget::ExpandAll()
 {
 	//Utils::RunWithProgressBar(QtConcurrent::run(ui.treeView_assetFileBrowser, &QTreeView::expandAll));
 	ui.treeView_assetFileBrowser->expandAll();
+}
+
+void AssetManagerWidget::FileClicked( const QModelIndex& p_val )
+{
+	QFileInfo fileInfo = m_assetFileModel->fileInfo(p_val);
+	
+	//File clicked
+	ui.label_fileName->setText(fileInfo.fileName());
+	ui.label_sizeName->setText(QString::number((fileInfo.size() / 1000) + 1) + " KB");
+	ui.label_createdName->setText(fileInfo.created().toString());
+
+	//Reset preview image
+	ui.widget_pictureFrame->setStyleSheet("");
+
+	if(fileInfo.isFile())
+	{
+		if(fileInfo.suffix() == "world")
+		{
+			//Level file selected
+			QString image = fileInfo.dir().path() + "/" + fileInfo.completeBaseName() + ".png";
+			QFileInfo file(image);
+			if(file.exists())
+			{
+				ui.widget_pictureFrame->setStyleSheet("border-image: url(" + image + ")");
+			}
+			else
+			{
+				//If .png is not available, check if .jpg is
+				image = fileInfo.dir().path() + "/" + fileInfo.completeBaseName() + ".jpg";
+				QFileInfo fileJPG(image);
+				if(fileJPG.exists())
+				{
+					ui.widget_pictureFrame->setStyleSheet("border-image: url(" + image + ")");
+				}
+			}
+			
+		}
+		else if(fileInfo.suffix() == "png" || fileInfo.suffix() == "jpg" || fileInfo.suffix() == "dds")
+		{
+			ui.widget_pictureFrame->setStyleSheet("border-image: url(" + fileInfo.filePath() + ")");
+		}
+	}
 }
