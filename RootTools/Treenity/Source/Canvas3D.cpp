@@ -95,8 +95,20 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 
 void Canvas3D::dragEnterEvent( QDragEnterEvent *event )
 {
+	QFileInfo fileInfo(event->mimeData()->text());
+
 	if (event->mimeData()->hasText())
-		event->acceptProposedAction();
+	{
+		if(fileInfo.suffix() == "world")
+		{
+			event->acceptProposedAction();
+		}
+		else
+		{
+			event->ignore();
+		}
+		
+	}
 }
 
 void Canvas3D::dropEvent( QDropEvent *event )

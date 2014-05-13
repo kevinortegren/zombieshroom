@@ -410,6 +410,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidget_6">
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
    <property name="allowedAreas">
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
@@ -420,6 +423,9 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_6">
+    <property name="acceptDrops">
+     <bool>true</bool>
+    </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QGroupBox" name="groupBox">
@@ -428,6 +434,9 @@
          <width>16777215</width>
          <height>120</height>
         </size>
+       </property>
+       <property name="acceptDrops">
+        <bool>true</bool>
        </property>
        <property name="title">
         <string>General</string>

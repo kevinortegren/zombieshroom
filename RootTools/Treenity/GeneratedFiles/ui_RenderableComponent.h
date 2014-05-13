@@ -19,6 +19,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QWidget>
+#include <RootTools/Treenity/Include/DropLineEdit.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -27,7 +28,7 @@ class Ui_Renderable
 public:
     QGridLayout *gridLayout;
     QToolButton *toolButton_modelBrowse;
-    QLineEdit *lineEdit_modelName;
+    DropLineEdit *lineEdit_modelName;
     QLabel *label;
     QLabel *label_2;
     QLineEdit *lineEdit_materialName;
@@ -39,6 +40,7 @@ public:
             Renderable->setObjectName(QStringLiteral("Renderable"));
         Renderable->resize(296, 149);
         Renderable->setMaximumSize(QSize(16777215, 150));
+        Renderable->setAcceptDrops(true);
         gridLayout = new QGridLayout(Renderable);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         toolButton_modelBrowse = new QToolButton(Renderable);
@@ -46,7 +48,7 @@ public:
 
         gridLayout->addWidget(toolButton_modelBrowse, 0, 3, 1, 1);
 
-        lineEdit_modelName = new QLineEdit(Renderable);
+        lineEdit_modelName = new DropLineEdit(Renderable);
         lineEdit_modelName->setObjectName(QStringLiteral("lineEdit_modelName"));
 
         gridLayout->addWidget(lineEdit_modelName, 0, 2, 1, 1);

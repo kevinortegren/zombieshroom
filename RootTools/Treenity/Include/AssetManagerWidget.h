@@ -19,6 +19,7 @@ private:
 	QFileSystemModel* m_assetFileModel;
 
 	QMenu* m_fileContextMenu;
+	QMenu* m_offsideContextMenu;
 
 	QStringList m_currentFilter;
 

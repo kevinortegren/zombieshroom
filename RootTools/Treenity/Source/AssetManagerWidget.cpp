@@ -38,7 +38,6 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	ui.treeView_assetFileBrowser->hideColumn(3);
 	ui.treeView_assetFileBrowser->setRootIndex(m_assetFolderModel->index(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/")));
 
-
 	//Set up list widget
 	m_assetFileModel = new QFileSystemModel();
 	m_assetFileModel->setRootPath(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/"));
@@ -47,11 +46,13 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	ui.listView_fileBrowser->setModel(m_assetFileModel);
 	ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/")));
 	ui.listView_fileBrowser->setDragDropMode(QAbstractItemView::DragOnly);
-	ui.listView_fileBrowser->setToolTip("krödda");
 
 	//Set up context menues
 	m_fileContextMenu = new QMenu("File context", this);
 	m_fileContextMenu->addAction(new QAction("Open externally", this));
+
+	m_offsideContextMenu = new QMenu("Offset menu", this);
+	m_offsideContextMenu->addAction(new QAction("Create folder", this));
 
 	IconSizeChanged(ui.listView_fileBrowser->iconSize().height());
 }
@@ -226,6 +227,12 @@ void AssetManagerWidget::TreeListContextMenu(const QPoint& p_val)
 	else
 	{
 		//No item is right clicked
+	/*	QAction* selectedAction = m_offsideContextMenu->exec(ui.listView_fileBrowser->mapToGlobal( p_val ));
+
+		if(selectedAction->text() == "Create folder")
+		{
+			m_assetFileModel->mkdir(m_assetFileModel->index(m_assetFileModel->rootPath()), "New folder");
+		}*/
 	}
 }
 

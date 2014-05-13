@@ -261,9 +261,11 @@ public:
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockWidget_4);
         dockWidget_6 = new QDockWidget(TreenityClass);
         dockWidget_6->setObjectName(QStringLiteral("dockWidget_6"));
+        dockWidget_6->setAcceptDrops(true);
         dockWidget_6->setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
         dockWidgetContents_6 = new QWidget();
         dockWidgetContents_6->setObjectName(QStringLiteral("dockWidgetContents_6"));
+        dockWidgetContents_6->setAcceptDrops(true);
         verticalLayout = new QVBoxLayout(dockWidgetContents_6);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -271,6 +273,7 @@ public:
         groupBox = new QGroupBox(dockWidgetContents_6);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setMaximumSize(QSize(16777215, 120));
+        groupBox->setAcceptDrops(true);
         groupBox->setFlat(false);
         groupBox->setCheckable(false);
         formLayout = new QFormLayout(groupBox);

@@ -6,6 +6,8 @@ RenderableView::RenderableView(QWidget* p_parent)
 {
 	ui.setupUi(this);
 
+	ui.lineEdit_modelName->AddDropFilter("dae");
+
 	connect(ui.lineEdit_materialName,		SIGNAL(editingFinished()), this,		SLOT(MaterialNameChanged()));
 	connect(ui.lineEdit_modelName,			SIGNAL(editingFinished()), this,		SLOT(ModelNameChanged()));
 }
