@@ -10,15 +10,15 @@
 #include <QFutureWatcher>
 #include <QtConcurrent/QtConcurrent>
 
-class Log : public QDockWidget
+class Utils : public QDockWidget
 {
 	Q_OBJECT
 public:
-	static Log* GetInstance();
+	static Utils* GetInstance();
 	static void Write(const QString& p_text);
 	static void RunWithProgressBar( QFuture<void> p_future);
 
-	~Log();
+	~Utils();
 
 	void WriteToConsole(const QString& p_text);
 	void Run( QFuture<void> p_future);
@@ -26,9 +26,9 @@ public:
 
 private:
 	static bool m_instanceFlag;
-	static Log* m_console;
+	static Utils* m_console;
 
-	Log(QWidget* p_parent = 0);
+	Utils(QWidget* p_parent = 0);
 
 	QTextBrowser*	m_textBrowser;
 	QWidget*		m_contentWidget;

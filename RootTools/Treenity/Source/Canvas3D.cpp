@@ -10,7 +10,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
 
-#include <RootTools/Treenity/Include/Log.h>
+#include <RootTools/Treenity/Include/Utils.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
