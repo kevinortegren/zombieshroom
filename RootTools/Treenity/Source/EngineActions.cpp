@@ -92,6 +92,7 @@ void EngineActions::LoadScene( const QString& p_filePath )
     m_treenityMain->GetProjectManager()->Import(p_filePath);
     AddDefaultEntities();
     InitializeScene();
+	m_treenityMain->GetEditor()->GetUi().statusBar->showMessage("Level loaded: " + p_filePath, 5000);
 }
 
 void EngineActions::CreateFreeFlyingCamera()
