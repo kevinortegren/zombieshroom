@@ -4,6 +4,7 @@
 #include <Utility/ECS/Include/Entity.h>
 #include <RootSystems/Include/Orientation.h>
 #include <glm/glm.hpp>
+#include <QString>
 
 namespace EditorMode
 {
@@ -21,7 +22,8 @@ struct EngineInterface
 	virtual void ClearScene() = 0;
 	virtual void AddDefaultEntities() = 0;
 	virtual void InitializeScene() = 0;
-
+	virtual void LoadScene(const QString& p_filePath) = 0;
+	
 	// Mode switching
 	virtual void EnterPlayMode() = 0;
 	virtual void ExitPlayMode() = 0;
@@ -59,5 +61,4 @@ struct EngineInterface
 	virtual glm::vec3& GetVelocity(ECS::Entity* p_entity) = 0;
 	virtual void SetMass(ECS::Entity* p_entity, float p_mass) = 0;
 	virtual void SetVelocity(ECS::Entity* p_entity, glm::vec3& p_velocity) = 0;
-
 };

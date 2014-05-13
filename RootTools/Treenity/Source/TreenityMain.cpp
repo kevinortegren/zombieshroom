@@ -25,7 +25,6 @@
 #include <RootSystems/Include/Network/NetworkTypes.h>
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
-#include <RootTools/Treenity/Include/Log.h>
 
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
@@ -483,9 +482,9 @@ void TreenityMain::Update(float dt)
 
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();	
+		m_scriptSystem->Process();
 		m_lookAtSystem->Process();
 		m_cameraSystem->Process();
-		m_scriptSystem->Process();
 		m_transformInterpolationSystem->Process();
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();

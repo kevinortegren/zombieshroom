@@ -4,7 +4,7 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
 
-#include <RootTools/Treenity/Include/Log.h>
+#include <RootTools/Treenity/Include/Utils.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <QFileDialog>
@@ -19,8 +19,8 @@ Treenity::Treenity(QWidget *parent)
 	: QMainWindow(parent), m_running(true)
 {
 	//Set some logging init things
-	Log::GetInstance()->setParent(this);
-	Log::GetInstance()->setFloating(true);
+	Utils::GetInstance()->setParent(this);
+	Utils::GetInstance()->setFloating(true);
 
 	// Setup component names in the editor.
 	m_componentNames[RootForce::ComponentType::RENDERABLE] = "Renderable";
@@ -86,7 +86,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_saveAs,						SIGNAL(triggered()), this,				SLOT(SaveAs()));
 	connect(ui.action_save,							SIGNAL(triggered()), this,				SLOT(Save()));
 	connect(ui.actionExit,							SIGNAL(triggered()), this,				SLOT(close()));
-	connect(ui.actionLog,							SIGNAL(triggered()), Log::GetInstance(), SLOT(Show()));
+	connect(ui.actionLog,							SIGNAL(triggered()), Utils::GetInstance(), SLOT(Show()));
 	connect(ui.action_addEntity,					SIGNAL(triggered()), this,				SLOT(CreateEntity()));
 	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
 	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
@@ -113,6 +113,7 @@ void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 	{
 		it.second->SetEngineInterface(p_engineInterface);
 	}
+	ui.widget_canvas3D->SetEngineInterface(p_engineInterface);
 }
 
 void Treenity::SetProjectManager(ProjectManager* p_projectManager)
@@ -144,7 +145,7 @@ void Treenity::EntityCreated(ECS::Entity* p_entity)
 {
 	ui.treeView_entityOutliner->EntityCreated(p_entity, m_projectManager->GetEntityName(p_entity));
 
-	Log::Write("Entity added: " + QString::number(p_entity->GetId()));
+	Utils::Write("Entity added: " + QString::number(p_entity->GetId()));
 }
 
 void Treenity::EntityRemoved(ECS::Entity* p_entity)
@@ -253,7 +254,7 @@ void Treenity::SaveAs()
 
 void Treenity::Play()
 {
-	Log::Write("Starting game session");
+	Utils::Write("Starting game session");
 
 	m_engineInterface->EnterPlayMode();
 }
@@ -401,7 +402,7 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 	{
 		if (m_engineInterface->GetMode() == EditorMode::GAME)
 		{
-			Log::Write("Stopping game session. Restoring world.");
+			Utils::Write("Stopping game session. Restoring world.");
 			m_engineInterface->ExitPlayMode();
 		}
 	}

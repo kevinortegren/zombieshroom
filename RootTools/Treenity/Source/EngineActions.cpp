@@ -14,6 +14,9 @@
 #include <RootTools/Treenity/Include/TreenityMain.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
+
+#include <RootTools/Treenity/Include/Utils.h>
+
 extern RootEngine::GameSharedContext g_engineContext;
 extern RootForce::Network::NetworkEntityMap g_networkEntityMap;
 
@@ -80,6 +83,15 @@ void EngineActions::InitializeScene()
 	// Add new entities.
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
+}
+
+void EngineActions::LoadScene( const QString& p_filePath )
+{
+    ClearScene();
+    //Utils::RunWithProgressBar(QtConcurrent::run(m_treenityMain->GetProjectManager(), &ProjectManager::Import, p_filePath));
+    m_treenityMain->GetProjectManager()->Import(p_filePath);
+    AddDefaultEntities();
+    InitializeScene();
 }
 
 void EngineActions::CreateFreeFlyingCamera()

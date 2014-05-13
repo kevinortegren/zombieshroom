@@ -5,11 +5,11 @@
 #include <Utility/ECS/Include/World.h>
 #include <RootSystems/Include/WorldSystem.h>
 
+
 class TreenityMain;
 
 class EngineActions : public EngineInterface
 {
-
 public:
 	EngineActions(ECS::World* p_world, TreenityMain* p_treenityMain);
 
@@ -21,13 +21,12 @@ public:
 	void ClearScene();
 	void AddDefaultEntities();
 	void InitializeScene();
+	void LoadScene(const QString& p_filePath);
 
 	// Mode switching
 	void EnterPlayMode();
 	void ExitPlayMode();
 	EditorMode::EditorMode GetMode();
-	void LoadWorld(ECS::World* p_world);
-	ECS::ComponentInterface* CreateComponentByType(ECS::World* p_world, ECS::Entity* p_entity, unsigned int p_componentType);
 
 	// Entity
 	ECS::Entity* CreateEntity();

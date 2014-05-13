@@ -30,38 +30,63 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTreeView" name="treeView_assetFileBrowser">
-     <property name="maximumSize">
-      <size>
-       <width>200</width>
-       <height>16777215</height>
-      </size>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMaximumSize</enum>
      </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <property name="verticalSpacing">
-      <number>6</number>
+     <property name="spacing">
+      <number>0</number>
      </property>
-     <item row="0" column="2">
-      <widget class="QLineEdit" name="lineEdit_assetSearch">
-       <property name="styleSheet">
-        <string notr="true">QLineEdit {
-     border: 2px solid gray;
-     border-radius: 10px;
-     padding: 0 8px;
-     selection-background-color: darkgray;
- }</string>
-       </property>
-       <property name="placeholderText">
-        <string>Search assets...</string>
-       </property>
-       <property name="clearButtonEnabled">
-        <bool>false</bool>
+     <item row="1" column="1">
+      <widget class="QTreeView" name="treeView_assetFileBrowser">
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
        </property>
       </widget>
      </item>
+     <item row="2" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="pushButton_expandall">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Expand all</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_collapseall">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Collapse all</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="spacing">
+      <number>6</number>
+     </property>
      <item row="0" column="0">
       <widget class="QPushButton" name="pushButton_back">
        <property name="minimumSize">
@@ -83,6 +108,24 @@
        </property>
        <property name="text">
         <string>&lt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLineEdit" name="lineEdit_assetSearch">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+     border: 2px solid gray;
+     border-radius: 10px;
+     padding: 0 8px;
+     selection-background-color: darkgray;
+ }</string>
+       </property>
+       <property name="placeholderText">
+        <string>Search assets...</string>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -112,6 +155,9 @@
      </item>
      <item row="1" column="0" colspan="3">
       <widget class="QListView" name="listView_fileBrowser">
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::NoDragDrop</enum>
+       </property>
        <property name="iconSize">
         <size>
          <width>50</width>
@@ -119,7 +165,13 @@
         </size>
        </property>
        <property name="textElideMode">
-        <enum>Qt::ElideMiddle</enum>
+        <enum>Qt::ElideRight</enum>
+       </property>
+       <property name="verticalScrollMode">
+        <enum>QAbstractItemView::ScrollPerPixel</enum>
+       </property>
+       <property name="horizontalScrollMode">
+        <enum>QAbstractItemView::ScrollPerPixel</enum>
        </property>
        <property name="movement">
         <enum>QListView::Static</enum>
@@ -132,6 +184,9 @@
        </property>
        <property name="viewMode">
         <enum>QListView::IconMode</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

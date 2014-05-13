@@ -1,16 +1,16 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'Log.h'
+** Meta object code from reading C++ file 'Utils.h'
 **
 ** Created by: The Qt Meta Object Compiler version 67 (Qt 5.2.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../Include/Log.h"
+#include "../Include/Utils.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'Log.h' doesn't include <QObject>."
+#error "The header file 'Utils.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
 #error "This file was generated using the moc from 5.2.0. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -18,26 +18,26 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-struct qt_meta_stringdata_Log_t {
+struct qt_meta_stringdata_Utils_t {
     QByteArrayData data[3];
-    char stringdata[11];
+    char stringdata[13];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    offsetof(qt_meta_stringdata_Log_t, stringdata) + ofs \
+    offsetof(qt_meta_stringdata_Utils_t, stringdata) + ofs \
         - idx * sizeof(QByteArrayData) \
     )
-static const qt_meta_stringdata_Log_t qt_meta_stringdata_Log = {
+static const qt_meta_stringdata_Utils_t qt_meta_stringdata_Utils = {
     {
-QT_MOC_LITERAL(0, 0, 3),
-QT_MOC_LITERAL(1, 4, 4),
-QT_MOC_LITERAL(2, 9, 0)
+QT_MOC_LITERAL(0, 0, 5),
+QT_MOC_LITERAL(1, 6, 4),
+QT_MOC_LITERAL(2, 11, 0)
     },
-    "Log\0Show\0\0"
+    "Utils\0Show\0\0"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_Log[] = {
+static const uint qt_meta_data_Utils[] = {
 
  // content:
        7,       // revision
@@ -59,10 +59,10 @@ static const uint qt_meta_data_Log[] = {
        0        // eod
 };
 
-void Log::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void Utils::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        Log *_t = static_cast<Log *>(_o);
+        Utils *_t = static_cast<Utils *>(_o);
         switch (_id) {
         case 0: _t->Show(); break;
         default: ;
@@ -71,26 +71,26 @@ void Log::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **
     Q_UNUSED(_a);
 }
 
-const QMetaObject Log::staticMetaObject = {
-    { &QDockWidget::staticMetaObject, qt_meta_stringdata_Log.data,
-      qt_meta_data_Log,  qt_static_metacall, 0, 0}
+const QMetaObject Utils::staticMetaObject = {
+    { &QDockWidget::staticMetaObject, qt_meta_stringdata_Utils.data,
+      qt_meta_data_Utils,  qt_static_metacall, 0, 0}
 };
 
 
-const QMetaObject *Log::metaObject() const
+const QMetaObject *Utils::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *Log::qt_metacast(const char *_clname)
+void *Utils::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_Log.stringdata))
-        return static_cast<void*>(const_cast< Log*>(this));
+    if (!strcmp(_clname, qt_meta_stringdata_Utils.stringdata))
+        return static_cast<void*>(const_cast< Utils*>(this));
     return QDockWidget::qt_metacast(_clname);
 }
 
-int Log::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int Utils::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QDockWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
