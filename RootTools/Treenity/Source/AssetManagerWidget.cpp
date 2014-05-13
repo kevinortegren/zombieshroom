@@ -2,7 +2,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
-#include <RootTools/Treenity/Include/Log.h>
+#include <RootTools/Treenity/Include/Utils.h>
 #include <QDesktopServices>
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -212,7 +212,7 @@ void AssetManagerWidget::TreeListContextMenu(const QPoint& p_val)
 					//Enclose .exe-file path in quotes and enclose argument-path in quotes and then enclose the whole thing in quotes! Windows Magic right here :D
 					std::string particleEditorPath = "\"\"" + g_engineContext.m_resourceManager->GetWorkingDirectory() + "ParticleEditor.exe" + "\" \"" + particleFileInfo + "\"\"";
 					system(particleEditorPath.c_str());
-					Log::Write("Particle editor started!");
+					Utils::Write("Particle editor started!");
 				}
 				else
 				{
@@ -259,5 +259,6 @@ void AssetManagerWidget::CollapseAll()
 
 void AssetManagerWidget::ExpandAll()
 {
+	//Utils::RunWithProgressBar(QtConcurrent::run(ui.treeView_assetFileBrowser, &QTreeView::expandAll));
 	ui.treeView_assetFileBrowser->expandAll();
 }

@@ -1,13 +1,13 @@
-#include <RootTools/Treenity/Include/Log.h>
+#include <RootTools/Treenity/Include/Utils.h>
 
-bool Log::m_instanceFlag = false;
-Log* Log::m_console = nullptr;
+bool Utils::m_instanceFlag = false;
+Utils* Utils::m_console = nullptr;
 
-Log* Log::GetInstance()
+Utils* Utils::GetInstance()
 {
 	if(!m_instanceFlag)
 	{
-		m_console = new Log();
+		m_console = new Utils();
 		m_instanceFlag = true;
 		return m_console;
 	}
@@ -17,18 +17,18 @@ Log* Log::GetInstance()
 	}
 }
 
-Log::~Log()
+Utils::~Utils()
 {
 	m_instanceFlag = false;
 }
 
-void Log::Write( const QString& p_text )
+void Utils::Write( const QString& p_text )
 {
 	GetInstance()->WriteToConsole(p_text);
 }
 
 
-Log::Log( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
+Utils::Utils( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
 {
 
 	//QPalette palette;
@@ -48,7 +48,7 @@ Log::Log( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
 
 	setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
 	setGeometry(10, 25, 300, 700);
-	setWindowTitle("Log");
+	setWindowTitle("Utils");
 	hide();
 	
 	//Create a widget to hold all content
@@ -74,29 +74,31 @@ Log::Log( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
 	setWidget(m_contentWidget);
 
 	//Set up progress dialog 
-	m_progressDialog = new QProgressDialog();
+	m_progressDialog = new QProgressDialog(this);
 	connect(&m_futureWatcher, SIGNAL(finished()), m_progressDialog , SLOT(cancel()));
 }
 
-void Log::WriteToConsole( const QString& p_text )
+void Utils::WriteToConsole( const QString& p_text )
 {
 	m_textBrowser->append(p_text);
 }
 
-void Log::Show()
+void Utils::Show()
 {
 	show();
 }
 
-void Log::RunWithProgressBar( QFuture<void> p_future )
+void Utils::RunWithProgressBar( QFuture<void> p_future )
 {
 	GetInstance()->Run(p_future);
 }
 
-void Log::Run(  QFuture<void> p_future )
+void Utils::Run(  QFuture<void> p_future )
 {
 	// Start the computation.
 	m_futureWatcher.setFuture(p_future);
+	m_progressDialog->setWindowTitle("Loading");
+	m_progressDialog->setLabelText("Please wait...");
 	m_progressDialog->setMinimum(0);
 	m_progressDialog->setMaximum(0);
 	m_progressDialog->setWindowModality(Qt::WindowModal);
