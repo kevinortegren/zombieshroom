@@ -208,13 +208,22 @@ namespace RootEngine
 			for(unsigned int i = 0 ; i < p_aiMesh->mNumFaces ; i++)
 			{
 				const aiFace& Face = p_aiMesh->mFaces[i];
-				if(Face.mNumIndices != 3)
+				if(Face.mNumIndices == 3)
 				{
-					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 m_model->m_indices!", p_index, i);
+					m_model->m_indices.push_back(Face.mIndices[0]);
+					m_model->m_indices.push_back(Face.mIndices[1]);
+					m_model->m_indices.push_back(Face.mIndices[2]);
+					m_model->m_faceIndexCount = 3;
 				}
-				m_model->m_indices.push_back(Face.mIndices[0]);
-				m_model->m_indices.push_back(Face.mIndices[1]);
-				m_model->m_indices.push_back(Face.mIndices[2]);
+				else if(Face.mNumIndices == 2)
+				{
+					//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 m_model->m_indices!", p_index, i);
+					
+					m_model->m_indices.push_back(Face.mIndices[0]);
+					m_model->m_indices.push_back(Face.mIndices[1]);
+					m_model->m_faceIndexCount = 2;
+				}
+
 			}
 		
 			mesh->CreateIndexBuffer(&m_model->m_indices[0], m_model->m_indices.size());
@@ -284,9 +293,13 @@ namespace RootEngine
 				{
 					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error: Mesh nr %d, face nr %d doesn't contain 3 m_model->m_indices!", p_index, i);
 				}
-				indices.push_back(Face.mIndices[0]);
-				indices.push_back(Face.mIndices[1]);
-				indices.push_back(Face.mIndices[2]);
+				else
+				{
+					indices.push_back(Face.mIndices[0]);
+					indices.push_back(Face.mIndices[1]);
+					indices.push_back(Face.mIndices[2]);
+					m_model->m_faceIndexCount = 3;
+				}
 			}
 
 			std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
