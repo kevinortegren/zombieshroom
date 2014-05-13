@@ -21,6 +21,9 @@ public:
 
 	void Export(const QString& p_name);
 	void Import(const QString& p_name);
+
+	std::map<ECS::Entity*, std::string>& GetEntityNames();
+	void SetEntityNames(const std::map<ECS::Entity*, std::string>& p_entityNames);
 private:
 	ECS::World* m_world;
 

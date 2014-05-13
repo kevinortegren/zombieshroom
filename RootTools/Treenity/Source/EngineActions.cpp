@@ -165,7 +165,7 @@ void EngineActions::EnterPlayMode()
 	// Get the spawn position/orientation.
 	RootForce::Transform* spawnTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("TestSpawnpoint"));
 
-	Utils::RunWithProgressBar(QtConcurrent::run(this, &EngineActions::ExportLevelState));
+	Utils::RunWithProgressBar(QtConcurrent::run(this, &EngineActions::ParallelPlayModeEnter));
 
 	// Create a player.
 	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
@@ -206,6 +206,9 @@ void EngineActions::EnterPlayMode()
 
 void EngineActions::ExitPlayMode()
 {
+	// Stop the animation system.
+	m_treenityMain->GetAnimationSystem()->Terminate();
+
 	// Clear whatever happened within the game session.
 	ClearScene();
 	g_engineContext.m_physics->RemoveAll();
@@ -213,13 +216,12 @@ void EngineActions::ExitPlayMode()
 	RootForce::Network::NetworkComponent::ResetSequenceForUser(0);
 
 	// Restore the old world state.
+	std::map<ECS::Entity*, std::string> entityNames;
 	std::stringstream ss(m_editorLevelState);
-	m_world->GetEntityImporter()->Import(ss, nullptr);
+	m_world->GetEntityImporter()->Import(ss, &entityNames);
+	m_treenityMain->GetProjectManager()->SetEntityNames(entityNames);
 	AddDefaultEntities();
 	InitializeScene();
-
-	// Stop the animation system.
-	m_treenityMain->GetAnimationSystem()->Terminate();
 
 	//SDL_SetRelativeMouseMode(SDL_FALSE);
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
@@ -233,10 +235,10 @@ EditorMode::EditorMode EngineActions::GetMode()
 	return m_editorMode;
 }
 
-void EngineActions::ExportLevelState()
+void EngineActions::ParallelPlayModeEnter()
 {
 	// Save the current world state.
-	m_editorLevelState = m_world->GetEntityExporter()->Export(nullptr);
+	m_editorLevelState = m_world->GetEntityExporter()->Export(&m_treenityMain->GetProjectManager()->GetEntityNames());
 
 	// Remove the test spawnpoint, the editor camera and the editor spawnpoint.
 	m_world->GetEntityManager()->RemoveEntity(m_cameraEntity);
