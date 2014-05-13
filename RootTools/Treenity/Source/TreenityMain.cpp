@@ -228,29 +228,29 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_testColor1 = glm::vec4(0,1,0,1);
 	m_testColor2 = glm::vec4(0,0,1,1);
 
+	// X
 	m_circleEntity0 = g_world->GetEntityManager()->CreateEntity();
 	RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity0);
 	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity0);
-	t->m_orientation.Pitch(90.0f);
-	r->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
+	r->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_x");
 	r->m_material = m_circleMaterial;
 	r->m_params[Render::Semantic::COLOR] = &m_testColor0;
 	r->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
 
+	// Y
 	m_circleEntity1 = g_world->GetEntityManager()->CreateEntity();
 	RootForce::Renderable* r1 = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity1);
 	RootForce::Transform* t1 = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity1);
-	t1->m_orientation.Yaw(90.0f);
-	r1->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
+	r1->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_y");
 	r1->m_material = m_circleMaterial;
 	r1->m_params[Render::Semantic::COLOR] = &m_testColor1;
 	r1->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
 
+	// Z
 	m_circleEntity2 = g_world->GetEntityManager()->CreateEntity();
 	RootForce::Renderable* r2 = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity2);
 	RootForce::Transform* t2 = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity2);
-	t2->m_orientation.Roll(90.0f);
-	r2->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
+	r2->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_z");
 	r2->m_material = m_circleMaterial;
 	r2->m_params[Render::Semantic::COLOR] = &m_testColor2;
 	r2->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
@@ -366,11 +366,11 @@ void TreenityMain::Update(float dt)
 	m_world.GetEntityManager()->CleanUp();
 
 	m_worldSystem.Process();
-	m_controllerActionSystem->Process();	
-	m_lookAtSystem->Process();
-	m_cameraSystem->Process();
+	m_controllerActionSystem->Process();
 	m_scriptSystem->Process();
 	m_transformInterpolationSystem->Process();
+	m_lookAtSystem->Process();
+	m_cameraSystem->Process();
 	m_shadowSystem->Process();
 	m_directionalLightSystem->Process();
 	m_pointLightSystem->Process();
@@ -442,9 +442,13 @@ void TreenityMain::RaySelect()
 	float bestDist = 0.0f;
 	int axis = -1;
 	
+	glm::vec3 normal = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.GetMatrix() * glm::vec3(1,0,0);
+
+	
+
 	glm::vec3 p;
 	float t = 999999.0f;;
-	if(RayVsPlane(glm::vec3(0,0,0), glm::vec3(1,0,0), cameraPos, ray, t))
+	if(RayVsPlane(glm::vec3(0,0,0), normal, cameraPos, ray, t))
 	{
 		p = cameraPos + t * ray;
 
@@ -456,14 +460,20 @@ void TreenityMain::RaySelect()
 
 			
 			bestDist = dist;
-			axis = 1;
+			axis = 0;
 		}
 			
 	}
 
+
+	normal = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.GetMatrix() * glm::vec3(0,1,0);
+
+	
+
+
 	glm::vec3 p1;
 	float t1 = 999999.0f;;
-	if(RayVsPlane(glm::vec3(0,0,0), glm::vec3(0,1,0), cameraPos, ray, t1))
+	if(RayVsPlane(glm::vec3(0,0,0), normal, cameraPos, ray, t1))
 	{
 		p1 = cameraPos + t1 * ray;
 		float dist = glm::distance(glm::vec3(0,0,0), p1);
@@ -474,13 +484,19 @@ void TreenityMain::RaySelect()
 
 			
 			bestDist = dist;
-			axis = 0;
+			axis = 1;
 		}		
 	}
 		
+
+	normal = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.GetMatrix() * glm::vec3(0,0,1);
+
+	
+
+
 	glm::vec3 p2;
 	float t2 = 999999.0f;;
-	if(RayVsPlane(glm::vec3(0,0,0), glm::vec3(0,0,1), cameraPos, ray, t2))
+	if(RayVsPlane(glm::vec3(0,0,0), normal, cameraPos, ray, t2))
 	{
 		p2 = cameraPos + t2 * ray;
 
@@ -497,18 +513,22 @@ void TreenityMain::RaySelect()
 		}	
 	}
 
+
 	switch (axis)
 	{
 	case 0:
 		m_testColor0 = glm::vec4(1,1,0,1);
+
 		break;
 		
 	case 1:
 		m_testColor1 = glm::vec4(1,1,0,1);
+
 		break;
 		
 	case 2:
 		m_testColor2 = glm::vec4(1,1,0,1);
+
 		break;
 
 	default:
@@ -519,23 +539,37 @@ void TreenityMain::RaySelect()
 	{
 	case 0:
 		m_testColor0 = glm::vec4(1,1,0,1);
+		g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), p, glm::vec4(1,0,0,1));
+
 		break;
 		
 	case 1:
 		m_testColor1 = glm::vec4(1,1,0,1);
+		g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), p1, glm::vec4(0,1,0,1));
+
 		break;
 		
 	case 2:
 		m_testColor2 = glm::vec4(1,1,0,1);
+		g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), p2, glm::vec4(0,0,1,1));
+
 		break;
 
 	default:
 		break;
 	}
 
+	RootForce::Orientation o1;
+	RootForce::Orientation o2;
+	RootForce::Orientation o3;
+
 	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE && axis != -1 && axis != selectedAxis )
 	{
 		selectedAxis = axis;
+
+		o1 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation;
+		o2 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation;
+		o3 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation;
 	}
 	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN && selectedAxis != -1)
 	{
@@ -543,32 +577,46 @@ void TreenityMain::RaySelect()
 		{
 		case 0:
 			{
-				RootForce::Transform* t0 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1);
-				RootForce::Transform* t1 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2);
-
-				float angle = atan2f(p1.z, p1.x);
-
-				std::cout << "Y plane " << glm::degrees(angle) << std::endl << std::endl;
-			}
-			break;
-		
-		case 1:
-			{
-				RootForce::Transform* t0 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0);
-				RootForce::Transform* t1 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2);
-
 				float angle = atan2f(p.y, p.z);
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation = o1;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = o2;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = o3;
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Pitch(-glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Pitch(-glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Pitch(-glm::degrees(angle));
+
 
 				std::cout << "X plane " << glm::degrees(angle) << std::endl << std::endl;
 			}
 			break;
-		
+		case 1:
+			{
+				float angle = atan2f(p1.z, p1.x);
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation = o1;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = o2;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = o3;
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Yaw(-glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Yaw(-glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Yaw(-glm::degrees(angle));
+
+				std::cout << "Y plane " << glm::degrees(angle) << std::endl << std::endl;
+			}
+			break;
 		case 2:
 			{
-				RootForce::Transform* t0 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0);
-				RootForce::Transform* t1 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1);
-
 				float angle = atan2f(p2.y, p2.x);
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation = o1;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = o2;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = o3;
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Roll(glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Roll(glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Roll(glm::degrees(angle));
 
 				std::cout << "Z plane " << glm::degrees(angle) << std::endl << std::endl;
 			}
@@ -875,7 +923,7 @@ bool TreenityMain::RayVsPlane(const glm::vec3& center, const glm::vec3& normal, 
 	float d = glm::dot(p, normal);
 	if(d > 0)
 	{
-		return false;
+		return true;
 	}
 	else
 	{
