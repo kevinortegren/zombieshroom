@@ -15,14 +15,16 @@ layout(std140) uniform PerObject
 	mat4 modelMatrix;
 	mat4 normalMatrix;
 	vec4 color;
+	vec2 viewport;
 };
+
+in float viewZ;
 
 void main()
 {
-	vec4 posView = invProjection * gl_FragCoord;	
-	vec4 center = viewMatrix * vec4(0,0,0,1);
+	vec4 center = viewMatrix * modelMatrix * vec4(0,0,0,1);
 	
-	if(posView.z < center.z)
+	if(viewZ < center.z)
 		discard;
 	
 	frag_color = color;
