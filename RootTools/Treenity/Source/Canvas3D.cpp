@@ -9,6 +9,7 @@
 
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootTools/Treenity/Include/Log.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -89,4 +90,28 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 	scrollEvent.type = SDL_MOUSEWHEEL;
 	scrollEvent.wheel.y = event->delta() / 100;
 	SDL_PushEvent(&scrollEvent);
+}
+
+void Canvas3D::keyPressEvent( QKeyEvent *k )
+{
+	SDL_Event e;
+	e.type = SDL_KEYDOWN;
+	e.key.keysym.scancode = GetScanCodeFromQtKey( k->key() );
+	e.key.repeat = k->isAutoRepeat();
+	SDL_PushEvent(&e);
+
+	QWidget::keyPressEvent(k);
+}
+
+void Canvas3D::keyReleaseEvent( QKeyEvent *k )
+{
+	if (!k->isAutoRepeat())
+	{
+		SDL_Event e;
+		e.type = SDL_KEYUP;
+		e.key.keysym.scancode = GetScanCodeFromQtKey( k->key() );
+		SDL_PushEvent(&e);
+
+		QWidget::keyReleaseEvent(k);
+	}
 }

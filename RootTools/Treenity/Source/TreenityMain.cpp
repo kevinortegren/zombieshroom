@@ -85,7 +85,6 @@ int main(int argc, char *argv[])
 TreenityMain::TreenityMain(const std::string& p_path)
 	: m_engineActions(&m_world, this)
 	, m_projectManager(&m_world)
-	, m_previousEditorMode(EditorMode::EDITOR)
 {
 	g_world = &m_world;
 
@@ -369,16 +368,6 @@ bool TreenityMain::IsRunning()
 	return m_treenityEditor.IsRunning();
 }
 
-void TreenityMain::EnterPlayMode()
-{
-	
-}
-
-void TreenityMain::ExitPlayMode()
-{
-
-}
-
 void TreenityMain::HandleEditorEvents()
 {
 	m_globalKeys.Update();
@@ -408,6 +397,9 @@ void TreenityMain::HandleIngameEvents()
 	if (g_engineContext.m_inputSys != nullptr)
 	{
 		g_engineContext.m_inputSys->Reset();
+		g_engineContext.m_inputSys->SetMousePos(glm::ivec2(QCursor::pos().x(), QCursor::pos().y()));
+		QCursor::setPos(QApplication::primaryScreen(), m_treenityEditor.GetCanvasCenter());
+		g_engineContext.m_inputSys->SetMousePos(glm::ivec2(QCursor::pos().x(), QCursor::pos().y()));
 	}
 
 	SDL_Event event;
@@ -468,19 +460,17 @@ void TreenityMain::ProcessWorldMessages()
 			} break;
 		}
 
-		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
+		//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Message Type %d - Entity ID: %d - Component Type: %d", itr->m_type, itr->m_entity->GetId(), itr->m_compType);
 	}
 }
 
 void TreenityMain::Update(float dt)
 {
-	if (m_previousEditorMode == EditorMode::EDITOR && m_engineActions.GetMode() == EditorMode::GAME)
+	if (dt > 4.0f)
 	{
-		// Reset the time the loading for going in-game took.
+		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "Frame time dt == %f. Setting dt = 0 to avoid calamity.", dt);
 		dt = 0.0f;
 	}
-	m_previousEditorMode = m_engineActions.GetMode();
-
 
 	if (m_engineActions.GetMode() == EditorMode::EDITOR)
 	{
@@ -522,14 +512,23 @@ void TreenityMain::Update(float dt)
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
 
+
 		// Update on player controls.
 		m_playerControlSystem->Process();
 		m_actionSystem->Process();
+
+		
+		// Start the animations.
+		m_animationSystem->Run();
 
 		// Update the physics.
 		m_physicsTransformCorrectionSystem->Process();
 		g_engineContext.m_physics->Update(m_world.GetDelta());
 		m_physicsSystem->Process();
+
+		
+		// Update the animation state.
+		m_stateSystem->Process();
 
 		// Update collision
 		//m_collisionSystem->Process();
@@ -540,15 +539,17 @@ void TreenityMain::Update(float dt)
 
 		// Update the rendering.
 		m_worldSystem->Process();
+		m_transformInterpolationSystem->Process();
 		m_actionSystem->UpdateAimingDevice(false);
 		m_thirdPersonBehaviorSystem->Process();
 		m_lookAtSystem->Process();
 		m_cameraSystem->Process();
-		m_transformInterpolationSystem->Process();
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
 		m_renderingSystem->Process();
+
+		m_animationSystem->Synch();
 
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();

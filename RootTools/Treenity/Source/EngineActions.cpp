@@ -148,7 +148,7 @@ void EngineActions::CreateTestSpawnpoint()
 void EngineActions::EnterPlayMode()
 {
 	m_editorMode = EditorMode::GAME;
-	//g_engineContext.m_inputSys->LockMouseToCenter(true);
+	g_engineContext.m_inputSys->LockMouseToCenter(true);
 	//SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	// Save the current world state.
@@ -182,13 +182,23 @@ void EngineActions::EnterPlayMode()
 
 	g_engineContext.m_script->SetFunction(g_engineContext.m_resourceManager->GetScript("Player"), "OnTeamSelect");
 	g_engineContext.m_script->AddParameterUserData(playerEntity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->AddParameterNumber(1);
+	g_engineContext.m_script->AddParameterNumber(2);
 	g_engineContext.m_script->ExecuteScript();
 
 	// Set the player's position to the test spawnpoint.
 	RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(playerEntity);
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(playerEntity);
 	transform->m_position = spawnTransform->m_position;
 	transform->m_orientation = spawnTransform->m_orientation;
+	g_engineContext.m_physics->SetPosition(*collision->m_handle, transform->m_position);
+	g_engineContext.m_physics->SetOrientation(*collision->m_handle, transform->m_orientation.GetQuaternion());
+
+	// Startup the animation system.
+	m_treenityMain->GetAnimationSystem()->Start();
+
+	// Process the messages.
+	m_treenityMain->ProcessWorldMessages();
+	m_world->GetEntityManager()->CleanUp();
 
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Entered play mode");	
 }
@@ -205,8 +215,11 @@ void EngineActions::ExitPlayMode()
 	AddDefaultEntities();
 	InitializeScene();
 
+	// Stop the animation system.
+	m_treenityMain->GetAnimationSystem()->Terminate();
+
 	//SDL_SetRelativeMouseMode(SDL_FALSE);
-	//g_engineContext.m_inputSys->LockMouseToCenter(false);
+	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	m_editorMode = EditorMode::EDITOR;
 
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Exited play mode");

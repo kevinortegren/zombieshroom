@@ -55,10 +55,7 @@ public:
 	Treenity* GetEditor() { return &m_treenityEditor; }
 	RootForce::WorldSystem* GetWorldSystem() { return m_worldSystem.get(); }
 	RootForce::ShadowSystem* GetShadowSystem() { return m_shadowSystem; }
-	
-	// These will set up/reset systems needed for playing.
-	void EnterPlayMode();
-	void ExitPlayMode();
+	RootForce::AnimationSystem* GetAnimationSystem() { return m_animationSystem; }
 private:
 
 	void RenderSelectedEntity();
@@ -78,8 +75,6 @@ private:
 	EngineActions m_engineActions;	
 	ProjectManager m_projectManager;
 	GlobalKeys m_globalKeys;
-
-	EditorMode::EditorMode m_previousEditorMode;
 
 	glm::vec3 debugRay;
 	glm::vec3 debugCameraPos;

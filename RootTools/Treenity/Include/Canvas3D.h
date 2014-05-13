@@ -17,8 +17,8 @@ public:
 
 protected:
 	void wheelEvent(QWheelEvent* event);
-	//void keyPressEvent( QKeyEvent *k );
-	//void keyReleaseEvent( QKeyEvent *k );
+	void keyPressEvent( QKeyEvent *k );
+	void keyReleaseEvent( QKeyEvent *k );
 	void resizeEvent( QResizeEvent * event );
 	//void enterEvent( QEvent * event );
 	

@@ -202,6 +202,11 @@ void Treenity::CreateOpenGLContext()
 	showMaximized();
 }
 
+QPoint Treenity::GetCanvasCenter() const
+{
+	return ui.widget_canvas3D->geometry().center();
+}
+
 void Treenity::New()
 {
 	m_engineInterface->NewScene();

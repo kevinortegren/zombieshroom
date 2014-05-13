@@ -565,30 +565,41 @@ namespace RootForce
 	{
 		m_keybindings.clear();
 
-		Keybinding kb;
-		kb.Edge = false;
-		kb.ActionUp = PlayerAction::NONE;
-		kb.Action = PlayerAction::MOVE_FORWARDS;
-		kb.Bindings.push_back(SDL_SCANCODE_W);
-		m_keybindings.push_back(kb);
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::MOVE_FORWARDS;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_W);
 		
-		kb.Edge = false;
-		kb.ActionUp = PlayerAction::NONE;
-		kb.Action = PlayerAction::MOVE_BACKWARDS;
-		kb.Bindings.push_back(SDL_SCANCODE_S);
-		m_keybindings.push_back(kb);
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::MOVE_BACKWARDS;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_S);
 		
-		kb.Edge = false;
-		kb.ActionUp = PlayerAction::NONE;
-		kb.Action = PlayerAction::STRAFE_RIGHT;
-		kb.Bindings.push_back(SDL_SCANCODE_D);
-		m_keybindings.push_back(kb);
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::STRAFE_RIGHT;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_D);
 
-		kb.Edge = false;
-		kb.ActionUp = PlayerAction::NONE;
-		kb.Action = PlayerAction::STRAFE_LEFT;
-		kb.Bindings.push_back(SDL_SCANCODE_A);
-		m_keybindings.push_back(kb);
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::STRAFE_LEFT;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_A);
+
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::STRAFE_LEFT;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_A);
+
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::JUMP_RELEASED;
+		m_keybindings.back().Action = PlayerAction::JUMP_PRESSED;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_SPACE);
 
 		/*
 		kb.Edge = false;
