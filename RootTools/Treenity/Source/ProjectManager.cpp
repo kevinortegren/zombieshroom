@@ -89,3 +89,13 @@ void ProjectManager::Import(const QString& p_name)
 	Utils::Write("Project loaded from " + info.fileName());
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Project loaded from %s", p_name.toStdString().c_str());
 }
+
+std::map<ECS::Entity*, std::string>& ProjectManager::GetEntityNames()
+{
+	return m_entityNames;
+}
+
+void ProjectManager::SetEntityNames(const std::map<ECS::Entity*, std::string>& p_entityNames)
+{
+	m_entityNames = p_entityNames;
+}

@@ -16,10 +16,18 @@ public:
 	// Project startup
 	void NewScene();
 	void CreateFreeFlyingCamera();
+	void CreateTestSpawnpoint();
 	
 	void ClearScene();
 	void AddDefaultEntities();
 	void InitializeScene();
+	void LoadScene(const QString& p_filePath);
+
+	// Mode switching
+	void EnterPlayMode();
+	void ExitPlayMode();
+	EditorMode::EditorMode GetMode();
+	void ParallelPlayModeEnter();
 
 	void LoadScene(const QString& p_filePath);
 
@@ -58,8 +66,10 @@ private:
 
 	TreenityMain* m_treenityMain;
 	ECS::World* m_world;
+	EditorMode::EditorMode m_editorMode;
+	std::string m_editorLevelState;
 
 	ECS::Entity* m_cameraEntity;
 	ECS::Entity* m_aimingDevice;
-
+	ECS::Entity* m_testSpawnpoint;
 };

@@ -28,6 +28,8 @@ namespace RootForce
 		: ECS::VoidSystem(p_world) 
 		, m_clientPeer(nullptr)
 	{
+		SetDefaultKeybindings();
+
 		for(int i = 0; i < PlayerAction::END; ++i)
 		{
 			m_playerActionData[i].ActiveTime = 0.0f;
@@ -458,14 +460,6 @@ namespace RootForce
 		float abilityChannelingTime = (float) g_engineContext.m_script->GetGlobalNumber("channelingTime", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
 		float abilityCooldownTime = (float) g_engineContext.m_script->GetGlobalNumber("cooldown", action->CurrentAbilityEvent.ActiveAbilityScript.C_String());
 
-		// Update the HUD (charging/channeling bar). TODO: Perhaps move this outside?
-		if(action->CurrentAbilityEvent.Time <= abilityChargeTime)
-            m_hud->SetValue("ChargeBarValue", std::to_string(action->CurrentAbilityEvent.Time/abilityChargeTime));
-        else if(abilityChannelingTime > 0)
-            m_hud->SetValue("ChargeBarValue", std::to_string((abilityChargeTime + abilityChannelingTime - action->CurrentAbilityEvent.Time)/abilityChannelingTime));
-        else if(abilityChargeTime > 0) // Make sure the charge bar reaches the end before fading out
-            m_hud->SetValue("ChargeBarValue", "1");
-
 		// Check to see if the charge time is up.
 		if (action->CurrentAbilityEvent.Time >= abilityChargeTime && playerComponent->AbilityState == AbilityState::CHARGING)
 		{
@@ -517,8 +511,6 @@ namespace RootForce
 		Network::NetworkComponent* network = m_world->GetEntityManager()->GetComponent<Network::NetworkComponent>(player);
 		HealthComponent* health = m_world->GetEntityManager()->GetComponent<HealthComponent>(player);
 
-        m_hud->SetValue("ChargeBarValue", "0");
-
 		switch (playerComponent->AbilityState)
 		{
 			case AbilityState::CHARGING:
@@ -567,6 +559,109 @@ namespace RootForce
 		// Reset the current event.
 		playerComponent->AbilityState = AbilityState::OFF;
 		action->CurrentAbilityEvent = AbilityEvent();
+	}
+
+	void PlayerControlSystem::SetDefaultKeybindings()
+	{
+		m_keybindings.clear();
+
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::MOVE_FORWARDS;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_W);
+		
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::MOVE_BACKWARDS;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_S);
+		
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::STRAFE_RIGHT;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_D);
+
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::STRAFE_LEFT;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_A);
+
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::NONE;
+		m_keybindings.back().Action = PlayerAction::STRAFE_LEFT;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_A);
+
+		m_keybindings.push_back(Keybinding());
+		m_keybindings.back().Edge = false;
+		m_keybindings.back().ActionUp = PlayerAction::JUMP_RELEASED;
+		m_keybindings.back().Action = PlayerAction::JUMP_PRESSED;
+		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_SPACE);
+
+		/*
+		kb.Edge = false;
+		kb.ActionUp = PlayerAction::NONE;
+		kb.Action = PlayerAction::SELECT_ABILITY1;
+		kb.Bindings.push_back(SDL_SCANCODE_1);
+		m_keybindings.push_back(kb);
+
+		kb.Edge = false;
+		kb.ActionUp = PlayerAction::NONE;
+		kb.Action = PlayerAction::SELECT_ABILITY2;
+		kb.Bindings.push_back(SDL_SCANCODE_2);
+		m_keybindings.push_back(kb);
+
+		kb.Edge = false;
+		kb.ActionUp = PlayerAction::NONE;
+		kb.Action = PlayerAction::SELECT_ABILITY3;
+		kb.Bindings.push_back(SDL_SCANCODE_3);
+		m_keybindings.push_back(kb);
+
+		kb.Edge = false;
+		kb.ActionUp = PlayerAction::ACTIVATE_ABILITY_RELEASED;
+		kb.Action = PlayerAction::ACTIVATE_ABILITY_PRESSED;
+		kb.Bindings.push_back(SDL_Scancode(490));
+		m_keybindings.push_back(kb);
+
+		kb.Edge = false;
+		kb.ActionUp = PlayerAction::JUMP_RELEASED;
+		kb.Action = PlayerAction::JUMP_PRESSED;
+		kb.Bindings.push_back(SDL_Scancode(44));
+		m_keybindings.push_back(kb);
+		
+		kb.Edge = false;
+		kb.ActionUp = PlayerAction::NONE;
+		kb.Action = PlayerAction::PICK_UP_ABILITY;
+		kb.Bindings.push_back(SDL_Scancode(225));
+		m_keybindings.push_back(kb);
+
+		kb.Edge = false;
+		kb.ActionUp = PlayerAction::ACTIVATE_PUSH_ABILITY_RELEASED;
+		kb.Action = PlayerAction::ACTIVATE_PUSH_ABILITY_PRESSED;
+		kb.Bindings.push_back(SDL_Scancode(492));
+		m_keybindings.push_back(kb);
+		
+		kb.Edge = true;
+		kb.ActionUp = PlayerAction::NONE;
+		kb.Action = PlayerAction::SWITCH_ABILITY_FORWARD;
+		kb.Bindings.push_back(SDL_Scancode(20));
+		m_keybindings.push_back(kb);
+		
+		kb.Edge = true;
+		kb.ActionUp = PlayerAction::NONE;
+		kb.Action = PlayerAction::SCROLL_ABILITY_FORWARD;
+		kb.Bindings.push_back(SDL_Scancode(493));
+		m_keybindings.push_back(kb);
+
+		kb.Edge = false;
+		kb.ActionUp = PlayerAction::NONE;
+		kb.Action = PlayerAction::SCROLL_ABILITY_BACKWARD;
+		kb.Bindings.push_back(SDL_Scancode(494));
+		m_keybindings.push_back(kb);
+		*/
 	}
 
 }

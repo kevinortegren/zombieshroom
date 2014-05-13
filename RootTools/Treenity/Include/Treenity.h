@@ -45,6 +45,8 @@ public:
 	void EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group);
 	void CreateOpenGLContext();
+	Ui::TreenityClass& GetUi();
+	//QPoint GetCanvasCenter() const;
 
 	// Implemented from EditorInterface
 	void SelectInOutliner(const std::set<ECS::Entity*>& p_entities);
@@ -53,7 +55,7 @@ public:
 	void AddToSelection(ECS::Entity* p_entity);
 	void ClearSelection();
 	const std::set<ECS::Entity*>& GetSelection() const;
-	void RenameEntity(ECS::Entity* p_entity, const std::string& p_name);
+	void RenameEntity(ECS::Entity* p_entity, const QString& p_name);
 
 	//Called after RootEngine has been loaded from TreenityMain!
 	void Init();
@@ -67,9 +69,10 @@ private:
 	ProjectManager* m_projectManager;
 	std::set<ECS::Entity*> m_selectedEntities;
 
-	EngineInterface* m_engineInterface;
-
+	// Editor state
 	bool m_running;
+
+	EngineInterface* m_engineInterface;
 	Ui::TreenityClass ui;
 
 	// Utility
@@ -89,6 +92,7 @@ private slots:
 	void OpenProject();
 	void Save();
 	void SaveAs();
+	void Play();
 	void CreateEntity();
 	void DestroyEntity();
 	void RenameEntity();

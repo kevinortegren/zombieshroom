@@ -38,6 +38,7 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	ui.treeView_assetFileBrowser->hideColumn(3);
 	ui.treeView_assetFileBrowser->setRootIndex(m_assetFolderModel->index(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/")));
 
+
 	//Set up list widget
 	m_assetFileModel = new QFileSystemModel();
 	m_assetFileModel->setRootPath(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/"));
@@ -182,6 +183,7 @@ void AssetManagerWidget::IconSizeChanged( int p_val )
 		ui.listView_fileBrowser->setIconSize(QSize(p_val, p_val));	
 		ui.listView_fileBrowser->setGridSize(QSize(p_val + 10, p_val + 25));	
 		ui.listView_fileBrowser->setWordWrap(true);
+<<<<<<< HEAD
 	}
 	//Reset drag mode(It got removed when changing view mode)
 	ui.listView_fileBrowser->setDragDropMode(QAbstractItemView::DragOnly);
@@ -236,6 +238,56 @@ void AssetManagerWidget::TreeListContextMenu(const QPoint& p_val)
 	}
 }
 
+=======
+	}
+	//Reset drag mode(It got removed when changing view mode)
+	ui.listView_fileBrowser->setDragDropMode(QAbstractItemView::DragOnly);
+}
+
+void AssetManagerWidget::TreeListContextMenu(const QPoint& p_val)
+{
+	QModelIndex temp = ui.listView_fileBrowser->indexAt(p_val);
+
+	if(temp.isValid())
+	{
+		QFileInfo fileInfo = m_assetFileModel->fileInfo(temp);
+
+		//File right clicked
+		if(fileInfo.isFile())
+		{
+			QAction* selectedAction = m_fileContextMenu->exec(ui.listView_fileBrowser->mapToGlobal( p_val ));
+		
+			//No action selected
+			if(selectedAction == nullptr)
+				return;
+
+			if(selectedAction->text() == "Open externally")
+			{
+				if(fileInfo.suffix().compare("particle") == 0) //Doubleclicked a .particle-file. Opens up the particle editor!
+				{
+					//Start the Particle editor from the same folder. Alternative is to remove this if-statement and let Qt open the particle editor.
+					std::string particleFileInfo = fileInfo.filePath().toStdString();
+					//Enclose .exe-file path in quotes and enclose argument-path in quotes and then enclose the whole thing in quotes! Windows Magic right here :D
+					std::string particleEditorPath = "\"\"" + g_engineContext.m_resourceManager->GetWorkingDirectory() + "ParticleEditor.exe" + "\" \"" + particleFileInfo + "\"\"";
+					system(particleEditorPath.c_str());
+					Utils::Write("Particle editor started!");
+				}
+				else
+				{
+					//This opens a file with the default program. If no program is selected it will prompt the user to find a program. Very nice... very nice indeed!
+					QString temp = "file:///" + fileInfo.filePath();
+					QDesktopServices::openUrl(QUrl(temp, QUrl::TolerantMode)); //Don't know if QDesktopServices is included in our external libs. If this is causing compile problems, comment it out!
+				}
+			}
+		}
+	}
+	else
+	{
+		//No item is right clicked
+	}
+}
+
+>>>>>>> origin/treenity
 void AssetManagerWidget::SetFolderSpecificFilters( const QString& p_folderName )
 {
 	m_currentFilter.clear();

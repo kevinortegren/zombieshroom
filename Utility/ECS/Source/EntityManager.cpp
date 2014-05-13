@@ -36,6 +36,10 @@ void ECS::EntityManager::RemoveEntity(ECS::Entity* p_entity)
 	if(p_entity == nullptr)
 		return;
 
+	// Remove the entity from all tags and groups
+	m_world->GetTagManager()->Unregister(p_entity);
+	m_world->GetGroupManager()->UnregisterEntityFromAllGroups(p_entity);
+
 	Message m;
 	m.m_type = MessageType::ENTITY_REMOVED;
 	m.m_entity = p_entity;

@@ -111,6 +111,30 @@ void Canvas3D::dragEnterEvent( QDragEnterEvent *event )
 	}
 }
 
+void Canvas3D::keyPressEvent( QKeyEvent *k )
+{
+	SDL_Event e;
+	e.type = SDL_KEYDOWN;
+	e.key.keysym.scancode = GetScanCodeFromQtKey( k->key() );
+	e.key.repeat = k->isAutoRepeat();
+	SDL_PushEvent(&e);
+
+	QWidget::keyPressEvent(k);
+}
+
+void Canvas3D::keyReleaseEvent( QKeyEvent *k )
+{
+	if (!k->isAutoRepeat())
+	{
+		SDL_Event e;
+		e.type = SDL_KEYUP;
+		e.key.keysym.scancode = GetScanCodeFromQtKey( k->key() );
+		SDL_PushEvent(&e);
+
+		QWidget::keyReleaseEvent(k);
+	}
+}
+
 void Canvas3D::dropEvent( QDropEvent *event )
 {	
 	QFileInfo fileInfo(event->mimeData()->text());

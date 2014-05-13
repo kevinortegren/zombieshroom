@@ -135,32 +135,47 @@ void EntityOutliner::EntityRemoved(ECS::Entity* p_entity)
 void EntityOutliner::TagAdded(ECS::Entity* p_entity, const std::string& p_tag)
 {
 	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
-	item->TagAdded(p_tag);
+	if (item != nullptr)
+	{
+		item->TagAdded(p_tag);
+	}
 }
 
 void EntityOutliner::TagRemoved(ECS::Entity* p_entity, const std::string& p_tag)
 {
 	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
-	item->TagRemoved(p_tag);
+	if (item != nullptr)
+	{
+		item->TagRemoved(p_tag);
+	}
 }
 
 void EntityOutliner::EntityAddedToGroup(ECS::Entity* p_entity, const std::string& p_group)
 {
 	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
-	item->EntityAddedToGroup(p_group);
+	if (item != nullptr)
+	{
+		item->EntityAddedToGroup(p_group);
+	}
 }
 
 void EntityOutliner::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& p_group)
 {
 	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
-	item->EntityRemovedFromGroup(p_group);
+	if (item != nullptr)
+	{
+		item->EntityRemovedFromGroup(p_group);
+	}
 }
 
 
 void EntityOutliner::EntityRenamed(ECS::Entity* p_entity, const QString& p_name)
 {
 	EntityOutlinerItem* item = FindItemWithEntity(p_entity);
-	item->EntityRenamed(p_name);
+	if (item != nullptr)
+	{
+		item->EntityRenamed(p_name);
+	}
 }
 
 ECS::Entity* EntityOutliner::GetSelectedEntity()

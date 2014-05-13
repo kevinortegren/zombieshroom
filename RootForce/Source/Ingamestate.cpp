@@ -55,6 +55,7 @@ namespace RootForce
 		g_world->GetEntityManager()->GetAllocator()->CreateList<RootForce::KillAnnouncement>(10);
 
 		m_hud = std::shared_ptr<RootForce::HUD>(new HUD());
+		m_hudManager = std::shared_ptr<RootForce::HUDManager>(new HUDManager(m_displayIngameMenu));
 	}
 
 	void IngameState::Initialize()
@@ -257,9 +258,6 @@ namespace RootForce
 			m_timerSystem->SetServerPeer(m_networkContext.m_server->GetPeerInterface());
 		}
 
-		// Give the player control system access to the HUD.
-		m_playerControlSystem->SetHUD(m_hud.get());
-
 		// Initialize the debug, setting the html view
 #ifdef _DEBUG
 		g_engineContext.m_debugOverlay->SetView(g_engineContext.m_gui->LoadURL("Debug", "debug.html"));
@@ -269,7 +267,6 @@ namespace RootForce
 		m_hud->Initialize(g_engineContext.m_gui->LoadURL("HUD", "hud.html"), &g_engineContext);
 		m_hud->SetSelectedAbility(0);
 
-		m_sharedSystems.m_matchStateSystem->SetHUD(m_hud.get());
 		m_sharedSystems.m_matchStateSystem->SetAbilitySpawnSystem(m_sharedSystems.m_abilitySpawnSystem);
 
 		// Reset the ingame menu before we start the match
@@ -322,6 +319,12 @@ namespace RootForce
 
 		g_engineContext.m_sound->PlayBackgroundSound("gustav4_2.mp3");
 		//g_engineContext->m_resourceManager->LoadSoundAudio("gustav4_2.mp3", SOUND_LOOP_NORMAL | )
+
+		// Setup the HUD manager.
+		m_hudManager->SetHUD(m_hud.get());
+		m_hudManager->SetIngameMenu(m_ingameMenu.get());
+		m_hudManager->SetMatchStateSystem(m_sharedSystems.m_matchStateSystem.get());
+		m_sharedSystems.m_matchStateSystem->AddListener(m_hudManager.get());
 	}
 
 	void IngameState::Exit()
@@ -342,6 +345,12 @@ namespace RootForce
 		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
 #endif
 		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
+
+		// Unset the variables stored by the HUD manager.
+		m_hudManager->SetHUD(nullptr);
+		m_hudManager->SetIngameMenu(nullptr);
+		m_hudManager->SetMatchStateSystem(nullptr);
+		m_sharedSystems.m_matchStateSystem->RemoveListener(m_hudManager.get());
 
 		// Remove all entities.
 		g_world->GetEntityManager()->RemoveAllEntitiesAndComponents();
@@ -441,7 +450,7 @@ namespace RootForce
 		}
 		
 		// Update the HUD values.
-		UpdateHUD();
+		m_hudManager->UpdateHUD();
 		
 		// Update the console commands.
 		GameStates::GameStates consoleGameState = UpdateConsole();
@@ -806,77 +815,6 @@ namespace RootForce
 
 
 		return GameStates::Ingame;
-	}
-
-	void IngameState::UpdateHUD()
-	{
-		if (m_sharedSystems.m_matchStateSystem->IsMatchOver())
-		{
-			m_hud->SetValue("EndGame", "true" );
-		}
-
-		if (m_sharedSystems.m_matchStateSystem->IsMatchOver() || g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::DOWN)
-		{
-			m_hud->SetValue("ShowScore", "true" );
-			m_hud->SetScoreList(m_sharedSystems.m_matchStateSystem->GetScoreList());
-		}
-		else if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_TAB) == RootEngine::InputManager::KeyState::UP)
-		{
-			m_hud->SetValue("ShowScore", "false" );
-		}
-		if(m_displayIngameMenu)
-		{
-			m_ingameMenu->SetScoreList(m_sharedSystems.m_matchStateSystem->GetScoreList());
-		}
-		else
-		{
-			ECS::Entity* player = g_world->GetTagManager()->GetEntityByTag("Player");
-			if (!m_sharedSystems.m_matchStateSystem->IsMatchOver())
-			{
-				PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
-				HealthComponent* healthComponent = g_world->GetEntityManager()->GetComponent<HealthComponent>(player);
-				PlayerActionComponent* playerActionComponent = g_world->GetEntityManager()->GetComponent<PlayerActionComponent>(player);
-
-				//Update all the data that is displayed in the HUD
-				m_hud->SetValue("PlayerScore", std::to_string(playerComponent->Score) );
-				m_hud->SetValue("PlayerDeaths", std::to_string(playerComponent->Deaths) );
-				m_hud->SetValue("Team1Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(1)) );
-				m_hud->SetValue("Team2Score",  std::to_string(m_sharedSystems.m_matchStateSystem->GetTeamScore(2)) );
-				if(healthComponent && playerActionComponent)
-				{
-					m_hud->SetValue("Health", std::to_string(healthComponent->Health) );
-					m_hud->SetValue("IsDead", healthComponent->IsDead?"true":"false" );
-
-					m_hud->SetAbility(1, playerComponent->AbilityScripts[0].Name);
-					m_hud->SetAbility(2,  playerComponent->AbilityScripts[1].Name);
-					m_hud->SetAbility(3,  playerComponent->AbilityScripts[2].Name);
-
-					m_hud->SetCharges(1, playerComponent->AbilityScripts[0].Charges);
-					m_hud->SetCharges(2, playerComponent->AbilityScripts[1].Charges);
-					m_hud->SetCharges(3, playerComponent->AbilityScripts[2].Charges);
-					
-					//g_engineContext.m_logger->LogText(LogTag::GUI, LogLevel::PINK_PRINT, ("current crosshair: " + playerComponent->AbilityScripts[playerActionComponent->SelectedAbility].Crosshair).c_str());
-					m_hud->SetCrosshair(playerComponent->AbilityScripts[playerActionComponent->SelectedAbility].Crosshair);
-
-					if(playerComponent->AbilityScripts[0].Cooldown > 0 && playerComponent->AbilityScripts[0].Name.compare("") != 0)
-						m_hud->SetCooldown(1, playerComponent->AbilityScripts[0].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[0].Name));
-					else
-						m_hud->SetCooldown(1, 0);
-					if(playerComponent->AbilityScripts[1].Cooldown > 0 && playerComponent->AbilityScripts[1].Name.compare("") != 0)
-						m_hud->SetCooldown(2, playerComponent->AbilityScripts[1].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[1].Name));
-					else
-						m_hud->SetCooldown(2, 0);
-					if(playerComponent->AbilityScripts[2].Cooldown > 0 && playerComponent->AbilityScripts[2].Name.compare("") != 0)
-						m_hud->SetCooldown(3, playerComponent->AbilityScripts[2].Cooldown/(float) g_engineContext.m_script->GetGlobalNumber("cooldown", playerComponent->AbilityScripts[2].Name));
-					else
-						m_hud->SetCooldown(3, 0);
-					m_hud->SetSelectedAbility(playerActionComponent->SelectedAbility + 1);
-				}
-			}
-		}
-
-		m_hud->SetValue("TimeLeft", std::to_string((int)m_sharedSystems.m_matchStateSystem->GetTimeLeft()));
-		m_hud->Update(); // Executes either the HUD update or ShowScore if the match is over
 	}
 
 	void IngameState::PrintGlobalCommandHelp()

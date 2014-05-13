@@ -33,12 +33,15 @@ namespace RootForce
 		switch(ruleSet->CurrentState)
 		{
 			case MatchState::Warmup:
-				m_hud->GetView()->BufferJavascript("Announce('Waiting for players...', -1);");
+				//m_hud->GetView()->BufferJavascript("Announce('Waiting for players...', -1);");
 				if(numPlayers >= ruleSet->MinPlayers)
 				{
 					ruleSet->CountDown = 5.0f;
 					ruleSet->CurrentState = MatchState::CountDown;
-					m_hud->GetView()->BufferJavascript("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);");
+
+					for (auto listener : m_matchStateListeners)
+						listener->MatchStateChanged(MatchState::CountDown, MatchState::Warmup);
+					//m_hud->GetView()->BufferJavascript("Announce('5',1);Announce('4',1);Announce('3',1);Announce('2',1);Announce('1',1);");
 				}
 				break;
 			case MatchState::CountDown:
@@ -81,7 +84,9 @@ namespace RootForce
 						}
 					}
 					ruleSet->CurrentState = MatchState::Match;
-					m_hud->GetView()->BufferJavascript("Announce('May the roots be with you!',3);");
+					for (auto listener : m_matchStateListeners)
+						listener->MatchStateChanged(MatchState::Match, MatchState::CountDown);
+					//m_hud->GetView()->BufferJavascript("Announce('May the roots be with you!',3);");
 					killAnnouncement->KillPair.clear();
 				}
 				break;
@@ -92,6 +97,10 @@ namespace RootForce
 
 		for(auto pair : killAnnouncement->KillPair)
 		{
+			for (auto listener : m_matchStateListeners)
+				listener->PlayerKilled(killAnnouncement, pair.first, pair.second);
+
+			/*
 			PlayerComponent* murderer = pair.first?m_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.first):nullptr;
 			PlayerComponent* victim = m_world->GetEntityManager()->GetComponent<PlayerComponent>(pair.second);
 			m_hud->GetView()->BufferJavascript("KillAnnouncement('" + (murderer?murderer->Name:std::string()) + "','" + victim->Name + "', '" + killAnnouncement->AbilityName + "');");
@@ -100,6 +109,7 @@ namespace RootForce
 				m_hud->GetView()->BufferJavascript("Announce('You have killed " + victim->Name + "', 3);");
 			if(pair.second == player)
 				m_hud->GetView()->BufferJavascript("Announce('You have been killed" + (murderer?" by " + murderer->Name:std::string()) + "', 3);");
+			*/
 		}
 		killAnnouncement->KillPair.clear();
 	}
@@ -191,6 +201,21 @@ namespace RootForce
 			return true;
 		else
 			return false;
+	}
+
+	void MatchStateSystem::AddListener(MatchStateListener* p_listener)
+	{
+		m_matchStateListeners.insert(p_listener);
+	}
+
+	void MatchStateSystem::RemoveListener(MatchStateListener* p_listener)
+	{
+		m_matchStateListeners.erase(p_listener);
+	}
+
+	bool MatchStateSystem::IsListening(MatchStateListener* p_listener)
+	{
+		return m_matchStateListeners.find(p_listener) != m_matchStateListeners.end();
 	}
 
 	

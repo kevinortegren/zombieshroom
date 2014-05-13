@@ -25,8 +25,8 @@ public:
 
 protected:
 	void wheelEvent(QWheelEvent* event);
-	//void keyPressEvent( QKeyEvent *k );
-	//void keyReleaseEvent( QKeyEvent *k );
+	void keyPressEvent( QKeyEvent *k );
+	void keyReleaseEvent( QKeyEvent *k );
 	void resizeEvent( QResizeEvent * event );
 	//void enterEvent( QEvent * event );
 	void dragEnterEvent(QDragEnterEvent* event);
@@ -35,5 +35,4 @@ protected:
 private:
 	std::shared_ptr<SDL_Window> m_window;
 	EngineInterface* m_engineInterface;
-
 };

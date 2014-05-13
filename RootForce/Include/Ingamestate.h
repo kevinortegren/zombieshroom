@@ -40,6 +40,7 @@
 #include <RootSystems/Include/Network/MessageHandlers.h>
 #include <RootSystems/Include/ChatSystem.h>
 #include <RootForce/Include/HUD.h>
+#include <RootForce/Include/HUDManager.h>
 #include <RootForce/Include/IngameMenu.h>
 #include <thread>
 namespace RootForce
@@ -64,6 +65,7 @@ namespace RootForce
 		bool m_displayGuiHUD;
 
 		std::shared_ptr<RootForce::HUD> m_hud;
+		std::shared_ptr<RootForce::HUDManager> m_hudManager;
 		std::shared_ptr<RootForce::IngameMenu> m_ingameMenu;
 
 		// Game systems
@@ -103,7 +105,6 @@ namespace RootForce
 		Keymapper* m_keymapper;
 
 		GameStates::GameStates UpdateConsole();
-		void UpdateHUD();
 		void PrintGlobalCommandHelp();
 	};
 }

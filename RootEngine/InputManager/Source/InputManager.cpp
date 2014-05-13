@@ -1,4 +1,5 @@
 #include "InputManager.h"
+#include <iostream>
 
 namespace RootEngine
 {
@@ -37,7 +38,9 @@ namespace RootEngine
 				break;
 			case SDL_KEYDOWN:
 				if(!p_event.key.repeat)
+				{
 					m_keyState[p_event.key.keysym.scancode] = KeyState::DOWN;
+				}
 				break;
 			case SDL_KEYUP:
 				m_keyState[p_event.key.keysym.scancode] = KeyState::UP;

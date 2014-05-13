@@ -17,11 +17,11 @@ namespace ECS
 		TagManager(World* p_world);
 
 		void RegisterEntity(const std::string& p_tag, Entity* p_entity);
+		void Unregister(ECS::Entity* p_entity);
 		void Unregister(const std::string& p_tag);
 		void UnregisterAll();
 
 		Entity* GetEntityByTag(const std::string& p_tag);
-
 	private:
 		World* m_world;
 		std::map<std::string, Entity*> m_tags; 

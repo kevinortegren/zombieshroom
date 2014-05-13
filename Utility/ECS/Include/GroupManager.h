@@ -18,6 +18,7 @@ namespace ECS
 
 		void RegisterEntity(const std::string& p_group, ECS::Entity* p_entity);
 		void UnregisterEntity(const std::string& p_group, ECS::Entity* p_entity);
+		void UnregisterEntityFromAllGroups(ECS::Entity* p_entity);
 		void UnregisterAll();
 		bool IsEntityInGroup(ECS::Entity* p_entity, const std::string& p_group);
 

@@ -1,6 +1,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #pragma once
 
+#include <set>
 #include <Utility/ECS/Include/World.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/GameSharedContext.h>
@@ -55,6 +56,16 @@ namespace RootForce
 		}
 	};
 
+	/*
+		Listener interface. Can be used to listen for events from the match state system.
+	*/
+	class MatchStateListener
+	{
+	public:
+		virtual void MatchStateChanged(MatchState p_newState, MatchState p_previousState) = 0;
+		virtual void PlayerKilled(KillAnnouncement* p_killAnnouncement, ECS::Entity* p_murderer, ECS::Entity* p_victim) = 0;
+	};
+
 	class MatchStateSystem : public ECS::VoidSystem
 	{
 	public:
@@ -67,19 +78,22 @@ namespace RootForce
 		bool IsMatchOver();
 		void SetLoggingInterface(Logging* p_logger);
 		void SetNetworkContext(NetworkContext* p_networkContext) { m_networkContext = p_networkContext; }
-		void SetHUD(HUD* p_hud) { m_hud = p_hud; }
 		void SetAbilitySpawnSystem(AbilitySpawnSystem* p_system) { m_abilitySpawnSystem = p_system; }
 
 		float GetTimeLeft();
 		int GetTeamScore(int p_team);
 
+		void AddListener(MatchStateListener* p_listener);
+		void RemoveListener(MatchStateListener* p_listener);
+		bool IsListening(MatchStateListener* p_listener);
 	private:
 		NetworkContext* m_networkContext;
 		RootEngine::GameSharedContext* m_gameSharedContext;
 		Logging* m_logger;
 
-		HUD* m_hud;
 		AbilitySpawnSystem* m_abilitySpawnSystem;
+
+		std::set<MatchStateListener*> m_matchStateListeners;
 	};
 }
 

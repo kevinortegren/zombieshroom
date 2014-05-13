@@ -6,6 +6,15 @@
 #include <glm/glm.hpp>
 #include <QString>
 
+namespace EditorMode
+{
+	enum EditorMode
+	{
+		EDITOR,
+		GAME
+	};
+}
+
 struct EngineInterface
 {
 	// Project management
@@ -14,6 +23,11 @@ struct EngineInterface
 	virtual void AddDefaultEntities() = 0;
 	virtual void InitializeScene() = 0;
 	virtual void LoadScene(const QString& p_filePath) = 0;
+
+	// Mode switching
+	virtual void EnterPlayMode() = 0;
+	virtual void ExitPlayMode() = 0;
+	virtual EditorMode::EditorMode GetMode() = 0;
 
 	// Entity
 	virtual ECS::Entity* CreateEntity() = 0;
@@ -47,5 +61,4 @@ struct EngineInterface
 	virtual glm::vec3& GetVelocity(ECS::Entity* p_entity) = 0;
 	virtual void SetMass(ECS::Entity* p_entity, float p_mass) = 0;
 	virtual void SetVelocity(ECS::Entity* p_entity, glm::vec3& p_velocity) = 0;
-
 };

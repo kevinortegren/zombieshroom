@@ -30,22 +30,6 @@ void Utils::Write( const QString& p_text )
 
 Utils::Utils( QWidget* p_parent /*= 0*/ ) : QDockWidget(p_parent)
 {
-
-	//QPalette palette;
-	//palette.setColor(QPalette::Window, QColor(53,53,53));
-	//palette.setColor(QPalette::WindowText, Qt::white);
-	//palette.setColor(QPalette::Base, QColor(15,15,15));
-	//palette.setColor(QPalette::AlternateBase, QColor(53,53,53));
-	//palette.setColor(QPalette::ToolTipBase, Qt::white);
-	//palette.setColor(QPalette::ToolTipText, Qt::white);
-	//palette.setColor(QPalette::Text, Qt::white);
-	//palette.setColor(QPalette::Button, QColor(53,53,53));
-	//palette.setColor(QPalette::ButtonText, Qt::white);
-	//palette.setColor(QPalette::BrightText, Qt::red);
-	//palette.setColor(QPalette::Highlight, QColor(255,140,0));
-	//palette.setColor(QPalette::HighlightedText, Qt::black);
-	//setPalette(palette);
-
 	setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
 	setGeometry(10, 25, 300, 700);
 	setWindowTitle("Utils");
@@ -91,6 +75,7 @@ void Utils::Show()
 void Utils::RunWithProgressBar( QFuture<void> p_future )
 {
 	GetInstance()->Run(p_future);
+
 }
 
 void Utils::Run(  QFuture<void> p_future )
