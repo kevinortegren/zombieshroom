@@ -307,6 +307,43 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_globalKeys.RegisterModifier(Qt::AltModifier);
 	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
+	
+	// Test
+ 
+    m_circleMaterial = g_engineContext.m_renderer->CreateMaterial("CircleMaterial");
+    m_circleMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Circle");
+    
+    m_testColor0 = glm::vec4(1,0,0,1);
+    m_testColor1 = glm::vec4(0,1,0,1);
+    m_testColor2 = glm::vec4(0,0,1,1);
+ 
+ 
+    m_circleEntity0 = g_world->GetEntityManager()->CreateEntity();
+    RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity0);
+    RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity0);
+    t->m_orientation.Pitch(90.0f);
+    r->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
+    r->m_material = m_circleMaterial;
+    r->m_params[Render::Semantic::COLOR] = &m_testColor0;
+    r->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
+ 
+    m_circleEntity1 = g_world->GetEntityManager()->CreateEntity();
+    RootForce::Renderable* r1 = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity1);
+    RootForce::Transform* t1 = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity1);
+    t1->m_orientation.Yaw(90.0f);
+    r1->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
+    r1->m_material = m_circleMaterial;
+    r1->m_params[Render::Semantic::COLOR] = &m_testColor1;
+    r1->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
+ 
+    m_circleEntity2 = g_world->GetEntityManager()->CreateEntity();
+    RootForce::Renderable* r2 = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity2);
+    RootForce::Transform* t2 = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity2);
+    t2->m_orientation.Roll(90.0f);
+    r2->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
+    r2->m_material = m_circleMaterial;
+    r2->m_params[Render::Semantic::COLOR] = &m_testColor2;
+    r2->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
 
 }
 
@@ -776,6 +813,9 @@ bool TreenityMain::RayVsOBB(const glm::vec3& cameraPos, const glm::vec3& ray, Ro
  
 bool TreenityMain::RayVsTriangle(const glm::vec3& cameraPos, const glm::vec3& ray, const RootEngine::Model* model, const glm::mat4x4& transform, float& t)
 {
+	if(model->m_faceIndexCount == 2)
+        return false;
+
     std::cout << model->m_indices.size() << std::endl;
     std::cout << model->m_positions.size() << std::endl;
  

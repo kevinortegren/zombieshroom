@@ -38,6 +38,7 @@ namespace RootEngine
 
 		std::vector<unsigned int> m_indices;
 		std::vector<glm::vec3> m_positions;
+		int m_faceIndexCount;
 
 		Model()
 #ifndef COMPILE_LEVEL_EDITOR
