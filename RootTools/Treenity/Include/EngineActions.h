@@ -27,6 +27,7 @@ public:
 	void EnterPlayMode();
 	void ExitPlayMode();
 	EditorMode::EditorMode GetMode();
+	void ExportLevelState();
 
 	// Entity
 	ECS::Entity* CreateEntity();

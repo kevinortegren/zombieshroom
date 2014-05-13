@@ -88,9 +88,10 @@ void Utils::Show()
 	show();
 }
 
-void Utils::RunWithProgressBar( QFuture<void> p_future )
+QFuture<void> Utils::RunWithProgressBar( QFuture<void> p_future )
 {
 	GetInstance()->Run(p_future);
+	return p_future;
 }
 
 void Utils::Run(  QFuture<void> p_future )

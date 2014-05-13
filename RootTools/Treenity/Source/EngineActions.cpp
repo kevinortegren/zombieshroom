@@ -161,25 +161,11 @@ void EngineActions::EnterPlayMode()
 {
 	m_editorMode = EditorMode::GAME;
 	g_engineContext.m_inputSys->LockMouseToCenter(true);
-	//SDL_SetRelativeMouseMode(SDL_TRUE);
-
-	// Save the current world state.
-	m_editorLevelState = m_world->GetEntityExporter()->Export(nullptr);
 
 	// Get the spawn position/orientation.
 	RootForce::Transform* spawnTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("TestSpawnpoint"));
 
-	// Remove the test spawnpoint, the editor camera and the editor spawnpoint.
-	m_world->GetEntityManager()->RemoveEntity(m_cameraEntity);
-	m_world->GetEntityManager()->RemoveEntity(m_aimingDevice);
-	m_world->GetEntityManager()->RemoveEntity(m_testSpawnpoint);
-
-	// Create a camera.
-	m_treenityMain->GetWorldSystem()->CreatePlayerCamera();
-
-	// Initialize the physics.
-	m_treenityMain->GetWorldSystem()->AddStaticEntitiesToPhysics();
-	g_engineContext.m_physics->EnableDebugDraw(true);
+	Utils::RunWithProgressBar(QtConcurrent::run(this, &EngineActions::ExportLevelState));
 
 	// Create a player.
 	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
@@ -245,6 +231,25 @@ void EngineActions::ExitPlayMode()
 EditorMode::EditorMode EngineActions::GetMode()
 {
 	return m_editorMode;
+}
+
+void EngineActions::ExportLevelState()
+{
+	// Save the current world state.
+	m_editorLevelState = m_world->GetEntityExporter()->Export(nullptr);
+
+	// Remove the test spawnpoint, the editor camera and the editor spawnpoint.
+	m_world->GetEntityManager()->RemoveEntity(m_cameraEntity);
+	m_world->GetEntityManager()->RemoveEntity(m_aimingDevice);
+	m_world->GetEntityManager()->RemoveEntity(m_testSpawnpoint);
+
+	// Create a camera.
+	m_treenityMain->GetWorldSystem()->CreatePlayerCamera();
+
+	// Initialize the physics.
+	m_treenityMain->GetWorldSystem()->AddStaticEntitiesToPhysics();
+	g_engineContext.m_physics->EnableDebugDraw(true);
+	
 }
 
 // Entity

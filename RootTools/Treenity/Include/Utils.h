@@ -16,7 +16,7 @@ class Utils : public QDockWidget
 public:
 	static Utils* GetInstance();
 	static void Write(const QString& p_text);
-	static void RunWithProgressBar( QFuture<void> p_future);
+	static QFuture<void> RunWithProgressBar( QFuture<void> p_future);
 
 	~Utils();
 
