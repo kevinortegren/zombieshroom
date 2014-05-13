@@ -86,4 +86,5 @@ private:
 	float dangle1;
 	float dangle2;
 
+	RootForce::Orientation m_o0;
 };
