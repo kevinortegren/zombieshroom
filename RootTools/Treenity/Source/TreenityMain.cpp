@@ -255,7 +255,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	r2->m_params[Render::Semantic::COLOR] = &m_testColor2;
 	r2->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
 
-	dangle0 = dangle1 = dangle2 = 0;
+	angle0 = 0;
 }
 
 TreenityMain::~TreenityMain()
@@ -426,6 +426,53 @@ void TreenityMain::RenderSelectedEntity()
 	}
 }
 
+float TreenityMain::GetAngleFromAxis(int axis, const glm::vec3& position)
+{
+	float angle = 0.0f;
+	switch (axis)
+	{
+	case 0:
+		{
+			glm::vec3 pnorm = glm::normalize(position);
+			glm::vec3 up = m_o0.GetUp();
+			glm::vec3 front = m_o0.GetFront();
+
+			float y = glm::dot(up, pnorm);
+			float z = glm::dot(front, pnorm);
+			angle = atan2f(y, z);
+		}
+		break;
+		
+	case 1:
+		{
+			glm::vec3 pnorm = glm::normalize(position);
+			glm::vec3 front = m_o0.GetFront();
+			glm::vec3 left = -m_o0.GetRight();
+
+			float z = glm::dot(front, pnorm);
+			float x = glm::dot(left, pnorm);
+			angle = atan2f(z, x);
+		}
+		break;
+		
+	case 2:
+		{
+			glm::vec3 pnorm = glm::normalize(position);
+			glm::vec3 up = m_o0.GetUp();
+			glm::vec3 left = -m_o0.GetRight();
+
+			float y = glm::dot(up, pnorm);
+			float x = glm::dot(left, pnorm);
+			angle = atan2f(y, x);
+		}
+		break;
+
+	default:
+		break;
+	}
+	return angle;
+}
+
 void TreenityMain::RaySelect()
 {
 	m_testColor0 = glm::vec4(1,0,0,1);
@@ -561,11 +608,35 @@ void TreenityMain::RaySelect()
 		break;
 	}
 
+	
 	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE && axis != -1 && axis != selectedAxis )
 	{
 		selectedAxis = axis;
 
 		m_o0 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation;
+
+		switch (selectedAxis)
+		{
+		case 0:
+			angle0 = GetAngleFromAxis(selectedAxis, p); 
+			break;
+		
+		case 1:
+			angle0 = GetAngleFromAxis(selectedAxis, p1); 
+			break;
+		
+		case 2:
+			angle0 = GetAngleFromAxis(selectedAxis, p2); 
+			break;
+
+		default:
+			break;
+		}
+	}
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::UP_EDGE && selectedAxis != -1)
+	{
+		angle0 = 0.0f;
+		selectedAxis = -1;
 	}
 	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN && selectedAxis != -1)
 	{
@@ -581,16 +652,18 @@ void TreenityMain::RaySelect()
 				float z = glm::dot(front, pnorm);
 				float angle = atan2f(y, z);
 
+
+
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation = m_o0;
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = m_o0;
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = m_o0;
 
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Pitch(-glm::degrees(angle));
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Pitch(-glm::degrees(angle));
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Pitch(-glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Pitch(glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Pitch(glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Pitch(glm::degrees(angle0 - angle));
 
 
-				std::cout << "X plane " << glm::degrees(angle) << std::endl << std::endl;
+				std::cout << "X plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(angle0) << std::endl << std::endl;
 			}
 			break;
 		case 1:
@@ -607,11 +680,12 @@ void TreenityMain::RaySelect()
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = m_o0;
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = m_o0;
 
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Yaw(-glm::degrees(angle));
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Yaw(-glm::degrees(angle));
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Yaw(-glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Yaw(glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Yaw(glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Yaw(glm::degrees(angle0 - angle));
 
-				std::cout << "Y plane " << glm::degrees(angle) << std::endl << std::endl;
+				std::cout << "Y plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(angle0) << std::endl << std::endl;
+
 			}
 			break;
 		case 2:
@@ -628,11 +702,12 @@ void TreenityMain::RaySelect()
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = m_o0;
 				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = m_o0;
 
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Roll(glm::degrees(angle));
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Roll(glm::degrees(angle));
-				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Roll(glm::degrees(angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Roll(-glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Roll(-glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Roll(-glm::degrees(angle0 - angle));
 
-				std::cout << "Z plane " << glm::degrees(angle) << std::endl << std::endl;
+				std::cout << "Z plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(angle0) << std::endl << std::endl;
+
 			}
 			break;
 

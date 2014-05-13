@@ -34,6 +34,8 @@ public:
 
 private:
 
+	float GetAngleFromAxis(int axis, const glm::vec3& position);
+
 	void RenderSelectedEntity();
 	void RaySelect();
 
@@ -82,9 +84,7 @@ private:
 
 	int selectedAxis;
 
-	float dangle0;
-	float dangle1;
-	float dangle2;
+	float angle0;
 
 	RootForce::Orientation m_o0;
 };
