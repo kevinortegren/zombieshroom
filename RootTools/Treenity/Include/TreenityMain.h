@@ -62,7 +62,7 @@ private:
 	void RenderSelectedEntity();
 	void RaySelect();
 
-	const glm::vec3& ConstructRay();
+	glm::vec3 ConstructRay();
 	bool RayVsSphere(const glm::vec3& cameraPos, const glm::vec3& ray, const glm::vec3& center, float radius, float& t);
 	bool RayVsOBB(const glm::vec3& cameraPos, const glm::vec3& ray, RootEngine::OBB* obb, const glm::mat4x4& transform, float& t);
 	bool RayVsTriangle(const glm::vec3& cameraPos, const glm::vec3& ray, const RootEngine::Model* model, const glm::mat4x4& transform, float& t);

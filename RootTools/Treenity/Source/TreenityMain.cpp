@@ -495,7 +495,7 @@ void TreenityMain::Update(float dt)
 		m_renderingSystem->Process();
 		
 		if (!g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT))
-		RaySelect();
+			RaySelect();
 
 		RenderSelectedEntity();
 		
@@ -605,7 +605,7 @@ void TreenityMain::RaySelect()
         glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
  
         // Construct ray.
-        const glm::vec3& ray = glm::normalize(ConstructRay());
+        glm::vec3 ray = ConstructRay();
  
         debugRay = ray;
         debugCameraPos = cameraPos;
@@ -687,7 +687,7 @@ void TreenityMain::RaySelect()
     }
 }
 
-const glm::vec3& TreenityMain::ConstructRay()
+glm::vec3 TreenityMain::ConstructRay()
 {
  
     // Get mouse pos relative to window
@@ -708,9 +708,9 @@ const glm::vec3& TreenityMain::ConstructRay()
  
     // World space coords
     glm::vec4 rW = inverseView * rayView;
-    const glm::vec3& rayWorld = glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
  
-    return rayWorld;
+	//return normalized world space ray(Fixed return of local reference variable)
+    return glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
 }
 
 bool TreenityMain::RayVsSphere(const glm::vec3& cameraPos, const glm::vec3& ray, const glm::vec3& center, float radius, float& t)
