@@ -57,6 +57,7 @@ public:
 	RootForce::WorldSystem* GetWorldSystem() { return m_worldSystem.get(); }
 	RootForce::ShadowSystem* GetShadowSystem() { return m_shadowSystem; }
 	RootForce::AnimationSystem* GetAnimationSystem() { return m_animationSystem; }
+	RootForce::WaterSystem*		GetWaterSystem() { return m_waterSystem; }
 private:
 
 	float GetAngleFromAxis(int axis, const glm::vec3& position);

@@ -17,6 +17,7 @@ public:
 	void NewScene();
 	void CreateFreeFlyingCamera();
 	void CreateTestSpawnpoint();
+	void CreateWater();
 	
 	void ClearScene();
 	void AddDefaultEntities();
@@ -70,4 +71,5 @@ private:
 	ECS::Entity* m_cameraEntity;
 	ECS::Entity* m_aimingDevice;
 	ECS::Entity* m_testSpawnpoint;
+	ECS::Entity* m_water;
 };

@@ -228,6 +228,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
 	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
+	m_cameraSystem->LockToWater(false); //Don't lock the camera to the water surface
 
 	m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
@@ -484,6 +485,8 @@ void TreenityMain::Update(float dt)
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
 
+		//Update water
+		m_waterSystem->Process();
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
@@ -515,6 +518,8 @@ void TreenityMain::Update(float dt)
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
 
+		//Update water
+		m_waterSystem->Process();
 
 		// Update on player controls.
 		m_playerControlSystem->Process();
@@ -916,6 +921,9 @@ void TreenityMain::RaySelect()
 				continue;
 
 			if(m_world.GetTagManager()->GetEntityByTag("AimingDevice") == (*itr))
+				continue;
+
+			if(m_world.GetTagManager()->GetEntityByTag("Water") == (*itr))
 				continue;
 
 			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
