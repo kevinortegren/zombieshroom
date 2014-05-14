@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>227</width>
+    <width>296</width>
     <height>146</height>
    </rect>
   </property>
@@ -75,7 +75,7 @@
    <item row="1" column="1">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_translationX">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -88,7 +88,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -102,6 +102,12 @@
    </item>
    <item row="1" column="2">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_translationY">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>20</width>
@@ -110,7 +116,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -131,6 +137,12 @@
    </item>
    <item row="2" column="3">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationZ">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>20</width>
@@ -139,7 +151,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -153,6 +165,12 @@
    </item>
    <item row="1" column="3">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_translationZ">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>20</width>
@@ -161,7 +179,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -182,6 +200,12 @@
    </item>
    <item row="3" column="2">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleY">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>20</width>
@@ -190,7 +214,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -207,6 +231,12 @@
    </item>
    <item row="2" column="1">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationX">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>20</width>
@@ -215,7 +245,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -229,6 +259,12 @@
    </item>
    <item row="3" column="1">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleX">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>20</width>
@@ -237,7 +273,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -254,6 +290,12 @@
    </item>
    <item row="3" column="3">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_scaleZ">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>20</width>
@@ -262,7 +304,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -279,6 +321,12 @@
    </item>
    <item row="2" column="2">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_orientationY">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>20</width>
@@ -287,7 +335,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
