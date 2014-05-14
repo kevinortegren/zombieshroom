@@ -245,11 +245,11 @@ namespace RootForce
 		vec3 direction = normalize(p_direction);
 		vec3 up = normalize(p_upVector);
 		vec3 arbitraryVector = vec3(0.0f, 0.0f, 1.0f);
-		if(glm::dot(arbitraryVector, direction) == -1.0f || glm::dot(arbitraryVector, direction) == 1.0f)
-		{
-			arbitraryVector = vec3(0.0f, 1.0f, 0.0f);
-		}
 		vec3 axis = glm::cross(direction, arbitraryVector);
+		if(glm::dot(axis, axis) == 0.0f)
+		{
+			axis = vec3(0.0f, 1.0f, 0.0f);
+		}
 		float angle = glm::degrees(glm::acos(glm::dot(direction, vec3(0.0f, 0.0f, 1.0f))));
 		vec3 third = glm::cross(axis, vec3(0.0f, 0.0f, 1.0f));
 		if (glm::dot(third, direction) < 0)
