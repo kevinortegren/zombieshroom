@@ -61,4 +61,14 @@ struct EngineInterface
 	virtual glm::vec3& GetVelocity(ECS::Entity* p_entity) = 0;
 	virtual void SetMass(ECS::Entity* p_entity, float p_mass) = 0;
 	virtual void SetVelocity(ECS::Entity* p_entity, glm::vec3& p_velocity) = 0;
+
+	//Water collider
+	virtual void	AddWaterCollider(ECS::Entity* p_entity) = 0;
+	virtual void	RemoveWaterCollider(ECS::Entity* p_entity) = 0;
+	virtual int		GetWaterColliderRadius(ECS::Entity* p_entity) = 0;
+	virtual float	GetWaterColliderInterval(ECS::Entity* p_entity) = 0;
+	virtual float	GetWaterColliderPower(ECS::Entity* p_entity) = 0;
+	virtual void	SetWaterColliderRadius(ECS::Entity* p_entity, int p_val) = 0;
+	virtual void	SetWaterColliderInterval(ECS::Entity* p_entity, float p_val) = 0;
+	virtual void	SetWaterColliderPower(ECS::Entity* p_entity, float p_val) = 0;
 };

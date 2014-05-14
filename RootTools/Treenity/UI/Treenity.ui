@@ -251,6 +251,7 @@
      </property>
      <addaction name="action_addRenderable"/>
      <addaction name="action_addPhysics"/>
+     <addaction name="action_addWaterCollider"/>
     </widget>
     <addaction name="menu_addComponent"/>
    </widget>
@@ -615,6 +616,11 @@
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open Project...</string>
+   </property>
+  </action>
+  <action name="action_addWaterCollider">
+   <property name="text">
+    <string>Water Collider</string>
    </property>
   </action>
  </widget>

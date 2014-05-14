@@ -23,44 +23,44 @@ Treenity::Treenity(QWidget *parent)
 	Utils::GetInstance()->setFloating(true);
 
 	// Setup component names in the editor.
-	m_componentNames[RootForce::ComponentType::RENDERABLE] = "Renderable";
-	m_componentNames[RootForce::ComponentType::TRANSFORM] = "Transform";
-	m_componentNames[RootForce::ComponentType::POINTLIGHT] = "Point Light";
-	m_componentNames[RootForce::ComponentType::CAMERA] = "Camera";
-	m_componentNames[RootForce::ComponentType::HEALTH] = "Health";
-	m_componentNames[RootForce::ComponentType::PLAYERCONTROL] = "Player Control";
-	m_componentNames[RootForce::ComponentType::PHYSICS] = "Physics";
-	m_componentNames[RootForce::ComponentType::NETWORK] = "Network";
-	m_componentNames[RootForce::ComponentType::LOOKATBEHAVIOR] = "Look-At Behaviour";
+	m_componentNames[RootForce::ComponentType::RENDERABLE]			= "Renderable";
+	m_componentNames[RootForce::ComponentType::TRANSFORM]			= "Transform";
+	m_componentNames[RootForce::ComponentType::POINTLIGHT]			= "Point Light";
+	m_componentNames[RootForce::ComponentType::CAMERA]				= "Camera";
+	m_componentNames[RootForce::ComponentType::HEALTH]				= "Health";
+	m_componentNames[RootForce::ComponentType::PLAYERCONTROL]		= "Player Control";
+	m_componentNames[RootForce::ComponentType::PHYSICS]				= "Physics";
+	m_componentNames[RootForce::ComponentType::NETWORK]				= "Network";
+	m_componentNames[RootForce::ComponentType::LOOKATBEHAVIOR]		= "Look-At Behaviour";
 	m_componentNames[RootForce::ComponentType::THIRDPERSONBEHAVIOR] = "Third Person Behaviour";
-	m_componentNames[RootForce::ComponentType::SCRIPT] = "Script";
-	m_componentNames[RootForce::ComponentType::COLLISION] = "Collision";
-	m_componentNames[RootForce::ComponentType::COLLISIONRESPONDER] = "Collision Responder";
-	m_componentNames[RootForce::ComponentType::PLAYER] = "Player";
-	m_componentNames[RootForce::ComponentType::ANIMATION] = "Animation";
-	m_componentNames[RootForce::ComponentType::PARTICLE] = "Particle";
-	m_componentNames[RootForce::ComponentType::TDMRULES] = "Team-Deathmatch Rules";
-	m_componentNames[RootForce::ComponentType::PLAYERACTION] = "Player Action";
-	m_componentNames[RootForce::ComponentType::PLAYERPHYSICS] = "Player Physics";
-	m_componentNames[RootForce::ComponentType::ENTITYSTATE] = "Entity State";
-	m_componentNames[RootForce::ComponentType::SHADOWCASTER] = "Shadowcaster";
-	m_componentNames[RootForce::ComponentType::DIRECTIONALLIGHT] = "Directional Light";
-	m_componentNames[RootForce::ComponentType::SERVERINFORMATION] = "Server Information";
-	m_componentNames[RootForce::ComponentType::CLIENT] = "Client";
-	m_componentNames[RootForce::ComponentType::RAGDOLL] = "Ragdoll";
-	m_componentNames[RootForce::ComponentType::WATERCOLLIDER] = "Water Collider";
-	m_componentNames[RootForce::ComponentType::ABILITYSPAWN] = "Ability Spawn";
-	m_componentNames[RootForce::ComponentType::TRYPICKUPCOMPONENT] = "Try Pickup";
-	m_componentNames[RootForce::ComponentType::SOUND] = "Sound";
-	m_componentNames[RootForce::ComponentType::TIMER] = "Timer";
-	m_componentNames[RootForce::ComponentType::FOLLOW] = "Follow";
-	m_componentNames[RootForce::ComponentType::HOMING] = "Homing";
-	m_componentNames[RootForce::ComponentType::RAY] = "Ray";
-	m_componentNames[RootForce::ComponentType::DAMAGEANDKNOCKBACK] = "Damage and Knockback";
-	m_componentNames[RootForce::ComponentType::SCALABLE] = "Scalable";
-	m_componentNames[RootForce::ComponentType::STATCHANGE] = "Stat Change";
-	m_componentNames[RootForce::ComponentType::KILLANNOUNCEMENT] = "Kill Announcement";
-	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS] = "Controller Action";
+	m_componentNames[RootForce::ComponentType::SCRIPT]				= "Script";
+	m_componentNames[RootForce::ComponentType::COLLISION]			= "Collision";
+	m_componentNames[RootForce::ComponentType::COLLISIONRESPONDER]	= "Collision Responder";
+	m_componentNames[RootForce::ComponentType::PLAYER]				= "Player";
+	m_componentNames[RootForce::ComponentType::ANIMATION]			= "Animation";
+	m_componentNames[RootForce::ComponentType::PARTICLE]			= "Particle";
+	m_componentNames[RootForce::ComponentType::TDMRULES]			= "Team-Deathmatch Rules";
+	m_componentNames[RootForce::ComponentType::PLAYERACTION]		= "Player Action";
+	m_componentNames[RootForce::ComponentType::PLAYERPHYSICS]		= "Player Physics";
+	m_componentNames[RootForce::ComponentType::ENTITYSTATE]			= "Entity State";
+	m_componentNames[RootForce::ComponentType::SHADOWCASTER]		= "Shadowcaster";
+	m_componentNames[RootForce::ComponentType::DIRECTIONALLIGHT]	= "Directional Light";
+	m_componentNames[RootForce::ComponentType::SERVERINFORMATION]	= "Server Information";
+	m_componentNames[RootForce::ComponentType::CLIENT]				= "Client";
+	m_componentNames[RootForce::ComponentType::RAGDOLL]				= "Ragdoll";
+	m_componentNames[RootForce::ComponentType::WATERCOLLIDER]		= "Water Collider";
+	m_componentNames[RootForce::ComponentType::ABILITYSPAWN]		= "Ability Spawn";
+	m_componentNames[RootForce::ComponentType::TRYPICKUPCOMPONENT]	= "Try Pickup";
+	m_componentNames[RootForce::ComponentType::SOUND]				= "Sound";
+	m_componentNames[RootForce::ComponentType::TIMER]				= "Timer";
+	m_componentNames[RootForce::ComponentType::FOLLOW]				= "Follow";
+	m_componentNames[RootForce::ComponentType::HOMING]				= "Homing";
+	m_componentNames[RootForce::ComponentType::RAY]					= "Ray";
+	m_componentNames[RootForce::ComponentType::DAMAGEANDKNOCKBACK]	= "Damage and Knockback";
+	m_componentNames[RootForce::ComponentType::SCALABLE]			= "Scalable";
+	m_componentNames[RootForce::ComponentType::STATCHANGE]			= "Stat Change";
+	m_componentNames[RootForce::ComponentType::KILLANNOUNCEMENT]	= "Kill Announcement";
+	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS]	= "Controller Action";
 
 	// Setup the main UI.
 	ui.setupUi(this);
@@ -68,10 +68,10 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the component view and its items.
 	m_compView = new ComponentView();
 	ui.verticalLayout->addWidget(m_compView);
-	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView();
-	m_componentViews[RootForce::ComponentType::RENDERABLE] = new RenderableView();
-	m_componentViews[RootForce::ComponentType::PHYSICS] = new PhysicsView();
-
+	m_componentViews[RootForce::ComponentType::TRANSFORM]		= new TransformView();
+	m_componentViews[RootForce::ComponentType::RENDERABLE]		= new RenderableView();
+	m_componentViews[RootForce::ComponentType::PHYSICS]			= new PhysicsView();
+	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]	= new WaterColliderView();
 
 	for (auto it : m_componentViews)
 	{
@@ -81,18 +81,19 @@ Treenity::Treenity(QWidget *parent)
 	ui.treeView_entityOutliner->SetEditorInterface(this);
 
 	// Match signals with slots.
-	connect(ui.actionNew,							SIGNAL(triggered()), this,				SLOT(New()));
-	connect(ui.actionOpen_Project,					SIGNAL(triggered()), this,				SLOT(OpenProject()));
-	connect(ui.action_saveAs,						SIGNAL(triggered()), this,				SLOT(SaveAs()));
-	connect(ui.action_save,							SIGNAL(triggered()), this,				SLOT(Save()));
-	connect(ui.actionExit,							SIGNAL(triggered()), this,				SLOT(close()));
-	connect(ui.actionLog,							SIGNAL(triggered()), Utils::GetInstance(), SLOT(Show()));
-	connect(ui.action_addEntity,					SIGNAL(triggered()), this,				SLOT(CreateEntity()));
-	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
-	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
-	connect(ui.action_addRenderable,				SIGNAL(triggered()), this,				SLOT(AddRenderable()));
-	connect(ui.action_addPhysics,					SIGNAL(triggered()), this,				SLOT(AddPhysics()));
-	connect(ui.actionPlay,							SIGNAL(triggered()), this,				SLOT(Play()));
+	connect(ui.actionNew,							SIGNAL(triggered()),		this,					SLOT(New()));
+	connect(ui.actionOpen_Project,					SIGNAL(triggered()),		this,					SLOT(OpenProject()));
+	connect(ui.action_saveAs,						SIGNAL(triggered()),		this,					SLOT(SaveAs()));
+	connect(ui.action_save,							SIGNAL(triggered()),		this,					SLOT(Save()));
+	connect(ui.actionExit,							SIGNAL(triggered()),		this,					SLOT(close()));
+	connect(ui.actionLog,							SIGNAL(triggered()),		Utils::GetInstance(),	SLOT(Show()));
+	connect(ui.action_addEntity,					SIGNAL(triggered()),		this,					SLOT(CreateEntity()));
+	connect(ui.action_removeEntity,					SIGNAL(triggered()),		this,					SLOT(DestroyEntity()));
+	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()),	this,					SLOT(RenameEntity()));
+	connect(ui.action_addRenderable,				SIGNAL(triggered()),		this,					SLOT(AddRenderable()));
+	connect(ui.action_addPhysics,					SIGNAL(triggered()),		this,					SLOT(AddPhysics()));
+	connect(ui.action_addWaterCollider,				SIGNAL(triggered()),		this,					SLOT(AddWaterCollider()));
+	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
@@ -344,6 +345,14 @@ void Treenity::AddPhysics()
 	if(m_selectedEntities.size() == 1)
 	{
 		m_engineInterface->AddPhysics(*m_selectedEntities.begin());
+	}
+}
+
+void Treenity::AddWaterCollider()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddWaterCollider(*m_selectedEntities.begin());
 	}
 }
 

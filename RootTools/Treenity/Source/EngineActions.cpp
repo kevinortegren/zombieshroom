@@ -421,3 +421,43 @@ void EngineActions::RemovePhysics( ECS::Entity* p_entity )
 {
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(p_entity);
 }
+
+void EngineActions::AddWaterCollider( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->CreateComponent<RootForce::WaterCollider>(p_entity);
+}
+
+void EngineActions::RemoveWaterCollider( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->RemoveComponent<RootForce::WaterCollider>(p_entity);
+}
+
+int EngineActions::GetWaterColliderRadius(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_radius;
+}
+
+float EngineActions::GetWaterColliderInterval(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbInterval;
+}
+
+float EngineActions::GetWaterColliderPower(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbPower;
+}
+
+void EngineActions::SetWaterColliderRadius(ECS::Entity* p_entity, int p_val )
+{
+	 m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_radius = p_val;
+}
+
+void EngineActions::SetWaterColliderInterval(ECS::Entity* p_entity, float p_val )
+{
+	m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbInterval = p_val;
+}
+
+void EngineActions::SetWaterColliderPower(ECS::Entity* p_entity, float p_val )
+{
+	m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbPower = p_val;
+}
