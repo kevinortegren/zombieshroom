@@ -310,42 +310,43 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
 	
 	// Test
- 
-    m_circleMaterial = g_engineContext.m_renderer->CreateMaterial("CircleMaterial");
-    m_circleMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Circle");
-    
-    m_testColor0 = glm::vec4(1,0,0,1);
-    m_testColor1 = glm::vec4(0,1,0,1);
-    m_testColor2 = glm::vec4(0,0,1,1);
- 
- 
-    m_circleEntity0 = g_world->GetEntityManager()->CreateEntity();
-    RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity0);
-    RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity0);
-    t->m_orientation.Pitch(90.0f);
-    r->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
-    r->m_material = m_circleMaterial;
-    r->m_params[Render::Semantic::COLOR] = &m_testColor0;
-    r->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
- 
-    m_circleEntity1 = g_world->GetEntityManager()->CreateEntity();
-    RootForce::Renderable* r1 = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity1);
-    RootForce::Transform* t1 = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity1);
-    t1->m_orientation.Yaw(90.0f);
-    r1->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
-    r1->m_material = m_circleMaterial;
-    r1->m_params[Render::Semantic::COLOR] = &m_testColor1;
-    r1->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
- 
-    m_circleEntity2 = g_world->GetEntityManager()->CreateEntity();
-    RootForce::Renderable* r2 = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity2);
-    RootForce::Transform* t2 = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity2);
-    t2->m_orientation.Roll(90.0f);
-    r2->m_model = g_engineContext.m_resourceManager->LoadCollada("circle64");
-    r2->m_material = m_circleMaterial;
-    r2->m_params[Render::Semantic::COLOR] = &m_testColor2;
-    r2->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
+	m_circleMaterial = g_engineContext.m_renderer->CreateMaterial("CircleMaterial");
+	m_circleMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Circle");
+	
+	selectedAxis = -1;
 
+	m_testColor0 = glm::vec4(1,0,0,1);
+	m_testColor1 = glm::vec4(0,1,0,1);
+	m_testColor2 = glm::vec4(0,0,1,1);
+
+	// X
+	m_circleEntity0 = g_world->GetEntityManager()->CreateEntity();
+	RootForce::Renderable* r = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity0);
+	RootForce::Transform* t = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity0);
+	r->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_x");
+	r->m_material = m_circleMaterial;
+	r->m_params[Render::Semantic::COLOR] = &m_testColor0;
+	r->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
+
+	// Y
+	m_circleEntity1 = g_world->GetEntityManager()->CreateEntity();
+	RootForce::Renderable* r1 = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity1);
+	RootForce::Transform* t1 = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity1);
+	r1->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_y");
+	r1->m_material = m_circleMaterial;
+	r1->m_params[Render::Semantic::COLOR] = &m_testColor1;
+	r1->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
+
+	// Z
+	m_circleEntity2 = g_world->GetEntityManager()->CreateEntity();
+	RootForce::Renderable* r2 = g_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_circleEntity2);
+	RootForce::Transform* t2 = g_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_circleEntity2);
+	r2->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_z");
+	r2->m_material = m_circleMaterial;
+	r2->m_params[Render::Semantic::COLOR] = &m_testColor2;
+	r2->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
+
+	angle0 = 0;
 }
 
 TreenityMain::~TreenityMain()
@@ -484,11 +485,11 @@ void TreenityMain::Update(float dt)
 		m_world.GetEntityManager()->CleanUp();
 
 		m_worldSystem->Process();
-		m_controllerActionSystem->Process();	
+		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
+		m_transformInterpolationSystem->Process();
 		m_lookAtSystem->Process();
 		m_cameraSystem->Process();
-		m_transformInterpolationSystem->Process();
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
@@ -596,95 +597,384 @@ void TreenityMain::RenderSelectedEntity()
 	}
 }
 
+float TreenityMain::GetAngleFromAxis(int axis, const glm::vec3& position)
+{
+	float angle = 0.0f;
+	switch (axis)
+	{
+	case 0:
+		{
+			glm::vec3 pnorm = glm::normalize(position);
+			glm::vec3 up = m_o0.GetUp();
+			glm::vec3 front = m_o0.GetFront();
+
+			float y = glm::dot(up, pnorm);
+			float z = glm::dot(front, pnorm);
+			angle = atan2f(y, z);
+		}
+		break;
+		
+	case 1:
+		{
+			glm::vec3 pnorm = glm::normalize(position);
+			glm::vec3 front = m_o0.GetFront();
+			glm::vec3 left = -m_o0.GetRight();
+
+			float z = glm::dot(front, pnorm);
+			float x = glm::dot(left, pnorm);
+			angle = atan2f(z, x);
+		}
+		break;
+		
+	case 2:
+		{
+			glm::vec3 pnorm = glm::normalize(position);
+			glm::vec3 up = m_o0.GetUp();
+			glm::vec3 left = -m_o0.GetRight();
+
+			float y = glm::dot(up, pnorm);
+			float x = glm::dot(left, pnorm);
+			angle = atan2f(y, x);
+		}
+		break;
+
+	default:
+		break;
+	}
+	return angle;
+}
+
 void TreenityMain::RaySelect()
 {
-    if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
-    {
-        // Get camera entity
-        ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
-        glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
- 
-        // Construct ray.
-        glm::vec3 ray = ConstructRay();
- 
-        debugRay = ray;
-        debugCameraPos = cameraPos;
- 
-        float closestDist = 999999.0f;
-        ECS::Entity* closestEntity = nullptr;
- 
-        std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
-        for(auto itr = entities.begin(); itr != entities.end(); ++itr)
-        {
-            if((*itr)->GetFlag() == 0)
-                continue;
- 
-            if(m_world.GetTagManager()->GetEntityByTag("Skybox") == (*itr))
-                continue;
- 
-            if(m_world.GetTagManager()->GetEntityByTag("Camera") == (*itr))
-                continue;
- 
-            if(m_world.GetTagManager()->GetEntityByTag("AimingDevice") == (*itr))
-                continue;
- 
-            glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
- 
-            glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
- 
-            RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));
-            if(renderable != nullptr)
-            {
-                float t = 999999.0f;
-                if(RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t))
-                {
-                    float newt = 9999999.0f;
-                    if(RayVsTriangle(cameraPos, ray, renderable->m_model, transform, newt))
-                    {
-                        if(newt < closestDist)
-                        {
-                            closestEntity = (*itr);
-                            closestDist = newt;
-                            g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                static float radius = 5.0f;
- 
-                float t = 999999.0f;
-                RayVsSphere(cameraPos, ray, entityPos, radius, t);
- 
-                if(t < closestDist)
-                {
-                    closestEntity = (*itr);
-                    closestDist = t;
-                    g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
- 
-                }
-            }
-        }
- 
-        if(closestEntity != nullptr)
-        {
-            g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
- 
-            if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LSHIFT))
-            {
-                m_treenityEditor.AddToSelection(closestEntity);
-            }
-            else
-            {
-                m_treenityEditor.Select(closestEntity);
-            }
-        }
-        else
-        {
-            m_treenityEditor.Select(nullptr);
-        }
-    }
+	m_testColor0 = glm::vec4(1,0,0,1);
+	m_testColor1 = glm::vec4(0,1,0,1);
+	m_testColor2 = glm::vec4(0,0,1,1);
+
+	// Get camera entity
+	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
+	glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
+
+	// Construct ray.
+	glm::vec3 ray = ConstructRay();
+
+	float bestDist = 0.0f;
+	int axis = -1;
+	
+	glm::vec3 normal = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.GetMatrix() * glm::vec3(1,0,0);
+
+	g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), glm::vec3(0,0,0) - m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.GetRight(), glm::vec4(1,0,0,1));
+
+	glm::vec3 p;
+	float t = 999999.0f;;
+	if(RayVsPlane(glm::vec3(0,0,0), -m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.GetRight(), cameraPos, ray, t))
+	{
+		p = cameraPos + t * ray;
+
+		float dist = glm::distance(glm::vec3(0,0,0), p);
+		if(dist < 1.0f && dist > 0.5f && dist > bestDist)
+		{
+			/*std::cout << "X dist " << dist << std::endl;
+			std::cout << "X plane " << glm::degrees(atan2f(p.y, p.z)) << std::endl << std::endl;*/
+
+			
+			bestDist = dist;
+			axis = 0;
+		}
+			
+	}
+
+	
+
+	normal = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.GetMatrix() * glm::vec3(0,1,0);
+
+	g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), glm::vec3(0,0,0) + m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.GetUp(), glm::vec4(0,1,0,1));
+
+
+	glm::vec3 p1;
+	float t1 = 999999.0f;;
+	if(RayVsPlane(glm::vec3(0,0,0), m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.GetUp(), cameraPos, ray, t1))
+	{
+		p1 = cameraPos + t1 * ray;
+		float dist = glm::distance(glm::vec3(0,0,0), p1);
+		if(dist < 1.0f && dist > 0.5f && dist > bestDist)
+		{
+			/*std::cout << "Y dist " << dist << std::endl;
+			std::cout << "Y plane " << glm::degrees(atan2f(p1.z, p1.x)) << std::endl << std::endl;*/
+
+			
+			bestDist = dist;
+			axis = 1;
+		}		
+	}
+
+	
+		
+	normal = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.GetMatrix() * glm::vec3(0,0,1);
+
+	g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), glm::vec3(0,0,0) + m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.GetFront(), glm::vec4(0,0,1,1));
+
+
+	glm::vec3 p2;
+	float t2 = 999999.0f;;
+	if(RayVsPlane(glm::vec3(0,0,0), m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.GetFront(), cameraPos, ray, t2))
+	{
+		p2 = cameraPos + t2 * ray;
+
+		float dist = glm::distance(glm::vec3(0,0,0), p2);
+		if(dist < 1.0f && dist > 0.5f && dist > bestDist)
+		{
+			/*std::cout << "Z dist " << dist << std::endl;
+			std::cout << "Z plane " << glm::degrees(atan2f(p2.y, p2.x)) << std::endl << std::endl;*/
+
+			
+			bestDist = dist;
+			axis = 2;
+
+		}	
+	}
+
+
+	switch (axis)
+	{
+	case 0:
+		m_testColor0 = glm::vec4(1,1,0,1);
+
+		break;
+		
+	case 1:
+		m_testColor1 = glm::vec4(1,1,0,1);
+
+		break;
+		
+	case 2:
+		m_testColor2 = glm::vec4(1,1,0,1);
+
+		break;
+
+	default:
+		break;
+	}
+
+	switch (selectedAxis)
+	{
+	case 0:
+		m_testColor0 = glm::vec4(1,1,0,1);
+		g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), p, glm::vec4(1,0,0,1));
+
+		break;
+		
+	case 1:
+		m_testColor1 = glm::vec4(1,1,0,1);
+		g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), p1, glm::vec4(0,1,0,1));
+
+		break;
+		
+	case 2:
+		m_testColor2 = glm::vec4(1,1,0,1);
+		g_engineContext.m_renderer->AddLine(glm::vec3(0,0,0), p2, glm::vec4(0,0,1,1));
+
+		break;
+
+	default:
+		break;
+	}
+
+	
+	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE && axis != -1 && axis != selectedAxis )
+	{
+		selectedAxis = axis;
+
+		m_o0 = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation;
+
+		switch (selectedAxis)
+		{
+		case 0:
+			angle0 = GetAngleFromAxis(selectedAxis, p); 
+			break;
+		
+		case 1:
+			angle0 = GetAngleFromAxis(selectedAxis, p1); 
+			break;
+		
+		case 2:
+			angle0 = GetAngleFromAxis(selectedAxis, p2); 
+			break;
+
+		default:
+			break;
+		}
+	}
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::UP_EDGE && selectedAxis != -1)
+	{
+		angle0 = 0.0f;
+		selectedAxis = -1;
+	}
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN && selectedAxis != -1)
+	{
+		switch (selectedAxis)
+		{
+		case 0:
+			{
+				glm::vec3 pnorm = glm::normalize(p);
+				glm::vec3 up = m_o0.GetUp();
+				glm::vec3 front = m_o0.GetFront();
+
+				float y = glm::dot(up, pnorm);
+				float z = glm::dot(front, pnorm);
+				float angle = atan2f(y, z);
+
+
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation = m_o0;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = m_o0;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = m_o0;
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Pitch(glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Pitch(glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Pitch(glm::degrees(angle0 - angle));
+
+
+				std::cout << "X plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(angle0) << std::endl << std::endl;
+			}
+			break;
+		case 1:
+			{
+				glm::vec3 pnorm = glm::normalize(p1);
+				glm::vec3 front = m_o0.GetFront();
+				glm::vec3 left = -m_o0.GetRight();
+
+				float z = glm::dot(front, pnorm);
+				float x = glm::dot(left, pnorm);
+				float angle = atan2f(z, x);
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation = m_o0;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = m_o0;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = m_o0;
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Yaw(glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Yaw(glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Yaw(glm::degrees(angle0 - angle));
+
+				std::cout << "Y plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(angle0) << std::endl << std::endl;
+
+			}
+			break;
+		case 2:
+			{
+				glm::vec3 pnorm = glm::normalize(p2);
+				glm::vec3 up = m_o0.GetUp();
+				glm::vec3 left = -m_o0.GetRight();
+
+				float y = glm::dot(up, pnorm);
+				float x = glm::dot(left, pnorm);
+				float angle = atan2f(y, x);
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation = m_o0;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation = m_o0;
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation = m_o0;
+
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity0)->m_orientation.Roll(-glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity1)->m_orientation.Roll(-glm::degrees(angle0 - angle));
+				m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_circleEntity2)->m_orientation.Roll(-glm::degrees(angle0 - angle));
+
+				std::cout << "Z plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(angle0) << std::endl << std::endl;
+
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+	else if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+	{
+		selectedAxis = -1;
+
+		// Get camera entity
+		ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
+		glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
+
+		// Construct ray.
+		const glm::vec3& ray = glm::normalize(ConstructRay());
+
+		debugRay = ray;
+		debugCameraPos = cameraPos;
+
+		float closestDist = 999999.0f;
+		ECS::Entity* closestEntity = nullptr;
+
+		std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
+		for(auto itr = entities.begin(); itr != entities.end(); ++itr)
+		{
+			if((*itr)->GetFlag() == 0)
+				continue;
+
+			if(m_world.GetTagManager()->GetEntityByTag("Skybox") == (*itr))
+				continue;
+
+			if(m_world.GetTagManager()->GetEntityByTag("Camera") == (*itr))
+				continue;
+
+			if(m_world.GetTagManager()->GetEntityByTag("AimingDevice") == (*itr))
+				continue;
+
+			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
+
+			glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
+
+			RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));
+			if(renderable != nullptr)
+			{
+				float t = 999999.0f;
+				if(RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t))
+				{
+					float newt = 9999999.0f;
+					if(RayVsTriangle(cameraPos, ray, renderable->m_model, transform, newt))
+					{
+						if(newt < closestDist)
+						{
+							closestEntity = (*itr);
+							closestDist = newt;
+							g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
+						}
+					}
+				}
+			}
+			else
+			{
+				static float radius = 5.0f;
+
+				float t = 999999.0f;
+				RayVsSphere(cameraPos, ray, entityPos, radius, t);
+
+				if(t < closestDist)
+				{
+					closestEntity = (*itr);
+					closestDist = t;
+					g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
+
+				}
+			}
+		}
+
+		if(closestEntity != nullptr)
+		{
+			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
+
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LSHIFT))
+			{
+				m_treenityEditor.AddToSelection(closestEntity);
+			}
+			else
+			{
+				m_treenityEditor.Select(closestEntity);
+			}
+		}
+		else
+		{
+			m_treenityEditor.Select(nullptr);
+		}
+	}
 }
 
 glm::vec3 TreenityMain::ConstructRay()
@@ -861,28 +1151,45 @@ bool TreenityMain::RayVsTriangle(const glm::vec3& cameraPos, const glm::vec3& ra
  
 void TreenityMain::Debug(RootEngine::OBB* obb, const glm::mat4x4& p_space, const glm::vec3& p_color)
 {
-    glm::vec4 positions[8];
-    positions[0] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_minZ, 1.0f);
-    positions[1] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_minZ, 1.0f);
-    positions[2] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_maxZ, 1.0f);
-    positions[3] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_maxZ, 1.0f);
-    positions[4] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_minZ, 1.0f);
-    positions[5] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_minZ, 1.0f);
-    positions[6] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_maxZ, 1.0f);
-    positions[7] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_maxZ, 1.0f);
- 
-    unsigned int indices[] = 
-    { 
-        0, 2, 2, 3, 3, 1, 1, 0,
-        4, 6, 6, 7, 7, 5, 5, 4,
-        0, 4, 2, 6, 3, 7, 1, 5 
-    };
- 
-    for(int i = 0; i < 24; i += 2)
-    {
-        glm::vec3 pos1, pos2;
-        pos1 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i]]);
-        pos2 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i+1]]);
-        g_engineContext.m_renderer->AddLine(pos1, pos2, glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
-    }
+	glm::vec4 positions[8];
+	positions[0] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[1] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[2] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[3] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[4] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[5] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[6] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_maxZ, 1.0f);
+	positions[7] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_maxZ, 1.0f);
+
+	unsigned int indices[] = 
+	{ 
+		0, 2, 2, 3, 3, 1, 1, 0,
+		4, 6, 6, 7, 7, 5, 5, 4,
+		0, 4, 2, 6, 3, 7, 1, 5 
+	};
+
+	for(int i = 0; i < 24; i += 2)
+	{
+		glm::vec3 pos1, pos2;
+		pos1 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i]]);
+		pos2 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i+1]]);
+		g_engineContext.m_renderer->AddLine(pos1, pos2, glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
+	}
+}
+
+bool TreenityMain::RayVsPlane(const glm::vec3& center, const glm::vec3& normal, const glm::vec3& cameraPos, const glm::vec3& ray, float& t)
+{
+	t = -glm::dot(normal, cameraPos) / glm::dot(normal, ray);
+
+	glm::vec3 p = cameraPos + t * ray;
+
+	float d = glm::dot(p, normal);
+	if(d > 0)
+	{
+		return true;
+	}
+	else
+	{
+		return true;
+	}
 }

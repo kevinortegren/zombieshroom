@@ -185,9 +185,12 @@ namespace RootForce
 
 	void Orientation::Rotate(quat p_orientation)
 	{
+		glm::vec3 euler = glm::eulerAngles(p_orientation);
+
 		//m_orientation = normalize(glm::cross(m_orientation, p_orientation));
 		m_orientation = glm::cross(m_orientation, p_orientation);
 
+		glm::vec3 euler2 = glm::eulerAngles(m_orientation);
 	}
 
 	void Orientation::PitchGlobal(float p_angle)

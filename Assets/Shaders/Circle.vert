@@ -15,7 +15,11 @@ layout(std140) uniform PerObject
 	vec4 color;
 };
 
+out float viewZ;
+
 void main()
 {
+	viewZ = (viewMatrix * modelMatrix * vec4( in_position, 1.0f )).z;
+
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
 }

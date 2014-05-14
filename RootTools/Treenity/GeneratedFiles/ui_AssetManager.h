@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -21,6 +22,7 @@
 #include <QtWidgets/QListView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
 
@@ -36,18 +38,30 @@ public:
     QPushButton *pushButton_expandall;
     QPushButton *pushButton_collapseall;
     QGridLayout *gridLayout;
-    QPushButton *pushButton_back;
     QLineEdit *lineEdit_assetSearch;
-    QPushButton *pushButton_forward;
-    QListView *listView_fileBrowser;
-    QSlider *horizontalSlider_icon;
+    QPushButton *pushButton_back;
     QLabel *label;
+    QListView *listView_fileBrowser;
+    QPushButton *pushButton_forward;
+    QSlider *horizontalSlider_icon;
+    QGridLayout *gridLayout_3;
+    QSpacerItem *verticalSpacer;
+    QFrame *frame;
+    QGridLayout *gridLayout_4;
+    QLabel *label_cc;
+    QLabel *label_fileName;
+    QLabel *label_ss;
+    QLabel *label_fn;
+    QLabel *label_createdName;
+    QLabel *label_sizeName;
+    QGridLayout *gridLayout_5;
+    QLabel *widget_pictureFrame;
 
     void setupUi(QWidget *AssetManagerUi)
     {
         if (AssetManagerUi->objectName().isEmpty())
             AssetManagerUi->setObjectName(QStringLiteral("AssetManagerUi"));
-        AssetManagerUi->resize(1005, 286);
+        AssetManagerUi->resize(1067, 286);
         horizontalLayout = new QHBoxLayout(AssetManagerUi);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
@@ -86,16 +100,6 @@ public:
         gridLayout = new QGridLayout();
         gridLayout->setSpacing(6);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        pushButton_back = new QPushButton(AssetManagerUi);
-        pushButton_back->setObjectName(QStringLiteral("pushButton_back"));
-        pushButton_back->setMinimumSize(QSize(25, 25));
-        pushButton_back->setMaximumSize(QSize(25, 25));
-        pushButton_back->setStyleSheet(QLatin1String("QPushButton{\n"
-"	color: #FF8C00;\n"
-"}"));
-
-        gridLayout->addWidget(pushButton_back, 0, 0, 1, 1);
-
         lineEdit_assetSearch = new QLineEdit(AssetManagerUi);
         lineEdit_assetSearch->setObjectName(QStringLiteral("lineEdit_assetSearch"));
         lineEdit_assetSearch->setStyleSheet(QLatin1String("QLineEdit {\n"
@@ -108,15 +112,20 @@ public:
 
         gridLayout->addWidget(lineEdit_assetSearch, 0, 2, 1, 1);
 
-        pushButton_forward = new QPushButton(AssetManagerUi);
-        pushButton_forward->setObjectName(QStringLiteral("pushButton_forward"));
-        pushButton_forward->setMinimumSize(QSize(25, 25));
-        pushButton_forward->setMaximumSize(QSize(25, 25));
-        pushButton_forward->setStyleSheet(QLatin1String("QPushButton{\n"
+        pushButton_back = new QPushButton(AssetManagerUi);
+        pushButton_back->setObjectName(QStringLiteral("pushButton_back"));
+        pushButton_back->setMinimumSize(QSize(25, 25));
+        pushButton_back->setMaximumSize(QSize(25, 25));
+        pushButton_back->setStyleSheet(QLatin1String("QPushButton{\n"
 "	color: #FF8C00;\n"
 "}"));
 
-        gridLayout->addWidget(pushButton_forward, 0, 1, 1, 1);
+        gridLayout->addWidget(pushButton_back, 0, 0, 1, 1);
+
+        label = new QLabel(AssetManagerUi);
+        label->setObjectName(QStringLiteral("label"));
+
+        gridLayout->addWidget(label, 2, 0, 1, 2);
 
         listView_fileBrowser = new QListView(AssetManagerUi);
         listView_fileBrowser->setObjectName(QStringLiteral("listView_fileBrowser"));
@@ -132,6 +141,16 @@ public:
 
         gridLayout->addWidget(listView_fileBrowser, 1, 0, 1, 3);
 
+        pushButton_forward = new QPushButton(AssetManagerUi);
+        pushButton_forward->setObjectName(QStringLiteral("pushButton_forward"));
+        pushButton_forward->setMinimumSize(QSize(25, 25));
+        pushButton_forward->setMaximumSize(QSize(25, 25));
+        pushButton_forward->setStyleSheet(QLatin1String("QPushButton{\n"
+"	color: #FF8C00;\n"
+"}"));
+
+        gridLayout->addWidget(pushButton_forward, 0, 1, 1, 1);
+
         horizontalSlider_icon = new QSlider(AssetManagerUi);
         horizontalSlider_icon->setObjectName(QStringLiteral("horizontalSlider_icon"));
         horizontalSlider_icon->setMaximumSize(QSize(150, 16777215));
@@ -143,13 +162,85 @@ public:
 
         gridLayout->addWidget(horizontalSlider_icon, 2, 2, 1, 1);
 
-        label = new QLabel(AssetManagerUi);
-        label->setObjectName(QStringLiteral("label"));
-
-        gridLayout->addWidget(label, 2, 0, 1, 2);
-
 
         horizontalLayout->addLayout(gridLayout);
+
+        gridLayout_3 = new QGridLayout();
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_3->setSizeConstraint(QLayout::SetNoConstraint);
+        verticalSpacer = new QSpacerItem(0, 21, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        gridLayout_3->addItem(verticalSpacer, 1, 0, 1, 1);
+
+        frame = new QFrame(AssetManagerUi);
+        frame->setObjectName(QStringLiteral("frame"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(frame->sizePolicy().hasHeightForWidth());
+        frame->setSizePolicy(sizePolicy);
+        frame->setMinimumSize(QSize(0, 0));
+        frame->setMaximumSize(QSize(300, 16777215));
+        frame->setFrameShape(QFrame::StyledPanel);
+        frame->setLineWidth(1);
+        frame->setMidLineWidth(0);
+        gridLayout_4 = new QGridLayout(frame);
+        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        label_cc = new QLabel(frame);
+        label_cc->setObjectName(QStringLiteral("label_cc"));
+        label_cc->setMaximumSize(QSize(50, 20));
+
+        gridLayout_4->addWidget(label_cc, 3, 0, 1, 1);
+
+        label_fileName = new QLabel(frame);
+        label_fileName->setObjectName(QStringLiteral("label_fileName"));
+        label_fileName->setMaximumSize(QSize(16777215, 16777215));
+        label_fileName->setWordWrap(true);
+
+        gridLayout_4->addWidget(label_fileName, 1, 1, 1, 1);
+
+        label_ss = new QLabel(frame);
+        label_ss->setObjectName(QStringLiteral("label_ss"));
+        label_ss->setMaximumSize(QSize(50, 20));
+
+        gridLayout_4->addWidget(label_ss, 2, 0, 1, 1);
+
+        label_fn = new QLabel(frame);
+        label_fn->setObjectName(QStringLiteral("label_fn"));
+        label_fn->setMaximumSize(QSize(50, 20));
+
+        gridLayout_4->addWidget(label_fn, 1, 0, 1, 1);
+
+        label_createdName = new QLabel(frame);
+        label_createdName->setObjectName(QStringLiteral("label_createdName"));
+        label_createdName->setMaximumSize(QSize(16777215, 16777215));
+        label_createdName->setWordWrap(true);
+
+        gridLayout_4->addWidget(label_createdName, 3, 1, 1, 1);
+
+        label_sizeName = new QLabel(frame);
+        label_sizeName->setObjectName(QStringLiteral("label_sizeName"));
+        label_sizeName->setMaximumSize(QSize(16777215, 16777215));
+        label_sizeName->setWordWrap(true);
+
+        gridLayout_4->addWidget(label_sizeName, 2, 1, 1, 1);
+
+        gridLayout_5 = new QGridLayout();
+        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        widget_pictureFrame = new QLabel(frame);
+        widget_pictureFrame->setObjectName(QStringLiteral("widget_pictureFrame"));
+        widget_pictureFrame->setMaximumSize(QSize(180, 180));
+
+        gridLayout_5->addWidget(widget_pictureFrame, 0, 0, 1, 1);
+
+
+        gridLayout_4->addLayout(gridLayout_5, 0, 0, 1, 2);
+
+
+        gridLayout_3->addWidget(frame, 0, 0, 1, 1);
+
+
+        horizontalLayout->addLayout(gridLayout_3);
 
 
         retranslateUi(AssetManagerUi);
@@ -162,10 +253,17 @@ public:
         AssetManagerUi->setWindowTitle(QApplication::translate("AssetManagerUi", "Form", 0));
         pushButton_expandall->setText(QApplication::translate("AssetManagerUi", "Expand all", 0));
         pushButton_collapseall->setText(QApplication::translate("AssetManagerUi", "Collapse all", 0));
-        pushButton_back->setText(QApplication::translate("AssetManagerUi", "<", 0));
         lineEdit_assetSearch->setPlaceholderText(QApplication::translate("AssetManagerUi", "Search assets...", 0));
-        pushButton_forward->setText(QApplication::translate("AssetManagerUi", ">", 0));
+        pushButton_back->setText(QApplication::translate("AssetManagerUi", "<", 0));
         label->setText(QApplication::translate("AssetManagerUi", "Icon size:", 0));
+        pushButton_forward->setText(QApplication::translate("AssetManagerUi", ">", 0));
+        label_cc->setText(QApplication::translate("AssetManagerUi", "Created:", 0));
+        label_fileName->setText(QString());
+        label_ss->setText(QApplication::translate("AssetManagerUi", "Size:", 0));
+        label_fn->setText(QApplication::translate("AssetManagerUi", "Name:", 0));
+        label_createdName->setText(QString());
+        label_sizeName->setText(QString());
+        widget_pictureFrame->setText(QString());
     } // retranslateUi
 
 };

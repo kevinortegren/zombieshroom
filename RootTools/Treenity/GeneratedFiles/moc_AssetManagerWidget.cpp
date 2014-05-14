@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_AssetManagerWidget_t {
-    QByteArrayData data[14];
-    char stringdata[180];
+    QByteArrayData data[15];
+    char stringdata[192];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,18 +35,19 @@ QT_MOC_LITERAL(2, 37, 0),
 QT_MOC_LITERAL(3, 38, 5),
 QT_MOC_LITERAL(4, 44, 14),
 QT_MOC_LITERAL(5, 59, 12),
-QT_MOC_LITERAL(6, 72, 12),
-QT_MOC_LITERAL(7, 85, 15),
-QT_MOC_LITERAL(8, 101, 15),
-QT_MOC_LITERAL(9, 117, 19),
-QT_MOC_LITERAL(10, 137, 12),
-QT_MOC_LITERAL(11, 150, 6),
-QT_MOC_LITERAL(12, 157, 11),
-QT_MOC_LITERAL(13, 169, 9)
+QT_MOC_LITERAL(6, 72, 11),
+QT_MOC_LITERAL(7, 84, 12),
+QT_MOC_LITERAL(8, 97, 15),
+QT_MOC_LITERAL(9, 113, 15),
+QT_MOC_LITERAL(10, 129, 19),
+QT_MOC_LITERAL(11, 149, 12),
+QT_MOC_LITERAL(12, 162, 6),
+QT_MOC_LITERAL(13, 169, 11),
+QT_MOC_LITERAL(14, 181, 9)
     },
     "AssetManagerWidget\0SearchLineChanged\0"
     "\0p_val\0FolderSelected\0FileSelected\0"
-    "NavigateBack\0NavigateForward\0"
+    "FileClicked\0NavigateBack\0NavigateForward\0"
     "IconSizeChanged\0TreeListContextMenu\0"
     "FolderLoaded\0p_path\0CollapseAll\0"
     "ExpandAll\0"
@@ -59,7 +60,7 @@ static const uint qt_meta_data_AssetManagerWidget[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -67,26 +68,28 @@ static const uint qt_meta_data_AssetManagerWidget[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   64,    2, 0x08,
-       4,    1,   67,    2, 0x08,
-       5,    1,   70,    2, 0x08,
-       6,    0,   73,    2, 0x08,
-       7,    0,   74,    2, 0x08,
-       8,    1,   75,    2, 0x08,
-       9,    1,   78,    2, 0x08,
-      10,    1,   81,    2, 0x08,
-      12,    0,   84,    2, 0x08,
-      13,    0,   85,    2, 0x08,
+       1,    1,   69,    2, 0x08,
+       4,    1,   72,    2, 0x08,
+       5,    1,   75,    2, 0x08,
+       6,    1,   78,    2, 0x08,
+       7,    0,   81,    2, 0x08,
+       8,    0,   82,    2, 0x08,
+       9,    1,   83,    2, 0x08,
+      10,    1,   86,    2, 0x08,
+      11,    1,   89,    2, 0x08,
+      13,    0,   92,    2, 0x08,
+      14,    0,   93,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void, QMetaType::QString,    3,
+    QMetaType::Void, QMetaType::QModelIndex,    3,
     QMetaType::Void, QMetaType::QModelIndex,    3,
     QMetaType::Void, QMetaType::QModelIndex,    3,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void, QMetaType::QPoint,    3,
-    QMetaType::Void, QMetaType::QString,   11,
+    QMetaType::Void, QMetaType::QString,   12,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -101,13 +104,14 @@ void AssetManagerWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, i
         case 0: _t->SearchLineChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 1: _t->FolderSelected((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
         case 2: _t->FileSelected((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
-        case 3: _t->NavigateBack(); break;
-        case 4: _t->NavigateForward(); break;
-        case 5: _t->IconSizeChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->TreeListContextMenu((*reinterpret_cast< const QPoint(*)>(_a[1]))); break;
-        case 7: _t->FolderLoaded((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 8: _t->CollapseAll(); break;
-        case 9: _t->ExpandAll(); break;
+        case 3: _t->FileClicked((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
+        case 4: _t->NavigateBack(); break;
+        case 5: _t->NavigateForward(); break;
+        case 6: _t->IconSizeChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 7: _t->TreeListContextMenu((*reinterpret_cast< const QPoint(*)>(_a[1]))); break;
+        case 8: _t->FolderLoaded((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 9: _t->CollapseAll(); break;
+        case 10: _t->ExpandAll(); break;
         default: ;
         }
     }
@@ -138,13 +142,13 @@ int AssetManagerWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 11;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 11)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 10;
+        _id -= 11;
     }
     return _id;
 }
