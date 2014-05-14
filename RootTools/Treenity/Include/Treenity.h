@@ -18,6 +18,8 @@
 #include <RootTools/Treenity/Include/Components/RenderableView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
 #include <RootTools/Treenity/Include/AssetManagerWidget.h>
+#include <RootTools/Treenity/Include/RotationTool.h>
+
 
 class Treenity : public QMainWindow, public EditorInterface
 {
@@ -31,6 +33,8 @@ public:
 	void SetProjectManager(ProjectManager* p_projectManager);
 	void CreateNewScene();
 	void UpdateWindowTitle();
+
+	void InitializeTools(ECS::World* p_world);
 
 	bool IsRunning();
 	void closeEvent(QCloseEvent *event);
@@ -60,7 +64,11 @@ public:
 	//Called after RootEngine has been loaded from TreenityMain!
 	void Init();
 
+	// Tools.
+	RotationTool m_rotationTool;
+
 private:
+
 	// Component meta-data.
 	std::map<int, QString> m_componentNames;
 

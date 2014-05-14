@@ -50,6 +50,8 @@ void EngineActions::ClearScene()
 
 void EngineActions::AddDefaultEntities()
 {
+	m_treenityMain->GetEditor()->InitializeTools(m_world);
+
 	// Process entities from world import.
     m_treenityMain->ProcessWorldMessages();
  

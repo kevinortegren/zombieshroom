@@ -193,6 +193,12 @@ void Treenity::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& 
 	ui.treeView_entityOutliner->EntityRemovedFromGroup(p_entity, p_group);
 }
 
+void Treenity::InitializeTools(ECS::World* p_world)
+{
+	m_rotationTool.LoadResources(p_world);
+}
+
+//TODO: Rename.
 void Treenity::CreateOpenGLContext()
 {
 	ui.widget_canvas3D->CreateOpenGLContext();
@@ -364,6 +370,9 @@ void Treenity::UpdateOnSelection()
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
+
+		// m_selectedTool.SetSelectedEntity(selectedEntity);
+		m_rotationTool.SetSelectedEntity(selectedEntity);
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);
