@@ -117,7 +117,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	}
 	
 	//Init Treenity QMainWindow and all UIs
-    m_treenityEditor.Init();
+	m_treenityEditor.Init();
 
 	m_treenityEditor.CreateOpenGLContext();
 	m_treenityEditor.SetEngineInterface(&m_engineActions);
@@ -454,7 +454,7 @@ void TreenityMain::Update(float dt)
 		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
 
-		m_transformInterpolationSystem->Process();
+		
 		m_lookAtSystem->Process();
 		
 		m_shadowSystem->Process();
@@ -467,6 +467,8 @@ void TreenityMain::Update(float dt)
 			RaySelect();
 
 		m_cameraSystem->Process();
+
+		m_transformInterpolationSystem->Process();
 		m_renderingSystem->Process();
 
 		RenderSelectedEntity();
@@ -675,173 +677,173 @@ void TreenityMain::RaySelect()
 glm::vec3 TreenityMain::ConstructRay()
 {
  
-    // Get mouse pos relative to window
-    glm::ivec2 position;
-    SDL_GetMouseState(&position.x, &position.y);
+	// Get mouse pos relative to window
+	glm::ivec2 position;
+	SDL_GetMouseState(&position.x, &position.y);
  
-    // Calculate NDC coords
-    float x = (2.0f * position.x) / (float)g_engineContext.m_renderer->GetWidth() - 1.0f;
-    float y = (2.0f * -position.y) / (float)g_engineContext.m_renderer->GetHeight() + 1.0f;
+	// Calculate NDC coords
+	float x = (2.0f * position.x) / (float)g_engineContext.m_renderer->GetWidth() - 1.0f;
+	float y = (2.0f * -position.y) / (float)g_engineContext.m_renderer->GetHeight() + 1.0f;
  
-    glm::mat4 inverseProjection = glm::inverse(g_engineContext.m_renderer->GetProjectionMatrix());
-    glm::mat4 inverseView = glm::inverse(g_engineContext.m_renderer->GetViewMatrix());
+	glm::mat4 inverseProjection = glm::inverse(g_engineContext.m_renderer->GetProjectionMatrix());
+	glm::mat4 inverseView = glm::inverse(g_engineContext.m_renderer->GetViewMatrix());
  
-    // View space coords
-    glm::vec4 rayView = inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
-    rayView.z = -1.0f;
-    rayView.w = 0.0f;
+	// View space coords
+	glm::vec4 rayView = inverseProjection * glm::vec4(x, y, -1.0f, 1.0f);
+	rayView.z = -1.0f;
+	rayView.w = 0.0f;
  
-    // World space coords
-    glm::vec4 rW = inverseView * rayView;
+	// World space coords
+	glm::vec4 rW = inverseView * rayView;
  
 	//return normalized world space ray(Fixed return of local reference variable)
-    return glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
+	return glm::normalize(glm::vec3(rW.x, rW.y, rW.z));
 }
 
 bool TreenityMain::RayVsSphere(const glm::vec3& cameraPos, const glm::vec3& ray, const glm::vec3& center, float radius, float& t)
 {
-    glm::vec3 entityPos = center;
-    glm::vec3 direction = entityPos - cameraPos;
-    
-    float radiusSq = radius*radius;
+	glm::vec3 entityPos = center;
+	glm::vec3 direction = entityPos - cameraPos;
+	
+	float radiusSq = radius*radius;
  
-    float tca = glm::dot(direction, ray);
-    if(tca < 0)
-    {
-        return false;
-    }
-    float d2 = glm::dot(direction, direction) - tca * tca;
-    if(d2 > radiusSq)
-    {
-        return false;
-    }
-    float thc = glm::sqrt(radiusSq - d2);
-    float t0 = tca - thc;
+	float tca = glm::dot(direction, ray);
+	if(tca < 0)
+	{
+		return false;
+	}
+	float d2 = glm::dot(direction, direction) - tca * tca;
+	if(d2 > radiusSq)
+	{
+		return false;
+	}
+	float thc = glm::sqrt(radiusSq - d2);
+	float t0 = tca - thc;
  
-    t = t0;
+	t = t0;
  
-    return true;
+	return true;
 }
 
 bool TreenityMain::RayVsOBB(const glm::vec3& cameraPos, const glm::vec3& ray, RootEngine::OBB* obb, const glm::mat4x4& transform, float& t)
 {
-    float tMin = -99999.9f;
-    float tMax = 99999.9f;
+	float tMin = -99999.9f;
+	float tMax = 99999.9f;
  
-    // OBB Positions.
-    glm::vec4 positions[8];
-    positions[0] = transform * glm::vec4(obb->m_minX, obb->m_minY, obb->m_minZ, 1.0f);
-    positions[1] = transform * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_minZ, 1.0f);
-    positions[2] = transform * glm::vec4(obb->m_minX, obb->m_minY, obb->m_maxZ, 1.0f);
-    positions[3] = transform * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_maxZ, 1.0f);
-    positions[4] = transform * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_minZ, 1.0f);
-    positions[5] = transform * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_minZ, 1.0f);
-    positions[6] = transform * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_maxZ, 1.0f);
-    positions[7] = transform * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_maxZ, 1.0f);
+	// OBB Positions.
+	glm::vec4 positions[8];
+	positions[0] = transform * glm::vec4(obb->m_minX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[1] = transform * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[2] = transform * glm::vec4(obb->m_minX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[3] = transform * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[4] = transform * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[5] = transform * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[6] = transform * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_maxZ, 1.0f);
+	positions[7] = transform * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_maxZ, 1.0f);
  
-    glm::vec4 normalX = positions[1] - positions[0];
-    glm::vec4 normalY = positions[4] - positions[0];
-    glm::vec4 normalZ = positions[2] - positions[0];
+	glm::vec4 normalX = positions[1] - positions[0];
+	glm::vec4 normalY = positions[4] - positions[0];
+	glm::vec4 normalZ = positions[2] - positions[0];
  
-    glm::vec4 center = positions[0] + (normalX / 2) + (normalY / 2) + (normalZ / 2); 
+	glm::vec4 center = positions[0] + (normalX / 2) + (normalY / 2) + (normalZ / 2); 
  
-    glm::vec3 normals[3];
-    normals[0] = glm::normalize(glm::vec3(normalX.x, normalX.y, normalX.z));
-    normals[1] = glm::normalize(glm::vec3(normalY.x, normalY.y, normalY.z));
-    normals[2] = glm::normalize(glm::vec3(normalZ.x, normalZ.y, normalZ.z));
+	glm::vec3 normals[3];
+	normals[0] = glm::normalize(glm::vec3(normalX.x, normalX.y, normalX.z));
+	normals[1] = glm::normalize(glm::vec3(normalY.x, normalY.y, normalY.z));
+	normals[2] = glm::normalize(glm::vec3(normalZ.x, normalZ.y, normalZ.z));
  
-    float distances[3];
-    distances[0] = glm::length(normalX) / 2;
-    distances[1] = glm::length(normalY) / 2;
-    distances[2] = glm::length(normalZ) / 2;
+	float distances[3];
+	distances[0] = glm::length(normalX) / 2;
+	distances[1] = glm::length(normalY) / 2;
+	distances[2] = glm::length(normalZ) / 2;
  
-    glm::vec3 direction = glm::vec3(center.x, center.y, center.z) - cameraPos;
+	glm::vec3 direction = glm::vec3(center.x, center.y, center.z) - cameraPos;
  
-    for(int i=0; i<3; i++)
-    {
-        float e = glm::dot(normals[i], direction);
-        float f = glm::dot(normals[i], ray);
+	for(int i=0; i<3; i++)
+	{
+		float e = glm::dot(normals[i], direction);
+		float f = glm::dot(normals[i], ray);
  
-        if(abs(f) > 0.000001f)
-        {
-            float t1 = (e + distances[i]) / f;
-            float t2 = (e - distances[i]) / f;
+		if(abs(f) > 0.000001f)
+		{
+			float t1 = (e + distances[i]) / f;
+			float t2 = (e - distances[i]) / f;
  
-            if(t1>t2)
-            {
-                float temp = t1;
-                t1 = t2;
-                t2 = temp;
-            }
+			if(t1>t2)
+			{
+				float temp = t1;
+				t1 = t2;
+				t2 = temp;
+			}
  
-            if(t1 > tMin) tMin = t1;
-            if(t2 < tMax) tMax = t2;
+			if(t1 > tMin) tMin = t1;
+			if(t2 < tMax) tMax = t2;
  
-            if(tMin > tMax) return false;
-            if(tMax < 0) return false;
-        }
+			if(tMin > tMax) return false;
+			if(tMax < 0) return false;
+		}
  
-        else if(-e-distances[i] > 0 || -e+distances[i] < 0) return false;     
-    }
+		else if(-e-distances[i] > 0 || -e+distances[i] < 0) return false;     
+	}
  
-    if(tMin > 0) 
+	if(tMin > 0) 
  
-    {
-        t = tMin;
-        return true;
-    }
-    else
-    {
-        t = tMax;
-        return true;
-    }
+	{
+		t = tMin;
+		return true;
+	}
+	else
+	{
+		t = tMax;
+		return true;
+	}
  
-    return false;
+	return false;
 }
  
 bool TreenityMain::RayVsTriangle(const glm::vec3& cameraPos, const glm::vec3& ray, const RootEngine::Model* model, const glm::mat4x4& transform, float& t)
 {
 	if(model->m_faceIndexCount == 2)
-        return false;
+		return false;
 
-    std::cout << model->m_indices.size() << std::endl;
-    std::cout << model->m_positions.size() << std::endl;
+	std::cout << model->m_indices.size() << std::endl;
+	std::cout << model->m_positions.size() << std::endl;
  
-    glm::mat4x4 inverseWorld = glm::inverse(transform);
+	glm::mat4x4 inverseWorld = glm::inverse(transform);
  
-    glm::vec4 rayLocal = inverseWorld * glm::vec4(ray.x, ray.y, ray.z, 0.0f);
-    glm::vec4 cameraLocal = inverseWorld * glm::vec4(cameraPos.x, cameraPos.y, cameraPos.z, 1.0f);
+	glm::vec4 rayLocal = inverseWorld * glm::vec4(ray.x, ray.y, ray.z, 0.0f);
+	glm::vec4 cameraLocal = inverseWorld * glm::vec4(cameraPos.x, cameraPos.y, cameraPos.z, 1.0f);
  
-    for(size_t i = 0; i < model->m_indices.size(); i += 3)
-    {
-        glm::vec3 result;
+	for(size_t i = 0; i < model->m_indices.size(); i += 3)
+	{
+		glm::vec3 result;
  
-        glm::vec3 A = model->m_positions[model->m_indices[i]];
-        glm::vec3 B = model->m_positions[model->m_indices[i+1]];
-        glm::vec3 C = model->m_positions[model->m_indices[i+2]];
+		glm::vec3 A = model->m_positions[model->m_indices[i]];
+		glm::vec3 B = model->m_positions[model->m_indices[i+1]];
+		glm::vec3 C = model->m_positions[model->m_indices[i+2]];
  
-        glm::vec3 e1 = B - A;
-        glm::vec3 e2 = C - A;
+		glm::vec3 e1 = B - A;
+		glm::vec3 e2 = C - A;
  
-        glm::vec3 q = glm::cross(glm::vec3(rayLocal.x, rayLocal.y, rayLocal.z), e2);
-        float a = glm::dot(e1, q);
-        float f = 1.0f / a;
+		glm::vec3 q = glm::cross(glm::vec3(rayLocal.x, rayLocal.y, rayLocal.z), e2);
+		float a = glm::dot(e1, q);
+		float f = 1.0f / a;
  
-        glm::vec3 s = glm::vec3(cameraLocal.x, cameraLocal.y, cameraLocal.z) - A;
-        result.x = f * glm::dot(s, q);
+		glm::vec3 s = glm::vec3(cameraLocal.x, cameraLocal.y, cameraLocal.z) - A;
+		result.x = f * glm::dot(s, q);
  
-        glm::vec3 j = glm::cross(s, e1);
-        result.y = f * glm::dot(glm::vec3(rayLocal.x, rayLocal.y, rayLocal.z), j);
-        result.z = f * glm::dot(e2, j);
+		glm::vec3 j = glm::cross(s, e1);
+		result.y = f * glm::dot(glm::vec3(rayLocal.x, rayLocal.y, rayLocal.z), j);
+		result.z = f * glm::dot(e2, j);
  
-        if(result.x > 0 && result.x < 1.0f && result.y > 0 && result.y < 1.0f && (result.x + result.y) > 0 && (result.x + result.y) < 1.0f)
-        {
-            t = result.z;
-            return true;
-        }
-    }
+		if(result.x > 0 && result.x < 1.0f && result.y > 0 && result.y < 1.0f && (result.x + result.y) > 0 && (result.x + result.y) < 1.0f)
+		{
+			t = result.z;
+			return true;
+		}
+	}
  
-    return false;
+	return false;
 }
  
 void TreenityMain::Debug(RootEngine::OBB* obb, const glm::mat4x4& p_space, const glm::vec3& p_color)
