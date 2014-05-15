@@ -62,25 +62,29 @@ std::string ECS::EntityExporter::Export(std::map<ECS::Entity*, std::string>* p_e
 	// For each component type.
 	for(unsigned int i = 0; i < m_world->GetEntityManager()->m_components.size(); i++)
 	{
-		out << YAML::BeginMap;
-		out << YAML::Key << "Type" << YAML::Value << i;
-		out << YAML::Key << "Data" << YAML::Value << YAML::BeginSeq;
-		// For each entity using this component.
-		for(unsigned int j = 0; j < m_world->GetEntityManager()->m_components[i].size(); j++)
+		if(m_world->GetEntityManager()->m_components[i].size() > 0)
 		{
-			if(m_world->GetEntityManager()->m_components[i][j] == nullptr)
-				continue;
-
-			if(nonExportIds[j])
-				continue;
-
 			out << YAML::BeginMap;
-			out << YAML::Key << "Entity" << YAML::Value << j;
-			m_exporter(out, m_world->GetEntityManager()->m_components[i][j], i);
+			out << YAML::Key << "Type" << YAML::Value << i;
+			out << YAML::Key << "Data" << YAML::Value << YAML::BeginSeq;
+			// For each entity using this component.
+			for(unsigned int j = 0; j < m_world->GetEntityManager()->m_components[i].size(); j++)
+			{
+				if(m_world->GetEntityManager()->m_components[i][j] == nullptr)
+					continue;
+
+				if(nonExportIds[j])
+					continue;
+
+				out << YAML::BeginMap;
+				out << YAML::Key << "Entity" << YAML::Value << j;
+				m_exporter(out, m_world->GetEntityManager()->m_components[i][j], i);
+				out << YAML::EndMap;
+			}
+			out << YAML::EndSeq;
 			out << YAML::EndMap;
 		}
-		out << YAML::EndSeq;
-		out << YAML::EndMap;
+		
 	}
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
