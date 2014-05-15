@@ -76,9 +76,9 @@ void RotationTool::Update()
 
 	glm::vec3 dir = -glm::normalize(cameraPos - selectedTransform->m_position);
 
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_position = cameraPos + 10.0f * dir;
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_position = cameraPos + 10.0f * dir;
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_position = cameraPos + 10.0f * dir;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_position = cameraPos + 8.0f * dir;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_position = cameraPos + 8.0f * dir;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_position = cameraPos + 8.0f * dir;
 }
 
 float RotationTool::GetAngleFromAxis(RotationAxis::RotationAxis axis, const glm::vec3& position)
@@ -160,9 +160,9 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	glm::vec3 normalZ = m_gimbalOrientation.GetFront();
 
 	// Debug render plane normals.
-	g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalX, glm::vec4(1,0,0,1));
-	g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalY, glm::vec4(0,1,0,1));
-	g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalZ, glm::vec4(0,0,1,1));
+	//g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalX, glm::vec4(1,0,0,1));
+	//g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalY, glm::vec4(0,1,0,1));
+	//g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalZ, glm::vec4(0,0,1,1));
 
 	float bestDist = 999999.0f;
 	RotationAxis::RotationAxis axis = RotationAxis::AXIS_NONE;
@@ -216,7 +216,7 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 		}
 	}
 
-	if(leftMouseButtonState == KeyState::DOWN_EDGE)
+	if(leftMouseButtonState == KeyState::DOWN_EDGE && axis != RotationAxis::AXIS_NONE)
 	{
 		if(distx < (1.0f + s_pickMargin) && distx > (1.0f - s_pickMargin))
 		{
@@ -312,4 +312,9 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 void RotationTool::SetSelectedEntity(ECS::Entity* p_entity)
 {
 	m_selectedEntity = p_entity;
+
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+
 }

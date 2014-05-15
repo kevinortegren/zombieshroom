@@ -450,7 +450,7 @@ void TreenityMain::Update(float dt)
 		m_scriptSystem->Process();
 
 		m_transformInterpolationSystem->Process();
-		m_lookAtSystem->Process();
+		//m_lookAtSystem->Process();
 		
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
@@ -557,7 +557,7 @@ void TreenityMain::RenderSelectedEntity()
 
 		g_engineContext.m_renderer->AddRenderJob(job);
 		
-		Debug(&renderable->m_model->m_obb, m_renderingSystem->m_matrices[entity].m_model, glm::vec3(0,1,0));
+		//Debug(&renderable->m_model->m_obb, m_renderingSystem->m_matrices[entity].m_model, glm::vec3(0,1,0));
 
 	}
 }
