@@ -45,7 +45,7 @@ public:
     {
         if (Transform->objectName().isEmpty())
             Transform->setObjectName(QStringLiteral("Transform"));
-        Transform->resize(227, 146);
+        Transform->resize(357, 146);
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -81,13 +81,13 @@ public:
 
         doubleSpinBox_translationX = new QDoubleSpinBox(Transform);
         doubleSpinBox_translationX->setObjectName(QStringLiteral("doubleSpinBox_translationX"));
-        QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(doubleSpinBox_translationX->sizePolicy().hasHeightForWidth());
         doubleSpinBox_translationX->setSizePolicy(sizePolicy1);
         doubleSpinBox_translationX->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_translationX->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_translationX->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_translationX->setMinimum(-1000);
         doubleSpinBox_translationX->setMaximum(1000);
 
@@ -95,8 +95,10 @@ public:
 
         doubleSpinBox_translationY = new QDoubleSpinBox(Transform);
         doubleSpinBox_translationY->setObjectName(QStringLiteral("doubleSpinBox_translationY"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_translationY->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_translationY->setSizePolicy(sizePolicy1);
         doubleSpinBox_translationY->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_translationY->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_translationY->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_translationY->setMinimum(-1000);
         doubleSpinBox_translationY->setMaximum(1000);
 
@@ -104,13 +106,16 @@ public:
 
         label = new QLabel(Transform);
         label->setObjectName(QStringLiteral("label"));
+        label->setMaximumSize(QSize(50, 16777215));
 
         gridLayout->addWidget(label, 1, 0, 1, 1);
 
         doubleSpinBox_orientationZ = new QDoubleSpinBox(Transform);
         doubleSpinBox_orientationZ->setObjectName(QStringLiteral("doubleSpinBox_orientationZ"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_orientationZ->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_orientationZ->setSizePolicy(sizePolicy1);
         doubleSpinBox_orientationZ->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_orientationZ->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_orientationZ->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_orientationZ->setMinimum(-360);
         doubleSpinBox_orientationZ->setMaximum(360);
 
@@ -118,8 +123,10 @@ public:
 
         doubleSpinBox_translationZ = new QDoubleSpinBox(Transform);
         doubleSpinBox_translationZ->setObjectName(QStringLiteral("doubleSpinBox_translationZ"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_translationZ->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_translationZ->setSizePolicy(sizePolicy1);
         doubleSpinBox_translationZ->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_translationZ->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_translationZ->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_translationZ->setMinimum(-1000);
         doubleSpinBox_translationZ->setMaximum(1000);
 
@@ -132,8 +139,10 @@ public:
 
         doubleSpinBox_scaleY = new QDoubleSpinBox(Transform);
         doubleSpinBox_scaleY->setObjectName(QStringLiteral("doubleSpinBox_scaleY"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_scaleY->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_scaleY->setSizePolicy(sizePolicy1);
         doubleSpinBox_scaleY->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_scaleY->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_scaleY->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_scaleY->setMinimum(-10000);
         doubleSpinBox_scaleY->setMaximum(10000);
         doubleSpinBox_scaleY->setValue(1);
@@ -142,8 +151,10 @@ public:
 
         doubleSpinBox_orientationX = new QDoubleSpinBox(Transform);
         doubleSpinBox_orientationX->setObjectName(QStringLiteral("doubleSpinBox_orientationX"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_orientationX->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_orientationX->setSizePolicy(sizePolicy1);
         doubleSpinBox_orientationX->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_orientationX->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_orientationX->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_orientationX->setMinimum(-360);
         doubleSpinBox_orientationX->setMaximum(360);
 
@@ -151,8 +162,10 @@ public:
 
         doubleSpinBox_scaleX = new QDoubleSpinBox(Transform);
         doubleSpinBox_scaleX->setObjectName(QStringLiteral("doubleSpinBox_scaleX"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_scaleX->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_scaleX->setSizePolicy(sizePolicy1);
         doubleSpinBox_scaleX->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_scaleX->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_scaleX->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_scaleX->setMinimum(-10000);
         doubleSpinBox_scaleX->setMaximum(10000);
         doubleSpinBox_scaleX->setValue(1);
@@ -161,8 +174,10 @@ public:
 
         doubleSpinBox_scaleZ = new QDoubleSpinBox(Transform);
         doubleSpinBox_scaleZ->setObjectName(QStringLiteral("doubleSpinBox_scaleZ"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_scaleZ->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_scaleZ->setSizePolicy(sizePolicy1);
         doubleSpinBox_scaleZ->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_scaleZ->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_scaleZ->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_scaleZ->setMinimum(-10000);
         doubleSpinBox_scaleZ->setMaximum(10000);
         doubleSpinBox_scaleZ->setValue(1);
@@ -171,8 +186,10 @@ public:
 
         doubleSpinBox_orientationY = new QDoubleSpinBox(Transform);
         doubleSpinBox_orientationY->setObjectName(QStringLiteral("doubleSpinBox_orientationY"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_orientationY->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_orientationY->setSizePolicy(sizePolicy1);
         doubleSpinBox_orientationY->setMinimumSize(QSize(20, 0));
-        doubleSpinBox_orientationY->setMaximumSize(QSize(50, 16777215));
+        doubleSpinBox_orientationY->setMaximumSize(QSize(16777215, 16777215));
         doubleSpinBox_orientationY->setMinimum(-360);
         doubleSpinBox_orientationY->setMaximum(360);
 

@@ -72,7 +72,6 @@ private:
 
 	void Debug(RootEngine::OBB* obb, const glm::mat4x4& p_space, const glm::vec3& p_color);
 
-	bool RayVsPlane(const glm::vec3& center, const glm::vec3& normal, const glm::vec3& cameraPos, const glm::vec3& ray, float& t);
 
 	void* m_engineModule;
 
@@ -123,19 +122,4 @@ private:
 
 	Render::Material* m_selectedEntityMaterial;
 	std::set<ECS::Entity*> m_pickedEntities;
-
-	ECS::Entity* m_circleEntity0;
-	ECS::Entity* m_circleEntity1;
-	ECS::Entity* m_circleEntity2;
-	Render::Material* m_circleMaterial;
-
-	glm::vec4 m_testColor0;
-	glm::vec4 m_testColor1;
-	glm::vec4 m_testColor2;
-
-	int selectedAxis;
-
-	float angle0;
-
-	RootForce::Orientation m_o0;
 };
