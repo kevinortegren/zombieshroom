@@ -50,6 +50,7 @@ public:
     QAction *action_addPhysics;
     QAction *actionNew;
     QAction *actionOpen_Project;
+    QAction *action_addWaterCollider;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     Canvas3D *widget_canvas3D;
@@ -137,6 +138,8 @@ public:
         actionNew->setObjectName(QStringLiteral("actionNew"));
         actionOpen_Project = new QAction(TreenityClass);
         actionOpen_Project->setObjectName(QStringLiteral("actionOpen_Project"));
+        action_addWaterCollider = new QAction(TreenityClass);
+        action_addWaterCollider->setObjectName(QStringLiteral("action_addWaterCollider"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -329,6 +332,7 @@ public:
         menuComponent->addAction(menu_addComponent->menuAction());
         menu_addComponent->addAction(action_addRenderable);
         menu_addComponent->addAction(action_addPhysics);
+        menu_addComponent->addAction(action_addWaterCollider);
         menuView->addAction(actionLog);
         mainToolBar->addAction(actionPlay);
 
@@ -373,6 +377,7 @@ public:
 #endif // QT_NO_TOOLTIP
         actionNew->setText(QApplication::translate("TreenityClass", "New", 0));
         actionOpen_Project->setText(QApplication::translate("TreenityClass", "Open Project...", 0));
+        action_addWaterCollider->setText(QApplication::translate("TreenityClass", "Water Collider", 0));
         pushButton_translateMode->setText(QString());
         pushButton_rotateMode->setText(QString());
         pushButton_scaleMode->setText(QString());

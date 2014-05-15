@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
 
 	QApplication a(argc, argv);
 	
+	//QCoreApplication::addLibraryPath("C:\\Qt86\\Qt5.2.1\\5.2.1\\msvc2012\\plugins");
+
 	a.setStyle(QStyleFactory::create("Fusion"));
 
 	QPalette darkPalette;
@@ -228,6 +230,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_cameraSystem = new RootForce::CameraSystem(&m_world, &g_engineContext);
 	m_world.GetSystemManager()->AddSystem<RootForce::CameraSystem>(m_cameraSystem);
+	m_cameraSystem->LockToWater(false); //Don't lock the camera to the water surface
 
 	m_lookAtSystem = new RootForce::LookAtSystem(g_world, &g_engineContext);
 	g_world->GetSystemManager()->AddSystem<RootForce::LookAtSystem>(m_lookAtSystem);
@@ -445,12 +448,14 @@ void TreenityMain::Update(float dt)
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
 
+		//Update water
+		m_waterSystem->Process();
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
 
 		m_transformInterpolationSystem->Process();
-		//m_lookAtSystem->Process();
+		m_lookAtSystem->Process();
 		
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
@@ -480,6 +485,8 @@ void TreenityMain::Update(float dt)
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
 
+		//Update water
+		m_waterSystem->Process();
 
 		// Update on player controls.
 		m_playerControlSystem->Process();
@@ -604,10 +611,11 @@ void TreenityMain::RaySelect()
 				if(m_world.GetTagManager()->GetEntityByTag("AimingDevice") == (*itr))
 					continue;
 
-				glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
+				if(m_world.GetTagManager()->GetEntityByTag("Water") == (*itr))
+					continue;
 
 				glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
-
+				glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
 				RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));
 				if(renderable != nullptr)
 				{

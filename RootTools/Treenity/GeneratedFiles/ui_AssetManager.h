@@ -41,21 +41,23 @@ public:
     QLineEdit *lineEdit_assetSearch;
     QPushButton *pushButton_back;
     QLabel *label;
-    QListView *listView_fileBrowser;
     QPushButton *pushButton_forward;
     QSlider *horizontalSlider_icon;
+    QListView *listView_fileBrowser;
     QGridLayout *gridLayout_3;
     QSpacerItem *verticalSpacer;
     QFrame *frame;
     QGridLayout *gridLayout_4;
-    QLabel *label_cc;
-    QLabel *label_fileName;
     QLabel *label_ss;
     QLabel *label_fn;
-    QLabel *label_createdName;
-    QLabel *label_sizeName;
     QGridLayout *gridLayout_5;
     QLabel *widget_pictureFrame;
+    QLabel *label_createdName;
+    QLabel *label_fileName;
+    QLabel *label_sizeName;
+    QLabel *label_cc;
+    QLabel *label_res;
+    QLabel *label_fileResolution;
 
     void setupUi(QWidget *AssetManagerUi)
     {
@@ -127,20 +129,6 @@ public:
 
         gridLayout->addWidget(label, 2, 0, 1, 2);
 
-        listView_fileBrowser = new QListView(AssetManagerUi);
-        listView_fileBrowser->setObjectName(QStringLiteral("listView_fileBrowser"));
-        listView_fileBrowser->setDragDropMode(QAbstractItemView::NoDragDrop);
-        listView_fileBrowser->setIconSize(QSize(50, 50));
-        listView_fileBrowser->setTextElideMode(Qt::ElideRight);
-        listView_fileBrowser->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-        listView_fileBrowser->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-        listView_fileBrowser->setMovement(QListView::Static);
-        listView_fileBrowser->setGridSize(QSize(80, 80));
-        listView_fileBrowser->setViewMode(QListView::IconMode);
-        listView_fileBrowser->setWordWrap(true);
-
-        gridLayout->addWidget(listView_fileBrowser, 1, 0, 1, 3);
-
         pushButton_forward = new QPushButton(AssetManagerUi);
         pushButton_forward->setObjectName(QStringLiteral("pushButton_forward"));
         pushButton_forward->setMinimumSize(QSize(25, 25));
@@ -161,6 +149,20 @@ public:
         horizontalSlider_icon->setTickPosition(QSlider::NoTicks);
 
         gridLayout->addWidget(horizontalSlider_icon, 2, 2, 1, 1);
+
+        listView_fileBrowser = new QListView(AssetManagerUi);
+        listView_fileBrowser->setObjectName(QStringLiteral("listView_fileBrowser"));
+        listView_fileBrowser->setDragDropMode(QAbstractItemView::NoDragDrop);
+        listView_fileBrowser->setIconSize(QSize(50, 50));
+        listView_fileBrowser->setTextElideMode(Qt::ElideRight);
+        listView_fileBrowser->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        listView_fileBrowser->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+        listView_fileBrowser->setMovement(QListView::Static);
+        listView_fileBrowser->setGridSize(QSize(80, 80));
+        listView_fileBrowser->setViewMode(QListView::IconMode);
+        listView_fileBrowser->setWordWrap(true);
+
+        gridLayout->addWidget(listView_fileBrowser, 1, 0, 1, 3);
 
 
         horizontalLayout->addLayout(gridLayout);
@@ -186,44 +188,17 @@ public:
         frame->setMidLineWidth(0);
         gridLayout_4 = new QGridLayout(frame);
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
-        label_cc = new QLabel(frame);
-        label_cc->setObjectName(QStringLiteral("label_cc"));
-        label_cc->setMaximumSize(QSize(50, 20));
-
-        gridLayout_4->addWidget(label_cc, 3, 0, 1, 1);
-
-        label_fileName = new QLabel(frame);
-        label_fileName->setObjectName(QStringLiteral("label_fileName"));
-        label_fileName->setMaximumSize(QSize(16777215, 16777215));
-        label_fileName->setWordWrap(true);
-
-        gridLayout_4->addWidget(label_fileName, 1, 1, 1, 1);
-
         label_ss = new QLabel(frame);
         label_ss->setObjectName(QStringLiteral("label_ss"));
-        label_ss->setMaximumSize(QSize(50, 20));
+        label_ss->setMaximumSize(QSize(55, 20));
 
         gridLayout_4->addWidget(label_ss, 2, 0, 1, 1);
 
         label_fn = new QLabel(frame);
         label_fn->setObjectName(QStringLiteral("label_fn"));
-        label_fn->setMaximumSize(QSize(50, 20));
+        label_fn->setMaximumSize(QSize(55, 20));
 
         gridLayout_4->addWidget(label_fn, 1, 0, 1, 1);
-
-        label_createdName = new QLabel(frame);
-        label_createdName->setObjectName(QStringLiteral("label_createdName"));
-        label_createdName->setMaximumSize(QSize(16777215, 16777215));
-        label_createdName->setWordWrap(true);
-
-        gridLayout_4->addWidget(label_createdName, 3, 1, 1, 1);
-
-        label_sizeName = new QLabel(frame);
-        label_sizeName->setObjectName(QStringLiteral("label_sizeName"));
-        label_sizeName->setMaximumSize(QSize(16777215, 16777215));
-        label_sizeName->setWordWrap(true);
-
-        gridLayout_4->addWidget(label_sizeName, 2, 1, 1, 1);
 
         gridLayout_5 = new QGridLayout();
         gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
@@ -234,7 +209,45 @@ public:
         gridLayout_5->addWidget(widget_pictureFrame, 0, 0, 1, 1);
 
 
-        gridLayout_4->addLayout(gridLayout_5, 0, 0, 1, 2);
+        gridLayout_4->addLayout(gridLayout_5, 0, 0, 1, 3);
+
+        label_createdName = new QLabel(frame);
+        label_createdName->setObjectName(QStringLiteral("label_createdName"));
+        label_createdName->setMaximumSize(QSize(16777215, 16777215));
+        label_createdName->setWordWrap(true);
+
+        gridLayout_4->addWidget(label_createdName, 5, 1, 1, 2);
+
+        label_fileName = new QLabel(frame);
+        label_fileName->setObjectName(QStringLiteral("label_fileName"));
+        label_fileName->setMaximumSize(QSize(16777215, 16777215));
+        label_fileName->setWordWrap(true);
+
+        gridLayout_4->addWidget(label_fileName, 1, 1, 1, 2);
+
+        label_sizeName = new QLabel(frame);
+        label_sizeName->setObjectName(QStringLiteral("label_sizeName"));
+        label_sizeName->setMaximumSize(QSize(16777215, 16777215));
+        label_sizeName->setWordWrap(true);
+
+        gridLayout_4->addWidget(label_sizeName, 2, 1, 1, 2);
+
+        label_cc = new QLabel(frame);
+        label_cc->setObjectName(QStringLiteral("label_cc"));
+        label_cc->setMaximumSize(QSize(55, 20));
+
+        gridLayout_4->addWidget(label_cc, 5, 0, 1, 1);
+
+        label_res = new QLabel(frame);
+        label_res->setObjectName(QStringLiteral("label_res"));
+        label_res->setMaximumSize(QSize(55, 20));
+
+        gridLayout_4->addWidget(label_res, 6, 0, 1, 1);
+
+        label_fileResolution = new QLabel(frame);
+        label_fileResolution->setObjectName(QStringLiteral("label_fileResolution"));
+
+        gridLayout_4->addWidget(label_fileResolution, 6, 1, 1, 2);
 
 
         gridLayout_3->addWidget(frame, 0, 0, 1, 1);
@@ -257,13 +270,15 @@ public:
         pushButton_back->setText(QApplication::translate("AssetManagerUi", "<", 0));
         label->setText(QApplication::translate("AssetManagerUi", "Icon size:", 0));
         pushButton_forward->setText(QApplication::translate("AssetManagerUi", ">", 0));
-        label_cc->setText(QApplication::translate("AssetManagerUi", "Created:", 0));
-        label_fileName->setText(QString());
         label_ss->setText(QApplication::translate("AssetManagerUi", "Size:", 0));
         label_fn->setText(QApplication::translate("AssetManagerUi", "Name:", 0));
-        label_createdName->setText(QString());
-        label_sizeName->setText(QString());
         widget_pictureFrame->setText(QString());
+        label_createdName->setText(QString());
+        label_fileName->setText(QString());
+        label_sizeName->setText(QString());
+        label_cc->setText(QApplication::translate("AssetManagerUi", "Created:", 0));
+        label_res->setText(QApplication::translate("AssetManagerUi", "Resolution:", 0));
+        label_fileResolution->setText(QString());
     } // retranslateUi
 
 };

@@ -1,11 +1,13 @@
 #include <RootTools/Treenity/Include/Components/AbstractComponentView.h>
 
 AbstractComponentView::AbstractComponentView(QWidget* p_parent)
-	: QWidget(p_parent)
+	: QFrame(p_parent)
 	, m_engineInterface(nullptr)
 	, m_editorInterface(nullptr)
 {
 	setVisible(false);
+	setFrameStyle(QFrame::StyledPanel);
+	setLineWidth(1);
 }
 
 AbstractComponentView::~AbstractComponentView()

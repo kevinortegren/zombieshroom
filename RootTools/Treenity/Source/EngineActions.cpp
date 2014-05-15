@@ -65,12 +65,14 @@ void EngineActions::AddDefaultEntities()
 	// Add editable entities.
     ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
 	CreateTestSpawnpoint();
+	CreateWater();
 
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
 	
 	m_treenityMain->GetEditor()->RenameEntity(sun, "Sun");
 	m_treenityMain->GetEditor()->RenameEntity(m_testSpawnpoint, "Test Spawnpoint");
+	m_treenityMain->GetEditor()->RenameEntity(m_water, "Water");
 }
 
 // Can only be called after a world has been imported !!
@@ -130,7 +132,7 @@ void EngineActions::CreateFreeFlyingCamera()
 
 	cameraTransform->m_position = glm::vec3(0);
 	camera->m_frustum.m_near = 0.1f;
-	camera->m_frustum.m_far = 1000.0f;
+	camera->m_frustum.m_far = 5000.0f;
 	camera->m_frustum.m_fov = 45.0f;
 
 	m_world->GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
@@ -172,6 +174,16 @@ void EngineActions::CreateTestSpawnpoint()
 	renderable->m_shadowTech = Render::ShadowTechnique::SHADOW_DYNAMIC;
 }
 
+void EngineActions::CreateWater()
+{
+	m_water = m_world->GetTagManager()->GetEntityByTag("Water");
+	if (m_water == nullptr)
+	{
+		m_water = m_treenityMain->GetWaterSystem()->CreateDefaultWater();
+	}
+
+	m_treenityMain->GetWaterSystem()->CreateWater();
+}
 
 // Mode switching
 void EngineActions::EnterPlayMode()
@@ -410,4 +422,44 @@ void EngineActions::AddPhysics( ECS::Entity* p_entity )
 void EngineActions::RemovePhysics( ECS::Entity* p_entity )
 {
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(p_entity);
+}
+
+void EngineActions::AddWaterCollider( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->CreateComponent<RootForce::WaterCollider>(p_entity);
+}
+
+void EngineActions::RemoveWaterCollider( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->RemoveComponent<RootForce::WaterCollider>(p_entity);
+}
+
+int EngineActions::GetWaterColliderRadius(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_radius;
+}
+
+float EngineActions::GetWaterColliderInterval(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbInterval;
+}
+
+float EngineActions::GetWaterColliderPower(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbPower;
+}
+
+void EngineActions::SetWaterColliderRadius(ECS::Entity* p_entity, int p_val )
+{
+	 m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_radius = p_val;
+}
+
+void EngineActions::SetWaterColliderInterval(ECS::Entity* p_entity, float p_val )
+{
+	m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbInterval = p_val;
+}
+
+void EngineActions::SetWaterColliderPower(ECS::Entity* p_entity, float p_val )
+{
+	m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbPower = p_val;
 }

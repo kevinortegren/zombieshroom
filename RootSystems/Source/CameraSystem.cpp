@@ -14,10 +14,16 @@ namespace RootForce
 
 		// 100% script here.
 #ifndef COMPILE_LEVEL_EDITOR
-		if(m_world->GetStorage()->DoesKeyExist("Water"))
+		if(m_lockToWater)
 		{
-			if(transform->m_position.y <= m_world->GetStorage()->GetValueAsFloat("Water") + 5.0f)
-				transform->m_position.y = m_world->GetStorage()->GetValueAsFloat("Water") + 5.0f;
+			ECS::Entity* waterEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+			if(waterEnt)
+			{
+				RootForce::Transform* waterTrans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(waterEnt);
+
+				if(transform->m_position.y <= waterTrans->m_position.y + 5.0f)
+					transform->m_position.y = waterTrans->m_position.y + 5.0f;
+			}
 		}
 #endif
 

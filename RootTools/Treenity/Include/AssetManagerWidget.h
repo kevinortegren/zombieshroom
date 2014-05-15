@@ -7,7 +7,6 @@
 #include <QImage>
 #include <QImageReader>
 #include <RootTools/Treenity/GeneratedFiles/ui_AssetManager.h>
-#include <RootTools/Treenity/Include/DDSHelper/qddshandler.h>
 
 class AssetManagerWidget : public QWidget
 {
@@ -26,9 +25,8 @@ private:
 
 	QStringList m_currentFilter;
 
-	QDDSHandler* m_ddsHandler;
-
 	void SetFolderSpecificFilters(const QString& p_folderName);
+	void LoadImg(const QString p_filepath);
 
 private slots:
 	void SearchLineChanged(const QString& p_val);

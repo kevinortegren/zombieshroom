@@ -49,6 +49,8 @@ namespace RootForce
 		void Disturb(float p_x, float p_z, float p_power, int p_radius );
 		void ParseCommands(std::stringstream* p_data);
 
+		ECS::Entity* CreateDefaultWater();
+
 	private:
 
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
@@ -93,9 +95,8 @@ namespace RootForce
 
 		void ResetWater();
 
-		void UpdateWaterHeight();
-
 		void SaveWater();
 		void LoadWater();
+
 	};
 }

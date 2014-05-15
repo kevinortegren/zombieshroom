@@ -17,6 +17,7 @@ public:
 	void NewScene();
 	void CreateFreeFlyingCamera();
 	void CreateTestSpawnpoint();
+	void CreateWater();
 	
 	void ClearScene();
 	void AddDefaultEntities();
@@ -53,12 +54,22 @@ public:
 	void SetRenderableMaterialName(ECS::Entity* p_entity, std::string p_materialName);
 
 	//Physics
-	virtual void AddPhysics(ECS::Entity* p_entity);
-	virtual void RemovePhysics(ECS::Entity* p_entity);
-	virtual float GetMass(ECS::Entity* p_entity);
-	virtual glm::vec3& GetVelocity(ECS::Entity* p_entity);
-	virtual void SetMass(ECS::Entity* p_entity, float p_mass);
-	virtual void SetVelocity(ECS::Entity* p_entity, glm::vec3& p_velocity);
+	void AddPhysics(ECS::Entity* p_entity);
+	void RemovePhysics(ECS::Entity* p_entity);
+	float GetMass(ECS::Entity* p_entity);
+	glm::vec3& GetVelocity(ECS::Entity* p_entity);
+	void SetMass(ECS::Entity* p_entity, float p_mass);
+	void SetVelocity(ECS::Entity* p_entity, glm::vec3& p_velocity);
+
+	//Water collider
+	void	AddWaterCollider(ECS::Entity* p_entity);
+	void	RemoveWaterCollider(ECS::Entity* p_entity);
+	int		GetWaterColliderRadius(ECS::Entity* p_entity);
+	float	GetWaterColliderInterval(ECS::Entity* p_entity);
+	float	GetWaterColliderPower(ECS::Entity* p_entity);
+	void	SetWaterColliderRadius(ECS::Entity* p_entity, int p_val);
+	void	SetWaterColliderInterval(ECS::Entity* p_entity, float p_val);
+	void	SetWaterColliderPower(ECS::Entity* p_entity, float p_val);
 
 private:
 
@@ -70,4 +81,5 @@ private:
 	ECS::Entity* m_cameraEntity;
 	ECS::Entity* m_aimingDevice;
 	ECS::Entity* m_testSpawnpoint;
+	ECS::Entity* m_water;
 };
