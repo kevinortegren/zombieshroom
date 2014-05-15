@@ -23,6 +23,8 @@ public:
 
 	void LoadResources(ECS::World* p_world);
 
+	void Update();
+
 	bool Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray);
 
 	void SetSelectedEntity(ECS::Entity* p_entity);
@@ -43,7 +45,7 @@ private:
 
 	RotationAxis::RotationAxis m_selectedAxis;
 
-	RootForce::Orientation m_gimbal;
+	RootForce::Orientation m_gimbalOrientation;
 	RootForce::Orientation m_entityOrientation;
 
 	float m_angle0;

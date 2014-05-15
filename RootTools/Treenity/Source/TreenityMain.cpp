@@ -448,22 +448,28 @@ void TreenityMain::Update(float dt)
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
+
 		m_transformInterpolationSystem->Process();
 		m_lookAtSystem->Process();
-		m_cameraSystem->Process();
+		
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
-		m_renderingSystem->Process();
-		
+
+		m_treenityEditor.m_rotationTool.Update();
+
 		if (!g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT))
 			RaySelect();
+
+		m_cameraSystem->Process();
+		m_renderingSystem->Process();
 
 		RenderSelectedEntity();
 
 		g_engineContext.m_renderer->Clear();
 		g_engineContext.m_renderer->Render();
 		g_engineContext.m_renderer->Swap();
+
 	}
 	else if (m_engineActions.GetMode() == EditorMode::GAME)
 	{

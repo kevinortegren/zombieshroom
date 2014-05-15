@@ -11,6 +11,8 @@ namespace RootForce
 		Orientation tempOrientation = transform->m_orientation;
 		tempOrientation.Yaw(180.0f);
 		glm::mat4 tempWorldMatrix;
+
+		// 100% script here.
 #ifndef COMPILE_LEVEL_EDITOR
 		if(m_world->GetStorage()->DoesKeyExist("Water"))
 		{
@@ -18,6 +20,7 @@ namespace RootForce
 				transform->m_position.y = m_world->GetStorage()->GetValueAsFloat("Water") + 5.0f;
 		}
 #endif
+
 		glm::mat4 translation = glm::translate(glm::mat4(1), transform->m_position);
 		glm::mat4 rotation = glm::rotate(translation, tempOrientation.GetAngle(), tempOrientation.GetAxis());
 		glm::mat4 viewMatrix = glm::inverse(rotation);
@@ -34,6 +37,7 @@ namespace RootForce
 			{
 				m_world->GetEntityManager()->GetComponent<RootForce::Transform>(skybox)->m_position = transform->m_position;
 			}
+			//std::cout << "CameraSystem Pos:\t " << transform->m_position.x << " " << transform->m_position.y << " " << transform->m_position.z << std::endl;
 			m_engineContext->m_renderer->SetViewMatrix(viewMatrix);
 			m_engineContext->m_renderer->SetProjectionMatrix(projectionMatrix);
 			m_engineContext->m_renderer->SetCameraPosition(transform->m_position);

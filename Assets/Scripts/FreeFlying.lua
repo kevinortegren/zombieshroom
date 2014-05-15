@@ -7,10 +7,10 @@ FreeFlying.RotateSpeed = 45.0;
 function FreeFlying.Setup(self)
 	
 	local controllerActions = self:GetControllerActions();
-	controllerActions:Bind("Forward", 82);
-	controllerActions:Bind("Back", 81);
-	controllerActions:Bind("Left", 80);
-	controllerActions:Bind("Right", 79);
+	controllerActions:Bind("Forward", 26);
+	controllerActions:Bind("Back", 22);
+	controllerActions:Bind("Left", 4);
+	controllerActions:Bind("Right", 7);
 	controllerActions:Bind("PitchUp", 96);
 	controllerActions:Bind("PitchDown", 90);
 	controllerActions:Bind("YawLeft", 92);
