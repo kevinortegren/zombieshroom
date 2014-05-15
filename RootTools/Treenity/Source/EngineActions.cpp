@@ -1,6 +1,7 @@
 #include <RootTools/Treenity/Include/EngineActions.h>
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
+#include <RootSystems/Include/CollisionSystem.h>
 #include <RootSystems/Include/PhysicsSystem.h>
 #include <RootSystems/Include/Script.h>
 #include <RootSystems/Include/CameraSystem.h>
@@ -14,6 +15,7 @@
 #include <RootTools/Treenity/Include/TreenityMain.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 
 #include <RootTools/Treenity/Include/Utils.h>
 
@@ -355,7 +357,9 @@ const glm::vec3& EngineActions::GetScale(ECS::Entity* p_entity)
 // Renderable
 void EngineActions::AddRenderable(ECS::Entity* p_entity)
 {
-	m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
+	RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
+	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/box");
+	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("TestSpawnpoint");
 }
 
 void EngineActions::RemoveRenderable(ECS::Entity* p_entity)
@@ -404,6 +408,16 @@ glm::vec3& EngineActions::GetVelocity( ECS::Entity* p_entity )
 
 void EngineActions::SetMass( ECS::Entity* p_entity, float p_mass)
 {
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+
+	if(collision->m_handle == nullptr)
+	{
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::FATAL_ERROR, "EngineActions: No collision component! Cannot set mass!");
+		return;
+	}
+
+	g_engineContext.m_physics->SetMass(*collision->m_handle, p_mass);
+
 	RootForce::Physics* physics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
 	physics->m_mass = p_mass;
 }
@@ -416,7 +430,14 @@ void EngineActions::SetVelocity( ECS::Entity* p_entity, glm::vec3& p_velocity )
 
 void EngineActions::AddPhysics( ECS::Entity* p_entity )
 {
-	m_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
+	RootForce::Physics* physics = m_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
+	RootForce::Collision* collision = m_world->GetEntityManager()->CreateComponent<RootForce::Collision>(p_entity);
+	RootForce::Transform* trans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
+
+	collision->m_handle = g_engineContext.m_physics->CreateHandle(p_entity, RootEngine::Physics::PhysicsType::TYPE_DYNAMIC, false);
+	g_engineContext.m_physics->SetGravity(*collision->m_handle, glm::vec3(0, -9.82f, 0));
+	physics->m_mass = 1;
+	g_engineContext.m_physics->BindSphereShape(*collision->m_handle, trans->m_position, glm::quat(0,0,0,1), 1, physics->m_mass, true, true);
 }
 
 void EngineActions::RemovePhysics( ECS::Entity* p_entity )

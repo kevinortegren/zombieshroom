@@ -32,6 +32,7 @@ public:
 	void SetJumpForce(float p_jumpForce);
 	void SetOrientation(glm::quat p_orientation);
 	float GetMass() const {return m_mass;}
+	float GetGravity() const {return m_kinController->getGravity();}
 	float GetMaxSpeed() const {return m_maxSpeed;}
 	float GetStepHeight() const {return m_stepHeight;}
 	float GetModelHeight() const {return m_heightOffset;}

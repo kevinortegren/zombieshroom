@@ -74,6 +74,8 @@ namespace RootEngine
 			int* m_id; // The value that is returned as a handle to the game logic, should be updated when a object is removed.
 			std::string m_modelHandle;
 			bool m_externalControlled;
+			bool m_collideWithWorld;
+			bool m_collideWithStatic;
 			int m_ragdollIndex;
 			CustomUserPointer()
 			{
@@ -143,6 +145,7 @@ namespace RootEngine
 			virtual glm::vec3 GetPos(int p_objectHandle)= 0;
 			virtual glm::vec3 GetVelocity(int p_objectHandle) = 0;
 			virtual float GetMass(int p_objectHandle) = 0;
+			virtual glm::vec3 GetGravity(int p_objectHandle) = 0;
 			virtual int GetType(int p_objectHandle) = 0;
 			virtual float GetMaxSpeed(int p_objectHandle) = 0;
 			virtual float GetStepHeight(int p_objectHandle) = 0;
@@ -151,7 +154,11 @@ namespace RootEngine
 			virtual glm::mat4* GetBones(int p_objectHandle) = 0;
 			virtual std::string GetPhysicsModelHandle(int p_objectHandle) = 0;
 			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
-			
+			virtual PhysicsShape::PhysicsShape GetShape(int p_objectHandle) = 0;
+			virtual float GetRadius(int p_objectHandle) = 0;
+			virtual bool GetCollideWithStatic(int p_objectHandle) = 0;
+			virtual bool GetCollideWithWorld(int p_objectHandle)  = 0;
+
 			//Setters
 			virtual void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation) = 0;
 			virtual void SetVelocity(int p_objectHandle, glm::vec3 p_velocity) = 0;
@@ -219,6 +226,7 @@ namespace RootEngine
 			glm::vec3 GetVelocity(int p_objectHandle);
 			glm::mat4* GetBones(int p_objectHandle);
 			float GetMass(int p_objectHandle);
+			glm::vec3 GetGravity(int p_objectHandle);
 			int GetType(int p_objectHandle);
 			float GetMaxSpeed(int p_objectHandle);
 			float GetStepHeight(int p_objectHandle);
@@ -228,6 +236,10 @@ namespace RootEngine
 			glm::quat GetOrientation(int p_objectHandle);
 			glm::vec3 GetPlayerKnockbackVector(int p_objectHandle);
 			float GetPlayerVerticalVelocity(int p_objectHandle);
+			PhysicsShape::PhysicsShape GetShape(int p_objectHandle);
+			float GetRadius(int p_objectHandle);
+			bool GetCollideWithStatic(int p_objectHandle);
+			bool GetCollideWithWorld(int p_objectHandle); 
 
 			//Setters
 			void SetGravity(int p_objectHandle, glm::vec3 p_gravity);

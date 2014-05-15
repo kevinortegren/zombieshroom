@@ -145,14 +145,52 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 			break;
 		case RootForce::ComponentType::PHYSICS:
 			{
-				RootForce::Physics* physics = static_cast<RootForce::Physics*>(p_component);
-				p_emitter << YAML::Key << "Mass" << YAML::Value << physics->m_mass;
+				/*RootForce::Physics* physics = static_cast<RootForce::Physics*>(p_component);
+				p_emitter << YAML::Key << "Mass" << YAML::Value << physics->m_mass;*/
 			}
 			break;
 		case RootForce::ComponentType::COLLISION:
 			{
 				RootForce::Collision* collision = static_cast<RootForce::Collision*>(p_component);
+
 				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
+
+				if(collision->m_handle == nullptr)
+					return;
+
+				p_emitter << YAML::Key << "PhysicsType" << YAML::Value << g_engineContext.m_physics->GetType(*collision->m_handle);
+				p_emitter << YAML::Key << "ShapeMass" << YAML::Value << g_engineContext.m_physics->GetMass(*collision->m_handle);
+				glm::vec3 gravity = g_engineContext.m_physics->GetGravity(*collision->m_handle);
+				p_emitter << YAML::Key << "ShapeGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq << gravity.x << gravity.y << gravity.z << YAML::EndSeq;
+
+				RootEngine::Physics::PhysicsShape::PhysicsShape shape = g_engineContext.m_physics->GetShape(*collision->m_handle);
+
+				p_emitter << YAML::Key << "PhysicsShape" << YAML::Value << (int)shape;
+
+				switch (shape)
+				{
+				case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
+					{
+
+						p_emitter << YAML::Key << "ShapeRadius"			<< YAML::Value << g_engineContext.m_physics->GetRadius(*collision->m_handle);
+						p_emitter << YAML::Key << "CollideWithWorld"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithWorld(*collision->m_handle);
+						p_emitter << YAML::Key << "CollideWithStatic"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithStatic(*collision->m_handle);
+
+					}
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_HULL:
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_NONE:
+					break;
+				default:
+					break;
+				}
 			}
 			break;
 		case RootForce::ComponentType::PARTICLE:

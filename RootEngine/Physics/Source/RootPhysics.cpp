@@ -392,7 +392,6 @@ namespace Physics
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 
-
 			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic);	
 
 			return;
@@ -518,6 +517,8 @@ namespace Physics
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
 		body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 		m_userPointer.at(p_objectHandle)->m_modelHandle = p_modelHandle;
+		m_userPointer.at(p_objectHandle)->m_collideWithStatic = p_collidesWithStatic;
+		m_userPointer.at(p_objectHandle)->m_collideWithWorld = p_collideWithWorld;
 	}
 	void RootPhysics::BindNoShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation )
 	{
@@ -1472,6 +1473,9 @@ namespace Physics
 
 		m_dynamicObjects.push_back(p_body);
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_dynamicObjects.size()-1;
+		m_userPointer.at(p_objectHandle)->m_collideWithStatic = p_collidesWithStatic;
+		m_userPointer.at(p_objectHandle)->m_collideWithWorld = p_collideWithWorld;
+
 		/*if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
 			body->setActivationState(DISABLE_DEACTIVATION);*/
 		p_body->setUserPointer((void*)m_userPointer.at(p_objectHandle));
@@ -1505,6 +1509,8 @@ namespace Physics
 		}
 		m_externallyControlled.push_back(controller);
 		m_userPointer.at(p_objectHandle)->m_vectorIndex = m_externallyControlled.size()-1;
+		m_userPointer.at(p_objectHandle)->m_collideWithStatic = p_collidesWithStatic;
+		m_userPointer.at(p_objectHandle)->m_collideWithWorld = p_collideWithWorld;
 		ghostObject->setUserPointer((void*)m_userPointer.at(p_objectHandle));
 		return;
 	}
@@ -1516,6 +1522,91 @@ namespace Physics
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY && !(m_userPointer.at(p_objectHandle)->m_externalControlled))
 			m_dynamicObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->setAngularFactor(btVector3(0.0f, 0.0f, 0.0f));
 	}
+
+	glm::vec3 RootPhysics::GetGravity( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return glm::vec3(0);
+		int index = m_userPointer.at(p_objectHandle)->m_vectorIndex;
+		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_PLAYER)
+		{
+			return glm::vec3(0, m_playerObjects.at(index)->GetGravity(), 0);
+		}
+		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled && m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
+		{
+			btVector3 tempGrav = m_dynamicObjects.at(index)->getGravity();
+			return glm::vec3(tempGrav.x(), tempGrav.y(), tempGrav.z());
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_externalControlled)
+		{
+			//Gravity doesn't exist in objectcontroller now, add if needed
+			g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::DEBUG_PRINT, "Changing gravity is not supported for externally controlled objects");
+			
+			return glm::vec3(0);
+		}
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_RAGDOLL)
+		{
+				
+
+			index = m_userPointer.at(p_objectHandle)->m_ragdollIndex;
+			if(index != -1)
+				return m_ragdolls.at(index)->GetGravity();
+			else
+				return glm::vec3(0);
+		}
+	}
+
+	PhysicsShape::PhysicsShape RootPhysics::GetShape( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return PhysicsShape::SHAPE_NONE;
+		else
+			return m_userPointer.at(p_objectHandle)->m_shape;
+	}
+
+	float RootPhysics::GetRadius( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return 0;
+
+		PhysicsShape::PhysicsShape shape = GetShape(p_objectHandle);
+		btCollisionShape* beteShape = m_dynamicObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->getCollisionShape();
+		
+		switch (shape)
+		{
+		case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
+				return (float)((btSphereShape*)beteShape)->getRadius();
+			break;
+		case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
+				return (float)((btConeShape*)beteShape)->getRadius();
+			break;
+		case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
+				return (float)((btCylinderShape*)beteShape)->getRadius();
+			break;
+		default:
+			break;
+		}
+
+		return 0;
+		
+	}
+
+	bool RootPhysics::GetCollideWithStatic( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return false;
+		else
+			return m_userPointer.at(p_objectHandle)->m_collideWithStatic;
+	}
+
+	bool RootPhysics::GetCollideWithWorld( int p_objectHandle )
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return false;
+		else
+			return m_userPointer.at(p_objectHandle)->m_collideWithWorld;
+	}
+
 
 }
 }

@@ -158,8 +158,12 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 {
 	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
-		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+		// Temporary solution to deal with physics and collider
+		if(p_componentType == 11)
+			return;
 
+		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+		m_componentViews[p_componentType]->DisplayEntity(p_entity);
 		//QWidget* widget = new QWidget();
 		//SetupUIForComponent(widget, p_componentType);
 		//m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
