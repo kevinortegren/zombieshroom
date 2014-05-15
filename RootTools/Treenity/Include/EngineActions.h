@@ -71,6 +71,12 @@ public:
 	void	SetWaterColliderInterval(ECS::Entity* p_entity, float p_val);
 	void	SetWaterColliderPower(ECS::Entity* p_entity, float p_val);
 
+	//Script
+	void		AddScript(ECS::Entity* p_entity);
+	void		RemoveScript(ECS::Entity* p_entity);
+	std::string GetScript(ECS::Entity* p_entity);
+	void		SetScript(ECS::Entity* p_entity, std::string p_script);
+
 private:
 
 	TreenityMain* m_treenityMain;

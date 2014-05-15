@@ -252,6 +252,7 @@
      <addaction name="action_addRenderable"/>
      <addaction name="action_addPhysics"/>
      <addaction name="action_addWaterCollider"/>
+     <addaction name="action_addScript"/>
     </widget>
     <addaction name="menu_addComponent"/>
    </widget>
@@ -621,6 +622,11 @@
   <action name="action_addWaterCollider">
    <property name="text">
     <string>Water Collider</string>
+   </property>
+  </action>
+  <action name="action_addScript">
+   <property name="text">
+    <string>Script</string>
    </property>
   </action>
  </widget>

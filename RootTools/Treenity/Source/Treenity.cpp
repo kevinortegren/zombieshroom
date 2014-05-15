@@ -72,6 +72,7 @@ Treenity::Treenity(QWidget *parent)
 	m_componentViews[RootForce::ComponentType::RENDERABLE]		= new RenderableView();
 	m_componentViews[RootForce::ComponentType::PHYSICS]			= new PhysicsView();
 	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]	= new WaterColliderView();
+	m_componentViews[RootForce::ComponentType::SCRIPT]			= new ScriptView();
 
 	for (auto it : m_componentViews)
 	{
@@ -93,6 +94,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addRenderable,				SIGNAL(triggered()),		this,					SLOT(AddRenderable()));
 	connect(ui.action_addPhysics,					SIGNAL(triggered()),		this,					SLOT(AddPhysics()));
 	connect(ui.action_addWaterCollider,				SIGNAL(triggered()),		this,					SLOT(AddWaterCollider()));
+	connect(ui.action_addScript,					SIGNAL(triggered()),		this,					SLOT(AddScriptComponent()));
 	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
 	
 	// Setup Qt-to-SDL keymatching.
@@ -363,6 +365,14 @@ void Treenity::AddWaterCollider()
 	if(m_selectedEntities.size() == 1)
 	{
 		m_engineInterface->AddWaterCollider(*m_selectedEntities.begin());
+	}
+}
+
+void Treenity::AddScriptComponent()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddScript(*m_selectedEntities.begin());
 	}
 }
 

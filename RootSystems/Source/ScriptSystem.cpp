@@ -29,6 +29,8 @@ namespace RootForce
 	{
 		RootForce::Script* script = m_scripts.Get(p_entity);
 		
+		if(script->Name == "")
+			return;
 		
 		if(g_engineContext.m_script->IsFunctionDefined(script->Name, "OnUpdate"))
 		{

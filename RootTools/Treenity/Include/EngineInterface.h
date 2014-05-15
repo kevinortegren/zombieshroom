@@ -71,4 +71,10 @@ struct EngineInterface
 	virtual void	SetWaterColliderRadius(ECS::Entity* p_entity, int p_val) = 0;
 	virtual void	SetWaterColliderInterval(ECS::Entity* p_entity, float p_val) = 0;
 	virtual void	SetWaterColliderPower(ECS::Entity* p_entity, float p_val) = 0;
+
+	//Script
+	virtual void		AddScript(ECS::Entity* p_entity) = 0;
+	virtual void		RemoveScript(ECS::Entity* p_entity) = 0;
+	virtual std::string GetScript(ECS::Entity* p_entity) = 0;
+	virtual void		SetScript(ECS::Entity* p_entity, std::string p_script) = 0;
 };

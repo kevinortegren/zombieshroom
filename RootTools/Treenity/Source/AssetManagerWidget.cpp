@@ -51,10 +51,15 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 
 	//Set up context menues
 	m_fileContextMenu = new QMenu("File context", this);
-	m_fileContextMenu->addAction(new QAction("Open externally", this));
+	QAction* tempAction = new QAction("Open externally", this);
+	m_fileContextMenu->addAction(tempAction);
+	connect(tempAction, SIGNAL(triggered()), this, SLOT(OpenExternally()));
 
 	m_offsideContextMenu = new QMenu("Offset menu", this);
-	m_offsideContextMenu->addAction(new QAction("Create folder", this));
+	tempAction = new QAction("Create script", this);
+	m_offsideContextMenu->addAction(tempAction);
+	connect(tempAction, SIGNAL(triggered()), this, SLOT(CreateScriptTriggered()));
+
 
 	IconSizeChanged(ui.listView_fileBrowser->iconSize().height());
 	//ui.widget_pictureFrame->setScaledContents(true);
@@ -201,40 +206,17 @@ void AssetManagerWidget::TreeListContextMenu(const QPoint& p_val)
 
 	if(temp.isValid())
 	{
-		QFileInfo fileInfo = m_assetFileModel->fileInfo(temp);
+		m_rightClickFileInfo = m_assetFileModel->fileInfo(temp);
 
 		//File right clicked
-		if(fileInfo.isFile())
+		if(m_rightClickFileInfo.isFile())
 		{
-			QAction* selectedAction = m_fileContextMenu->exec(ui.listView_fileBrowser->mapToGlobal( p_val ));
-		
-			//No action selected
-			if(selectedAction == nullptr)
-				return;
-
-			if(selectedAction->text() == "Open externally")
-			{
-				if(fileInfo.suffix().compare("particle") == 0) //Doubleclicked a .particle-file. Opens up the particle editor!
-				{
-					//Start the Particle editor from the same folder. Alternative is to remove this if-statement and let Qt open the particle editor.
-					std::string particleFileInfo = fileInfo.filePath().toStdString();
-					//Enclose .exe-file path in quotes and enclose argument-path in quotes and then enclose the whole thing in quotes! Windows Magic right here :D
-					std::string particleEditorPath = "\"\"" + g_engineContext.m_resourceManager->GetWorkingDirectory() + "ParticleEditor.exe" + "\" \"" + particleFileInfo + "\"\"";
-					system(particleEditorPath.c_str());
-					Utils::Write("Particle editor started!");
-				}
-				else
-				{
-					//This opens a file with the default program. If no program is selected it will prompt the user to find a program. Very nice... very nice indeed!
-					QString temp = "file:///" + fileInfo.filePath();
-					QDesktopServices::openUrl(QUrl(temp, QUrl::TolerantMode)); //Don't know if QDesktopServices is included in our external libs. If this is causing compile problems, comment it out!
-				}
-			}
+			m_fileContextMenu->popup(ui.listView_fileBrowser->mapToGlobal( p_val ));	
 		}
 	}
 	else
 	{
-		//No item is right clicked
+		m_offsideContextMenu->popup(ui.listView_fileBrowser->mapToGlobal( p_val ));
 	}
 }
 
@@ -356,4 +338,63 @@ void AssetManagerWidget::LoadImg( const QString p_filepath )
 	ui.label_res->setText("Resolution:");
 
 	ui.widget_pictureFrame->setPixmap(QPixmap::fromImage(image.scaled(ui.widget_pictureFrame->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+}
+
+void AssetManagerWidget::CreateScriptTriggered()
+{
+	QDir temp(m_assetFileModel->filePath(ui.listView_fileBrowser->rootIndex()));
+	
+	QString filename = temp.path() + "/DefaultScript.lua";
+	QFile file( filename );
+	if ( file.open(QIODevice::ReadWrite) )
+	{
+		QTextStream stream( &file );
+		stream << "DefaultScript = {};" << 
+			endl << 
+			"DefaultScript.globalVariable = 12;" << 
+			endl << 
+			endl << 
+			"function DefaultScript.OnLoad()" << 
+			endl <<
+			"end" << 
+			endl <<
+			endl <<
+			"function DefaultScript.OnUpdate(self)" <<
+			endl <<
+			"end" <<
+			endl <<
+			endl <<
+			"function DefaultScript.OnCollide(self, enitity)" <<
+			endl <<
+			"end" <<
+			endl <<
+			endl <<
+			"function DefaultScript.OnDestroy (self)" <<
+			endl <<
+			"end" <<
+			endl;
+
+		file.close();
+	}
+
+	Utils::Write("Script created!");
+}
+
+void AssetManagerWidget::OpenExternally()
+{
+	if(m_rightClickFileInfo.suffix().compare("particle") == 0) //Doubleclicked a .particle-file. Opens up the particle editor!
+	{
+		//Start the Particle editor from the same folder. Alternative is to remove this if-statement and let Qt open the particle editor.
+		std::string particleFileInfo = m_rightClickFileInfo.filePath().toStdString();
+		//Enclose .exe-file path in quotes and enclose argument-path in quotes and then enclose the whole thing in quotes! Windows Magic right here :D
+		std::string particleEditorPath = "\"\"" + g_engineContext.m_resourceManager->GetWorkingDirectory() + "ParticleEditor.exe" + "\" \"" + particleFileInfo + "\"\"";
+		system(particleEditorPath.c_str());
+		Utils::Write("Particle editor started!");
+	}
+	else
+	{
+		//This opens a file with the default program. If no program is selected it will prompt the user to find a program. Very nice... very nice indeed!
+		QString temp = "file:///" + m_rightClickFileInfo.filePath();
+		QDesktopServices::openUrl(QUrl(temp, QUrl::TolerantMode)); //Don't know if QDesktopServices is included in our external libs. If this is causing compile problems, comment it out!
+	}
 }

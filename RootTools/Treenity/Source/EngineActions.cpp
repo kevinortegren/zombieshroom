@@ -484,3 +484,23 @@ void EngineActions::SetWaterColliderPower(ECS::Entity* p_entity, float p_val )
 {
 	m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity)->m_disturbPower = p_val;
 }
+
+void EngineActions::AddScript( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->CreateComponent<RootForce::Script>(p_entity);
+}
+
+void EngineActions::RemoveScript( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Script>(p_entity);
+}
+
+std::string EngineActions::GetScript( ECS::Entity* p_entity )
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::Script>(p_entity)->Name;
+}
+
+void EngineActions::SetScript( ECS::Entity* p_entity, std::string p_script )
+{
+	m_world->GetEntityManager()->GetComponent<RootForce::Script>(p_entity)->Name = g_engineContext.m_resourceManager->LoadScript(p_script);
+}

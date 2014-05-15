@@ -17,6 +17,7 @@
 #include <RootTools/Treenity/Include/Components/PhysicsView.h>
 #include <RootTools/Treenity/Include/Components/RenderableView.h>
 #include <RootTools/Treenity/Include/Components/WaterColliderView.h>
+#include <RootTools/Treenity/Include/Components/ScriptView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
 #include <RootTools/Treenity/Include/AssetManagerWidget.h>
 #include <RootTools/Treenity/Include/RotationTool.h>
@@ -108,6 +109,7 @@ private slots:
 	void AddRenderable();
 	void AddPhysics();
 	void AddWaterCollider();
+	void AddScriptComponent();
 	
 };
 

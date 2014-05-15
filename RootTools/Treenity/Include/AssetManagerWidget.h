@@ -25,6 +25,8 @@ private:
 
 	QStringList m_currentFilter;
 
+	QFileInfo m_rightClickFileInfo;
+
 	void SetFolderSpecificFilters(const QString& p_folderName);
 	void LoadImg(const QString p_filepath);
 
@@ -40,4 +42,6 @@ private slots:
 	void FolderLoaded(const QString & p_path);
 	void CollapseAll();
 	void ExpandAll();
+	void CreateScriptTriggered();
+	void OpenExternally();
 };
