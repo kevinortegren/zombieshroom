@@ -57,8 +57,12 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	m_offsideContextMenu->addAction(new QAction("Create folder", this));
 
 	IconSizeChanged(ui.listView_fileBrowser->iconSize().height());
+	//ui.widget_pictureFrame->setScaledContents(true);
 
-	m_ddsHandler = new QDDSHandler();
+	//Hide resolution info at start
+	ui.label_fileResolution->setText("");
+	ui.label_res->setText("");
+
 }
 
 AssetManagerWidget::~AssetManagerWidget()
@@ -118,9 +122,9 @@ void AssetManagerWidget::SearchLineChanged( const QString& p_val )
 void AssetManagerWidget::FolderSelected( const QModelIndex& p_val )
 {
 	QFileInfo fileInfo = m_assetFolderModel->fileInfo(p_val);
-	m_assetFileModel->setRootPath(fileInfo.filePath());
-	ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(fileInfo.filePath()));
+	//m_assetFileModel->setRootPath(fileInfo.filePath());
 
+	ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(fileInfo.filePath()));
 	SetFolderSpecificFilters(fileInfo.baseName());
 	//Clear search bar when selecting a new folder. 2014-05-08: Only local search is available.
 	ui.lineEdit_assetSearch->clear();
@@ -133,7 +137,7 @@ void AssetManagerWidget::FileSelected( const QModelIndex& p_val )
 	QFileInfo fileInfo = m_assetFileModel->fileInfo(p_val);
 	if(fileInfo.isDir()) //Doubleclicked a folder! Navigate YO!
 	{
-		m_assetFileModel->setRootPath(fileInfo.filePath());
+		//m_assetFileModel->setRootPath(fileInfo.filePath());
 		ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(fileInfo.filePath()));
 
 		ui.treeView_assetFileBrowser->setCurrentIndex(m_assetFolderModel->index(fileInfo.filePath()));
@@ -144,10 +148,10 @@ void AssetManagerWidget::FileSelected( const QModelIndex& p_val )
 //Navigate back in list view
 void AssetManagerWidget::NavigateBack()
 {
-	
-	QDir temp(m_assetFileModel->rootPath());
+	QDir temp(m_assetFileModel->filePath(ui.listView_fileBrowser->rootIndex()));
 	//Check if we back up too much
-	if(temp.dirName() == "Assets")
+
+	if(temp.path() == m_assetFileModel->rootPath())
 		return;
 
 	if(!temp.cdUp())
@@ -159,7 +163,7 @@ void AssetManagerWidget::NavigateBack()
 		//New backed-up path!
 		QString newPath = temp.absolutePath();
 
-		m_assetFileModel->setRootPath(newPath);
+		//m_assetFileModel->setRootPath(newPath);
 		ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(newPath));
 		ui.treeView_assetFileBrowser->setCurrentIndex(m_assetFolderModel->index(newPath));
 	}
@@ -271,14 +275,15 @@ void AssetManagerWidget::ExpandAll()
 void AssetManagerWidget::FileClicked( const QModelIndex& p_val )
 {
 	QFileInfo fileInfo = m_assetFileModel->fileInfo(p_val);
-	
+
 	//File clicked
 	ui.label_fileName->setText(fileInfo.fileName());
 	ui.label_sizeName->setText(QString::number((fileInfo.size() / 1000) + 1) + " KB");
 	ui.label_createdName->setText(fileInfo.created().toString());
+	ui.label_fileResolution->setText("");
+	ui.label_res->setText("");
 
 	//Reset preview image
-	ui.widget_pictureFrame->setStyleSheet("");
 	ui.widget_pictureFrame->setPixmap(QPixmap());
 
 	if(fileInfo.isFile())
@@ -290,58 +295,65 @@ void AssetManagerWidget::FileClicked( const QModelIndex& p_val )
 			QFileInfo file(image);
 			if(file.exists())
 			{
-				ui.widget_pictureFrame->setStyleSheet("border-image: url(" + image + ")");
+				QtConcurrent::run(this, &AssetManagerWidget::LoadImg, image);
 			}
 			else
 			{
 				//If .png is not available, check if .jpg is
-				image = fileInfo.dir().path() + "/" + fileInfo.completeBaseName() + ".jpg";
+				QString image = fileInfo.dir().path() + "/" + fileInfo.completeBaseName() + ".jpg";
 				QFileInfo fileJPG(image);
 				if(fileJPG.exists())
 				{
-					ui.widget_pictureFrame->setStyleSheet("border-image: url(" + image + ")");
+					QtConcurrent::run(this, &AssetManagerWidget::LoadImg, image);
+				}
+				else
+				{
+					QString imgPath("Resources/nopreview.png");
+					QtConcurrent::run(this, &AssetManagerWidget::LoadImg, imgPath);
 				}
 			}
 			
 		}
-		else if(fileInfo.suffix() == "png" || fileInfo.suffix() == "jpg")
+		else if(fileInfo.suffix() == "png" || fileInfo.suffix() == "jpg" || fileInfo.suffix() == "dds")
 		{
-			ui.widget_pictureFrame->setStyleSheet("border-image: url(" + fileInfo.filePath() + ")");
+			//Load preview image on a separate thread to avoid loading-locks (Works like a charm!)
+			QtConcurrent::run(this, &AssetManagerWidget::LoadImg, fileInfo.filePath());
 		}
-		else if(fileInfo.suffix() == "dds")
+		else if(fileInfo.suffix() == "js")
 		{
-			QImageReader hello(fileInfo.filePath());
-
-			QFile imagefile(fileInfo.filePath());
-
-			if(imagefile.open(QIODevice::ReadOnly))
-				Utils::Write("Could not open DDS-file");
-
-			m_ddsHandler->setDevice(&imagefile);
-			m_ddsHandler->setFormat(QByteArray());
-
-			if(!m_ddsHandler->canRead())
-			{
-				Utils::Write("DDS handler cannot read!");
-				return;
-			}
-			else
-			{
-				QImage image;
-				if(m_ddsHandler->read(&image))
-				{
-					Utils::Write("DDS loaded succesfully");
-				}
-				else
-				{
-					Utils::Write("DDS NOT loaded!");
-				}
-				imagefile.close();
-				
-				Utils::Write(QString::number(m_ddsHandler->imageCount()));
-				Utils::Write("DDS x,y: " + QString::number(image.size().width()) + ", " + QString::number(image.size().height()));
-				ui.widget_pictureFrame->setPixmap(QPixmap::fromImage(image));
-			}
+			QString imgPath("Resources/javascripticon.png");
+			QtConcurrent::run(this, &AssetManagerWidget::LoadImg, imgPath);
+		}
+		else
+		{
+			QString imgPath("Resources/genericicon.png");
+			QtConcurrent::run(this, &AssetManagerWidget::LoadImg, imgPath);
 		}
 	}
+	else if(fileInfo.isDir())
+	{
+		QString imgPath("Resources/folder.png");
+		QtConcurrent::run(this, &AssetManagerWidget::LoadImg, imgPath);
+	}
+}
+
+void AssetManagerWidget::LoadImg( const QString p_filepath )
+{
+	QImageReader reader(p_filepath);
+
+	if(!reader.canRead())
+	{
+		return;
+	}
+
+	QImage image = reader.read();
+	if(image.isNull())
+	{
+		return;
+	}
+
+	ui.label_fileResolution->setText(QString::number(image.width()) + " x " + QString::number(image.height()));
+	ui.label_res->setText("Resolution:");
+
+	ui.widget_pictureFrame->setPixmap(QPixmap::fromImage(image.scaled(ui.widget_pictureFrame->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 }

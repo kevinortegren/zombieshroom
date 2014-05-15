@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
 
 	QApplication a(argc, argv);
 	
+	//QCoreApplication::addLibraryPath("C:\\Qt86\\Qt5.2.1\\5.2.1\\msvc2012\\plugins");
+
 	a.setStyle(QStyleFactory::create("Fusion"));
 
 	QPalette darkPalette;
