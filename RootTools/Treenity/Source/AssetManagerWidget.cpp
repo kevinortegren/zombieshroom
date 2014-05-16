@@ -42,13 +42,14 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 
 	//Set up list widget
 	m_assetFileModel = new QFileSystemModel();
+	m_assetFileModel->setIconProvider(new CustomFileIconProvider());
 	m_assetFileModel->setRootPath(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/"));
 	//m_assetFileModel->setFilter(QDir::Dirs|QDir::Drives|QDir::NoDotAndDotDot|QDir::AllDirs);
 
 	ui.listView_fileBrowser->setModel(m_assetFileModel);
 	ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/")));
 	ui.listView_fileBrowser->setDragDropMode(QAbstractItemView::DragOnly);
-
+	
 	//Set up context menues
 	m_fileContextMenu = new QMenu("File context", this);
 	QAction* tempAction = new QAction("Open externally", this);
