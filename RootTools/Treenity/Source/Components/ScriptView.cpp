@@ -20,7 +20,7 @@ const QString& ScriptView::GetComponentName() const
 
 void ScriptView::DisplayEntity( ECS::Entity* p_entity )
 {
-	ui.lineEdit_name->setText("");
+	ui.lineEdit_name->setText(QString::fromStdString(m_engineInterface->GetScript(p_entity)));
 }
 
 void ScriptView::NameChanged()
