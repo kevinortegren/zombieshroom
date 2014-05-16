@@ -158,8 +158,10 @@ public:
         listView_fileBrowser->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
         listView_fileBrowser->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
         listView_fileBrowser->setMovement(QListView::Static);
+        listView_fileBrowser->setLayoutMode(QListView::Batched);
         listView_fileBrowser->setGridSize(QSize(80, 80));
         listView_fileBrowser->setViewMode(QListView::IconMode);
+        listView_fileBrowser->setBatchSize(5);
         listView_fileBrowser->setWordWrap(true);
 
         gridLayout->addWidget(listView_fileBrowser, 1, 0, 1, 3);

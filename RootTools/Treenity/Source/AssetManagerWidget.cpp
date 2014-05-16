@@ -14,7 +14,7 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	ui.listView_fileBrowser->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	connect(ui.lineEdit_assetSearch,			SIGNAL(textEdited(const QString &)),			this,				SLOT(SearchLineChanged(const QString&)));
-	connect(ui.treeView_assetFileBrowser,		SIGNAL(doubleClicked(const QModelIndex&)),		this,				SLOT(FolderSelected(const QModelIndex&)));
+	connect(ui.treeView_assetFileBrowser,		SIGNAL(clicked(const QModelIndex&)),		this,				SLOT(FolderSelected(const QModelIndex&)));
 	connect(ui.listView_fileBrowser,			SIGNAL(doubleClicked(const QModelIndex&)),		this,				SLOT(FileSelected(const QModelIndex&)));
 	connect(ui.listView_fileBrowser,			SIGNAL(clicked(const QModelIndex&)),			this,				SLOT(FileClicked(const QModelIndex&)));
 	connect(ui.listView_fileBrowser,			SIGNAL(customContextMenuRequested(const QPoint &)),	this,			SLOT(TreeListContextMenu(const QPoint &)));
@@ -127,9 +127,8 @@ void AssetManagerWidget::SearchLineChanged( const QString& p_val )
 void AssetManagerWidget::FolderSelected( const QModelIndex& p_val )
 {
 	QFileInfo fileInfo = m_assetFolderModel->fileInfo(p_val);
-	//m_assetFileModel->setRootPath(fileInfo.filePath());
 
-	ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(fileInfo.filePath()));
+	ui.listView_fileBrowser->setRootIndex(m_assetFileModel->setRootPath(fileInfo.filePath()));
 	SetFolderSpecificFilters(fileInfo.baseName());
 	//Clear search bar when selecting a new folder. 2014-05-08: Only local search is available.
 	ui.lineEdit_assetSearch->clear();
@@ -142,10 +141,9 @@ void AssetManagerWidget::FileSelected( const QModelIndex& p_val )
 	QFileInfo fileInfo = m_assetFileModel->fileInfo(p_val);
 	if(fileInfo.isDir()) //Doubleclicked a folder! Navigate YO!
 	{
-		//m_assetFileModel->setRootPath(fileInfo.filePath());
-		ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(fileInfo.filePath()));
+		ui.listView_fileBrowser->setRootIndex(m_assetFileModel->setRootPath(fileInfo.filePath()));
 
-		ui.treeView_assetFileBrowser->setCurrentIndex(m_assetFolderModel->index(fileInfo.filePath()));
+		ui.treeView_assetFileBrowser->setCurrentIndex(m_assetFolderModel->setRootPath(fileInfo.filePath()));
 		SetFolderSpecificFilters(fileInfo.baseName());
 	}
 }
@@ -154,8 +152,8 @@ void AssetManagerWidget::FileSelected( const QModelIndex& p_val )
 void AssetManagerWidget::NavigateBack()
 {
 	QDir temp(m_assetFileModel->filePath(ui.listView_fileBrowser->rootIndex()));
-	//Check if we back up too much
 
+	//Check if we back up too much
 	if(temp.path() == m_assetFileModel->rootPath())
 		return;
 
@@ -168,9 +166,9 @@ void AssetManagerWidget::NavigateBack()
 		//New backed-up path!
 		QString newPath = temp.absolutePath();
 
-		//m_assetFileModel->setRootPath(newPath);
-		ui.listView_fileBrowser->setRootIndex(m_assetFileModel->index(newPath));
-		ui.treeView_assetFileBrowser->setCurrentIndex(m_assetFolderModel->index(newPath));
+		ui.listView_fileBrowser->setRootIndex(m_assetFileModel->setRootPath(newPath));
+
+		ui.treeView_assetFileBrowser->setCurrentIndex(m_assetFolderModel->setRootPath(newPath));
 	}
 }
 

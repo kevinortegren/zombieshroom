@@ -208,6 +208,9 @@
        <property name="movement">
         <enum>QListView::Static</enum>
        </property>
+       <property name="layoutMode">
+        <enum>QListView::Batched</enum>
+       </property>
        <property name="gridSize">
         <size>
          <width>80</width>
@@ -216,6 +219,9 @@
        </property>
        <property name="viewMode">
         <enum>QListView::IconMode</enum>
+       </property>
+       <property name="batchSize">
+        <number>5</number>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
