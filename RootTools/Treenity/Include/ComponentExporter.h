@@ -153,19 +153,23 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 			{
 				RootForce::Collision* collision = static_cast<RootForce::Collision*>(p_component);
 
-				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
-
-				if(collision->m_handle == nullptr)
-					return;
-
+				
 				p_emitter << YAML::Key << "PhysicsType" << YAML::Value << g_engineContext.m_physics->GetType(*collision->m_handle);
-				p_emitter << YAML::Key << "ShapeMass" << YAML::Value << g_engineContext.m_physics->GetMass(*collision->m_handle);
-				glm::vec3 gravity = g_engineContext.m_physics->GetGravity(*collision->m_handle);
-				p_emitter << YAML::Key << "ShapeGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq << gravity.x << gravity.y << gravity.z << YAML::EndSeq;
+
+				// If the entity is dynamic and has a physics component.
+				if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+				{
+					p_emitter << YAML::Key << "ShapeMass" << YAML::Value << g_engineContext.m_physics->GetMass(*collision->m_handle);
+
+					glm::vec3 gravity = g_engineContext.m_physics->GetGravity(*collision->m_handle);
+					p_emitter << YAML::Key << "ShapeGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq << gravity.x << gravity.y << gravity.z << YAML::EndSeq;
+				}
 
 				RootEngine::Physics::PhysicsShape::PhysicsShape shape = g_engineContext.m_physics->GetShape(*collision->m_handle);
 
 				p_emitter << YAML::Key << "PhysicsShape" << YAML::Value << (int)shape;
+				p_emitter << YAML::Key << "CollideWithWorld"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithWorld(*collision->m_handle);
+				p_emitter << YAML::Key << "CollideWithStatic"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithStatic(*collision->m_handle);
 
 				switch (shape)
 				{
@@ -173,18 +177,29 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 					{
 
 						p_emitter << YAML::Key << "ShapeRadius"			<< YAML::Value << g_engineContext.m_physics->GetRadius(*collision->m_handle);
-						p_emitter << YAML::Key << "CollideWithWorld"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithWorld(*collision->m_handle);
-						p_emitter << YAML::Key << "CollideWithStatic"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithStatic(*collision->m_handle);
-
 					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
+					{
+						p_emitter << YAML::Key << "ShapeRadius"			<< YAML::Value << g_engineContext.m_physics->GetRadius(*collision->m_handle);
+						p_emitter << YAML::Key << "ShapeHeight"			<< YAML::Value << g_engineContext.m_physics->GetHeight(*collision->m_handle);
+					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
+					{
+						p_emitter << YAML::Key << "ShapeRadius"			<< YAML::Value << g_engineContext.m_physics->GetRadius(*collision->m_handle);
+						p_emitter << YAML::Key << "ShapeHeight"			<< YAML::Value << g_engineContext.m_physics->GetHeight(*collision->m_handle);
+					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
+					{
+						p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
+					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_HULL:
+					{
+						// Possibly not needed to export?
+					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_NONE:
 					break;

@@ -50,6 +50,7 @@ public:
 
         lineEdit_modelName = new DropLineEdit(Renderable);
         lineEdit_modelName->setObjectName(QStringLiteral("lineEdit_modelName"));
+        lineEdit_modelName->setReadOnly(true);
 
         gridLayout->addWidget(lineEdit_modelName, 0, 2, 1, 1);
 
@@ -65,6 +66,7 @@ public:
 
         lineEdit_materialName = new QLineEdit(Renderable);
         lineEdit_materialName->setObjectName(QStringLiteral("lineEdit_materialName"));
+        lineEdit_materialName->setReadOnly(false);
 
         gridLayout->addWidget(lineEdit_materialName, 1, 2, 1, 1);
 

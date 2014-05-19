@@ -253,45 +253,60 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 		case RootForce::ComponentType::COLLISION:
 			{
 				RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(p_entity);
-				RootForce::CollisionResponder* collisionResp = p_world->GetEntityManager()->CreateComponent<RootForce::CollisionResponder>(p_entity);
+				//RootForce::CollisionResponder* collisionResp = p_world->GetEntityManager()->CreateComponent<RootForce::CollisionResponder>(p_entity);
 				RootForce::Physics* physics = p_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
 				RootForce::Transform* trans = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
 
-				std::string meshHandle;
-
-				p_node["MeshHandle"] >> meshHandle;
-				collision->m_meshHandle = meshHandle;
-
-				if(!p_node.FindValue("PhysicsType"))
-					break;
-
-				//Get type
+				// Backwards compatibility - for static meshes.
 				int type;
-				p_node["PhysicsType"] >> type;
+				if(!p_node.FindValue("PhysicsType"))
+					type = RootEngine::Physics::PhysicsType::TYPE_STATIC;
+				else
+					p_node["PhysicsType"] >> type;
 
 				//Create and store physics handle in collision component
 				collision->m_handle = g_engineContext.m_physics->CreateHandle(p_entity, (RootEngine::Physics::PhysicsType::PhysicsType)type, false);
 
 				//Create collision container
-				g_engineContext.m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
+				//g_engineContext.m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
 
-				//Set physics mass
-				p_node["ShapeMass"] >> physics->m_mass;
+				if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+				{
+					//Set physics mass
+					p_node["ShapeMass"] >> physics->m_mass;
+					if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_STATIC)
+						physics->m_mass = 0;
 
-				//Set physics gravity
-				glm::vec3 gravity;
-				p_node["ShapeGravity"][0] >> gravity.x;
-				p_node["ShapeGravity"][1] >> gravity.y;
-				p_node["ShapeGravity"][2] >> gravity.z;
-				g_engineContext.m_physics->SetGravity(*collision->m_handle, gravity);
+					//Set physics gravity
+					glm::vec3 gravity;
+					p_node["ShapeGravity"][0] >> gravity.x;
+					p_node["ShapeGravity"][1] >> gravity.y;
+					p_node["ShapeGravity"][2] >> gravity.z;
+					g_engineContext.m_physics->SetGravity(*collision->m_handle, gravity);
+				}
 
 				//Create physics shape
+				if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
+				{
+					std::string meshHandle;
+					p_node["MeshHandle"] >> meshHandle;
+					collision->m_meshHandle = meshHandle;
+
+					g_engineContext.m_physics->BindMeshShape(*collision->m_handle, meshHandle, trans->m_position, trans->m_orientation.GetQuaternion(), trans->m_scale, 0.0f, true);
+
+					break;
+				}
+
 				int shape;
 				p_node["PhysicsShape"] >> shape;
 
+				bool collideWithWorld;
+				p_node["CollideWithWorld"] >> collideWithWorld;
+
+				bool collideWithStatic;
+				p_node["CollideWithStatic"] >> collideWithStatic;
 
 				RootEngine::Physics::PhysicsShape::PhysicsShape pshape = (RootEngine::Physics::PhysicsShape::PhysicsShape)shape;
-
 				switch (pshape)
 				{
 				case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
@@ -299,21 +314,39 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 						float shapeRadius;
 						p_node["ShapeRadius"] >> shapeRadius;
 
-						bool collideWithWorld;
-						p_node["CollideWithWorld"] >> collideWithWorld;
-
-						bool collideWithStatic;
-						p_node["CollideWithStatic"] >> collideWithStatic;
-
-
 						g_engineContext.m_physics->BindSphereShape(*collision->m_handle, trans->m_position, glm::quat(0,0,0,1), shapeRadius, physics->m_mass, collideWithWorld, collideWithStatic);
 					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
+					{
+						float shapeRadius;
+						p_node["ShapeRadius"] >> shapeRadius;
+
+						float shapeHeight;
+						p_node["ShapeHeight"] >> shapeHeight;
+
+						g_engineContext.m_physics->BindConeShape(*collision->m_handle, trans->m_position, glm::quat(0,0,0,1), shapeHeight, shapeRadius, physics->m_mass, collideWithWorld, collideWithStatic);
+					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
+					{
+						float shapeRadius;
+						p_node["ShapeRadius"] >> shapeRadius;
+
+						float shapeHeight;
+						p_node["ShapeHeight"] >> shapeHeight;
+
+						g_engineContext.m_physics->BindCylinderShape(*collision->m_handle, trans->m_position, glm::quat(0,0,0,1), shapeHeight, shapeRadius, physics->m_mass, collideWithWorld, collideWithStatic);
+					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
+					{
+						std::string meshHandle;
+						p_node["MeshHandle"] >> meshHandle;
+						collision->m_meshHandle = meshHandle;
+
+						g_engineContext.m_physics->BindMeshShape(*collision->m_handle, meshHandle, trans->m_position, trans->m_orientation.GetQuaternion(), trans->m_scale, physics->m_mass, collideWithWorld, collideWithStatic);
+					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_HULL:
 					break;

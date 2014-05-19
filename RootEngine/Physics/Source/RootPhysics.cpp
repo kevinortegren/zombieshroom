@@ -1591,6 +1591,32 @@ namespace Physics
 		
 	}
 
+	float RootPhysics::GetHeight(int p_objectHandle)
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return 0;
+
+		PhysicsShape::PhysicsShape shape = GetShape(p_objectHandle);
+		btCollisionShape* beteShape = m_dynamicObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->getCollisionShape();
+		
+		switch (shape)
+		{
+		case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
+				return 2 * (float)((btSphereShape*)beteShape)->getRadius();
+			break;
+		case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
+				return (float)((btConeShape*)beteShape)->getHeight();
+			break;
+		case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
+				return (float)((btCylinderShape*)beteShape)->getHalfExtentsWithoutMargin().y();
+			break;
+		default:
+			break;
+		}
+
+		return 0;
+	}
+
 	bool RootPhysics::GetCollideWithStatic( int p_objectHandle )
 	{
 		if(!DoesObjectExist(p_objectHandle))

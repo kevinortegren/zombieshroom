@@ -389,6 +389,9 @@ void Treenity::UpdateOnSelection()
 		// Clear component list.
 		m_compView->RemoveItems();
 
+		// Update rotation tool selection.
+		m_rotationTool.SetSelectedEntity(nullptr);
+
 	}
 	else if (m_selectedEntities.size() == 1)
 	{
@@ -427,6 +430,9 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list (potential change in future, show transforms).
 		m_compView->RemoveItems();
+
+		// Update rotation tool selection.
+		m_rotationTool.SetSelectedEntity(nullptr);
 	}
 }
 

@@ -45,8 +45,8 @@ public:
     {
         if (Transform->objectName().isEmpty())
             Transform->setObjectName(QStringLiteral("Transform"));
-        Transform->resize(357, 146);
-        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        Transform->resize(232, 146);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(Transform->sizePolicy().hasHeightForWidth());

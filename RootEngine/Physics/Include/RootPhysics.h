@@ -156,6 +156,7 @@ namespace RootEngine
 			virtual glm::quat GetOrientation(int p_objectHandle) = 0;
 			virtual PhysicsShape::PhysicsShape GetShape(int p_objectHandle) = 0;
 			virtual float GetRadius(int p_objectHandle) = 0;
+			virtual float GetHeight(int p_objectHandle) = 0;
 			virtual bool GetCollideWithStatic(int p_objectHandle) = 0;
 			virtual bool GetCollideWithWorld(int p_objectHandle)  = 0;
 
@@ -238,6 +239,7 @@ namespace RootEngine
 			float GetPlayerVerticalVelocity(int p_objectHandle);
 			PhysicsShape::PhysicsShape GetShape(int p_objectHandle);
 			float GetRadius(int p_objectHandle);
+			float GetHeight(int p_objectHandle);
 			bool GetCollideWithStatic(int p_objectHandle);
 			bool GetCollideWithWorld(int p_objectHandle); 
 
