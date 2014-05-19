@@ -1191,6 +1191,15 @@ namespace Physics
 		}
 	}
 
+	void RootPhysics::ToggleCollisionFlag(int p_objectHandle, btCollisionObject::CollisionFlags p_flag)
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return;
+
+		p_flag = (btCollisionObject::CollisionFlags)((unsigned int) m_dynamicObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->getCollisionFlags() ^ (unsigned int) p_flag);
+		m_dynamicObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->setCollisionFlags(p_flag);
+	}
+
 	void RootPhysics::Move( int p_objectHandle , glm::vec3 p_position, float p_dt )
 	{
 		if(!DoesObjectExist(p_objectHandle))
