@@ -11,7 +11,7 @@ const float RotationTool::s_pickMargin = 0.4f; // Acceptable margin when picking
 const glm::vec4 RotationTool::s_hightlightColor = glm::vec4(1,1,0,1); // Yellow highlight color.
 
 RotationTool::RotationTool()
-	: m_selectedAxis(RotationAxis::AXIS_NONE), m_angle0(0.0f), m_selectedEntity(nullptr), m_visible(false)
+	: m_selectedAxis(RotationAxis::AXIS_NONE), m_angle0(0.0f)
 {
 
 }
@@ -38,7 +38,6 @@ void RotationTool::LoadResources(ECS::World* p_world)
 	// X
 	m_axisEntities[RotationAxis::AXIS_X] = m_world->GetEntityManager()->CreateEntity();
 	RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_axisEntities[RotationAxis::AXIS_X]);
-	//RootForce::Transform* t = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
 	r->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_x");
 	r->m_material = m_axisMaterial;
 	r->m_params[Render::Semantic::COLOR] = &m_axisColors[RotationAxis::AXIS_X];
@@ -47,7 +46,6 @@ void RotationTool::LoadResources(ECS::World* p_world)
 	// Y
 	m_axisEntities[RotationAxis::AXIS_Y] = m_world->GetEntityManager()->CreateEntity();
 	RootForce::Renderable* r1 = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_axisEntities[RotationAxis::AXIS_Y]);
-	//RootForce::Transform* t1 = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y]);
 	r1->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_y");
 	r1->m_material = m_axisMaterial;
 	r1->m_params[Render::Semantic::COLOR] = &m_axisColors[RotationAxis::AXIS_Y];
@@ -56,7 +54,6 @@ void RotationTool::LoadResources(ECS::World* p_world)
 	// Z
 	m_axisEntities[RotationAxis::AXIS_Z] = m_world->GetEntityManager()->CreateEntity();
 	RootForce::Renderable* r2 = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_axisEntities[RotationAxis::AXIS_Z]);
-	//RootForce::Transform* t2 = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z]);
 	r2->m_model = g_engineContext.m_resourceManager->LoadCollada("circle_z");
 	r2->m_material = m_axisMaterial;
 	r2->m_params[Render::Semantic::COLOR] = &m_axisColors[RotationAxis::AXIS_Z];
@@ -65,39 +62,11 @@ void RotationTool::LoadResources(ECS::World* p_world)
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_axisEntities[RotationAxis::AXIS_X]);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_axisEntities[RotationAxis::AXIS_Y]);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_axisEntities[RotationAxis::AXIS_Z]);
-
-	m_selectedEntity = nullptr;
-	m_visible = false;
-}
-
-void RotationTool::Update()
-{	
-	if(m_selectedEntity == nullptr)
-		return;
-
-	if(!m_visible)
-		return;
-
-	// Get camera entity
-	ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera"); 
-	glm::vec3 cameraPos = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
-
-	RootForce::Transform* cameraTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity);
-	RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
-
-	glm::vec3 dir = -glm::normalize(cameraPos - selectedTransform->m_position);
-
-	float t = 8.0f / glm::dot(cameraTransform->m_orientation.GetFront(), dir);
-
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_position = cameraPos + t * dir;
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_position = cameraPos + t * dir;
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_position = cameraPos + t * dir;
 }
 
 float RotationTool::GetAngleFromAxis(RotationAxis::RotationAxis axis, const glm::vec3& position)
 {
 	float angle = 0.0f;
-
 	switch (axis)
 	{
 	case RotationAxis::AXIS_X:
@@ -322,32 +291,25 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	return false;
 }
 
+void RotationTool::SetPosition(const glm::vec3& p_position)
+{
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_position = p_position;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_position = p_position;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_position = p_position;
+}
+
 void RotationTool::Hide()
 {
-	if(m_selectedEntity == nullptr)
-		return;
-
-	if(m_visible)
-	{
-		m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
-		m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y]);
-		m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z]);
-		m_visible = false;
-	}
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y]);
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z]);
 }
 
 void RotationTool::Show()
 {
-	if(m_selectedEntity == nullptr)
-		return;
-
-	if(!m_visible)
-	{
-		m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
-		m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y]);
-		m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z]);
-		m_visible = true;
-	}
+	m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
+	m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y]);
+	m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z]);
 
 	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
 	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <RootTools/Treenity/Include/Tool.h>
-
 #include <RootEngine/Render/Include/Material.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>
 
@@ -23,11 +22,9 @@ public:
 	~RotationTool();
 
 	void LoadResources(ECS::World* p_world);
-
-	void Update();
-
 	bool Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray);
 
+	void SetPosition(const glm::vec3& p_position);
 	void Hide();
 	void Show();
 
@@ -39,19 +36,11 @@ private:
 	static const float s_pickMargin;
 	static const glm::vec4 s_hightlightColor;
 
-	ECS::World* m_world;
-
 	Render::Material* m_axisMaterial;
 	ECS::Entity* m_axisEntities[3];
 	glm::vec4 m_axisColors[3];
-
 	RotationAxis::RotationAxis m_selectedAxis;
-
 	RootForce::Orientation m_gimbalOrientation;
 	RootForce::Orientation m_entityOrientation;
-
 	float m_angle0;
-
-	ECS::Entity* m_selectedEntity;
-	bool m_visible;
 };

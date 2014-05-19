@@ -219,7 +219,6 @@ namespace Render
 		glEnable(GL_DEPTH_TEST);
 		glCullFace(GL_BACK);	
 		glFrontFace(GL_CCW);
-		glLineWidth(2.0f);
 
 #if defined(_DEBUG) && defined(WIN32)
 		if(glDebugMessageCallbackARB)

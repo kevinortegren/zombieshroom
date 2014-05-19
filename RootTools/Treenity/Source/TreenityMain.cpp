@@ -586,6 +586,7 @@ void TreenityMain::RaySelect()
 	{
 		toolResult = m_treenityEditor.m_toolManager.GetSelectedTool()->Pick(cameraPos, ray);
 	}
+
 	if(toolResult == false)
 	{
 		if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)

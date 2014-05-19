@@ -203,6 +203,8 @@ void Treenity::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& 
 void Treenity::InitializeTools(ECS::World* p_world)
 {
 	m_toolManager.Initialize(p_world);
+	
+	m_toolManager.SetTool();
 }
 
 //TODO: Rename.

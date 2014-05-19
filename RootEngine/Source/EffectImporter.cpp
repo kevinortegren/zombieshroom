@@ -137,6 +137,13 @@ namespace RootEngine
 					
 				}
 
+				if(programs[j].FindValue("line-size"))
+				{
+					float value;
+					programs[j]["line-size"] >> value;
+					program->m_lineSize = value;
+				}
+
 				if(programs[j].FindValue("viewport"))
 				{
 					int x;
