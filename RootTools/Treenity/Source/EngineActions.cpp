@@ -52,23 +52,19 @@ void EngineActions::ClearScene()
 
 void EngineActions::AddDefaultEntities()
 {
-	m_treenityMain->GetEditor()->InitializeTools(m_world);
-
 	// Process entities from world import.
     m_treenityMain->ProcessWorldMessages();
  
-    // Add non-editable entities.
+	// Add non-editable entities.
 	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
-
 	CreateFreeFlyingCamera();
-	
+	m_treenityMain->GetEditor()->InitializeTools(m_world);
 	m_world->GetEntityManager()->CleanUp();
 
 	// Add editable entities.
     ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
 	CreateTestSpawnpoint();
 	CreateWater();
-
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
 	

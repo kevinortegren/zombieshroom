@@ -20,7 +20,7 @@
 #include <RootTools/Treenity/Include/Components/ScriptView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
 #include <RootTools/Treenity/Include/AssetManagerWidget.h>
-#include <RootTools/Treenity/Include/RotationTool.h>
+#include <RootTools/Treenity/Include/ToolManager.h>
 
 
 class Treenity : public QMainWindow, public EditorInterface
@@ -66,8 +66,7 @@ public:
 	//Called after RootEngine has been loaded from TreenityMain!
 	void Init();
 
-	// Tools.
-	RotationTool m_rotationTool;
+	ToolManager m_toolManager;
 
 private:
 

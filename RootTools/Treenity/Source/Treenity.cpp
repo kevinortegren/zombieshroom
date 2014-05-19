@@ -202,7 +202,7 @@ void Treenity::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& 
 
 void Treenity::InitializeTools(ECS::World* p_world)
 {
-	m_rotationTool.LoadResources(p_world);
+	m_toolManager.Initialize(p_world);
 }
 
 //TODO: Rename.
@@ -390,15 +390,16 @@ void Treenity::UpdateOnSelection()
 		m_compView->RemoveItems();
 
 		// Update rotation tool selection.
-		m_rotationTool.SetSelectedEntity(nullptr);
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 
 	}
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
 
-		// m_selectedTool.SetSelectedEntity(selectedEntity);
-		m_rotationTool.SetSelectedEntity(selectedEntity);
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(selectedEntity);
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);
@@ -432,7 +433,8 @@ void Treenity::UpdateOnSelection()
 		m_compView->RemoveItems();
 
 		// Update rotation tool selection.
-		m_rotationTool.SetSelectedEntity(nullptr);
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 	}
 }
 

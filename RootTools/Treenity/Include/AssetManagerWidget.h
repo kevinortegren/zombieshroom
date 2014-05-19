@@ -7,6 +7,7 @@
 #include <QImage>
 #include <QImageReader>
 #include <RootTools/Treenity/GeneratedFiles/ui_AssetManager.h>
+#include <RootTools/Treenity/Include/CustomFileIconProvider.h>
 
 class AssetManagerWidget : public QWidget
 {
