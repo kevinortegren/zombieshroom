@@ -6,9 +6,11 @@ PhysicsView::PhysicsView(QWidget* p_parent)
 {
 	ui.setupUi(this);
 
+	/*
 	connect(ui.doubleSpinBox_velocityX,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityXChanged(double)));
 	connect(ui.doubleSpinBox_velocityY,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityYChanged(double)));
 	connect(ui.doubleSpinBox_velocityZ,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityZChanged(double)));
+	*/
 	connect(ui.doubleSpinBox_mass,		SIGNAL(valueChanged(double)), this,		SLOT(MassChanged(double)));
 }
 
@@ -19,13 +21,16 @@ const QString& PhysicsView::GetComponentName() const
 
 void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 {
+	/*
 	ui.doubleSpinBox_velocityX->setValue(m_engineInterface->GetVelocity(p_entity).x);
 	ui.doubleSpinBox_velocityY->setValue(m_engineInterface->GetVelocity(p_entity).y);
 	ui.doubleSpinBox_velocityZ->setValue(m_engineInterface->GetVelocity(p_entity).z);
+	*/
 
 	ui.doubleSpinBox_mass->setValue(m_engineInterface->GetMass(p_entity));
 }
 
+/*
 void PhysicsView::VelocityXChanged(double p_value)
 {
 	if (m_editorInterface->GetSelection().size() == 1)
@@ -61,6 +66,7 @@ void PhysicsView::VelocityZChanged(double p_value)
 		m_engineInterface->SetVelocity(selectedEntity, velocity);
 	}
 }
+*/
 
 void PhysicsView::MassChanged(double p_value)
 {

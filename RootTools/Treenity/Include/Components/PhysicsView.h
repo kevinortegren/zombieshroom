@@ -16,8 +16,10 @@ private:
 	QString m_name;
 	Ui::Physics ui;
 private slots:
+	/*
 	void VelocityXChanged(double p_value);
 	void VelocityYChanged(double p_value);
 	void VelocityZChanged(double p_value);
+	*/
 	void MassChanged(double p_value);
 };
