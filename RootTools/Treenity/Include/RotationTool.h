@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Utility/ECS/Include/World.h>
+#include <RootTools/Treenity/Include/Tool.h>
+
 #include <RootEngine/Render/Include/Material.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>
 
@@ -15,7 +16,7 @@ namespace RotationAxis
 	};
 }
 
-class RotationTool 
+class RotationTool : public Tool
 {
 public:
 	RotationTool();
@@ -27,7 +28,8 @@ public:
 
 	bool Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray);
 
-	void SetSelectedEntity(ECS::Entity* p_entity);
+	void Hide();
+	void Show();
 
 private:
 
@@ -51,4 +53,5 @@ private:
 	float m_angle0;
 
 	ECS::Entity* m_selectedEntity;
+	bool m_visible;
 };

@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_AssetManagerWidget_t {
-    QByteArrayData data[15];
-    char stringdata[192];
+    QByteArrayData data[17];
+    char stringdata[229];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -43,14 +43,17 @@ QT_MOC_LITERAL(10, 129, 19),
 QT_MOC_LITERAL(11, 149, 12),
 QT_MOC_LITERAL(12, 162, 6),
 QT_MOC_LITERAL(13, 169, 11),
-QT_MOC_LITERAL(14, 181, 9)
+QT_MOC_LITERAL(14, 181, 9),
+QT_MOC_LITERAL(15, 191, 21),
+QT_MOC_LITERAL(16, 213, 14)
     },
     "AssetManagerWidget\0SearchLineChanged\0"
     "\0p_val\0FolderSelected\0FileSelected\0"
     "FileClicked\0NavigateBack\0NavigateForward\0"
     "IconSizeChanged\0TreeListContextMenu\0"
     "FolderLoaded\0p_path\0CollapseAll\0"
-    "ExpandAll\0"
+    "ExpandAll\0CreateScriptTriggered\0"
+    "OpenExternally\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -60,7 +63,7 @@ static const uint qt_meta_data_AssetManagerWidget[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      13,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -68,17 +71,19 @@ static const uint qt_meta_data_AssetManagerWidget[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   69,    2, 0x08,
-       4,    1,   72,    2, 0x08,
-       5,    1,   75,    2, 0x08,
-       6,    1,   78,    2, 0x08,
-       7,    0,   81,    2, 0x08,
-       8,    0,   82,    2, 0x08,
-       9,    1,   83,    2, 0x08,
-      10,    1,   86,    2, 0x08,
-      11,    1,   89,    2, 0x08,
-      13,    0,   92,    2, 0x08,
-      14,    0,   93,    2, 0x08,
+       1,    1,   79,    2, 0x08,
+       4,    1,   82,    2, 0x08,
+       5,    1,   85,    2, 0x08,
+       6,    1,   88,    2, 0x08,
+       7,    0,   91,    2, 0x08,
+       8,    0,   92,    2, 0x08,
+       9,    1,   93,    2, 0x08,
+      10,    1,   96,    2, 0x08,
+      11,    1,   99,    2, 0x08,
+      13,    0,  102,    2, 0x08,
+      14,    0,  103,    2, 0x08,
+      15,    0,  104,    2, 0x08,
+      16,    0,  105,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -90,6 +95,8 @@ static const uint qt_meta_data_AssetManagerWidget[] = {
     QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void, QMetaType::QPoint,    3,
     QMetaType::Void, QMetaType::QString,   12,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -112,6 +119,8 @@ void AssetManagerWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, i
         case 8: _t->FolderLoaded((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 9: _t->CollapseAll(); break;
         case 10: _t->ExpandAll(); break;
+        case 11: _t->CreateScriptTriggered(); break;
+        case 12: _t->OpenExternally(); break;
         default: ;
         }
     }
@@ -142,13 +151,13 @@ int AssetManagerWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 13;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 13)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 11;
+        _id -= 13;
     }
     return _id;
 }

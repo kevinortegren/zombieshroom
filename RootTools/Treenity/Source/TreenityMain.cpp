@@ -461,7 +461,8 @@ void TreenityMain::Update(float dt)
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
 
-		m_treenityEditor.m_rotationTool.Update();
+		if(m_treenityEditor.m_toolManager.GetSelectedTool() != nullptr)
+			m_treenityEditor.m_toolManager.GetSelectedTool()->Update();
 
 		if (!g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT))
 			RaySelect();
@@ -580,8 +581,12 @@ void TreenityMain::RaySelect()
 	// Construct ray.
 	glm::vec3 ray = ConstructRay();
 
-	// Pick and update the roration tool.
-	if(m_treenityEditor.m_rotationTool.Pick(cameraPos, ray) == false)
+	bool toolResult = false;
+	if(m_treenityEditor.m_toolManager.GetSelectedTool() != nullptr)
+	{
+		toolResult = m_treenityEditor.m_toolManager.GetSelectedTool()->Pick(cameraPos, ray);
+	}
+	if(toolResult == false)
 	{
 		if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 		{
@@ -601,7 +606,7 @@ void TreenityMain::RaySelect()
 			std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
 			for(auto itr = entities.begin(); itr != entities.end(); ++itr)
 			{
-				if((*itr)->GetFlag() == 0)
+				if(m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr)) == nullptr)
 					continue;
 
 				if(m_world.GetTagManager()->GetEntityByTag("Skybox") == (*itr))
@@ -669,6 +674,9 @@ void TreenityMain::RaySelect()
 			else
 			{
 				m_treenityEditor.Select(nullptr);
+
+				if(m_treenityEditor.m_toolManager.GetSelectedTool() != nullptr)
+					m_treenityEditor.m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 			}
 		}
 	}
