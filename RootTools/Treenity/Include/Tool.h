@@ -7,9 +7,9 @@ class Tool
 public:
 	Tool();
 	virtual ~Tool() {}
-	virtual void Update();
-	virtual void SetSelectedEntity(ECS::Entity* p_entity);
-	virtual ECS::Entity* GetSelectedEntity();
+	void Update();
+	void SetSelectedEntity(ECS::Entity* p_entity);
+	ECS::Entity* GetSelectedEntity();
 
 	virtual void LoadResources(ECS::World* p_world) = 0;
 	virtual bool Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray) = 0;

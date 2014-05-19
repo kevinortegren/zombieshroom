@@ -384,6 +384,9 @@ void Treenity::UpdateOnSelection()
 
 	if (m_selectedEntities.size() == 0)
 	{
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+
 		// Disable name entry.
 		ui.lineEdit_entityName->setText("");
 		ui.lineEdit_entityName->setEnabled(false);
@@ -423,6 +426,9 @@ void Treenity::UpdateOnSelection()
 	}
 	else if (m_selectedEntities.size() > 1)
 	{
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+
 		// Enable name, allow all names to be changed.
 		ui.lineEdit_entityName->setText("");
 		ui.lineEdit_entityName->setEnabled(true);

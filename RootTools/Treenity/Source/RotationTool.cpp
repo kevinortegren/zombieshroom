@@ -12,14 +12,10 @@ const glm::vec4 RotationTool::s_hightlightColor = glm::vec4(1,1,0,1); // Yellow 
 
 RotationTool::RotationTool()
 	: m_selectedAxis(RotationAxis::AXIS_NONE), m_angle0(0.0f)
-{
-
-}
+{}
 
 RotationTool::~RotationTool()
-{
-
-}
+{}
 
 void RotationTool::LoadResources(ECS::World* p_world)
 {

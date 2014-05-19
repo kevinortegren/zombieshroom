@@ -29,20 +29,16 @@ void TransformView::DisplayEntity(ECS::Entity* p_entity)
 	ui.doubleSpinBox_translationY->setValue(m_engineInterface->GetPosition(p_entity).y);
 	ui.doubleSpinBox_translationZ->setValue(m_engineInterface->GetPosition(p_entity).z);
 
-	glm::quat q = m_engineInterface->GetOrientation(p_entity).GetQuaternion();
+	// [col][row]
+	glm::mat3 matrix = m_engineInterface->GetOrientation(p_entity).GetMatrix();
 
-	glm::vec3 euler = glm::eulerAngles(q);
-	ui.doubleSpinBox_orientationX->setValue(euler.x);
-	ui.doubleSpinBox_orientationY->setValue(euler.y);
-	ui.doubleSpinBox_orientationZ->setValue(euler.z);
+	float x = glm::degrees(atan2f(matrix[1][2], matrix[2][2]));
+	float y = glm::degrees(atan2f(-matrix[0][2], sqrtf((matrix[1][2]*matrix[1][2])+(matrix[2][2]*matrix[2][2]))));
+	float z = glm::degrees(atan2f(matrix[0][1], matrix[0][0]));
 
-	/*float roll  = atan2f(2*q.y*q.w - 2*q.x*q.z, 1 - 2*q.y*q.y - 2*q.z*q.z);
-	float pitch = atan2f(2*q.x*q.w - 2*q.y*q.z, 1 - 2*q.x*q.x - 2*q.z*q.z);
-	float yaw   = asinf(2*q.x*q.y + 2*q.z*q.w);
-	glm::vec3 euler = glm::vec3(roll, yaw, pitch);
-	ui.doubleSpinBox_orientationX->setValue(glm::degrees(euler.x));
-	ui.doubleSpinBox_orientationY->setValue(glm::degrees(euler.y));
-	ui.doubleSpinBox_orientationZ->setValue(glm::degrees(euler.z));*/
+	ui.doubleSpinBox_orientationX->setValue(x);
+	ui.doubleSpinBox_orientationY->setValue(y);
+	ui.doubleSpinBox_orientationZ->setValue(z);
 
 	ui.doubleSpinBox_scaleX->setValue(m_engineInterface->GetScale(p_entity).x);
 	ui.doubleSpinBox_scaleY->setValue(m_engineInterface->GetScale(p_entity).y);
@@ -91,21 +87,44 @@ void TransformView::OrientationXChanged(double p_value)
 	{
 		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
 
-		glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(selectedEntity).GetQuaternion());
-		euler.x = p_value;
-		m_engineInterface->SetOrientation(selectedEntity, RootForce::Orientation(euler.x, euler.y, euler.z));
+		glm::mat3 matrix = m_engineInterface->GetOrientation(selectedEntity).GetMatrix();
+
+		float x = p_value;
+		float y = glm::degrees(atan2f(-matrix[0][2], sqrtf((matrix[1][2]*matrix[1][2])+(matrix[2][2]*matrix[2][2]))));
+		float z = glm::degrees(atan2f(matrix[0][1], matrix[0][0]));
+
+		m_engineInterface->SetOrientation(selectedEntity, RootForce::Orientation(x, y, z));
 	}
 }
 
 void TransformView::OrientationYChanged(double p_value)
 {
+	int revs = floorf(p_value / 360.0f);
+	float degree = p_value - revs * 360;
+	
+	int flipped = 1;
+	if(degree > 270.0f)
+	{
+		degree -= 360.0f;
+	}
+	if(degree > 90.0f)
+	{
+		flipped = -1;
+		degree -= 180.0f;
+	}
+	std::cout << " Degree: " << degree << " Flipped: " << flipped << std::endl; 
+
 	if (m_editorInterface->GetSelection().size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
 
-		glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(selectedEntity).GetQuaternion());
-		euler.y = p_value;
-		m_engineInterface->SetOrientation(selectedEntity, RootForce::Orientation(euler.x, euler.y, euler.z));
+		glm::mat3 matrix = m_engineInterface->GetOrientation(selectedEntity).GetMatrix();
+
+		float x = glm::degrees(atan2f(matrix[1][2], matrix[2][2]));
+		float y = degree;
+		float z = glm::degrees(atan2f(matrix[0][1], matrix[0][0]));
+
+		m_engineInterface->SetOrientation(selectedEntity, RootForce::Orientation(x, y, z));
 	}
 }
 
@@ -115,9 +134,13 @@ void TransformView::OrientationZChanged(double p_value)
 	{
 		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
 
-		glm::vec3 euler = glm::eulerAngles(m_engineInterface->GetOrientation(selectedEntity).GetQuaternion());
-		euler.z = p_value;
-		m_engineInterface->SetOrientation(selectedEntity, RootForce::Orientation(euler.x, euler.y, euler.z));
+		glm::mat3 matrix = m_engineInterface->GetOrientation(selectedEntity).GetMatrix();
+
+		float x = glm::degrees(atan2f(matrix[1][2], matrix[2][2]));
+		float y = glm::degrees(atan2f(-matrix[0][2], sqrtf((matrix[1][2]*matrix[1][2])+(matrix[2][2]*matrix[2][2]))));
+		float z = p_value;
+
+		m_engineInterface->SetOrientation(selectedEntity, RootForce::Orientation(x, y, z));
 	}
 }
 
