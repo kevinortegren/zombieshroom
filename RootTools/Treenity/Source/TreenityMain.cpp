@@ -452,26 +452,18 @@ void TreenityMain::Update(float dt)
 		m_waterSystem->Process();
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();
-		m_scriptSystem->Process();
-
-		
-		m_lookAtSystem->Process();
-		
+		m_scriptSystem->Process();		
+		m_lookAtSystem->Process();		
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
 
-		if(m_treenityEditor.m_toolManager.GetSelectedTool() != nullptr)
-			m_treenityEditor.m_toolManager.GetSelectedTool()->Update();
-
-		if (!g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT))
-			RaySelect();
+		UpdateTools();
 
 		m_cameraSystem->Process();
-
 		m_transformInterpolationSystem->Process();
 		m_renderingSystem->Process();
-
+		
 		RenderSelectedEntity();
 
 		g_engineContext.m_renderer->Clear();
@@ -495,7 +487,7 @@ void TreenityMain::Update(float dt)
 		m_playerControlSystem->Process();
 		m_actionSystem->Process();
 
-		
+	
 		// Start the animations.
 		m_animationSystem->Run();
 
@@ -535,6 +527,43 @@ void TreenityMain::Update(float dt)
 	}
 }
 
+void TreenityMain::UpdateTools()
+{
+	Tool* selectedTool = m_treenityEditor.m_toolManager.GetSelectedTool();
+	if(selectedTool != nullptr)
+	{
+		selectedTool->UpdateRenderingPosition();
+	}
+
+	if (!g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LALT))
+	{
+		// Get camera entity
+		ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
+		glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
+
+		// Construct ray.
+		glm::vec3 ray = ConstructRay();
+
+		if(selectedTool != nullptr)
+		{
+			// Returns true when being used by picking, hovering, dragging etc.
+			bool inUse = m_treenityEditor.m_toolManager.GetSelectedTool()->Pick(cameraPos, ray);
+		
+			if(inUse)
+			{
+				if(selectedTool->GetSelectedEntity() != nullptr) 
+				{
+					m_treenityEditor.DisplayEntity(selectedTool->GetSelectedEntity());
+				}
+			}
+			else
+			{
+				SelectPick(cameraPos, ray);
+			}
+		}
+	}	
+}
+
 void TreenityMain::RenderSelectedEntity()
 {
 	for(auto itr = m_treenityEditor.GetSelection().begin(); itr != m_treenityEditor.GetSelection().end(); ++itr)
@@ -568,119 +597,96 @@ void TreenityMain::RenderSelectedEntity()
 		g_engineContext.m_renderer->AddRenderJob(job);
 		
 		//Debug(&renderable->m_model->m_obb, m_renderingSystem->m_matrices[entity].m_model, glm::vec3(0,1,0));
-
 	}
 }
 
-void TreenityMain::RaySelect()
+void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 {
-	// Get camera entity
-	ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
-	glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
-
-	// Construct ray.
-	glm::vec3 ray = ConstructRay();
-
-	bool toolResult = false;
-	if(m_treenityEditor.m_toolManager.GetSelectedTool() != nullptr)
+	if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
 	{
-		toolResult = m_treenityEditor.m_toolManager.GetSelectedTool()->Pick(cameraPos, ray);
-	}
+		debugRay = ray;
+		debugCameraPos = cameraPos;
 
-	if(toolResult == false)
-	{
-		if(g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT) == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		float closestDist = 999999.0f;
+		ECS::Entity* closestEntity = nullptr;
+
+		std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
+		for(auto itr = entities.begin(); itr != entities.end(); ++itr)
 		{
-			// Get camera entity
-			ECS::Entity* cameraEntity = m_world.GetTagManager()->GetEntityByTag("Camera"); 
-			glm::vec3 cameraPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(cameraEntity)->m_position;
+			if(m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr)) == nullptr)
+				continue;
 
-			// Construct ray.
-			const glm::vec3& ray = glm::normalize(ConstructRay());
+			if(m_world.GetTagManager()->GetEntityByTag("Skybox") == (*itr))
+				continue;
 
-			debugRay = ray;
-			debugCameraPos = cameraPos;
+			if(m_world.GetTagManager()->GetEntityByTag("Camera") == (*itr))
+				continue;
 
-			float closestDist = 999999.0f;
-			ECS::Entity* closestEntity = nullptr;
+			if(m_world.GetTagManager()->GetEntityByTag("AimingDevice") == (*itr))
+				continue;
 
-			std::vector<ECS::Entity*> entities = m_world.GetEntityManager()->GetAllEntities();
-			for(auto itr = entities.begin(); itr != entities.end(); ++itr)
+			if(m_world.GetTagManager()->GetEntityByTag("Water") == (*itr))
+				continue;
+
+			glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
+			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
+			RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));
+			if(renderable != nullptr)
 			{
-				if(m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr)) == nullptr)
-					continue;
-
-				if(m_world.GetTagManager()->GetEntityByTag("Skybox") == (*itr))
-					continue;
-
-				if(m_world.GetTagManager()->GetEntityByTag("Camera") == (*itr))
-					continue;
-
-				if(m_world.GetTagManager()->GetEntityByTag("AimingDevice") == (*itr))
-					continue;
-
-				if(m_world.GetTagManager()->GetEntityByTag("Water") == (*itr))
-					continue;
-
-				glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
-				glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
-				RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));
-				if(renderable != nullptr)
+				float t = 999999.0f;
+				if(RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t))
 				{
-					float t = 999999.0f;
-					if(RayVsOBB(cameraPos, ray, &renderable->m_model->m_obb, transform, t))
+					float newt = 9999999.0f;
+					if(RayVsTriangle(cameraPos, ray, renderable->m_model, transform, newt))
 					{
-						float newt = 9999999.0f;
-						if(RayVsTriangle(cameraPos, ray, renderable->m_model, transform, newt))
+						if(newt < closestDist)
 						{
-							if(newt < closestDist)
-							{
-								closestEntity = (*itr);
-								closestDist = newt;
-								g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
-							}
+							closestEntity = (*itr);
+							closestDist = newt;
+							g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
 						}
 					}
-				}
-				else
-				{
-					static float radius = 5.0f;
-
-					float t = 999999.0f;
-					RayVsSphere(cameraPos, ray, entityPos, radius, t);
-
-					if(t < closestDist)
-					{
-						closestEntity = (*itr);
-						closestDist = t;
-						g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
-
-					}
-				}
-			}
-
-			if(closestEntity != nullptr)
-			{
-				g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
-
-				if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LSHIFT))
-				{
-					m_treenityEditor.AddToSelection(closestEntity);
-				}
-				else
-				{
-					m_treenityEditor.Select(closestEntity);
 				}
 			}
 			else
 			{
-				m_treenityEditor.Select(nullptr);
+				static float radius = 5.0f;
 
-				if(m_treenityEditor.m_toolManager.GetSelectedTool() != nullptr)
-					m_treenityEditor.m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+				float t = 999999.0f;
+				RayVsSphere(cameraPos, ray, entityPos, radius, t);
+
+				if(t < closestDist)
+				{
+					closestEntity = (*itr);
+					closestDist = t;
+					g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
+
+				}
 			}
 		}
+
+		if(closestEntity != nullptr)
+		{
+			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
+
+			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LSHIFT))
+			{
+				m_treenityEditor.AddToSelection(closestEntity);
+			}
+			else
+			{
+				m_treenityEditor.Select(closestEntity);
+			}
+		}
+		else
+		{
+			m_treenityEditor.Select(nullptr);
+
+			if(m_treenityEditor.m_toolManager.GetSelectedTool() != nullptr)
+				m_treenityEditor.m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+		}
 	}
+	
 }
 
 glm::vec3 TreenityMain::ConstructRay()

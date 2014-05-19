@@ -60,10 +60,9 @@ public:
 	RootForce::WaterSystem*		GetWaterSystem() { return m_waterSystem; }
 private:
 
-	float GetAngleFromAxis(int axis, const glm::vec3& position);
-
+	void UpdateTools();
 	void RenderSelectedEntity();
-	void RaySelect();
+	void SelectPick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray);
 
 	glm::vec3 ConstructRay();
 	bool RayVsSphere(const glm::vec3& cameraPos, const glm::vec3& ray, const glm::vec3& center, float radius, float& t);
@@ -115,7 +114,7 @@ private:
 	RootForce::FollowSystem*							m_followSystem;
 	RootForce::HomingSystem*							m_homingSystem;
 	RootForce::RaySystem*								m_raySystem;
-    RootForce::TransformInterpolationSystem*			m_transformInterpolationSystem;
+	RootForce::TransformInterpolationSystem*			m_transformInterpolationSystem;
 	RootForce::Network::NetworkDebugSystem*				m_networkDebugSystem;
 	RootForce::WaterDeathSystem*						m_waterDeathSystem;
 	RootForce::ScaleSystem*								m_scaleSystem;

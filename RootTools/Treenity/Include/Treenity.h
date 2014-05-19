@@ -55,6 +55,7 @@ public:
 	//QPoint GetCanvasCenter() const;
 
 	// Implemented from EditorInterface
+	void DisplayEntity(ECS::Entity* p_selectedEntity);
 	void SelectInOutliner(const std::set<ECS::Entity*>& p_entities);
 	void Select(ECS::Entity* p_entity);
 	void Select(const std::set<ECS::Entity*>& p_entities);

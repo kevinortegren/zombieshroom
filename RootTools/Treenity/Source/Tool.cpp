@@ -7,8 +7,7 @@ Tool::Tool()
 
 }
 
-
-void Tool::Update()
+void Tool::UpdateRenderingPosition()
 {
 	if(m_selectedEntity == nullptr)
 		return;
@@ -40,8 +39,7 @@ void Tool::SetSelectedEntity(ECS::Entity* p_entity)
 		if(m_selectedEntity != p_entity)
 		{
 			m_selectedEntity = p_entity;
-			Show();
-			
+			Show();			
 		}
 	}
 }

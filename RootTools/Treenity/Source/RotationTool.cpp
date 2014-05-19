@@ -7,7 +7,7 @@
 #include <RootEngine/InputManager/Include/InputManager.h>
 extern RootEngine::GameSharedContext g_engineContext;
 
-const float RotationTool::s_pickMargin = 0.4f; // Acceptable margin when picking axis.
+const float RotationTool::s_pickMargin = 0.25f; // Acceptable margin when picking axis.
 const glm::vec4 RotationTool::s_hightlightColor = glm::vec4(1,1,0,1); // Yellow highlight color.
 
 RotationTool::RotationTool()
@@ -118,6 +118,10 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	if(m_selectedEntity == nullptr)
 		return false;
 
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+
 	// Transform of selected entity.
 	RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
 
@@ -162,59 +166,85 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	float disty = glm::distance(gimbalTransform->m_position, hits[RotationAxis::AXIS_Y]);
 	float distz = glm::distance(gimbalTransform->m_position, hits[RotationAxis::AXIS_Z]);
 
-	// Modify rotationbased on left mouse button state.
+	float cameraToHitX = glm::distance(p_cameraPos, hits[RotationAxis::AXIS_X]);
+	float cameraToHitY = glm::distance(p_cameraPos, hits[RotationAxis::AXIS_Y]);
+	float cameraToHitZ = glm::distance(p_cameraPos, hits[RotationAxis::AXIS_Z]);
+
+	float cameraToGimbal = glm::distance(p_cameraPos, gimbalTransform->m_position);
+
+	// Modify rotation based on left mouse button state.
 	using namespace RootEngine::InputManager::KeyState;
 
 	KeyState leftMouseButtonState = g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT);
 
 	if(m_selectedAxis == RotationAxis::AXIS_NONE)
 	{
-		if(distx < (1.0f + s_pickMargin) && distx > (1.0f - s_pickMargin))
+		if(cameraToHitX <= cameraToGimbal)
 		{
-			bestDist = abs(distx-1.0f);
-			axis = RotationAxis::AXIS_X;
-		}		
+			if(distx < (1.0f + s_pickMargin) && distx > (1.0f - s_pickMargin))
+			{
+				bestDist = abs(distx-1.0f);
+				axis = RotationAxis::AXIS_X;
+			}	
+		}
 
-		if(disty < (1.0f + s_pickMargin) && disty > (1.0f - s_pickMargin) && abs(disty-1.0f) < bestDist)
+		if(cameraToHitY <= cameraToGimbal)
 		{
-			bestDist = abs(disty-1.0f);
-			axis = RotationAxis::AXIS_Y;
-		}	
+			if(disty < (1.0f + s_pickMargin) && disty > (1.0f - s_pickMargin) && abs(disty-1.0f) < bestDist)
+			{
+				bestDist = abs(disty-1.0f);
+				axis = RotationAxis::AXIS_Y;
+			}	
 
-		if(distz < (1.0f + s_pickMargin) && distz > (1.0f - s_pickMargin) && abs(distz-1.0f) < bestDist)
+		}
+
+		if(cameraToHitZ <= cameraToGimbal)
 		{
-			bestDist = abs(distz-1.0f);
-			axis = RotationAxis::AXIS_Z;
-		}	
+			if(distz < (1.0f + s_pickMargin) && distz > (1.0f - s_pickMargin) && abs(distz-1.0f) < bestDist)
+			{
+				bestDist = abs(distz-1.0f);
+				axis = RotationAxis::AXIS_Z;
+			}	
+		}
 
 		if(axis != RotationAxis::AXIS_NONE)
 		{
-			// Highlight hoovered axis.
+			// Highlight hovered axis.
 			m_axisColors[axis] = s_hightlightColor;
 		}
 	}
 
 	if(leftMouseButtonState == KeyState::DOWN_EDGE && axis != RotationAxis::AXIS_NONE)
 	{
-		if(distx < (1.0f + s_pickMargin) && distx > (1.0f - s_pickMargin))
+		if(cameraToHitX <= cameraToGimbal)
 		{
-			bestDist = abs(distx-1.0f);
-			axis = RotationAxis::AXIS_X;
-		}		
+			if(distx < (1.0f + s_pickMargin) && distx > (1.0f - s_pickMargin))
+			{
+				bestDist = abs(distx-1.0f);
+				axis = RotationAxis::AXIS_X;
+			}	
+		}
 
-		if(disty < (1.0f + s_pickMargin) && disty > (1.0f - s_pickMargin) && abs(disty-1.0f) < bestDist)
+		if(cameraToHitY <= cameraToGimbal)
 		{
-			bestDist = abs(disty-1.0f);
-			axis = RotationAxis::AXIS_Y;
-		}	
+			if(disty < (1.0f + s_pickMargin) && disty > (1.0f - s_pickMargin) && abs(disty-1.0f) < bestDist)
+			{
+				bestDist = abs(disty-1.0f);
+				axis = RotationAxis::AXIS_Y;
+			}	
 
-		if(distz < (1.0f + s_pickMargin) && distz > (1.0f - s_pickMargin) && abs(distz-1.0f) < bestDist)
+		}
+
+		if(cameraToHitZ <= cameraToGimbal)
 		{
-			bestDist = abs(distz-1.0f);
-			axis = RotationAxis::AXIS_Z;
-		}	
+			if(distz < (1.0f + s_pickMargin) && distz > (1.0f - s_pickMargin) && abs(distz-1.0f) < bestDist)
+			{
+				bestDist = abs(distz-1.0f);
+				axis = RotationAxis::AXIS_Z;
+			}	
+		}
 
-		// Set selected axis to hoovered axis and store the current rotation of gimbal.
+		// Set selected axis to hovered axis and store the current rotation of gimbal.
 		m_angle0 = GetAngleFromAxis(axis, hits[axis] - gimbalTransform->m_position);
 		m_selectedAxis = axis;
 		return true;

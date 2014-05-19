@@ -6,6 +6,7 @@
 
 #include <RootTools/Treenity/Include/Utils.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/InputManager/Include/InputManager.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <QFileDialog>
 
@@ -385,7 +386,9 @@ void Treenity::UpdateOnSelection()
 	if (m_selectedEntities.size() == 0)
 	{
 		if(m_toolManager.GetSelectedTool() != nullptr)
+		{
 			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+		}
 
 		// Disable name entry.
 		ui.lineEdit_entityName->setText("");
@@ -400,7 +403,9 @@ void Treenity::UpdateOnSelection()
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
 
 		if(m_toolManager.GetSelectedTool() != nullptr)
+		{
 			m_toolManager.GetSelectedTool()->SetSelectedEntity(selectedEntity);
+		}
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);
@@ -427,7 +432,9 @@ void Treenity::UpdateOnSelection()
 	else if (m_selectedEntities.size() > 1)
 	{
 		if(m_toolManager.GetSelectedTool() != nullptr)
+		{
 			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+		}
 
 		// Enable name, allow all names to be changed.
 		ui.lineEdit_entityName->setText("");
@@ -436,6 +443,12 @@ void Treenity::UpdateOnSelection()
 		// Clear component list (potential change in future, show transforms).
 		m_compView->RemoveItems();
 	}
+}
+
+void Treenity::DisplayEntity(ECS::Entity* p_selectedEntity)
+{
+	// Update information about the selected entity.
+	static_cast<TransformView*>(m_componentViews[RootForce::ComponentType::TRANSFORM])->DisplayEntity(p_selectedEntity);
 }
 
 void Treenity::keyPressEvent( QKeyEvent* event )

@@ -7,7 +7,7 @@ class Tool
 public:
 	Tool();
 	virtual ~Tool() {}
-	void Update();
+	void UpdateRenderingPosition();
 	void SetSelectedEntity(ECS::Entity* p_entity);
 	ECS::Entity* GetSelectedEntity();
 

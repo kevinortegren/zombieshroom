@@ -15,6 +15,7 @@ public:
 private:
 	QString m_name;
 	Ui::Transform ui;
+	glm::vec3 m_currentOrientationEuler;
 private slots:
 	void PositionXChanged(double p_value);
 	void PositionYChanged(double p_value);
