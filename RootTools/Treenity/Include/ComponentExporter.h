@@ -193,7 +193,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
 					{
-						p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
+						p_emitter << YAML::Key << "MeshHandle" << YAML::Value << g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
 					}
 					break;
 				case RootEngine::Physics::PhysicsShape::SHAPE_HULL:

@@ -181,7 +181,7 @@ void main()
 			//	firstOccludedPos	= oldPosition.xy;
 			//}
 			//If ray is behind and object and in close proximity to it we have in intersection
-			if(diff >= 0 && diff < error*0.05)
+			if(diff >= 0 && diff < error*0.0005)
 			{
 				refS *= stepRefinementAmount;
 				currentPosition = oldPosition;

@@ -29,6 +29,6 @@ private slots:
 	void ConeHeightChanged(double p_value);
 	void CylinderRadiusChanged(double p_value);
 	void CylinderHeightChanged(double p_value);
-	void PhysicsMeshChanged(const QString& p_value);
+	void PhysicsMeshChanged();
 	void PhysicsMeshBrowse();
 };

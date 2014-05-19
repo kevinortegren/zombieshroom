@@ -6,8 +6,21 @@ PhysicsView::PhysicsView(QWidget* p_parent)
 {
 	ui.setupUi(this);
 
-	connect(ui.doubleSpinBox_mass,		SIGNAL(valueChanged(double)), this,		SLOT(MassChanged(double)));
-	connect(ui.comboBox_type,			SIGNAL(currentIndexChanged(int)), this, SLOT(TypeChanged(int)));
+	connect(ui.doubleSpinBox_mass,				SIGNAL(valueChanged(double)),		this,	SLOT(MassChanged(double)));
+	connect(ui.comboBox_type,					SIGNAL(currentIndexChanged(int)),	this,	SLOT(TypeChanged(int)));
+	connect(ui.comboBox_shape,					SIGNAL(currentIndexChanged(int)),	this,	SLOT(ShapeChanged(int)));
+	connect(ui.checkBox_collideWithStatic,		SIGNAL(clicked(bool)),				this,	SLOT(CollisionWithStaticChanged(bool)));
+	connect(ui.checkBox_collideWithWorld,		SIGNAL(clicked(bool)),				this,	SLOT(CollisionWithWorldChanged(bool)));
+	connect(ui.doubleSpinBox_coneHeight,		SIGNAL(valueChanged(double)),		this,	SLOT(ConeHeightChanged(double)));
+	connect(ui.doubleSpinBox_coneRadius,		SIGNAL(valueChanged(double)),		this,	SLOT(ConeRadiusChanged(double)));
+	connect(ui.doubleSpinBox_cylinderHeight,	SIGNAL(valueChanged(double)),		this,	SLOT(CylinderHeightChanged(double)));
+	connect(ui.doubleSpinBox_cylinderRadius,	SIGNAL(valueChanged(double)),		this,	SLOT(CylinderRadiusChanged(double)));
+	connect(ui.doubleSpinBox_sphereRadius,		SIGNAL(valueChanged(double)),		this,	SLOT(SphereRadiusChanged(double)));
+	connect(ui.doubleSpinBox_gravityX,			SIGNAL(valueChanged(double)),		this,	SLOT(GravityXChanged(double)));
+	connect(ui.doubleSpinBox_gravityY,			SIGNAL(valueChanged(double)),		this,	SLOT(GravityYChanged(double)));
+	connect(ui.doubleSpinBox_gravityX,			SIGNAL(valueChanged(double)),		this,	SLOT(GravityXChanged(double)));
+	connect(ui.lineEdit_physicsMesh,			SIGNAL(editingFinished()),			this,	SLOT(PhysicsMeshChanged()));
+	connect(ui.toolButton_physicsMesh,			SIGNAL(clicked()),					this,	SLOT(PhysicsMeshBrowse()));
 }
 
 const QString& PhysicsView::GetComponentName() const
@@ -21,7 +34,7 @@ void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 	ui.comboBox_type->setCurrentIndex(type);
 	ui.stackedWidget_type->setCurrentIndex(type);
 
-	if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+	if (type == 0)
 	{
 		ui.checkBox_collideWithWorld->setChecked(m_engineInterface->GetCollideWithWorld(p_entity));
 		ui.checkBox_collideWithStatic->setChecked(m_engineInterface->GetCollideWithStatic(p_entity));
@@ -75,27 +88,38 @@ void PhysicsView::TypeChanged( int p_value )
 
 void PhysicsView::CollisionWithWorldChanged( bool p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetCollideWithWorld(selection, p_value);
 }
 
 void PhysicsView::CollisionWithStaticChanged( bool p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetCollideWithStatic(selection, p_value);
 }
 
 void PhysicsView::GravityXChanged( double p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	glm::vec3 grav = m_engineInterface->GetGravity(selection);
+	grav.x = p_value;
+	m_engineInterface->SetGravity(selection, grav);
 }
 
 void PhysicsView::GravityYChanged( double p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	glm::vec3 grav = m_engineInterface->GetGravity(selection);
+	grav.y = p_value;
+	m_engineInterface->SetGravity(selection, grav);
 }
 
 void PhysicsView::GravityZChanged( double p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	glm::vec3 grav = m_engineInterface->GetGravity(selection);
+	grav.z = p_value;
+	m_engineInterface->SetGravity(selection, grav);
 }
 
 void PhysicsView::MassChanged(double p_value)
@@ -112,40 +136,48 @@ void PhysicsView::MassChanged(double p_value)
 
 void PhysicsView::ShapeChanged( int p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetPhysicsShape(selection, (RootEngine::Physics::PhysicsShape::PhysicsShape)p_value);
+	DisplayEntity(selection);
 }
 
 void PhysicsView::SphereRadiusChanged( double p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetShapeRadius(selection, p_value);
 }
 
 void PhysicsView::ConeRadiusChanged( double p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetShapeRadius(selection, p_value);
 }
 
 void PhysicsView::ConeHeightChanged( double p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetShapeHeight(selection, p_value);
 }
 
 void PhysicsView::CylinderRadiusChanged( double p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetShapeRadius(selection, p_value);
 }
 
 void PhysicsView::CylinderHeightChanged( double p_value )
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetShapeHeight(selection, p_value);
 }
 
-void PhysicsView::PhysicsMeshChanged( const QString& p_value )
+void PhysicsView::PhysicsMeshChanged()
 {
-
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetPhysicsMesh(selection, (ui.lineEdit_physicsMesh->text() + "0").toStdString());
 }
 
 void PhysicsView::PhysicsMeshBrowse()
 {
-
+	// TODO
 }

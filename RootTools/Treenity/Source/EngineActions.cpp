@@ -417,7 +417,26 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 		break;
 
 		case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
-			g_engineContext.m_physics->BindMeshShape(*collision->m_handle, p_meshHandle, transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic);
+			{
+				std::string newMeshHandle = p_meshHandle;
+				if(newMeshHandle == "")
+				{
+					RootForce::Renderable* rend = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
+					if(rend && rend->m_model)
+					{
+						newMeshHandle = g_engineContext.m_resourceManager->ResolveStringFromModel(rend->m_model) + "0";
+
+						if(newMeshHandle == "")
+							newMeshHandle = "Primitives/box0";
+					}
+					else
+					{
+						newMeshHandle = "Primitives/box0";
+					}					
+				}
+				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle, transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic);
+
+			}
 		break;
 	}
 

@@ -286,7 +286,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				}
 
 				//Create physics shape
-				if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
+			/*	if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 				{
 					std::string meshHandle;
 					p_node["MeshHandle"] >> meshHandle;
@@ -296,7 +296,7 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 
 					break;
 				}
-
+				*/
 				int shape;
 				p_node["PhysicsShape"] >> shape;
 

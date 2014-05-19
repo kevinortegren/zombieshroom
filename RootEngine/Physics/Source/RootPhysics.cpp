@@ -236,7 +236,7 @@ namespace Physics
 					}
 				}
 			}
-			else if (userPointer->m_type == PhysicsType::TYPE_DYNAMIC || (userPointer->m_type == PhysicsType::TYPE_ABILITY && userPointer->m_externalControlled == false))
+			else if (userPointer->m_type == PhysicsType::TYPE_DYNAMIC || (userPointer->m_type == PhysicsType::TYPE_ABILITY && userPointer->m_externalControlled == false) || userPointer->m_type == PhysicsType::TYPE_STATIC )
 			{
 				//unsigned int removedIndex = userPointer->m_vectorIndex;
 
@@ -488,6 +488,7 @@ namespace Physics
 		btCollisionShape* shape = CreateShape(temp);
 
 		m_userPointer.at(p_objectHandle)->m_shape = temp.m_type;
+		m_userPointer.at(p_objectHandle)->m_modelHandle = p_modelHandle;
 
 		btVector3 fallInertia = btVector3(0,0,0);
 		if(m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_STATIC)
