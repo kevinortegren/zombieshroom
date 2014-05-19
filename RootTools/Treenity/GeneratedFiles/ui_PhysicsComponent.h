@@ -32,7 +32,7 @@ public:
     QGridLayout *gridLayout;
     QComboBox *comboBox_shape;
     QLabel *label_7;
-    QStackedWidget *stackedWidget_2;
+    QStackedWidget *stackedWidget_type;
     QWidget *page_5;
     QGridLayout *gridLayout_5;
     QLabel *label_3;
@@ -48,7 +48,7 @@ public:
     QWidget *page_6;
     QLabel *label;
     QComboBox *comboBox_type;
-    QStackedWidget *stackedWidget;
+    QStackedWidget *stackedWidget_shape;
     QWidget *page;
     QGridLayout *gridLayout_4;
     QDoubleSpinBox *doubleSpinBox_sphereRadius;
@@ -75,7 +75,7 @@ public:
     {
         if (Physics->objectName().isEmpty())
             Physics->setObjectName(QStringLiteral("Physics"));
-        Physics->resize(280, 300);
+        Physics->resize(346, 300);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -95,8 +95,8 @@ public:
 
         gridLayout->addWidget(label_7, 2, 0, 1, 1);
 
-        stackedWidget_2 = new QStackedWidget(Physics);
-        stackedWidget_2->setObjectName(QStringLiteral("stackedWidget_2"));
+        stackedWidget_type = new QStackedWidget(Physics);
+        stackedWidget_type->setObjectName(QStringLiteral("stackedWidget_type"));
         page_5 = new QWidget();
         page_5->setObjectName(QStringLiteral("page_5"));
         gridLayout_5 = new QGridLayout(page_5);
@@ -124,16 +124,22 @@ public:
 
         doubleSpinBox_gravityX = new QDoubleSpinBox(page_5);
         doubleSpinBox_gravityX->setObjectName(QStringLiteral("doubleSpinBox_gravityX"));
+        doubleSpinBox_gravityX->setMinimum(-10000);
+        doubleSpinBox_gravityX->setMaximum(10000);
 
         gridLayout_5->addWidget(doubleSpinBox_gravityX, 2, 1, 1, 1);
 
         doubleSpinBox_gravityY = new QDoubleSpinBox(page_5);
         doubleSpinBox_gravityY->setObjectName(QStringLiteral("doubleSpinBox_gravityY"));
+        doubleSpinBox_gravityY->setMinimum(-10000);
+        doubleSpinBox_gravityY->setMaximum(10000);
 
         gridLayout_5->addWidget(doubleSpinBox_gravityY, 2, 2, 1, 1);
 
         doubleSpinBox_gravityZ = new QDoubleSpinBox(page_5);
         doubleSpinBox_gravityZ->setObjectName(QStringLiteral("doubleSpinBox_gravityZ"));
+        doubleSpinBox_gravityZ->setMinimum(-10000);
+        doubleSpinBox_gravityZ->setMaximum(10000);
 
         gridLayout_5->addWidget(doubleSpinBox_gravityZ, 2, 3, 1, 1);
 
@@ -144,6 +150,7 @@ public:
 
         doubleSpinBox_mass = new QDoubleSpinBox(page_5);
         doubleSpinBox_mass->setObjectName(QStringLiteral("doubleSpinBox_mass"));
+        doubleSpinBox_mass->setMaximum(10000);
 
         gridLayout_5->addWidget(doubleSpinBox_mass, 3, 1, 1, 1);
 
@@ -154,12 +161,12 @@ public:
 
         gridLayout_5->addWidget(label_2, 0, 0, 1, 1);
 
-        stackedWidget_2->addWidget(page_5);
+        stackedWidget_type->addWidget(page_5);
         page_6 = new QWidget();
         page_6->setObjectName(QStringLiteral("page_6"));
-        stackedWidget_2->addWidget(page_6);
+        stackedWidget_type->addWidget(page_6);
 
-        gridLayout->addWidget(stackedWidget_2, 1, 0, 1, 4);
+        gridLayout->addWidget(stackedWidget_type, 1, 0, 1, 4);
 
         label = new QLabel(Physics);
         label->setObjectName(QStringLiteral("label"));
@@ -172,14 +179,15 @@ public:
 
         gridLayout->addWidget(comboBox_type, 0, 1, 1, 3);
 
-        stackedWidget = new QStackedWidget(Physics);
-        stackedWidget->setObjectName(QStringLiteral("stackedWidget"));
+        stackedWidget_shape = new QStackedWidget(Physics);
+        stackedWidget_shape->setObjectName(QStringLiteral("stackedWidget_shape"));
         page = new QWidget();
         page->setObjectName(QStringLiteral("page"));
         gridLayout_4 = new QGridLayout(page);
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
         doubleSpinBox_sphereRadius = new QDoubleSpinBox(page);
         doubleSpinBox_sphereRadius->setObjectName(QStringLiteral("doubleSpinBox_sphereRadius"));
+        doubleSpinBox_sphereRadius->setMaximum(10000);
 
         gridLayout_4->addWidget(doubleSpinBox_sphereRadius, 0, 1, 1, 1);
 
@@ -189,7 +197,7 @@ public:
 
         gridLayout_4->addWidget(label_6, 0, 0, 1, 1);
 
-        stackedWidget->addWidget(page);
+        stackedWidget_shape->addWidget(page);
         page_3 = new QWidget();
         page_3->setObjectName(QStringLiteral("page_3"));
         gridLayout_2 = new QGridLayout(page_3);
@@ -207,15 +215,17 @@ public:
 
         doubleSpinBox_coneHeight = new QDoubleSpinBox(page_3);
         doubleSpinBox_coneHeight->setObjectName(QStringLiteral("doubleSpinBox_coneHeight"));
+        doubleSpinBox_coneHeight->setMaximum(10000);
 
         gridLayout_2->addWidget(doubleSpinBox_coneHeight, 1, 1, 1, 1);
 
         doubleSpinBox_coneRadius = new QDoubleSpinBox(page_3);
         doubleSpinBox_coneRadius->setObjectName(QStringLiteral("doubleSpinBox_coneRadius"));
+        doubleSpinBox_coneRadius->setMaximum(10000);
 
         gridLayout_2->addWidget(doubleSpinBox_coneRadius, 0, 1, 1, 1);
 
-        stackedWidget->addWidget(page_3);
+        stackedWidget_shape->addWidget(page_3);
         page_4 = new QWidget();
         page_4->setObjectName(QStringLiteral("page_4"));
         gridLayout_3 = new QGridLayout(page_4);
@@ -228,6 +238,7 @@ public:
 
         doubleSpinBox_cylinderRadius = new QDoubleSpinBox(page_4);
         doubleSpinBox_cylinderRadius->setObjectName(QStringLiteral("doubleSpinBox_cylinderRadius"));
+        doubleSpinBox_cylinderRadius->setMaximum(10000);
 
         gridLayout_3->addWidget(doubleSpinBox_cylinderRadius, 0, 1, 1, 1);
 
@@ -238,10 +249,11 @@ public:
 
         doubleSpinBox_cylinderHeight = new QDoubleSpinBox(page_4);
         doubleSpinBox_cylinderHeight->setObjectName(QStringLiteral("doubleSpinBox_cylinderHeight"));
+        doubleSpinBox_cylinderHeight->setMaximum(10000);
 
         gridLayout_3->addWidget(doubleSpinBox_cylinderHeight, 1, 1, 1, 1);
 
-        stackedWidget->addWidget(page_4);
+        stackedWidget_shape->addWidget(page_4);
         page_2 = new QWidget();
         page_2->setObjectName(QStringLiteral("page_2"));
         gridLayout_6 = new QGridLayout(page_2);
@@ -261,16 +273,16 @@ public:
 
         gridLayout_6->addWidget(toolButton_physicsMesh, 0, 2, 1, 1);
 
-        stackedWidget->addWidget(page_2);
+        stackedWidget_shape->addWidget(page_2);
 
-        gridLayout->addWidget(stackedWidget, 3, 0, 1, 4);
+        gridLayout->addWidget(stackedWidget_shape, 3, 0, 1, 4);
 
 
         retranslateUi(Physics);
-        QObject::connect(comboBox_type, SIGNAL(currentIndexChanged(int)), stackedWidget_2, SLOT(setCurrentIndex(int)));
-        QObject::connect(comboBox_shape, SIGNAL(currentIndexChanged(int)), stackedWidget, SLOT(setCurrentIndex(int)));
+        QObject::connect(comboBox_type, SIGNAL(currentIndexChanged(int)), stackedWidget_type, SLOT(setCurrentIndex(int)));
+        QObject::connect(comboBox_shape, SIGNAL(currentIndexChanged(int)), stackedWidget_shape, SLOT(setCurrentIndex(int)));
 
-        stackedWidget->setCurrentIndex(0);
+        stackedWidget_shape->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(Physics);

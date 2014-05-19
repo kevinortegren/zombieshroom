@@ -392,14 +392,142 @@ void EngineActions::SetRenderableMaterialName( ECS::Entity* p_entity, std::strin
 }
 
 //Physics
-float EngineActions::GetMass(ECS::Entity* p_entity)
+
+void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynamic, bool p_collideWithWorld, bool p_collideWithStatic, bool p_mass, RootEngine::Physics::PhysicsShape::PhysicsShape p_shape, float p_radius, float p_height, const std::string& p_meshHandle)
 {
-	return m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity)->m_mass;
+	RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+
+	if (collision->m_handle != nullptr)
+		g_engineContext.m_physics->RemoveObject(*collision->m_handle);
+	collision->m_handle = g_engineContext.m_physics->CreateHandle(p_entity, p_dynamic ? RootEngine::Physics::PhysicsType::TYPE_DYNAMIC : RootEngine::Physics::PhysicsType::TYPE_STATIC, false);
+
+	switch (p_shape)
+	{
+		case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
+			g_engineContext.m_physics->BindSphereShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_radius, p_mass, p_collideWithWorld, p_collideWithStatic);
+		break;
+
+		case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
+			g_engineContext.m_physics->BindConeShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_height, p_radius, p_mass, p_collideWithWorld, p_collideWithStatic);
+		break;
+
+		case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
+			g_engineContext.m_physics->BindCylinderShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_height, p_radius, p_mass, p_collideWithWorld, p_collideWithStatic);
+		break;
+
+		case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
+			g_engineContext.m_physics->BindMeshShape(*collision->m_handle, p_meshHandle, transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic);
+		break;
+	}
+
+	//g_engineContext.m_physics->ToggleCollisionFlag(*collision->m_handle, btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
+
+	RootForce::Physics* physComp = m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
+	if (p_dynamic)
+	{
+		if (physComp == nullptr)
+		{
+			RootForce::Physics* physics = m_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
+
+			physics->m_mass = p_mass;
+			g_engineContext.m_physics->SetGravity(*collision->m_handle, glm::vec3(0, -9.82f, 0));
+		}
+	}
+	else
+	{
+		m_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(p_entity);
+	}
 }
 
-glm::vec3& EngineActions::GetVelocity( ECS::Entity* p_entity )
+void EngineActions::AddPhysics( ECS::Entity* p_entity, bool p_dynamic )
 {
-	return m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity)->m_velocity;
+	RootForce::Transform* trans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
+	RootForce::Collision* collision = m_world->GetEntityManager()->CreateComponent<RootForce::Collision>(p_entity);
+	ReconstructPhysicsObject(p_entity, p_dynamic, true, true, 1.0f, RootEngine::Physics::PhysicsShape::SHAPE_SPHERE, 1.0f, 0.0f, "");
+}
+
+void EngineActions::RemovePhysics( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Collision>(p_entity);
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(p_entity);
+}
+
+RootEngine::Physics::PhysicsType::PhysicsType EngineActions::GetPhysicsType(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return (RootEngine::Physics::PhysicsType::PhysicsType) g_engineContext.m_physics->GetType(*collision->m_handle);
+}
+
+bool EngineActions::GetCollideWithWorld(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return g_engineContext.m_physics->GetCollideWithWorld(*collision->m_handle);
+}
+
+bool EngineActions::GetCollideWithStatic(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return g_engineContext.m_physics->GetCollideWithStatic(*collision->m_handle);
+}
+
+glm::vec3 EngineActions::GetGravity(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return g_engineContext.m_physics->GetGravity(*collision->m_handle);
+}
+
+float EngineActions::GetMass(ECS::Entity* p_entity)
+{
+	RootForce::Physics* physComp = m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
+	if (physComp != nullptr)
+		return physComp->m_mass;
+	return 0.0f;
+}
+
+RootEngine::Physics::PhysicsShape::PhysicsShape EngineActions::GetPhysicsShape(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return g_engineContext.m_physics->GetShape(*collision->m_handle);
+}
+
+float EngineActions::GetShapeRadius(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return g_engineContext.m_physics->GetRadius(*collision->m_handle);
+}
+
+float EngineActions::GetShapeHeight(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return g_engineContext.m_physics->GetHeight(*collision->m_handle);
+}
+
+std::string EngineActions::GetPhysicsMesh(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
+}
+
+void EngineActions::SetPhysicsType(ECS::Entity* p_entity, bool p_dynamic)
+{
+	ReconstructPhysicsObject(p_entity, p_dynamic, GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
+}
+
+void EngineActions::SetCollideWithWorld(ECS::Entity* p_entity, bool p_collide)
+{
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), p_collide, GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
+}
+
+void EngineActions::SetCollideWithStatic(ECS::Entity* p_entity, bool p_collide)
+{
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), p_collide, GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
+}
+
+void EngineActions::SetGravity(ECS::Entity* p_entity, const glm::vec3& p_gravity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	g_engineContext.m_physics->SetGravity(*collision->m_handle, p_gravity);
 }
 
 void EngineActions::SetMass( ECS::Entity* p_entity, float p_mass)
@@ -418,28 +546,27 @@ void EngineActions::SetMass( ECS::Entity* p_entity, float p_mass)
 	physics->m_mass = p_mass;
 }
 
-void EngineActions::SetVelocity( ECS::Entity* p_entity, glm::vec3& p_velocity )
+void EngineActions::SetPhysicsShape(ECS::Entity* p_entity, RootEngine::Physics::PhysicsShape::PhysicsShape p_shape)
 {
-	RootForce::Physics* physics = m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
-	physics->m_velocity = p_velocity;
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), p_shape, GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
 }
 
-void EngineActions::AddPhysics( ECS::Entity* p_entity )
+void EngineActions::SetShapeRadius(ECS::Entity* p_entity, float p_radius)
 {
-	RootForce::Physics* physics = m_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
-	RootForce::Collision* collision = m_world->GetEntityManager()->CreateComponent<RootForce::Collision>(p_entity);
-	RootForce::Transform* trans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
-
-	collision->m_handle = g_engineContext.m_physics->CreateHandle(p_entity, RootEngine::Physics::PhysicsType::TYPE_DYNAMIC, false);
-	g_engineContext.m_physics->SetGravity(*collision->m_handle, glm::vec3(0, -9.82f, 0));
-	physics->m_mass = 1;
-	g_engineContext.m_physics->BindSphereShape(*collision->m_handle, trans->m_position, glm::quat(0,0,0,1), 1, physics->m_mass, true, true);
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), p_radius, GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
 }
 
-void EngineActions::RemovePhysics( ECS::Entity* p_entity )
+void EngineActions::SetShapeHeight(ECS::Entity* p_entity, float p_height)
 {
-	m_world->GetEntityManager()->RemoveComponent<RootForce::Physics>(p_entity);
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), p_height, GetPhysicsMesh(p_entity));
 }
+
+void EngineActions::SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_mesh)
+{
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH, GetShapeRadius(p_entity), GetShapeHeight(p_entity), p_mesh);
+}
+
+
 
 void EngineActions::AddWaterCollider( ECS::Entity* p_entity )
 {

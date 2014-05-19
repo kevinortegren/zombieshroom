@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>280</width>
+    <width>346</width>
     <height>300</height>
    </rect>
   </property>
@@ -61,7 +61,7 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="4">
-    <widget class="QStackedWidget" name="stackedWidget_2">
+    <widget class="QStackedWidget" name="stackedWidget_type">
      <widget class="QWidget" name="page_5">
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="1" column="0">
@@ -99,13 +99,34 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityX"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityX">
+         <property name="minimum">
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item row="2" column="2">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityY"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityY">
+         <property name="minimum">
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item row="2" column="3">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityZ"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityZ">
+         <property name="minimum">
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_5">
@@ -115,7 +136,11 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_mass"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_mass">
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_2">
@@ -169,14 +194,18 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="4">
-    <widget class="QStackedWidget" name="stackedWidget">
+    <widget class="QStackedWidget" name="stackedWidget_shape">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_sphereRadius"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_sphereRadius">
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_6">
@@ -216,10 +245,18 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_coneHeight"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_coneHeight">
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_coneRadius"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_coneRadius">
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -239,7 +276,11 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_cylinderRadius"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_cylinderRadius">
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_11">
@@ -249,7 +290,11 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_cylinderHeight"/>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_cylinderHeight">
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -283,7 +328,7 @@
   <connection>
    <sender>comboBox_type</sender>
    <signal>currentIndexChanged(int)</signal>
-   <receiver>stackedWidget_2</receiver>
+   <receiver>stackedWidget_type</receiver>
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -299,7 +344,7 @@
   <connection>
    <sender>comboBox_shape</sender>
    <signal>currentIndexChanged(int)</signal>
-   <receiver>stackedWidget</receiver>
+   <receiver>stackedWidget_shape</receiver>
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">

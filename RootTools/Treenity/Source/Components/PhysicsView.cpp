@@ -6,12 +6,8 @@ PhysicsView::PhysicsView(QWidget* p_parent)
 {
 	ui.setupUi(this);
 
-	/*
-	connect(ui.doubleSpinBox_velocityX,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityXChanged(double)));
-	connect(ui.doubleSpinBox_velocityY,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityYChanged(double)));
-	connect(ui.doubleSpinBox_velocityZ,	SIGNAL(valueChanged(double)), this,		SLOT(VelocityZChanged(double)));
-	*/
 	connect(ui.doubleSpinBox_mass,		SIGNAL(valueChanged(double)), this,		SLOT(MassChanged(double)));
+	connect(ui.comboBox_type,			SIGNAL(currentIndexChanged(int)), this, SLOT(TypeChanged(int)));
 }
 
 const QString& PhysicsView::GetComponentName() const
@@ -21,52 +17,86 @@ const QString& PhysicsView::GetComponentName() const
 
 void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 {
-	/*
-	ui.doubleSpinBox_velocityX->setValue(m_engineInterface->GetVelocity(p_entity).x);
-	ui.doubleSpinBox_velocityY->setValue(m_engineInterface->GetVelocity(p_entity).y);
-	ui.doubleSpinBox_velocityZ->setValue(m_engineInterface->GetVelocity(p_entity).z);
-	*/
+	int type = m_engineInterface->GetPhysicsType(p_entity) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC ? 0 : 1;
+	ui.comboBox_type->setCurrentIndex(type);
+	ui.stackedWidget_type->setCurrentIndex(type);
 
-	ui.doubleSpinBox_mass->setValue(m_engineInterface->GetMass(p_entity));
-}
-
-/*
-void PhysicsView::VelocityXChanged(double p_value)
-{
-	if (m_editorInterface->GetSelection().size() == 1)
+	if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
 	{
-		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
-
-		glm::vec3 velocity = m_engineInterface->GetVelocity(selectedEntity);
-		velocity.x = p_value;
-		m_engineInterface->SetVelocity(selectedEntity, velocity);
+		ui.checkBox_collideWithWorld->setChecked(m_engineInterface->GetCollideWithWorld(p_entity));
+		ui.checkBox_collideWithStatic->setChecked(m_engineInterface->GetCollideWithStatic(p_entity));
+		ui.doubleSpinBox_gravityX->setValue(m_engineInterface->GetGravity(p_entity).x);
+		ui.doubleSpinBox_gravityY->setValue(m_engineInterface->GetGravity(p_entity).y);
+		ui.doubleSpinBox_gravityZ->setValue(m_engineInterface->GetGravity(p_entity).z);
+		ui.doubleSpinBox_mass->setValue(m_engineInterface->GetMass(p_entity));
 	}
-}
-
-void PhysicsView::VelocityYChanged(double p_value)
-{
-	if (m_editorInterface->GetSelection().size() == 1)
+	
+	switch (m_engineInterface->GetPhysicsShape(p_entity))
 	{
-		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
+		case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
+		{
+			ui.comboBox_shape->setCurrentIndex(0);
+			ui.stackedWidget_shape->setCurrentIndex(0);
+			ui.doubleSpinBox_sphereRadius->setValue(m_engineInterface->GetShapeRadius(p_entity));
+		} break;
 
-		glm::vec3 velocity = m_engineInterface->GetVelocity(selectedEntity);
-		velocity.y = p_value;
-		m_engineInterface->SetVelocity(selectedEntity, velocity);
+		case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
+		{
+			ui.comboBox_shape->setCurrentIndex(1);
+			ui.stackedWidget_shape->setCurrentIndex(1);
+			ui.doubleSpinBox_coneRadius->setValue(m_engineInterface->GetShapeRadius(p_entity));
+			ui.doubleSpinBox_coneHeight->setValue(m_engineInterface->GetShapeHeight(p_entity));
+		} break;
+
+		case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
+		{
+			ui.comboBox_shape->setCurrentIndex(2);
+			ui.stackedWidget_shape->setCurrentIndex(2);
+			ui.doubleSpinBox_cylinderRadius->setValue(m_engineInterface->GetShapeRadius(p_entity));
+			ui.doubleSpinBox_cylinderHeight->setValue(m_engineInterface->GetShapeHeight(p_entity));
+		} break;
+
+		case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
+		{
+			ui.comboBox_shape->setCurrentIndex(3);
+			ui.stackedWidget_shape->setCurrentIndex(3);
+			ui.lineEdit_physicsMesh->setText(QString::fromStdString(m_engineInterface->GetPhysicsMesh(p_entity)));
+		} break;
 	}
+
 }
 
-void PhysicsView::VelocityZChanged(double p_value)
+void PhysicsView::TypeChanged( int p_value )
 {
-	if (m_editorInterface->GetSelection().size() == 1)
-	{
-		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
-
-		glm::vec3 velocity = m_engineInterface->GetVelocity(selectedEntity);
-		velocity.z = p_value;
-		m_engineInterface->SetVelocity(selectedEntity, velocity);
-	}
+	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+	m_engineInterface->SetPhysicsType(selection, p_value ? false : true);
+	DisplayEntity(selection);
 }
-*/
+
+void PhysicsView::CollisionWithWorldChanged( bool p_value )
+{
+
+}
+
+void PhysicsView::CollisionWithStaticChanged( bool p_value )
+{
+
+}
+
+void PhysicsView::GravityXChanged( double p_value )
+{
+
+}
+
+void PhysicsView::GravityYChanged( double p_value )
+{
+
+}
+
+void PhysicsView::GravityZChanged( double p_value )
+{
+
+}
 
 void PhysicsView::MassChanged(double p_value)
 {
@@ -78,4 +108,44 @@ void PhysicsView::MassChanged(double p_value)
 		mass = p_value;
 		m_engineInterface->SetMass(selectedEntity, mass);
 	}
+}
+
+void PhysicsView::ShapeChanged( int p_value )
+{
+
+}
+
+void PhysicsView::SphereRadiusChanged( double p_value )
+{
+
+}
+
+void PhysicsView::ConeRadiusChanged( double p_value )
+{
+
+}
+
+void PhysicsView::ConeHeightChanged( double p_value )
+{
+
+}
+
+void PhysicsView::CylinderRadiusChanged( double p_value )
+{
+
+}
+
+void PhysicsView::CylinderHeightChanged( double p_value )
+{
+
+}
+
+void PhysicsView::PhysicsMeshChanged( const QString& p_value )
+{
+
+}
+
+void PhysicsView::PhysicsMeshBrowse()
+{
+
 }

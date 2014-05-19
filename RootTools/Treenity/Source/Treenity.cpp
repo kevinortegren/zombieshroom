@@ -34,7 +34,7 @@ Treenity::Treenity(QWidget *parent)
 	m_componentNames[RootForce::ComponentType::LOOKATBEHAVIOR]		= "Look-At Behaviour";
 	m_componentNames[RootForce::ComponentType::THIRDPERSONBEHAVIOR] = "Third Person Behaviour";
 	m_componentNames[RootForce::ComponentType::SCRIPT]				= "Script";
-	m_componentNames[RootForce::ComponentType::COLLISION]			= "Collision";
+	m_componentNames[RootForce::ComponentType::COLLISION]			= "Physics";	// Required since the component list searches on name.
 	m_componentNames[RootForce::ComponentType::COLLISIONRESPONDER]	= "Collision Responder";
 	m_componentNames[RootForce::ComponentType::PLAYER]				= "Player";
 	m_componentNames[RootForce::ComponentType::ANIMATION]			= "Animation";
@@ -70,7 +70,7 @@ Treenity::Treenity(QWidget *parent)
 	ui.verticalLayout->addWidget(m_compView);
 	m_componentViews[RootForce::ComponentType::TRANSFORM]		= new TransformView();
 	m_componentViews[RootForce::ComponentType::RENDERABLE]		= new RenderableView();
-	m_componentViews[RootForce::ComponentType::PHYSICS]			= new PhysicsView();
+	m_componentViews[RootForce::ComponentType::COLLISION]		= new PhysicsView();
 	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]	= new WaterColliderView();
 	m_componentViews[RootForce::ComponentType::SCRIPT]			= new ScriptView();
 
@@ -161,7 +161,7 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
 		// Temporary solution to deal with physics and collider
-		if(p_componentType == 11)
+		if(p_componentType == RootForce::ComponentType::PHYSICS)
 			return;
 
 		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
@@ -176,6 +176,10 @@ void Treenity::ComponentRemoved(ECS::Entity* p_entity, int p_componentType)
 {
 	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
+		// Temporary solution to deal with physics and collider
+		if(p_componentType == RootForce::ComponentType::PHYSICS)
+			return;
+
 		m_compView->RemoveItem(m_componentNames[p_componentType]);
 	}
 }
@@ -356,7 +360,7 @@ void Treenity::AddPhysics()
 {
 	if(m_selectedEntities.size() == 1)
 	{
-		m_engineInterface->AddPhysics(*m_selectedEntities.begin());
+		m_engineInterface->AddPhysics(*m_selectedEntities.begin(), true);
 	}
 }
 

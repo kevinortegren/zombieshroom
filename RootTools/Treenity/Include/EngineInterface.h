@@ -3,6 +3,7 @@
 #include <Utility/ECS/Include/World.h>
 #include <Utility/ECS/Include/Entity.h>
 #include <RootSystems/Include/Orientation.h>
+#include <RootEngine/Physics/Include/RootPhysics.h>
 #include <glm/glm.hpp>
 #include <QString>
 
@@ -55,12 +56,26 @@ struct EngineInterface
 	virtual void SetRenderableMaterialName(ECS::Entity* p_entity, std::string p_materialName) = 0;
 
 	//Physics
-	virtual void AddPhysics(ECS::Entity* p_entity) = 0;
+	virtual void AddPhysics(ECS::Entity* p_entity, bool p_dynamic) = 0;
 	virtual void RemovePhysics(ECS::Entity* p_entity) = 0;
+	virtual RootEngine::Physics::PhysicsType::PhysicsType GetPhysicsType(ECS::Entity* p_entity) = 0;
+	virtual bool GetCollideWithWorld(ECS::Entity* p_entity) = 0;
+	virtual bool GetCollideWithStatic(ECS::Entity* p_entity) = 0;
+	virtual glm::vec3 GetGravity(ECS::Entity* p_entity) = 0;
 	virtual float GetMass(ECS::Entity* p_entity) = 0;
-	virtual glm::vec3& GetVelocity(ECS::Entity* p_entity) = 0;
+	virtual RootEngine::Physics::PhysicsShape::PhysicsShape GetPhysicsShape(ECS::Entity* p_entity) = 0;
+	virtual float GetShapeRadius(ECS::Entity* p_entity) = 0;
+	virtual float GetShapeHeight(ECS::Entity* p_entity) = 0;
+	virtual std::string GetPhysicsMesh(ECS::Entity* p_entity) = 0;
+	virtual void SetPhysicsType(ECS::Entity* p_entity, bool p_dynamic) = 0;
+	virtual void SetCollideWithWorld(ECS::Entity* p_entity, bool p_collide) = 0;
+	virtual void SetCollideWithStatic(ECS::Entity* p_entity, bool p_collide) = 0;
+	virtual void SetGravity(ECS::Entity* p_entity, const glm::vec3& p_gravity) = 0;
 	virtual void SetMass(ECS::Entity* p_entity, float p_mass) = 0;
-	virtual void SetVelocity(ECS::Entity* p_entity, glm::vec3& p_velocity) = 0;
+	virtual void SetPhysicsShape(ECS::Entity* p_entity, RootEngine::Physics::PhysicsShape::PhysicsShape p_shape) = 0;
+	virtual void SetShapeRadius(ECS::Entity* p_entity, float p_radius) = 0;
+	virtual void SetShapeHeight(ECS::Entity* p_entity, float p_height) = 0;
+	virtual void SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_mesh) = 0;
 
 	//Water collider
 	virtual void	AddWaterCollider(ECS::Entity* p_entity) = 0;
