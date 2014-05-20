@@ -45,6 +45,11 @@ void RenderableView::DisplayEntity(ECS::Entity* p_entity)
 	ui.lineEdit_modelName->setText(QString::fromUtf8(m_engineInterface->GetRenderableModelName(p_entity).c_str()));
 	ui.lineEdit_materialName->setText(QString::fromUtf8(m_engineInterface->GetRenderableMaterialName(p_entity).c_str()));
 
+	Render::Material* material =  m_engineInterface->GetMaterial(ui.lineEdit_materialName->text().toStdString());
+
+	if(m_currentMaterial == material)
+		return;
+
 	// Store current material.
 	m_currentMaterial = m_engineInterface->GetMaterial(ui.lineEdit_materialName->text().toStdString());
 
@@ -56,15 +61,15 @@ void RenderableView::DisplayEntity(ECS::Entity* p_entity)
 	{
 		ui.stackedWidget_shaderProperties->setCurrentIndex(0);
 
-		RenderableView::DisplayDiffuse();
-		//QtConcurrent::run(this, &RenderableView::DisplayDiffuse);
+		//RenderableView::DisplayDiffuse();
+		QtConcurrent::run(this, &RenderableView::DisplayDiffuse, material);
 	}
 	else if(effectName == "Mesh_NormalMap")
 	{
 		ui.stackedWidget_shaderProperties->setCurrentIndex(1);
 
-		RenderableView::DisplayDiffuseNormal();
-		//QtConcurrent::run(this, &RenderableView::DisplayDiffuseNormal);
+		//RenderableView::DisplayDiffuseNormal();
+		QtConcurrent::run(this, &RenderableView::DisplayDiffuseNormal, material);
 	}
 	else
 	{
@@ -158,13 +163,13 @@ QPixmap RenderableView::GetPixmap(Render::TextureInterface* p_texture)
 	return pm;
 }
 
-void RenderableView::DisplayDiffuse()
+void RenderableView::DisplayDiffuse(Render::Material* p_material)
 {
 	ui.label_image_diffuse->setPixmap(QPixmap());
 	ui.label_image_specular->setPixmap(QPixmap());
 	ui.label_image_glow->setPixmap(QPixmap());
 
-	for(auto itr = m_currentMaterial->m_textures.begin(); itr != m_currentMaterial->m_textures.end(); ++itr)
+	for(auto itr = p_material->m_textures.begin(); itr != p_material->m_textures.end(); ++itr)
 	{
 		if((*itr).first == Render::TextureSemantic::DIFFUSE)
 		{
@@ -184,14 +189,14 @@ void RenderableView::DisplayDiffuse()
 	}
 }
 
-void RenderableView::DisplayDiffuseNormal()
+void RenderableView::DisplayDiffuseNormal(Render::Material* p_material)
 {	
 	ui.label_image_diffuse_1->setPixmap(QPixmap());
 	ui.label_image_specular_1->setPixmap(QPixmap());
 	ui.label_image_normal_1->setPixmap(QPixmap());
 	ui.label_image_glow_1->setPixmap(QPixmap());
 
-	for(auto itr = m_currentMaterial->m_textures.begin(); itr != m_currentMaterial->m_textures.end(); ++itr)
+	for(auto itr = p_material->m_textures.begin(); itr != p_material->m_textures.end(); ++itr)
 	{
 		if((*itr).first == Render::TextureSemantic::DIFFUSE)
 		{

@@ -16,8 +16,8 @@ private:
 	
 	QPixmap GetPixmap(Render::TextureInterface* p_texture);
 
-	void DisplayDiffuse();
-	void DisplayDiffuseNormal();
+	void DisplayDiffuse(Render::Material* p_material);
+	void DisplayDiffuseNormal(Render::Material* p_material);
 
 	QString m_name;
 	Ui::Renderable ui;
