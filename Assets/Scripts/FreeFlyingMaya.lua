@@ -56,9 +56,7 @@ function FreeFlyingMaya.OnUpdate(self)
 	
 	local aimTransform = Entity.GetEntityByTag("AimingDevice"):GetTransformation();
 	
-	local worldDisplace = aimTransform:GetOrient():GetFront() * Vec3.New(-FreeFlyingMaya.Displacement, -FreeFlyingMaya.Displacement, -FreeFlyingMaya.Displacement);
-
-	transform:SetPos(aimTransform:GetPos() + worldDisplace);
+	
 
 	if controllerActions:IsActivated("Alt") then
 	
@@ -88,6 +86,11 @@ function FreeFlyingMaya.OnUpdate(self)
 		end
         
 	end
+
+	local worldDisplace = aimTransform:GetOrient():GetFront() * Vec3.New(-FreeFlyingMaya.Displacement, -FreeFlyingMaya.Displacement, -FreeFlyingMaya.Displacement);
+
+	transform:SetPos(aimTransform:GetPos() + worldDisplace);
+
 	FreeFlyingMaya.Displacement = FreeFlyingMaya.Displacement - Static.GetScroll() * speedZoomFactor;
 
     
