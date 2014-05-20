@@ -54,7 +54,7 @@ public:
 	void SetRenderableMaterialName(ECS::Entity* p_entity, std::string p_materialName);
 
 	//Physics
-	void ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynamic, bool p_collideWithWorld, bool p_collideWithStatic, bool p_mass, RootEngine::Physics::PhysicsShape::PhysicsShape p_shape, float p_radius, float p_height, const std::string& p_meshHandle);
+	void ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynamic, bool p_collideWithWorld, bool p_collideWithStatic, bool p_mass, RootEngine::Physics::PhysicsShape::PhysicsShape p_shape, float p_radius, float p_height, const std::string& p_meshHandle, bool p_visualize = false);
 	void AddPhysics(ECS::Entity* p_entity, bool p_dynamic);
 	void RemovePhysics(ECS::Entity* p_entity);
 	RootEngine::Physics::PhysicsType::PhysicsType GetPhysicsType(ECS::Entity* p_entity);
@@ -75,6 +75,7 @@ public:
 	void SetShapeRadius(ECS::Entity* p_entity, float p_radius);
 	void SetShapeHeight(ECS::Entity* p_entity, float p_height);
 	void SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_mesh);
+	void SetCollisionVisualized(ECS::Entity* p_entity, bool p_visualize);
 
 	//Water collider
 	void	AddWaterCollider(ECS::Entity* p_entity);

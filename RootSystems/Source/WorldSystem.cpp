@@ -129,6 +129,10 @@ namespace RootForce
 
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Creating static mesh vertices: %d indices %d", vertices.size(), indices.size());
 		}
+		else
+		{
+			m_staticMesh = nullptr;
+		}
 	}
 
 	void WorldSystem::SubdivideTree()

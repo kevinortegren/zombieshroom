@@ -372,7 +372,7 @@ namespace Physics
 	
 
 
-	void RootPhysics::BindSphereShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
+	void RootPhysics::BindSphereShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic, bool p_visualize)
 	{
 		
 		btVector3 pos;
@@ -399,7 +399,7 @@ namespace Physics
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
 
-			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic);	
+			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic, p_visualize);	
 
 			return;
 		}
@@ -409,7 +409,7 @@ namespace Physics
 		}
 	}
 
-	void RootPhysics::BindCylinderShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
+	void RootPhysics::BindCylinderShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic, bool p_visualize)
 	{
 		btVector3 pos;
 		pos.setX( p_position[0]);
@@ -435,7 +435,7 @@ namespace Physics
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
-			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
+			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic, p_visualize); 
 			return;
 		}
 		else //Create a controller
@@ -444,7 +444,7 @@ namespace Physics
 		}
 	}
 
-	void RootPhysics::BindConeShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
+	void RootPhysics::BindConeShape( int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic, bool p_visualize)
 	{
 		btVector3 pos;
 		pos.setX( p_position[0]);
@@ -470,7 +470,7 @@ namespace Physics
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape,fallInertia);
-			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
+			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic, p_visualize); 
 			return;
 		}
 		else //Create a controller
@@ -479,7 +479,7 @@ namespace Physics
 		}
 	}
 
-	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic)
+	void RootPhysics::BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic, bool p_visualize)
 	{
 		btVector3 pos;
 		pos.setX( p_position[0]);
@@ -506,7 +506,7 @@ namespace Physics
 		{
 			btDefaultMotionState* motionstate = new btDefaultMotionState(trans);
 			btRigidBody* body = new btRigidBody(p_mass, motionstate , shape, fallInertia);
-			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic); 
+			AddRigidBody(p_objectHandle, body, p_collideWithWorld, p_collidesWithStatic, p_visualize); 
 			return;
 		}
 		else //Create a controller
@@ -1459,12 +1459,12 @@ namespace Physics
 		return nullptr;
 	}
 
-	void RootPhysics::AddRigidBody( int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld, bool p_collidesWithStatic )
+	void RootPhysics::AddRigidBody( int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld, bool p_collidesWithStatic, bool p_visualize )
 	{
 		if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC)
 		{
 				p_body->setRestitution(0.8f);
-				p_body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT /*| btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT*/);
+				p_body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
 		}
 		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC)
 		{
@@ -1475,6 +1475,8 @@ namespace Physics
 				p_body->setCcdSweptSphereRadius(1.f);
 		}
 		
+		if (!p_visualize)
+			p_body->setCollisionFlags(p_body->getCollisionFlags() | btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT);
 		
 		if(!p_collideWithWorld)
 			p_body->setCollisionFlags(p_body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);

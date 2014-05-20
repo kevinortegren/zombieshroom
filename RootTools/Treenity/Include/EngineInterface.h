@@ -76,6 +76,7 @@ struct EngineInterface
 	virtual void SetShapeRadius(ECS::Entity* p_entity, float p_radius) = 0;
 	virtual void SetShapeHeight(ECS::Entity* p_entity, float p_height) = 0;
 	virtual void SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_mesh) = 0;
+	virtual void SetCollisionVisualized(ECS::Entity* p_entity, bool p_visualize) = 0;
 
 	//Water collider
 	virtual void	AddWaterCollider(ECS::Entity* p_entity) = 0;

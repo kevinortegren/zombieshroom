@@ -395,7 +395,7 @@ void EngineActions::SetRenderableMaterialName( ECS::Entity* p_entity, std::strin
 
 //Physics
 
-void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynamic, bool p_collideWithWorld, bool p_collideWithStatic, bool p_mass, RootEngine::Physics::PhysicsShape::PhysicsShape p_shape, float p_radius, float p_height, const std::string& p_meshHandle)
+void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynamic, bool p_collideWithWorld, bool p_collideWithStatic, bool p_mass, RootEngine::Physics::PhysicsShape::PhysicsShape p_shape, float p_radius, float p_height, const std::string& p_meshHandle, bool p_visualize)
 {
 	RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
 	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
@@ -413,15 +413,15 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 	switch (p_shape)
 	{
 		case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
-			g_engineContext.m_physics->BindSphereShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_radius, p_mass, p_collideWithWorld, p_collideWithStatic);
+			g_engineContext.m_physics->BindSphereShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_radius, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
 		break;
 
 		case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
-			g_engineContext.m_physics->BindConeShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_height, p_radius, p_mass, p_collideWithWorld, p_collideWithStatic);
+			g_engineContext.m_physics->BindConeShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_height, p_radius, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
 		break;
 
 		case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
-			g_engineContext.m_physics->BindCylinderShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_height, p_radius, p_mass, p_collideWithWorld, p_collideWithStatic);
+			g_engineContext.m_physics->BindCylinderShape(*collision->m_handle, transform->m_position, transform->m_orientation.GetQuaternion(), p_height, p_radius, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
 		break;
 
 		case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
@@ -444,7 +444,7 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 						newMeshHandle = "Primitives/box0";
 					}					
 				}
-				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle, transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic);
+				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle, transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
 
 			}
 		break;
@@ -595,6 +595,11 @@ void EngineActions::SetShapeHeight(ECS::Entity* p_entity, float p_height)
 void EngineActions::SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_mesh)
 {
 	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH, GetShapeRadius(p_entity), GetShapeHeight(p_entity), p_mesh);
+}
+
+void EngineActions::SetCollisionVisualized(ECS::Entity* p_entity, bool p_visualize)
+{
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), p_visualize);
 }
 
 

@@ -81,6 +81,7 @@ private:
 	QString m_currentProjectFile;
 	ProjectManager* m_projectManager;
 	std::set<ECS::Entity*> m_selectedEntities;
+	std::set<ECS::Entity*> m_previouslySelectedEntities;
 
 	// Editor state
 	bool m_running;

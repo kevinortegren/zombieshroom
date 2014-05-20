@@ -287,6 +287,7 @@ void Treenity::Play()
 
 void Treenity::Select(ECS::Entity* p_entity)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.clear();
 
 	if(p_entity != nullptr)
@@ -297,6 +298,7 @@ void Treenity::Select(ECS::Entity* p_entity)
 
 void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities = p_entities;
 
 	UpdateOnSelection();
@@ -304,6 +306,7 @@ void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
 
 void Treenity::AddToSelection(ECS::Entity* p_entity)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.insert(p_entity);
 
 	UpdateOnSelection();
@@ -311,6 +314,7 @@ void Treenity::AddToSelection(ECS::Entity* p_entity)
 
 void Treenity::ClearSelection()
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.clear();
 
 	UpdateOnSelection();
@@ -450,6 +454,27 @@ void Treenity::UpdateOnSelection()
 		// Update rotation tool selection.
 		if(m_toolManager.GetSelectedTool() != nullptr)
 			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+	}
+
+	// For all selected entities that has a collision component, visualize their shape.
+	for (auto entity : m_selectedEntities)
+	{
+		if ((entity->GetFlag() & (1ULL << RootForce::ComponentType::COLLISION)) != 0)
+		{
+			m_engineInterface->SetCollisionVisualized(entity, true);
+		}
+	}
+
+	// Remove collision visualization for deselected entities.
+	for (auto entity : m_previouslySelectedEntities)
+	{
+		if ((entity->GetFlag() & (1ULL << RootForce::ComponentType::COLLISION)) != 0)
+		{
+			if (m_selectedEntities.find(entity) == m_selectedEntities.end())
+			{
+				m_engineInterface->SetCollisionVisualized(entity, false);
+			}
+		}
 	}
 }
 

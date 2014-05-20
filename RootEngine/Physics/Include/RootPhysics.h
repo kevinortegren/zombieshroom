@@ -135,10 +135,10 @@ namespace RootEngine
 			virtual void DeactivateRagdoll(int p_objectHandle) = 0;
 
 			//Binds a shape to a handle
-			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true) = 0;
-			virtual void BindCylinderShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true) = 0;
-			virtual void BindConeShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true) = 0;
-			virtual void BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true ) = 0;
+			virtual void BindSphereShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true, bool p_visualize = true) = 0;
+			virtual void BindCylinderShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true, bool p_visualize = true) = 0;
+			virtual void BindConeShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true, bool p_visualize = true) = 0;
+			virtual void BindMeshShape( int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true, bool p_visualize = true) = 0;
 			virtual void BindHullShape(int p_objectHandle, std::string p_modelHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true) = 0;
 			virtual void BindNoShape(int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation) = 0;
 			
@@ -214,10 +214,10 @@ namespace RootEngine
 			void DeactivateRagdoll(int p_objectHandle);
 
 			//Binds
-			void BindSphereShape(int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true);
-			void BindCylinderShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true);
-			void BindConeShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true);
-			void BindMeshShape(int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true );
+			void BindSphereShape(int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true, bool p_visualize = true);
+			void BindCylinderShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true, bool p_visualize = true);
+			void BindConeShape(int p_objectHandle,  glm::vec3 p_position, glm::quat p_rotation, float p_height, float p_radius, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true, bool p_visualize = true);
+			void BindMeshShape(int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, glm::vec3 p_scale, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true, bool p_visualize = true);
 			void BindHullShape(int p_objectHandle, std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass, bool p_collideWithWorld, bool p_collidesWithStatic = true);
 			void BindNoShape(int p_objectHandle, glm::vec3 p_position, glm::quat p_rotation);
 
@@ -273,7 +273,7 @@ namespace RootEngine
 			void Init();
 			bool DoesObjectExist(int p_objectHandle);
 			bool DoesUserPointerExist( int p_objectHandle );
-			void AddRigidBody(int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld, bool p_collidesWithStatic);
+			void AddRigidBody(int p_objectHandle, btRigidBody* p_body, bool p_collideWithWorld, bool p_collidesWithStatic, bool p_visualize = true);
 			void AddController(int p_objectHandle, btCollisionShape* p_collisionShape, bool p_collideWithWorld, bool p_collidesWithStatic, const btTransform& p_transform);
 			btRigidBody* CreateMesh(std::string p_modelHandle, glm::vec3 p_position, glm::quat p_rotation, float p_mass);
 			btCollisionShape* CreateShape(ShapeStruct p_shapeStruct);
