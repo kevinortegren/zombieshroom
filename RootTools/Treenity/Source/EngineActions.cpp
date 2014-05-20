@@ -650,3 +650,14 @@ void EngineActions::SetScript( ECS::Entity* p_entity, std::string p_script )
 {
 	m_world->GetEntityManager()->GetComponent<RootForce::Script>(p_entity)->Name = g_engineContext.m_resourceManager->LoadScript(p_script);
 }
+
+//Collision responder
+void EngineActions::AddCollisionResponder( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->CreateComponent<RootForce::CollisionResponder>(p_entity);
+}
+
+void EngineActions::RemoveCollisionResponder( ECS::Entity* p_entity )
+{
+	m_world->GetEntityManager()->RemoveComponent<RootForce::CollisionResponder>(p_entity);
+}

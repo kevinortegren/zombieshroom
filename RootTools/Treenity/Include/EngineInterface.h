@@ -92,4 +92,8 @@ struct EngineInterface
 	virtual void		RemoveScript(ECS::Entity* p_entity) = 0;
 	virtual std::string GetScript(ECS::Entity* p_entity) = 0;
 	virtual void		SetScript(ECS::Entity* p_entity, std::string p_script) = 0;
+
+	//Collision responder
+	virtual void		AddCollisionResponder(ECS::Entity* p_entity) = 0;
+	virtual void		RemoveCollisionResponder(ECS::Entity* p_entity) = 0;
 };

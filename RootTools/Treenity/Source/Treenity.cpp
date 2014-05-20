@@ -68,11 +68,12 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the component view and its items.
 	m_compView = new ComponentView();
 	ui.verticalLayout->addWidget(m_compView);
-	m_componentViews[RootForce::ComponentType::TRANSFORM]		= new TransformView();
-	m_componentViews[RootForce::ComponentType::RENDERABLE]		= new RenderableView();
-	m_componentViews[RootForce::ComponentType::COLLISION]		= new PhysicsView();
-	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]	= new WaterColliderView();
-	m_componentViews[RootForce::ComponentType::SCRIPT]			= new ScriptView();
+	m_componentViews[RootForce::ComponentType::TRANSFORM]			= new TransformView();
+	m_componentViews[RootForce::ComponentType::RENDERABLE]			= new RenderableView();
+	m_componentViews[RootForce::ComponentType::COLLISION]			= new PhysicsView();
+	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]		= new WaterColliderView();
+	m_componentViews[RootForce::ComponentType::SCRIPT]				= new ScriptView();
+	m_componentViews[RootForce::ComponentType::COLLISIONRESPONDER]	= new CollisionResponderView();
 
 	for (auto it : m_componentViews)
 	{
@@ -95,6 +96,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addPhysics,					SIGNAL(triggered()),		this,					SLOT(AddPhysics()));
 	connect(ui.action_addWaterCollider,				SIGNAL(triggered()),		this,					SLOT(AddWaterCollider()));
 	connect(ui.action_addScript,					SIGNAL(triggered()),		this,					SLOT(AddScriptComponent()));
+	connect(ui.action_collisionResponder,			SIGNAL(triggered()),		this,					SLOT(AddCollisionResponder()));
 	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
 	
 	// Setup Qt-to-SDL keymatching.
@@ -379,6 +381,15 @@ void Treenity::AddScriptComponent()
 		m_engineInterface->AddScript(*m_selectedEntities.begin());
 	}
 }
+
+void Treenity::AddCollisionResponder()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddCollisionResponder(*m_selectedEntities.begin());
+	}
+}
+
 
 void Treenity::UpdateOnSelection()
 {

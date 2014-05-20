@@ -18,6 +18,7 @@
 #include <RootTools/Treenity/Include/Components/RenderableView.h>
 #include <RootTools/Treenity/Include/Components/WaterColliderView.h>
 #include <RootTools/Treenity/Include/Components/ScriptView.h>
+#include <RootTools/Treenity/Include/Components/CollisionResponderView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
 #include <RootTools/Treenity/Include/AssetManagerWidget.h>
 #include <RootTools/Treenity/Include/ToolManager.h>
@@ -109,6 +110,7 @@ private slots:
 	void AddPhysics();
 	void AddWaterCollider();
 	void AddScriptComponent();
+	void AddCollisionResponder();
 	
 };
 

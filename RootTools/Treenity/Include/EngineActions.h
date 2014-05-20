@@ -92,6 +92,10 @@ public:
 	std::string GetScript(ECS::Entity* p_entity);
 	void		SetScript(ECS::Entity* p_entity, std::string p_script);
 
+	//Collision responder
+	void		AddCollisionResponder(ECS::Entity* p_entity); 
+	void		RemoveCollisionResponder(ECS::Entity* p_entity);
+
 private:
 
 	TreenityMain* m_treenityMain;
