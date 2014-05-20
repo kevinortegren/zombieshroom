@@ -23,6 +23,8 @@ private:
 
 	QString m_name;
 	Ui::Physics ui;
+
+	void BlockAllSignals(bool p_block);
 private slots:
 	void TypeChanged(int p_value);
 	void CollisionWithWorldChanged(bool p_value);

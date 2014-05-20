@@ -399,10 +399,16 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 {
 	RootForce::Transform* transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
 	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	glm::vec3 gravity;
 
 	if (collision->m_handle != nullptr)
+	{
+		gravity = g_engineContext.m_physics->GetGravity(*collision->m_handle);
 		g_engineContext.m_physics->RemoveObject(*collision->m_handle);
+	}
 	collision->m_handle = g_engineContext.m_physics->CreateHandle(p_entity, p_dynamic ? RootEngine::Physics::PhysicsType::TYPE_DYNAMIC : RootEngine::Physics::PhysicsType::TYPE_STATIC, false);
+
+	//g_engineContext.m_logger->LogText(LogTag::PHYSICS, LogLevel::PINK_PRINT, "Recreating physics object associated with entity %d with new handle %d", p_entity->GetId(), *collision->m_handle);
 
 	switch (p_shape)
 	{
@@ -454,8 +460,10 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 			RootForce::Physics* physics = m_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
 
 			physics->m_mass = p_mass;
-			g_engineContext.m_physics->SetGravity(*collision->m_handle, glm::vec3(0, -9.82f, 0));
+			//g_engineContext.m_physics->SetGravity(*collision->m_handle, glm::vec3(0, -9.82f, 0));
 		}
+
+		g_engineContext.m_physics->SetGravity(*collision->m_handle, gravity);
 	}
 	else
 	{

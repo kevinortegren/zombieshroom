@@ -30,7 +30,9 @@ const QString& PhysicsView::GetComponentName() const
 
 void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 {
-	int type = m_engineInterface->GetPhysicsType(p_entity) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC ? 0 : 1;
+	BlockAllSignals(true);
+
+	int type = m_engineInterface->GetPhysicsType(p_entity) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC ? TYPE_DYNAMIC : TYPE_STATIC;
 	ui.comboBox_type->setCurrentIndex(type);
 	ui.stackedWidget_type->setCurrentIndex(type);
 
@@ -38,9 +40,11 @@ void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 	{
 		ui.checkBox_collideWithWorld->setChecked(m_engineInterface->GetCollideWithWorld(p_entity));
 		ui.checkBox_collideWithStatic->setChecked(m_engineInterface->GetCollideWithStatic(p_entity));
-		ui.doubleSpinBox_gravityX->setValue(m_engineInterface->GetGravity(p_entity).x);
-		ui.doubleSpinBox_gravityY->setValue(m_engineInterface->GetGravity(p_entity).y);
-		ui.doubleSpinBox_gravityZ->setValue(m_engineInterface->GetGravity(p_entity).z);
+
+		glm::vec3 gravity = m_engineInterface->GetGravity(p_entity);
+		ui.doubleSpinBox_gravityX->setValue(gravity.x);
+		ui.doubleSpinBox_gravityY->setValue(gravity.y);
+		ui.doubleSpinBox_gravityZ->setValue(gravity.z);
 		ui.doubleSpinBox_mass->setValue(m_engineInterface->GetMass(p_entity));
 	}
 	
@@ -48,35 +52,56 @@ void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 	{
 		case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
 		{
-			ui.comboBox_shape->setCurrentIndex(0);
-			ui.stackedWidget_shape->setCurrentIndex(0);
+			ui.comboBox_shape->setCurrentIndex(SHAPE_SPHERE);
+			ui.stackedWidget_shape->setCurrentIndex(SHAPE_SPHERE);
 			ui.doubleSpinBox_sphereRadius->setValue(m_engineInterface->GetShapeRadius(p_entity));
 		} break;
 
 		case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
 		{
-			ui.comboBox_shape->setCurrentIndex(1);
-			ui.stackedWidget_shape->setCurrentIndex(1);
+			ui.comboBox_shape->setCurrentIndex(SHAPE_CONE);
+			ui.stackedWidget_shape->setCurrentIndex(SHAPE_CONE);
 			ui.doubleSpinBox_coneRadius->setValue(m_engineInterface->GetShapeRadius(p_entity));
 			ui.doubleSpinBox_coneHeight->setValue(m_engineInterface->GetShapeHeight(p_entity));
 		} break;
 
 		case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
 		{
-			ui.comboBox_shape->setCurrentIndex(2);
-			ui.stackedWidget_shape->setCurrentIndex(2);
+			ui.comboBox_shape->setCurrentIndex(SHAPE_CYLINDER);
+			ui.stackedWidget_shape->setCurrentIndex(SHAPE_CYLINDER);
 			ui.doubleSpinBox_cylinderRadius->setValue(m_engineInterface->GetShapeRadius(p_entity));
 			ui.doubleSpinBox_cylinderHeight->setValue(m_engineInterface->GetShapeHeight(p_entity));
 		} break;
 
 		case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
 		{
-			ui.comboBox_shape->setCurrentIndex(3);
-			ui.stackedWidget_shape->setCurrentIndex(3);
+			ui.comboBox_shape->setCurrentIndex(SHAPE_MESH);
+			ui.stackedWidget_shape->setCurrentIndex(SHAPE_MESH);
 			ui.lineEdit_physicsMesh->setText(QString::fromStdString(m_engineInterface->GetPhysicsMesh(p_entity)));
 		} break;
 	}
 
+	BlockAllSignals(false);
+}
+
+void PhysicsView::BlockAllSignals(bool p_block)
+{
+	blockSignals(p_block);
+	ui.checkBox_collideWithStatic->blockSignals(p_block);
+	ui.checkBox_collideWithWorld->blockSignals(p_block);
+	ui.comboBox_shape->blockSignals(p_block);
+	ui.comboBox_type->blockSignals(p_block);
+	ui.doubleSpinBox_coneHeight->blockSignals(p_block);
+	ui.doubleSpinBox_coneRadius->blockSignals(p_block);
+	ui.doubleSpinBox_cylinderHeight->blockSignals(p_block);
+	ui.doubleSpinBox_cylinderRadius->blockSignals(p_block);
+	ui.doubleSpinBox_gravityX->blockSignals(p_block);
+	ui.doubleSpinBox_gravityY->blockSignals(p_block);
+	ui.doubleSpinBox_gravityZ->blockSignals(p_block);
+	ui.doubleSpinBox_mass->blockSignals(p_block);
+	ui.doubleSpinBox_sphereRadius->blockSignals(p_block);
+	ui.lineEdit_physicsMesh->blockSignals(p_block);
+	ui.toolButton_physicsMesh->blockSignals(p_block);
 }
 
 void PhysicsView::TypeChanged( int p_value )
