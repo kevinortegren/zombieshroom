@@ -13,6 +13,7 @@
 #include <RootTools/Treenity/Include/KeyHelper.h>
 
 #include <QPushButton>
+#include <QScrollArea>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -35,7 +36,7 @@ Treenity::Treenity(QWidget *parent)
 	m_componentNames[RootForce::ComponentType::LOOKATBEHAVIOR]		= "Look-At Behaviour";
 	m_componentNames[RootForce::ComponentType::THIRDPERSONBEHAVIOR] = "Third Person Behaviour";
 	m_componentNames[RootForce::ComponentType::SCRIPT]				= "Script";
-	m_componentNames[RootForce::ComponentType::COLLISION]			= "Collision";
+	m_componentNames[RootForce::ComponentType::COLLISION]			= "Physics";	// Required since the component list searches on name.
 	m_componentNames[RootForce::ComponentType::COLLISIONRESPONDER]	= "Collision Responder";
 	m_componentNames[RootForce::ComponentType::PLAYER]				= "Player";
 	m_componentNames[RootForce::ComponentType::ANIMATION]			= "Animation";
@@ -66,14 +67,20 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the main UI.
 	ui.setupUi(this);
 
-	// Setup the component view and its items.
 	m_compView = new ComponentView();
-	ui.verticalLayout->addWidget(m_compView);
-	m_componentViews[RootForce::ComponentType::TRANSFORM]		= new TransformView();
-	m_componentViews[RootForce::ComponentType::RENDERABLE]		= new RenderableView();
-	m_componentViews[RootForce::ComponentType::PHYSICS]			= new PhysicsView();
-	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]	= new WaterColliderView();
-	m_componentViews[RootForce::ComponentType::SCRIPT]			= new ScriptView();
+	QScrollArea* scroll = new QScrollArea();
+	scroll->setWidgetResizable(true);
+	scroll->setWidget(m_compView);
+
+	// Setup the component view and its items.
+	
+	ui.verticalLayout->addWidget(scroll);
+	m_componentViews[RootForce::ComponentType::TRANSFORM]			= new TransformView();
+	m_componentViews[RootForce::ComponentType::RENDERABLE]			= new RenderableView();
+	m_componentViews[RootForce::ComponentType::COLLISION]			= new PhysicsView();
+	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]		= new WaterColliderView();
+	m_componentViews[RootForce::ComponentType::SCRIPT]				= new ScriptView();
+	m_componentViews[RootForce::ComponentType::COLLISIONRESPONDER]	= new CollisionResponderView();
 
 	for (auto it : m_componentViews)
 	{
@@ -96,6 +103,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addPhysics,					SIGNAL(triggered()),		this,					SLOT(AddPhysics()));
 	connect(ui.action_addWaterCollider,				SIGNAL(triggered()),		this,					SLOT(AddWaterCollider()));
 	connect(ui.action_addScript,					SIGNAL(triggered()),		this,					SLOT(AddScriptComponent()));
+	connect(ui.action_collisionResponder,			SIGNAL(triggered()),		this,					SLOT(AddCollisionResponder()));
 	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
 	
 	// Setup Qt-to-SDL keymatching.
@@ -162,7 +170,7 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
 		// Temporary solution to deal with physics and collider
-		if(p_componentType == 11)
+		if(p_componentType == RootForce::ComponentType::PHYSICS)
 			return;
 
 		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
@@ -177,6 +185,10 @@ void Treenity::ComponentRemoved(ECS::Entity* p_entity, int p_componentType)
 {
 	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
+		// Temporary solution to deal with physics and collider
+		if(p_componentType == RootForce::ComponentType::PHYSICS)
+			return;
+
 		m_compView->RemoveItem(m_componentNames[p_componentType]);
 	}
 }
@@ -284,6 +296,7 @@ void Treenity::Play()
 
 void Treenity::Select(ECS::Entity* p_entity)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.clear();
 
 	if(p_entity != nullptr)
@@ -294,6 +307,7 @@ void Treenity::Select(ECS::Entity* p_entity)
 
 void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities = p_entities;
 
 	UpdateOnSelection();
@@ -301,6 +315,7 @@ void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
 
 void Treenity::AddToSelection(ECS::Entity* p_entity)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.insert(p_entity);
 
 	UpdateOnSelection();
@@ -308,6 +323,7 @@ void Treenity::AddToSelection(ECS::Entity* p_entity)
 
 void Treenity::ClearSelection()
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.clear();
 
 	UpdateOnSelection();
@@ -359,7 +375,7 @@ void Treenity::AddPhysics()
 {
 	if(m_selectedEntities.size() == 1)
 	{
-		m_engineInterface->AddPhysics(*m_selectedEntities.begin());
+		m_engineInterface->AddPhysics(*m_selectedEntities.begin(), true);
 	}
 }
 
@@ -379,6 +395,15 @@ void Treenity::AddScriptComponent()
 	}
 }
 
+void Treenity::AddCollisionResponder()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddCollisionResponder(*m_selectedEntities.begin());
+	}
+}
+
+
 void Treenity::UpdateOnSelection()
 {
 	ui.treeView_entityOutliner->SetCurrentItems(m_selectedEntities);
@@ -396,6 +421,10 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list.
 		m_compView->RemoveItems();
+
+		// Update rotation tool selection.
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 
 	}
 	else if (m_selectedEntities.size() == 1)
@@ -442,6 +471,31 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list (potential change in future, show transforms).
 		m_compView->RemoveItems();
+
+		// Update rotation tool selection.
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+	}
+
+	// For all selected entities that has a collision component, visualize their shape.
+	for (auto entity : m_selectedEntities)
+	{
+		if ((entity->GetFlag() & (1ULL << RootForce::ComponentType::COLLISION)) != 0)
+		{
+			m_engineInterface->SetCollisionVisualized(entity, true);
+		}
+	}
+
+	// Remove collision visualization for deselected entities.
+	for (auto entity : m_previouslySelectedEntities)
+	{
+		if ((entity->GetFlag() & (1ULL << RootForce::ComponentType::COLLISION)) != 0)
+		{
+			if (m_selectedEntities.find(entity) == m_selectedEntities.end())
+			{
+				m_engineInterface->SetCollisionVisualized(entity, false);
+			}
+		}
 	}
 }
 
@@ -478,4 +532,26 @@ void Treenity::Init()
 {
 	m_assetManagerWidget = new AssetManagerWidget();
 	ui.verticalLayout_assetManager->addWidget(m_assetManagerWidget);
+}
+
+void Treenity::Update(float p_dt)
+{
+	// Poll for the component views (since we cannot get events when component data is changed).
+	if (m_selectedEntities.size() == 1)
+	{
+		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
+
+		uint64_t flag = selectedEntity->GetFlag();
+		for (int i = 0; i < 64; ++i)
+		{
+			uint64_t mask = 1ULL << i;
+			if ((flag & mask) != 0)
+			{
+				if (m_componentViews.find(i) != m_componentViews.end())
+				{
+					m_componentViews[i]->DisplayEntity(selectedEntity);
+				}
+			}
+		}
+	}
 }

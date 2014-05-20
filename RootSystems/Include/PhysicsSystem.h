@@ -23,7 +23,7 @@ namespace RootForce
 		PhysicsSystem(ECS::World* p_world)
 			: ECS::EntitySystem(p_world)
 		{
-			SetUsage<Physics>();
+			//SetUsage<Physics>();
 			SetUsage<Collision>();
 			SetUsage<Transform>();
 		}
@@ -51,7 +51,7 @@ namespace RootForce
 		PhysicsTransformCorrectionSystem(ECS::World* p_world)
 			: ECS::EntitySystem(p_world)
 		{
-			SetUsage<Physics>();
+			//SetUsage<Physics>();
 			SetUsage<Collision>();
 			SetUsage<Transform>();
 		}

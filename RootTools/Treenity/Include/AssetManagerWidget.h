@@ -30,6 +30,7 @@ private:
 
 	void SetFolderSpecificFilters(const QString& p_folderName);
 	void LoadImg(const QString p_filepath);
+	void CacheAllTextures();
 
 private slots:
 	void SearchLineChanged(const QString& p_val);

@@ -129,6 +129,10 @@ namespace RootForce
 
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::PINK_PRINT, "Creating static mesh vertices: %d indices %d", vertices.size(), indices.size());
 		}
+		else
+		{
+			m_staticMesh = nullptr;
+		}
 	}
 
 	void WorldSystem::SubdivideTree()
@@ -249,6 +253,7 @@ namespace RootForce
 #ifndef COMPILE_LEVEL_EDITOR
 	void WorldSystem::AddStaticEntitiesToPhysics()
 	{
+		/*
 		// Add static entities to physics.
 		ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Static");
 		for(auto itr = range.first; itr != range.second; ++itr)
@@ -263,6 +268,7 @@ namespace RootForce
 			m_engineContext->m_physics->BindMeshShape(*(collision->m_handle), collision->m_meshHandle,
 				transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, 0.0f, true);
 		}
+		*/
 	}
 
 

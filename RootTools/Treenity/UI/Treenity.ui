@@ -253,6 +253,7 @@
      <addaction name="action_addPhysics"/>
      <addaction name="action_addWaterCollider"/>
      <addaction name="action_addScript"/>
+     <addaction name="action_collisionResponder"/>
     </widget>
     <addaction name="menu_addComponent"/>
    </widget>
@@ -627,6 +628,11 @@
   <action name="action_addScript">
    <property name="text">
     <string>Script</string>
+   </property>
+  </action>
+  <action name="action_collisionResponder">
+   <property name="text">
+    <string>Collision responder</string>
    </property>
   </action>
  </widget>

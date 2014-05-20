@@ -18,6 +18,7 @@
 #include <RootTools/Treenity/Include/Components/RenderableView.h>
 #include <RootTools/Treenity/Include/Components/WaterColliderView.h>
 #include <RootTools/Treenity/Include/Components/ScriptView.h>
+#include <RootTools/Treenity/Include/Components/CollisionResponderView.h>
 #include <RootTools/Treenity/Include/EditorInterface.h>
 #include <RootTools/Treenity/Include/AssetManagerWidget.h>
 #include <RootTools/Treenity/Include/ToolManager.h>
@@ -67,6 +68,9 @@ public:
 	//Called after RootEngine has been loaded from TreenityMain!
 	void Init();
 
+	// Called every frame by the main loop.
+	void Update(float p_dt);
+
 	ToolManager m_toolManager;
 
 private:
@@ -78,6 +82,7 @@ private:
 	QString m_currentProjectFile;
 	ProjectManager* m_projectManager;
 	std::set<ECS::Entity*> m_selectedEntities;
+	std::set<ECS::Entity*> m_previouslySelectedEntities;
 
 	// Editor state
 	bool m_running;
@@ -110,6 +115,7 @@ private slots:
 	void AddPhysics();
 	void AddWaterCollider();
 	void AddScriptComponent();
+	void AddCollisionResponder();
 	
 };
 

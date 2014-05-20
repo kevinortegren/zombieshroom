@@ -1,5 +1,7 @@
 - Entities:
     - 0
+    - 1
+    - 2
     - 3
     - 4
     - 5
@@ -13,6 +15,7 @@
     - 13
     - 14
     - 15
+    - 16
     - 17
     - 18
     - 19
@@ -90,249 +93,254 @@
     - 91
     - 92
     - 93
-    - 94
-    - 95
-    - 96
+    - 100
 - Components:
     - Type: 0
       Data:
-        - Entity: 42
+        - Entity: 14
+          Model: WaterModel
+          Material:
+            Name: waterrender
+            Effect: MeshWater
+            Normal: computeTex3
+            Glow: SkyBox
+        - Entity: 39
           Model: CharacterShape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 43
+        - Entity: 40
           Model: PalmCrownBigsShape
           Material:
             Name: PalmCrownTex
             Effect: Mesh_Normal_Trans
             Diffuse: Leef
             Normal: Leef_Normal
-        - Entity: 44
+        - Entity: 41
           Model: PalmCrownIslandShape1
           Material:
             Name: PalmCrownTex
             Effect: Mesh_Normal_Trans
             Diffuse: Leef
             Normal: Leef_Normal
-        - Entity: 45
+        - Entity: 42
           Model: PalmCrownIslandShape
           Material:
             Name: PalmCrownTex
             Effect: Mesh_Normal_Trans
             Diffuse: Leef
             Normal: Leef_Normal
-        - Entity: 46
+        - Entity: 43
           Model: PalmCrownsCenterShape
           Material:
             Name: PalmCrownTex
             Effect: Mesh_Normal_Trans
             Diffuse: Leef
             Normal: Leef_Normal
-        - Entity: 47
+        - Entity: 44
           Model: PalmCrownsLeftShape
           Material:
             Name: PalmCrownTex
             Effect: Mesh_Normal_Trans
             Diffuse: Leef
             Normal: Leef_Normal
-        - Entity: 48
+        - Entity: 45
           Model: PalmsCrownsRightShape
           Material:
             Name: PalmCrownTex
             Effect: Mesh_Normal_Trans
             Diffuse: Leef
             Normal: Leef_Normal
-        - Entity: 49
+        - Entity: 46
           Model: PalmCrownRuinsShape
           Material:
             Name: PalmCrownTex
             Effect: Mesh_Normal_Trans
             Diffuse: Leef
             Normal: Leef_Normal
-        - Entity: 50
+        - Entity: 47
           Model: RightPalmsShape
           Material:
             Name: Palm
             Effect: Mesh_NormalMap
             Diffuse: PalmTreeTex
             Normal: PalmTreeTex_normal
-        - Entity: 51
+        - Entity: 48
           Model: IslandPalmsShape
           Material:
             Name: Palm
             Effect: Mesh_NormalMap
             Diffuse: PalmTreeTex
             Normal: PalmTreeTex_normal
-        - Entity: 52
+        - Entity: 49
           Model: PalmBridgeShape
           Material:
             Name: Palm
             Effect: Mesh_NormalMap
             Diffuse: PalmTreeTex
             Normal: PalmTreeTex_normal
-        - Entity: 53
+        - Entity: 50
           Model: PalmBridge1Shape
           Material:
             Name: Palm
             Effect: Mesh_NormalMap
             Diffuse: PalmTreeTex
             Normal: PalmTreeTex_normal
-        - Entity: 54
+        - Entity: 51
           Model: LeftPalms1Shape
           Material:
             Name: Palm
             Effect: Mesh_NormalMap
             Diffuse: PalmTreeTex
             Normal: PalmTreeTex_normal
-        - Entity: 55
+        - Entity: 52
           Model: RuinPalmsShape
           Material:
             Name: Palm
             Effect: Mesh_NormalMap
             Diffuse: PalmTreeTex
             Normal: PalmTreeTex_normal
-        - Entity: 56
+        - Entity: 53
           Model: IslandPalms1Shape
           Material:
             Name: Palm
             Effect: Mesh_NormalMap
             Diffuse: PalmTreeTex
             Normal: PalmTreeTex_normal
-        - Entity: 57
+        - Entity: 54
           Model: PalmBridge2Shape
           Material:
             Name: Palm
             Effect: Mesh_NormalMap
             Diffuse: PalmTreeTex
             Normal: PalmTreeTex_normal
-        - Entity: 58
+        - Entity: 55
           Model: PalmLeefBridgeShape
           Material:
             Name: PalmCrownTex
             Effect: Mesh_Normal_Trans
             Diffuse: Leef
             Normal: Leef_Normal
-        - Entity: 59
+        - Entity: 56
           Model: BushesShape1
           Material:
             Name: Ormbunke
             Effect: Mesh_Normal_Trans
             Diffuse: Ormbunke
             Normal: Ormbunke_Normal
-        - Entity: 60
+        - Entity: 57
           Model: StoneBridgeShape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 61
+        - Entity: 58
           Model: StoneBridge1Shape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 62
+        - Entity: 59
           Model: StoneBridge2Shape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 63
+        - Entity: 60
           Model: StoneClusterShape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 64
+        - Entity: 61
           Model: StoneCluster1Shape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 65
+        - Entity: 62
           Model: StoneCluster2Shape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 66
+        - Entity: 63
           Model: StoneRing1Shape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 67
+        - Entity: 64
           Model: StoneRing1Shape
           Material:
             Name: StoneTex
             Effect: Mesh
             Diffuse: BrightStone
-        - Entity: 68
+        - Entity: 65
           Model: CircleRuinShape
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 69
+        - Entity: 66
           Model: RuinsShape
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 70
+        - Entity: 67
           Model: RuinsShape1
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 71
+        - Entity: 68
           Model: RuinsShape3
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 72
+        - Entity: 69
           Model: RuinClusterShape
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 73
+        - Entity: 70
           Model: RuinCluster1Shape
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 74
+        - Entity: 71
           Model: RuinCluster2Shape
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 75
+        - Entity: 72
           Model: RuinWallShape
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 76
+        - Entity: 73
           Model: RuinWall1Shape
           Material:
             Name: NewBrickWalls:RuinWallTex
             Effect: Mesh_NormalMap
             Diffuse: StoneWallVines
             Normal: StoneWallVinesNormal
-        - Entity: 77
+        - Entity: 74
           Model: BackIsland1Shape
           Material:
             Name: ThreeIslandTex
@@ -342,11 +350,8 @@
             TextureRed: sandTiles
             TextureGreen: customGrass3
             TextureBlue: rock_clear2
-            TextureRedNormal: sandTilesNormal
-            TextureGreenNormal: customGrass3Normal
-            TextureBlueNormal: rock_clear2Normal
             TileFactor: 24
-        - Entity: 78
+        - Entity: 75
           Model: ThreeIslands1Shape
           Material:
             Name: ThreeIslandTex
@@ -356,11 +361,8 @@
             TextureRed: sandTiles
             TextureGreen: customGrass3
             TextureBlue: rock_clear2
-            TextureRedNormal: sandTilesNormal
-            TextureGreenNormal: customGrass3Normal
-            TextureBlueNormal: rock_clear2Normal
             TileFactor: 24
-        - Entity: 79
+        - Entity: 76
           Model: LittleMountainShape
           Material:
             Name: LittleMountainPaint
@@ -370,11 +372,8 @@
             TextureRed: CustomGrass3
             TextureGreen: CustomGrass3
             TextureBlue: CustomGrass3
-            TextureRedNormal: CustomGrass3Normal
-            TextureGreenNormal: CustomGrass3Normal
-            TextureBlueNormal: CustomGrass3Normal
             TileFactor: 8
-        - Entity: 80
+        - Entity: 77
           Model: VolcanoShape
           Material:
             Name: MountainPaint
@@ -385,10 +384,8 @@
             TextureRed: sandTiles
             TextureGreen: rock_clear
             TextureBlue: rock_clear2
-            TextureRedNormal: sandTilesNormal
-            TextureBlueNormal: rock_clear2Normal
             TileFactor: 16
-        - Entity: 81
+        - Entity: 78
           Model: IslandTerrainShape
           Material:
             Name: PaintTerrain1
@@ -398,171 +395,189 @@
             TextureRed: sandTiles
             TextureGreen: customGrass3
             TextureBlue: rock_clear2
-            TextureRedNormal: sandTilesNormal
-            TextureGreenNormal: customGrass3Normal
-            TextureBlueNormal: rock_clear2Normal
             TileFactor: 48
+        - Entity: 100
+          Model: testchar
+          Material:
+            Name: TestSpawnpoint
+            Effect: Mesh_NormalMap
+            Diffuse: WStexture
+            Specular: WSSpecular
+            Normal: WSNormal
+            Glow: WSGlowRed
     - Type: 1
       Data:
         - Entity: 0
           Position: [-4.25607, 217.774, 30.5396]
           Rotation: [-0.466304, 0.704338, -0.236195, -0.480293]
           Scale: [1, 1, 1]
-        - Entity: 3
+        - Entity: 1
           Position: [175.078, 33.8895, 116.99]
           Rotation: [0, 0.9479, 0, -0.318568]
           Scale: [1, 1, 1]
-        - Entity: 4
+        - Entity: 2
           Position: [56.5468, 19.5069, 42.5689]
           Rotation: [0, 0.829545, 0, -0.55844]
           Scale: [1, 1, 1]
-        - Entity: 5
+        - Entity: 3
           Position: [36.5521, 85.6569, -163.918]
           Rotation: [0, 0.186886, 0, 0.982382]
           Scale: [1, 1, 1]
-        - Entity: 6
+        - Entity: 4
           Position: [-123.355, 33.587, -43.9994]
           Rotation: [0, 0.70538, 0, 0.70883]
           Scale: [1, 1, 1]
-        - Entity: 7
+        - Entity: 5
           Position: [436.748, 38.674, -171.096]
           Rotation: [0, -0.395373, 0, 0.918521]
           Scale: [1, 1, 1]
-        - Entity: 8
+        - Entity: 6
           Position: [399.077, 19.4229, 19.9458]
           Rotation: [0, -0.661028, 0, 0.750361]
           Scale: [1, 1, 1]
-        - Entity: 9
+        - Entity: 7
           Position: [308.903, 70.8426, 255.291]
           Rotation: [0, 0.942234, 0, -0.334956]
           Scale: [1, 1, 1]
-        - Entity: 10
+        - Entity: 8
           Position: [-204.655, 135.798, -39.2852]
           Rotation: [0, 0.679821, 0, 0.733378]
           Scale: [1, 1, 1]
-        - Entity: 11
+        - Entity: 9
           Position: [-134.567, 107.328, -102.466]
           Rotation: [0, 0.459287, 0, 0.888288]
           Scale: [1, 1, 1]
-        - Entity: 12
+        - Entity: 10
           Position: [399.077, 633.062, 19.9458]
           Rotation: [0, -0.661028, 0, 0.750361]
           Scale: [1, 1, 1]
-        - Entity: 13
+        - Entity: 11
           Position: [-129.047, 210.692, -211.798]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 14
+        - Entity: 12
           Position: [-33.0166, 11.4425, 129.726]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 15
+        - Entity: 13
           Position: [-421.467, 21.9553, -7.08853]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 17
+        - Entity: 14
           Position: [0, 1.3976, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [40, 1, 40]
-        - Entity: 18
+        - Entity: 15
           Position: [235.956, 18.6599, 175.801]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 19
+        - Entity: 16
           Position: [21.9056, 31.7291, 60.6137]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 20
+        - Entity: 17
           Position: [77.9471, 8.53765, 1.44814]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 21
+        - Entity: 18
           Position: [-79.8664, 65.856, 210.804]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 22
+        - Entity: 19
           Position: [-433.876, 18.665, 23.538]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 23
+        - Entity: 20
           Position: [436.571, 11.6582, -88.6327]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 24
+        - Entity: 21
           Position: [391.764, 14.2557, 30.4072]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 25
+        - Entity: 22
           Position: [369.799, 60.7207, 326.7]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 26
+        - Entity: 23
           Position: [-114.714, 182.466, -205.006]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 27
+        - Entity: 24
           Position: [-136.211, 82.6601, -97.4946]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 28
+        - Entity: 25
           Position: [80.9391, 89.5169, 117.999]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 29
+        - Entity: 26
           Position: [-7.14007, 34.9295, -34.7855]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 30
+        - Entity: 27
           Position: [-87.9062, 61.8024, -6.05375]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 31
+        - Entity: 28
           Position: [192.729, 7.26519, 2.27759]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 32
+        - Entity: 29
           Position: [-27.7183, 12.4411, 100.025]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 33
+        - Entity: 30
           Position: [42.959, 59.1372, -143.148]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 34
+        - Entity: 31
           Position: [-136.211, 124.608, -152.681]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 35
+        - Entity: 32
           Position: [293.411, 8.69434, -84.5188]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 36
+        - Entity: 33
           Position: [239.719, 42.1608, -273.67]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 37
+        - Entity: 34
           Position: [-13.1028, 65.8252, 101.033]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 38
+        - Entity: 35
           Position: [-132.951, 79.5611, 31.9841]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 39
+        - Entity: 36
           Position: [8.58671, 79.4159, -124.514]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 40
+        - Entity: 37
           Position: [-52.7952, 38.0941, 61.3033]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 41
+        - Entity: 38
           Position: [399.077, 595.698, 19.9458]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 42
+        - Entity: 39
           Position: [-171.138, 164.491, -259.184]
           Rotation: [0, 0, 0.27463, 0.96155]
+          Scale: [1, 1, 1]
+        - Entity: 40
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 41
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 42
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 43
           Position: [0, 0, 0]
@@ -633,7 +648,7 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 60
-          Position: [0, 0, 0]
+          Position: [0, -3.43715, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 61
@@ -645,25 +660,25 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 63
-          Position: [0, -3.43715, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-32.9663, 11.1927, 130.308]
+          Rotation: [0.0226053, 0.541511, -0.0528149, 0.838729]
+          Scale: [0.762467, 0.762467, 0.762467]
         - Entity: 64
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
+          Position: [-421.035, 19.4572, -6.80124]
+          Rotation: [-0.0513788, 0.574902, -0.043957, 0.815424]
+          Scale: [0.762467, 0.762467, 0.762467]
         - Entity: 65
           Position: [0, 0, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 66
-          Position: [-32.9663, 11.1927, 130.308]
-          Rotation: [0.0226053, 0.541511, -0.0528149, 0.838729]
-          Scale: [0.762467, 0.762467, 0.762467]
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
         - Entity: 67
-          Position: [-421.035, 19.4572, -6.80124]
-          Rotation: [-0.0513788, 0.574902, -0.043957, 0.815424]
-          Scale: [0.762467, 0.762467, 0.762467]
+          Position: [12.403, -4.48597, -35.8729]
+          Rotation: [0, -0.105548, 0, 0.994414]
+          Scale: [1, 1, 1]
         - Entity: 68
           Position: [0, 0, 0]
           Rotation: [0, 0, 0, 1]
@@ -673,8 +688,8 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 70
-          Position: [12.403, -4.48597, -35.8729]
-          Rotation: [0, -0.105548, 0, 0.994414]
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 71
           Position: [0, 0, 0]
@@ -689,110 +704,114 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 74
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 75
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 76
-          Position: [0, 0, 0]
-          Rotation: [0, 0, 0, 1]
-          Scale: [1, 1, 1]
-        - Entity: 77
           Position: [-130.45, 17.4759, 263.628]
           Rotation: [0, 0, 0, 1]
           Scale: [0.680022, 0.899104, 0.680022]
-        - Entity: 78
+        - Entity: 75
           Position: [0, 4.98636, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [0.680022, 0.680022, 0.680022]
-        - Entity: 79
+        - Entity: 76
           Position: [81.8425, 78.3131, 117.645]
           Rotation: [0, -0.807789, 0, 0.589472]
           Scale: [0.347685, 0.212911, 0.347685]
-        - Entity: 80
+        - Entity: 77
           Position: [-129.743, 172.915, -213.487]
           Rotation: [0, -0.411279, 0, 0.91151]
           Scale: [0.515587, 0.515587, 0.515587]
-        - Entity: 81
+        - Entity: 78
           Position: [-6.03961e-015, 1.20792e-014, 4.83169e-014]
           Rotation: [0, 0, 0, 1]
           Scale: [0.678427, 0.678427, 0.678427]
-        - Entity: 82
+        - Entity: 79
           Position: [-126.736, 219.986, -212.325]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 83
+        - Entity: 80
           Position: [-41.2071, 23.8356, 162.161]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 84
+        - Entity: 81
           Position: [-455.514, 24.4596, -382.999]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 85
+        - Entity: 82
           Position: [-79.7248, 37.95, 2.4943]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 86
+        - Entity: 83
           Position: [-45.0268, 22.193, 24.9689]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 87
+        - Entity: 84
           Position: [-67.2069, 22.193, 24.9689]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 88
+        - Entity: 85
           Position: [-45.0268, 21.3873, 48.0006]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 89
+        - Entity: 86
           Position: [-14.6123, 20.1338, 47.6973]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 90
+        - Entity: 87
           Position: [17.7228, 14.5773, 48.0006]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 91
+        - Entity: 88
           Position: [17.7228, 14.8187, -43.1861]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 92
+        - Entity: 89
           Position: [-7.6591, 13.1965, -43.1861]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 93
+        - Entity: 90
           Position: [-42.4417, 20.5792, -34.7255]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 94
+        - Entity: 91
           Position: [-42.4417, 22.193, -6.28837]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 95
+        - Entity: 92
           Position: [-68.5286, 19.7343, -26.9699]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 96
+        - Entity: 93
           Position: [167.4, 19.806, -1.50299]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
+        - Entity: 100
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
     - Type: 2
       Data:
-        - Entity: 82
+        - Entity: 79
           Attenuation: [0, 0.030303, 0]
           Color: [1, 0, 0, 1]
           Range: 10
-        - Entity: 83
+        - Entity: 80
           Attenuation: [0, 0.060606, 0]
           Color: [1, 0.674167, 0, 1]
           Range: 10
-        - Entity: 84
+        - Entity: 81
           Attenuation: [0, 0.151515, 0]
           Color: [1, 0.674167, 0, 1]
+          Range: 10
+        - Entity: 82
+          Attenuation: [0, 1, 0]
+          Color: [0, 1, 0, 1]
+          Range: 10
+        - Entity: 83
+          Attenuation: [0, 1, 0]
+          Color: [0, 1, 0, 1]
+          Range: 10
+        - Entity: 84
+          Attenuation: [0, 1, 0]
+          Color: [0, 1, 0, 1]
           Range: 10
         - Entity: 85
           Attenuation: [0, 1, 0]
@@ -827,18 +846,6 @@
           Color: [0, 1, 0, 1]
           Range: 10
         - Entity: 93
-          Attenuation: [0, 1, 0]
-          Color: [0, 1, 0, 1]
-          Range: 10
-        - Entity: 94
-          Attenuation: [0, 1, 0]
-          Color: [0, 1, 0, 1]
-          Range: 10
-        - Entity: 95
-          Attenuation: [0, 1, 0]
-          Color: [0, 1, 0, 1]
-          Range: 10
-        - Entity: 96
           Attenuation: [0, 1, 0]
           Color: [0, 1, 0, 1]
           Range: 10
@@ -853,7 +860,46 @@
         []
     - Type: 6
       Data:
-        []
+        - Entity: 39
+        - Entity: 40
+        - Entity: 41
+        - Entity: 42
+        - Entity: 43
+        - Entity: 44
+        - Entity: 45
+        - Entity: 46
+        - Entity: 47
+        - Entity: 48
+        - Entity: 49
+        - Entity: 50
+        - Entity: 51
+        - Entity: 52
+        - Entity: 53
+        - Entity: 54
+        - Entity: 55
+        - Entity: 56
+        - Entity: 57
+        - Entity: 58
+        - Entity: 59
+        - Entity: 60
+        - Entity: 61
+        - Entity: 62
+        - Entity: 63
+        - Entity: 64
+        - Entity: 65
+        - Entity: 66
+        - Entity: 67
+        - Entity: 68
+        - Entity: 69
+        - Entity: 70
+        - Entity: 71
+        - Entity: 72
+        - Entity: 73
+        - Entity: 74
+        - Entity: 75
+        - Entity: 76
+        - Entity: 77
+        - Entity: 78
     - Type: 7
       Data:
         []
@@ -868,85 +914,239 @@
         []
     - Type: 11
       Data:
-        - Entity: 42
+        - Entity: 39
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: CharacterShape0
-        - Entity: 43
+        - Entity: 40
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmCrownBigsShape0
-        - Entity: 44
+        - Entity: 41
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmCrownIslandShape10
-        - Entity: 45
+        - Entity: 42
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmCrownIslandShape0
-        - Entity: 46
+        - Entity: 43
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmCrownsCenterShape0
-        - Entity: 47
+        - Entity: 44
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmCrownsLeftShape0
-        - Entity: 48
+        - Entity: 45
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmsCrownsRightShape0
-        - Entity: 49
+        - Entity: 46
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmCrownRuinsShape0
-        - Entity: 50
+        - Entity: 47
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RightPalmsShape0
-        - Entity: 51
+        - Entity: 48
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: IslandPalmsShape0
-        - Entity: 52
+        - Entity: 49
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmBridgeShape0
-        - Entity: 53
+        - Entity: 50
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmBridge1Shape0
-        - Entity: 54
+        - Entity: 51
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: LeftPalms1Shape0
-        - Entity: 55
+        - Entity: 52
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinPalmsShape0
-        - Entity: 56
+        - Entity: 53
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: IslandPalms1Shape0
-        - Entity: 57
+        - Entity: 54
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmBridge2Shape0
-        - Entity: 58
+        - Entity: 55
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: PalmLeefBridgeShape0
-        - Entity: 59
-          MeshHandle: BushesShape10
-        - Entity: 60
+        - Entity: 57
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: StoneBridgeShape0
-        - Entity: 61
+        - Entity: 58
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: StoneBridge1Shape0
-        - Entity: 62
+        - Entity: 59
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: StoneBridge2Shape0
-        - Entity: 63
+        - Entity: 60
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: StoneClusterShape0
-        - Entity: 64
+        - Entity: 61
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: StoneCluster1Shape0
-        - Entity: 65
+        - Entity: 62
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: StoneCluster2Shape0
-        - Entity: 66
+        - Entity: 63
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: StoneRing1Shape0
-        - Entity: 67
+        - Entity: 64
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: StoneRing1Shape0
-        - Entity: 68
+        - Entity: 65
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: CircleRuinShape0
-        - Entity: 69
+        - Entity: 66
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinsShape0
-        - Entity: 70
+        - Entity: 67
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinsShape10
-        - Entity: 71
+        - Entity: 68
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinsShape30
-        - Entity: 72
+        - Entity: 69
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinClusterShape0
-        - Entity: 73
+        - Entity: 70
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinCluster1Shape0
-        - Entity: 74
+        - Entity: 71
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinCluster2Shape0
-        - Entity: 75
+        - Entity: 72
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinWallShape0
-        - Entity: 76
+        - Entity: 73
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: RuinWall1Shape0
-        - Entity: 77
+        - Entity: 74
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: BackIsland1Shape0
-        - Entity: 78
+        - Entity: 75
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: ThreeIslands1Shape0
-        - Entity: 79
+        - Entity: 76
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: LittleMountainShape0
-        - Entity: 80
+        - Entity: 77
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: VolcanoShape0
-        - Entity: 81
+        - Entity: 78
+          PhysicsType: 0
+          PhysicsShape: 3
+          CollideWithWorld: true
+          CollideWithStatic: true
           MeshHandle: IslandTerrainShape0
     - Type: 12
       Data:
@@ -959,12 +1159,18 @@
         []
     - Type: 15
       Data:
-        - Entity: 13
+        - Entity: 11
           File: SmokeAndSparks
-        - Entity: 14
+        - Entity: 12
+          File: Fire3
+        - Entity: 13
           File: Fire3
         - Entity: 15
-          File: Fire3
+          File: AbilitySpawn
+        - Entity: 16
+          File: AbilitySpawn
+        - Entity: 17
+          File: AbilitySpawn
         - Entity: 18
           File: AbilitySpawn
         - Entity: 19
@@ -1007,15 +1213,6 @@
           File: AbilitySpawn
         - Entity: 38
           File: AbilitySpawn
-        - Entity: 39
-          File: AbilitySpawn
-        - Entity: 40
-          File: AbilitySpawn
-        - Entity: 41
-          File: AbilitySpawn
-    - Type: 16
-      Data:
-        []
     - Type: 17
       Data:
         []
@@ -1033,140 +1230,37 @@
       Data:
         - Entity: 0
           Color: [1, 0.776791, 0.381842, 1]
-    - Type: 22
-      Data:
-        []
-    - Type: 23
-      Data:
-        []
     - Type: 24
       Data:
         []
     - Type: 25
       Data:
         []
-    - Type: 26
-      Data:
-        []
     - Type: 27
-      Data:
-        []
-    - Type: 28
-      Data:
-        []
-    - Type: 29
-      Data:
-        []
-    - Type: 30
-      Data:
-        []
-    - Type: 31
-      Data:
-        []
-    - Type: 32
-      Data:
-        []
-    - Type: 33
-      Data:
-        []
-    - Type: 34
       Data:
         []
     - Type: 35
       Data:
         []
-    - Type: 36
-      Data:
-        []
     - Type: 37
       Data:
         []
-    - Type: 38
-      Data:
-        []
-    - Type: 39
-      Data:
-        []
-    - Type: 40
-      Data:
-        []
-    - Type: 41
-      Data:
-        []
-    - Type: 42
-      Data:
-        []
-    - Type: 43
-      Data:
-        []
-    - Type: 44
-      Data:
-        []
-    - Type: 45
-      Data:
-        []
-    - Type: 46
-      Data:
-        []
-    - Type: 47
-      Data:
-        []
-    - Type: 48
-      Data:
-        []
-    - Type: 49
-      Data:
-        []
-    - Type: 50
-      Data:
-        []
-    - Type: 51
-      Data:
-        []
-    - Type: 52
-      Data:
-        []
-    - Type: 53
-      Data:
-        []
-    - Type: 54
-      Data:
-        []
-    - Type: 55
-      Data:
-        []
-    - Type: 56
-      Data:
-        []
-    - Type: 57
-      Data:
-        []
-    - Type: 58
-      Data:
-        []
-    - Type: 59
-      Data:
-        []
-    - Type: 60
-      Data:
-        []
-    - Type: 61
-      Data:
-        []
-    - Type: 62
-      Data:
-        []
-    - Type: 63
-      Data:
-        []
 - Tags:
-    - Id: 17
+    - Id: 14
       Tag: NonExport
     - Id: 0
       Tag: Sun
-    - Id: 17
+    - Id: 100
+      Tag: TestSpawnpoint
+    - Id: 14
       Tag: Water
 - Groups:
+    - Id: 15
+      Group: AbilitySpawnPoint
+    - Id: 16
+      Group: AbilitySpawnPoint
+    - Id: 17
+      Group: AbilitySpawnPoint
     - Id: 18
       Group: AbilitySpawnPoint
     - Id: 19
@@ -1209,1098 +1303,34 @@
       Group: AbilitySpawnPoint
     - Id: 38
       Group: AbilitySpawnPoint
-    - Id: 39
-      Group: AbilitySpawnPoint
-    - Id: 40
-      Group: AbilitySpawnPoint
-    - Id: 41
-      Group: AbilitySpawnPoint
-    - Id: 77
+    - Id: 74
+      Group: Grass
+    - Id: 75
+      Group: Grass
+    - Id: 76
       Group: Grass
     - Id: 78
       Group: Grass
-    - Id: 79
-      Group: Grass
-    - Id: 81
-      Group: Grass
+    - Id: 74
+      Group: Painted
+    - Id: 75
+      Group: Painted
+    - Id: 76
+      Group: Painted
     - Id: 77
       Group: Painted
     - Id: 78
       Group: Painted
-    - Id: 79
-      Group: Painted
-    - Id: 80
-      Group: Painted
-    - Id: 81
-      Group: Painted
-    - Id: 97
-      Group: Painted_Split
-    - Id: 98
-      Group: Painted_Split
-    - Id: 99
-      Group: Painted_Split
-    - Id: 100
-      Group: Painted_Split
-    - Id: 101
-      Group: Painted_Split
-    - Id: 102
-      Group: Painted_Split
-    - Id: 103
-      Group: Painted_Split
-    - Id: 104
-      Group: Painted_Split
-    - Id: 105
-      Group: Painted_Split
-    - Id: 106
-      Group: Painted_Split
-    - Id: 107
-      Group: Painted_Split
-    - Id: 108
-      Group: Painted_Split
-    - Id: 109
-      Group: Painted_Split
-    - Id: 110
-      Group: Painted_Split
-    - Id: 111
-      Group: Painted_Split
-    - Id: 112
-      Group: Painted_Split
-    - Id: 113
-      Group: Painted_Split
-    - Id: 114
-      Group: Painted_Split
-    - Id: 115
-      Group: Painted_Split
-    - Id: 116
-      Group: Painted_Split
-    - Id: 117
-      Group: Painted_Split
-    - Id: 118
-      Group: Painted_Split
-    - Id: 119
-      Group: Painted_Split
-    - Id: 120
-      Group: Painted_Split
-    - Id: 121
-      Group: Painted_Split
-    - Id: 122
-      Group: Painted_Split
-    - Id: 123
-      Group: Painted_Split
-    - Id: 124
-      Group: Painted_Split
-    - Id: 125
-      Group: Painted_Split
-    - Id: 126
-      Group: Painted_Split
-    - Id: 127
-      Group: Painted_Split
-    - Id: 128
-      Group: Painted_Split
-    - Id: 129
-      Group: Painted_Split
-    - Id: 130
-      Group: Painted_Split
-    - Id: 131
-      Group: Painted_Split
-    - Id: 132
-      Group: Painted_Split
-    - Id: 133
-      Group: Painted_Split
-    - Id: 134
-      Group: Painted_Split
-    - Id: 135
-      Group: Painted_Split
-    - Id: 136
-      Group: Painted_Split
-    - Id: 137
-      Group: Painted_Split
-    - Id: 138
-      Group: Painted_Split
-    - Id: 139
-      Group: Painted_Split
-    - Id: 140
-      Group: Painted_Split
-    - Id: 141
-      Group: Painted_Split
-    - Id: 142
-      Group: Painted_Split
-    - Id: 143
-      Group: Painted_Split
-    - Id: 144
-      Group: Painted_Split
-    - Id: 145
-      Group: Painted_Split
-    - Id: 146
-      Group: Painted_Split
-    - Id: 147
-      Group: Painted_Split
-    - Id: 148
-      Group: Painted_Split
-    - Id: 149
-      Group: Painted_Split
-    - Id: 150
-      Group: Painted_Split
-    - Id: 151
-      Group: Painted_Split
-    - Id: 152
-      Group: Painted_Split
-    - Id: 153
-      Group: Painted_Split
-    - Id: 154
-      Group: Painted_Split
-    - Id: 155
-      Group: Painted_Split
-    - Id: 156
-      Group: Painted_Split
-    - Id: 157
-      Group: Painted_Split
-    - Id: 158
-      Group: Painted_Split
-    - Id: 159
-      Group: Painted_Split
-    - Id: 160
-      Group: Painted_Split
-    - Id: 161
-      Group: Painted_Split
-    - Id: 162
-      Group: Painted_Split
-    - Id: 163
-      Group: Painted_Split
-    - Id: 164
-      Group: Painted_Split
-    - Id: 165
-      Group: Painted_Split
-    - Id: 166
-      Group: Painted_Split
-    - Id: 167
-      Group: Painted_Split
-    - Id: 168
-      Group: Painted_Split
-    - Id: 169
-      Group: Painted_Split
-    - Id: 170
-      Group: Painted_Split
-    - Id: 171
-      Group: Painted_Split
-    - Id: 172
-      Group: Painted_Split
-    - Id: 173
-      Group: Painted_Split
-    - Id: 174
-      Group: Painted_Split
-    - Id: 175
-      Group: Painted_Split
-    - Id: 176
-      Group: Painted_Split
-    - Id: 177
-      Group: Painted_Split
-    - Id: 178
-      Group: Painted_Split
-    - Id: 179
-      Group: Painted_Split
-    - Id: 180
-      Group: Painted_Split
-    - Id: 181
-      Group: Painted_Split
-    - Id: 182
-      Group: Painted_Split
-    - Id: 183
-      Group: Painted_Split
-    - Id: 184
-      Group: Painted_Split
-    - Id: 185
-      Group: Painted_Split
-    - Id: 186
-      Group: Painted_Split
-    - Id: 187
-      Group: Painted_Split
-    - Id: 188
-      Group: Painted_Split
-    - Id: 189
-      Group: Painted_Split
-    - Id: 190
-      Group: Painted_Split
-    - Id: 191
-      Group: Painted_Split
-    - Id: 192
-      Group: Painted_Split
-    - Id: 193
-      Group: Painted_Split
-    - Id: 194
-      Group: Painted_Split
-    - Id: 195
-      Group: Painted_Split
-    - Id: 196
-      Group: Painted_Split
-    - Id: 197
-      Group: Painted_Split
-    - Id: 198
-      Group: Painted_Split
-    - Id: 199
-      Group: Painted_Split
-    - Id: 200
-      Group: Painted_Split
-    - Id: 201
-      Group: Painted_Split
-    - Id: 202
-      Group: Painted_Split
-    - Id: 203
-      Group: Painted_Split
-    - Id: 204
-      Group: Painted_Split
-    - Id: 205
-      Group: Painted_Split
-    - Id: 206
-      Group: Painted_Split
-    - Id: 207
-      Group: Painted_Split
-    - Id: 208
-      Group: Painted_Split
-    - Id: 209
-      Group: Painted_Split
-    - Id: 210
-      Group: Painted_Split
-    - Id: 211
-      Group: Painted_Split
-    - Id: 212
-      Group: Painted_Split
-    - Id: 213
-      Group: Painted_Split
-    - Id: 214
-      Group: Painted_Split
-    - Id: 215
-      Group: Painted_Split
-    - Id: 216
-      Group: Painted_Split
-    - Id: 217
-      Group: Painted_Split
-    - Id: 218
-      Group: Painted_Split
-    - Id: 219
-      Group: Painted_Split
-    - Id: 220
-      Group: Painted_Split
-    - Id: 221
-      Group: Painted_Split
-    - Id: 222
-      Group: Painted_Split
-    - Id: 223
-      Group: Painted_Split
-    - Id: 224
-      Group: Painted_Split
-    - Id: 225
-      Group: Painted_Split
-    - Id: 226
-      Group: Painted_Split
-    - Id: 227
-      Group: Painted_Split
-    - Id: 228
-      Group: Painted_Split
-    - Id: 229
-      Group: Painted_Split
-    - Id: 230
-      Group: Painted_Split
-    - Id: 231
-      Group: Painted_Split
-    - Id: 232
-      Group: Painted_Split
-    - Id: 233
-      Group: Painted_Split
-    - Id: 234
-      Group: Painted_Split
-    - Id: 235
-      Group: Painted_Split
-    - Id: 236
-      Group: Painted_Split
-    - Id: 237
-      Group: Painted_Split
-    - Id: 238
-      Group: Painted_Split
-    - Id: 239
-      Group: Painted_Split
-    - Id: 240
-      Group: Painted_Split
-    - Id: 241
-      Group: Painted_Split
-    - Id: 242
-      Group: Painted_Split
-    - Id: 243
-      Group: Painted_Split
-    - Id: 244
-      Group: Painted_Split
-    - Id: 245
-      Group: Painted_Split
-    - Id: 246
-      Group: Painted_Split
-    - Id: 247
-      Group: Painted_Split
-    - Id: 248
-      Group: Painted_Split
-    - Id: 249
-      Group: Painted_Split
-    - Id: 250
-      Group: Painted_Split
-    - Id: 251
-      Group: Painted_Split
-    - Id: 252
-      Group: Painted_Split
-    - Id: 253
-      Group: Painted_Split
-    - Id: 254
-      Group: Painted_Split
-    - Id: 255
-      Group: Painted_Split
-    - Id: 256
-      Group: Painted_Split
-    - Id: 257
-      Group: Painted_Split
-    - Id: 258
-      Group: Painted_Split
-    - Id: 259
-      Group: Painted_Split
-    - Id: 260
-      Group: Painted_Split
-    - Id: 261
-      Group: Painted_Split
-    - Id: 262
-      Group: Painted_Split
-    - Id: 263
-      Group: Painted_Split
-    - Id: 264
-      Group: Painted_Split
-    - Id: 265
-      Group: Painted_Split
-    - Id: 266
-      Group: Painted_Split
-    - Id: 267
-      Group: Painted_Split
-    - Id: 268
-      Group: Painted_Split
-    - Id: 269
-      Group: Painted_Split
-    - Id: 270
-      Group: Painted_Split
-    - Id: 271
-      Group: Painted_Split
-    - Id: 272
-      Group: Painted_Split
-    - Id: 273
-      Group: Painted_Split
-    - Id: 274
-      Group: Painted_Split
-    - Id: 275
-      Group: Painted_Split
-    - Id: 276
-      Group: Painted_Split
-    - Id: 277
-      Group: Painted_Split
-    - Id: 278
-      Group: Painted_Split
-    - Id: 279
-      Group: Painted_Split
-    - Id: 280
-      Group: Painted_Split
-    - Id: 281
-      Group: Painted_Split
-    - Id: 282
-      Group: Painted_Split
-    - Id: 283
-      Group: Painted_Split
-    - Id: 284
-      Group: Painted_Split
-    - Id: 285
-      Group: Painted_Split
-    - Id: 286
-      Group: Painted_Split
-    - Id: 287
-      Group: Painted_Split
-    - Id: 288
-      Group: Painted_Split
-    - Id: 289
-      Group: Painted_Split
-    - Id: 290
-      Group: Painted_Split
-    - Id: 291
-      Group: Painted_Split
-    - Id: 292
-      Group: Painted_Split
-    - Id: 293
-      Group: Painted_Split
-    - Id: 294
-      Group: Painted_Split
-    - Id: 295
-      Group: Painted_Split
-    - Id: 296
-      Group: Painted_Split
-    - Id: 297
-      Group: Painted_Split
-    - Id: 298
-      Group: Painted_Split
-    - Id: 299
-      Group: Painted_Split
-    - Id: 300
-      Group: Painted_Split
-    - Id: 301
-      Group: Painted_Split
-    - Id: 302
-      Group: Painted_Split
-    - Id: 303
-      Group: Painted_Split
-    - Id: 304
-      Group: Painted_Split
-    - Id: 305
-      Group: Painted_Split
-    - Id: 306
-      Group: Painted_Split
-    - Id: 307
-      Group: Painted_Split
-    - Id: 308
-      Group: Painted_Split
-    - Id: 309
-      Group: Painted_Split
-    - Id: 310
-      Group: Painted_Split
-    - Id: 311
-      Group: Painted_Split
-    - Id: 312
-      Group: Painted_Split
-    - Id: 313
-      Group: Painted_Split
-    - Id: 314
-      Group: Painted_Split
-    - Id: 315
-      Group: Painted_Split
-    - Id: 316
-      Group: Painted_Split
-    - Id: 317
-      Group: Painted_Split
-    - Id: 318
-      Group: Painted_Split
-    - Id: 319
-      Group: Painted_Split
-    - Id: 320
-      Group: Painted_Split
-    - Id: 321
-      Group: Painted_Split
-    - Id: 322
-      Group: Painted_Split
-    - Id: 323
-      Group: Painted_Split
-    - Id: 324
-      Group: Painted_Split
-    - Id: 325
-      Group: Painted_Split
-    - Id: 326
-      Group: Painted_Split
-    - Id: 327
-      Group: Painted_Split
-    - Id: 328
-      Group: Painted_Split
-    - Id: 329
-      Group: Painted_Split
-    - Id: 330
-      Group: Painted_Split
-    - Id: 331
-      Group: Painted_Split
-    - Id: 332
-      Group: Painted_Split
-    - Id: 333
-      Group: Painted_Split
-    - Id: 334
-      Group: Painted_Split
-    - Id: 335
-      Group: Painted_Split
-    - Id: 336
-      Group: Painted_Split
-    - Id: 337
-      Group: Painted_Split
-    - Id: 338
-      Group: Painted_Split
-    - Id: 339
-      Group: Painted_Split
-    - Id: 340
-      Group: Painted_Split
-    - Id: 341
-      Group: Painted_Split
-    - Id: 342
-      Group: Painted_Split
-    - Id: 343
-      Group: Painted_Split
-    - Id: 344
-      Group: Painted_Split
-    - Id: 345
-      Group: Painted_Split
-    - Id: 346
-      Group: Painted_Split
-    - Id: 347
-      Group: Painted_Split
-    - Id: 348
-      Group: Painted_Split
-    - Id: 349
-      Group: Painted_Split
-    - Id: 350
-      Group: Painted_Split
-    - Id: 351
-      Group: Painted_Split
-    - Id: 352
-      Group: Painted_Split
-    - Id: 353
-      Group: Painted_Split
-    - Id: 354
-      Group: Painted_Split
-    - Id: 355
-      Group: Painted_Split
-    - Id: 356
-      Group: Painted_Split
-    - Id: 357
-      Group: Painted_Split
-    - Id: 358
-      Group: Painted_Split
-    - Id: 359
-      Group: Painted_Split
-    - Id: 360
-      Group: Painted_Split
-    - Id: 361
-      Group: Painted_Split
-    - Id: 362
-      Group: Painted_Split
-    - Id: 363
-      Group: Painted_Split
-    - Id: 364
-      Group: Painted_Split
-    - Id: 365
-      Group: Painted_Split
-    - Id: 366
-      Group: Painted_Split
-    - Id: 367
-      Group: Painted_Split
-    - Id: 368
-      Group: Painted_Split
-    - Id: 369
-      Group: Painted_Split
-    - Id: 370
-      Group: Painted_Split
-    - Id: 371
-      Group: Painted_Split
-    - Id: 372
-      Group: Painted_Split
-    - Id: 373
-      Group: Painted_Split
-    - Id: 374
-      Group: Painted_Split
-    - Id: 375
-      Group: Painted_Split
-    - Id: 376
-      Group: Painted_Split
-    - Id: 377
-      Group: Painted_Split
-    - Id: 378
-      Group: Painted_Split
-    - Id: 379
-      Group: Painted_Split
-    - Id: 380
-      Group: Painted_Split
-    - Id: 381
-      Group: Painted_Split
-    - Id: 382
-      Group: Painted_Split
-    - Id: 383
-      Group: Painted_Split
-    - Id: 384
-      Group: Painted_Split
-    - Id: 385
-      Group: Painted_Split
-    - Id: 386
-      Group: Painted_Split
-    - Id: 387
-      Group: Painted_Split
-    - Id: 388
-      Group: Painted_Split
-    - Id: 389
-      Group: Painted_Split
-    - Id: 390
-      Group: Painted_Split
-    - Id: 391
-      Group: Painted_Split
-    - Id: 392
-      Group: Painted_Split
-    - Id: 393
-      Group: Painted_Split
-    - Id: 394
-      Group: Painted_Split
-    - Id: 395
-      Group: Painted_Split
-    - Id: 396
-      Group: Painted_Split
-    - Id: 397
-      Group: Painted_Split
-    - Id: 398
-      Group: Painted_Split
-    - Id: 399
-      Group: Painted_Split
-    - Id: 400
-      Group: Painted_Split
-    - Id: 401
-      Group: Painted_Split
-    - Id: 402
-      Group: Painted_Split
-    - Id: 403
-      Group: Painted_Split
-    - Id: 404
-      Group: Painted_Split
-    - Id: 405
-      Group: Painted_Split
-    - Id: 406
-      Group: Painted_Split
-    - Id: 407
-      Group: Painted_Split
-    - Id: 408
-      Group: Painted_Split
-    - Id: 409
-      Group: Painted_Split
-    - Id: 410
-      Group: Painted_Split
-    - Id: 411
-      Group: Painted_Split
-    - Id: 412
-      Group: Painted_Split
-    - Id: 413
-      Group: Painted_Split
-    - Id: 414
-      Group: Painted_Split
-    - Id: 415
-      Group: Painted_Split
-    - Id: 416
-      Group: Painted_Split
-    - Id: 417
-      Group: Painted_Split
-    - Id: 418
-      Group: Painted_Split
-    - Id: 419
-      Group: Painted_Split
-    - Id: 420
-      Group: Painted_Split
-    - Id: 421
-      Group: Painted_Split
-    - Id: 422
-      Group: Painted_Split
-    - Id: 423
-      Group: Painted_Split
-    - Id: 424
-      Group: Painted_Split
-    - Id: 425
-      Group: Painted_Split
-    - Id: 426
-      Group: Painted_Split
-    - Id: 427
-      Group: Painted_Split
-    - Id: 428
-      Group: Painted_Split
-    - Id: 429
-      Group: Painted_Split
-    - Id: 430
-      Group: Painted_Split
-    - Id: 431
-      Group: Painted_Split
-    - Id: 432
-      Group: Painted_Split
-    - Id: 433
-      Group: Painted_Split
-    - Id: 434
-      Group: Painted_Split
-    - Id: 435
-      Group: Painted_Split
-    - Id: 436
-      Group: Painted_Split
-    - Id: 437
-      Group: Painted_Split
-    - Id: 438
-      Group: Painted_Split
-    - Id: 439
-      Group: Painted_Split
-    - Id: 440
-      Group: Painted_Split
-    - Id: 441
-      Group: Painted_Split
-    - Id: 442
-      Group: Painted_Split
-    - Id: 443
-      Group: Painted_Split
-    - Id: 444
-      Group: Painted_Split
-    - Id: 445
-      Group: Painted_Split
-    - Id: 446
-      Group: Painted_Split
-    - Id: 447
-      Group: Painted_Split
-    - Id: 448
-      Group: Painted_Split
-    - Id: 449
-      Group: Painted_Split
-    - Id: 450
-      Group: Painted_Split
-    - Id: 451
-      Group: Painted_Split
-    - Id: 452
-      Group: Painted_Split
-    - Id: 453
-      Group: Painted_Split
-    - Id: 454
-      Group: Painted_Split
-    - Id: 455
-      Group: Painted_Split
-    - Id: 456
-      Group: Painted_Split
-    - Id: 457
-      Group: Painted_Split
-    - Id: 458
-      Group: Painted_Split
-    - Id: 459
-      Group: Painted_Split
-    - Id: 460
-      Group: Painted_Split
-    - Id: 461
-      Group: Painted_Split
-    - Id: 462
-      Group: Painted_Split
-    - Id: 463
-      Group: Painted_Split
-    - Id: 464
-      Group: Painted_Split
-    - Id: 465
-      Group: Painted_Split
-    - Id: 466
-      Group: Painted_Split
-    - Id: 467
-      Group: Painted_Split
-    - Id: 468
-      Group: Painted_Split
-    - Id: 469
-      Group: Painted_Split
-    - Id: 470
-      Group: Painted_Split
-    - Id: 471
-      Group: Painted_Split
-    - Id: 472
-      Group: Painted_Split
-    - Id: 473
-      Group: Painted_Split
-    - Id: 474
-      Group: Painted_Split
-    - Id: 475
-      Group: Painted_Split
-    - Id: 476
-      Group: Painted_Split
-    - Id: 477
-      Group: Painted_Split
-    - Id: 478
-      Group: Painted_Split
-    - Id: 479
-      Group: Painted_Split
-    - Id: 480
-      Group: Painted_Split
-    - Id: 481
-      Group: Painted_Split
-    - Id: 482
-      Group: Painted_Split
-    - Id: 483
-      Group: Painted_Split
-    - Id: 484
-      Group: Painted_Split
-    - Id: 485
-      Group: Painted_Split
-    - Id: 486
-      Group: Painted_Split
-    - Id: 487
-      Group: Painted_Split
-    - Id: 488
-      Group: Painted_Split
-    - Id: 489
-      Group: Painted_Split
-    - Id: 490
-      Group: Painted_Split
-    - Id: 491
-      Group: Painted_Split
-    - Id: 492
-      Group: Painted_Split
-    - Id: 493
-      Group: Painted_Split
-    - Id: 494
-      Group: Painted_Split
-    - Id: 495
-      Group: Painted_Split
-    - Id: 496
-      Group: Painted_Split
-    - Id: 497
-      Group: Painted_Split
-    - Id: 498
-      Group: Painted_Split
-    - Id: 499
-      Group: Painted_Split
-    - Id: 500
-      Group: Painted_Split
-    - Id: 501
-      Group: Painted_Split
-    - Id: 502
-      Group: Painted_Split
-    - Id: 503
-      Group: Painted_Split
-    - Id: 504
-      Group: Painted_Split
-    - Id: 505
-      Group: Painted_Split
-    - Id: 506
-      Group: Painted_Split
-    - Id: 507
-      Group: Painted_Split
-    - Id: 508
-      Group: Painted_Split
-    - Id: 509
-      Group: Painted_Split
-    - Id: 510
-      Group: Painted_Split
-    - Id: 511
-      Group: Painted_Split
-    - Id: 512
-      Group: Painted_Split
-    - Id: 513
-      Group: Painted_Split
-    - Id: 514
-      Group: Painted_Split
-    - Id: 515
-      Group: Painted_Split
-    - Id: 516
-      Group: Painted_Split
-    - Id: 517
-      Group: Painted_Split
-    - Id: 518
-      Group: Painted_Split
-    - Id: 519
-      Group: Painted_Split
-    - Id: 520
-      Group: Painted_Split
-    - Id: 521
-      Group: Painted_Split
-    - Id: 522
-      Group: Painted_Split
-    - Id: 523
-      Group: Painted_Split
-    - Id: 524
-      Group: Painted_Split
-    - Id: 525
-      Group: Painted_Split
-    - Id: 526
-      Group: Painted_Split
-    - Id: 527
-      Group: Painted_Split
-    - Id: 528
-      Group: Painted_Split
-    - Id: 529
-      Group: Painted_Split
-    - Id: 530
-      Group: Painted_Split
-    - Id: 531
-      Group: Painted_Split
-    - Id: 532
-      Group: Painted_Split
-    - Id: 533
-      Group: Painted_Split
-    - Id: 534
-      Group: Painted_Split
-    - Id: 535
-      Group: Painted_Split
-    - Id: 536
-      Group: Painted_Split
-    - Id: 537
-      Group: Painted_Split
-    - Id: 538
-      Group: Painted_Split
-    - Id: 539
-      Group: Painted_Split
-    - Id: 540
-      Group: Painted_Split
-    - Id: 541
-      Group: Painted_Split
-    - Id: 542
-      Group: Painted_Split
-    - Id: 543
-      Group: Painted_Split
-    - Id: 544
-      Group: Painted_Split
-    - Id: 545
-      Group: Painted_Split
-    - Id: 546
-      Group: Painted_Split
-    - Id: 547
-      Group: Painted_Split
-    - Id: 548
-      Group: Painted_Split
-    - Id: 549
-      Group: Painted_Split
-    - Id: 550
-      Group: Painted_Split
-    - Id: 551
-      Group: Painted_Split
-    - Id: 552
-      Group: Painted_Split
-    - Id: 553
-      Group: Painted_Split
-    - Id: 554
-      Group: Painted_Split
-    - Id: 555
-      Group: Painted_Split
-    - Id: 556
-      Group: Painted_Split
-    - Id: 557
-      Group: Painted_Split
-    - Id: 558
-      Group: Painted_Split
-    - Id: 559
-      Group: Painted_Split
-    - Id: 560
-      Group: Painted_Split
-    - Id: 561
-      Group: Painted_Split
-    - Id: 562
-      Group: Painted_Split
-    - Id: 563
-      Group: Painted_Split
-    - Id: 564
-      Group: Painted_Split
-    - Id: 565
-      Group: Painted_Split
-    - Id: 566
-      Group: Painted_Split
-    - Id: 567
-      Group: Painted_Split
-    - Id: 568
-      Group: Painted_Split
-    - Id: 569
-      Group: Painted_Split
-    - Id: 570
-      Group: Painted_Split
-    - Id: 571
-      Group: Painted_Split
-    - Id: 572
-      Group: Painted_Split
-    - Id: 573
-      Group: Painted_Split
-    - Id: 574
-      Group: Painted_Split
-    - Id: 575
-      Group: Painted_Split
-    - Id: 576
-      Group: Painted_Split
-    - Id: 577
-      Group: Painted_Split
-    - Id: 578
-      Group: Painted_Split
-    - Id: 579
-      Group: Painted_Split
-    - Id: 580
-      Group: Painted_Split
-    - Id: 581
-      Group: Painted_Split
-    - Id: 582
-      Group: Painted_Split
-    - Id: 583
-      Group: Painted_Split
-    - Id: 584
-      Group: Painted_Split
-    - Id: 585
-      Group: Painted_Split
-    - Id: 586
-      Group: Painted_Split
-    - Id: 587
-      Group: Painted_Split
-    - Id: 588
-      Group: Painted_Split
-    - Id: 589
-      Group: Painted_Split
-    - Id: 590
-      Group: Painted_Split
-    - Id: 591
-      Group: Painted_Split
-    - Id: 592
-      Group: Painted_Split
-    - Id: 593
-      Group: Painted_Split
-    - Id: 594
-      Group: Painted_Split
-    - Id: 595
-      Group: Painted_Split
-    - Id: 596
-      Group: Painted_Split
-    - Id: 597
-      Group: Painted_Split
-    - Id: 598
-      Group: Painted_Split
-    - Id: 599
-      Group: Painted_Split
-    - Id: 600
-      Group: Painted_Split
-    - Id: 601
-      Group: Painted_Split
-    - Id: 602
-      Group: Painted_Split
-    - Id: 603
-      Group: Painted_Split
-    - Id: 604
-      Group: Painted_Split
-    - Id: 605
-      Group: Painted_Split
-    - Id: 606
-      Group: Painted_Split
-    - Id: 607
-      Group: Painted_Split
-    - Id: 608
-      Group: Painted_Split
-    - Id: 609
-      Group: Painted_Split
-    - Id: 610
-      Group: Painted_Split
-    - Id: 611
-      Group: Painted_Split
-    - Id: 612
-      Group: Painted_Split
-    - Id: 613
-      Group: Painted_Split
-    - Id: 614
-      Group: Painted_Split
-    - Id: 615
-      Group: Painted_Split
-    - Id: 616
-      Group: Painted_Split
-    - Id: 617
-      Group: Painted_Split
-    - Id: 618
-      Group: Painted_Split
-    - Id: 619
-      Group: Painted_Split
-    - Id: 620
-      Group: Painted_Split
-    - Id: 621
-      Group: Painted_Split
-    - Id: 622
-      Group: Painted_Split
-    - Id: 623
-      Group: Painted_Split
-    - Id: 624
-      Group: Painted_Split
-    - Id: 625
-      Group: Painted_Split
-    - Id: 626
-      Group: Painted_Split
-    - Id: 627
-      Group: Painted_Split
+    - Id: 11
+      Group: Particle
+    - Id: 12
+      Group: Particle
     - Id: 13
       Group: Particle
-    - Id: 14
-      Group: Particle
-    - Id: 15
-      Group: Particle
+    - Id: 1
+      Group: SpawnPoint
+    - Id: 2
+      Group: SpawnPoint
     - Id: 3
       Group: SpawnPoint
     - Id: 4
@@ -2317,10 +1347,12 @@
       Group: SpawnPoint
     - Id: 10
       Group: SpawnPoint
-    - Id: 11
-      Group: SpawnPoint
-    - Id: 12
-      Group: SpawnPoint
+    - Id: 40
+      Group: Static
+    - Id: 41
+      Group: Static
+    - Id: 42
+      Group: Static
     - Id: 43
       Group: Static
     - Id: 44
@@ -2347,11 +1379,11 @@
       Group: Static
     - Id: 55
       Group: Static
-    - Id: 56
-      Group: Static
     - Id: 57
       Group: Static
     - Id: 58
+      Group: Static
+    - Id: 59
       Group: Static
     - Id: 60
       Group: Static
@@ -2391,12 +1423,12 @@
       Group: Static
     - Id: 78
       Group: Static
-    - Id: 79
-      Group: Static
-    - Id: 80
-      Group: Static
-    - Id: 81
-      Group: Static
+    - Id: 40
+      Group: Transparent
+    - Id: 41
+      Group: Transparent
+    - Id: 42
+      Group: Transparent
     - Id: 43
       Group: Transparent
     - Id: 44
@@ -2405,15 +1437,9 @@
       Group: Transparent
     - Id: 46
       Group: Transparent
-    - Id: 47
+    - Id: 55
       Group: Transparent
-    - Id: 48
-      Group: Transparent
-    - Id: 49
-      Group: Transparent
-    - Id: 58
-      Group: Transparent
-    - Id: 59
+    - Id: 56
       Group: Transparent
 - Storage:
     - Key: Ambient
@@ -2426,3 +1452,194 @@
       Value: grass_translucency
     - Key: Water
       Value: 1.3976
+- EntityNames:
+    - ID: 0
+      Name: Sun
+    - ID: 1
+      Name: Unnamed
+    - ID: 2
+      Name: Unnamed
+    - ID: 3
+      Name: Unnamed
+    - ID: 4
+      Name: Unnamed
+    - ID: 5
+      Name: Unnamed
+    - ID: 6
+      Name: Unnamed
+    - ID: 7
+      Name: Unnamed
+    - ID: 8
+      Name: Unnamed
+    - ID: 9
+      Name: Unnamed
+    - ID: 10
+      Name: Unnamed
+    - ID: 11
+      Name: Unnamed
+    - ID: 12
+      Name: Unnamed
+    - ID: 13
+      Name: Unnamed
+    - ID: 14
+      Name: Water
+    - ID: 15
+      Name: Unnamed
+    - ID: 16
+      Name: Unnamed
+    - ID: 17
+      Name: Unnamed
+    - ID: 18
+      Name: Unnamed
+    - ID: 19
+      Name: Unnamed
+    - ID: 20
+      Name: Unnamed
+    - ID: 21
+      Name: Unnamed
+    - ID: 22
+      Name: Unnamed
+    - ID: 23
+      Name: Unnamed
+    - ID: 24
+      Name: Unnamed
+    - ID: 25
+      Name: Unnamed
+    - ID: 26
+      Name: Unnamed
+    - ID: 27
+      Name: Unnamed
+    - ID: 28
+      Name: Unnamed
+    - ID: 29
+      Name: Unnamed
+    - ID: 30
+      Name: Unnamed
+    - ID: 31
+      Name: Unnamed
+    - ID: 32
+      Name: Unnamed
+    - ID: 33
+      Name: Unnamed
+    - ID: 34
+      Name: Unnamed
+    - ID: 35
+      Name: Unnamed
+    - ID: 36
+      Name: Unnamed
+    - ID: 37
+      Name: Unnamed
+    - ID: 38
+      Name: Unnamed
+    - ID: 39
+      Name: Unnamed
+    - ID: 40
+      Name: Unnamed
+    - ID: 41
+      Name: Unnamed
+    - ID: 42
+      Name: Unnamed
+    - ID: 43
+      Name: Unnamed
+    - ID: 44
+      Name: Unnamed
+    - ID: 45
+      Name: Unnamed
+    - ID: 46
+      Name: Unnamed
+    - ID: 47
+      Name: Unnamed
+    - ID: 48
+      Name: Unnamed
+    - ID: 49
+      Name: Unnamed
+    - ID: 50
+      Name: Unnamed
+    - ID: 51
+      Name: Unnamed
+    - ID: 52
+      Name: Unnamed
+    - ID: 53
+      Name: Unnamed
+    - ID: 54
+      Name: Unnamed
+    - ID: 55
+      Name: Unnamed
+    - ID: 56
+      Name: Unnamed
+    - ID: 57
+      Name: Unnamed
+    - ID: 58
+      Name: Unnamed
+    - ID: 59
+      Name: Unnamed
+    - ID: 60
+      Name: Unnamed
+    - ID: 61
+      Name: Unnamed
+    - ID: 62
+      Name: Unnamed
+    - ID: 63
+      Name: Unnamed
+    - ID: 64
+      Name: Unnamed
+    - ID: 65
+      Name: Unnamed
+    - ID: 66
+      Name: Unnamed
+    - ID: 67
+      Name: Unnamed
+    - ID: 68
+      Name: Unnamed
+    - ID: 69
+      Name: Unnamed
+    - ID: 70
+      Name: Unnamed
+    - ID: 71
+      Name: Unnamed
+    - ID: 72
+      Name: Unnamed
+    - ID: 73
+      Name: Unnamed
+    - ID: 74
+      Name: Unnamed
+    - ID: 75
+      Name: Unnamed
+    - ID: 76
+      Name: Unnamed
+    - ID: 77
+      Name: Unnamed
+    - ID: 78
+      Name: Unnamed
+    - ID: 79
+      Name: Unnamed
+    - ID: 80
+      Name: Unnamed
+    - ID: 81
+      Name: Unnamed
+    - ID: 82
+      Name: Unnamed
+    - ID: 83
+      Name: Unnamed
+    - ID: 84
+      Name: Unnamed
+    - ID: 85
+      Name: Unnamed
+    - ID: 86
+      Name: Unnamed
+    - ID: 87
+      Name: Unnamed
+    - ID: 88
+      Name: Unnamed
+    - ID: 89
+      Name: Unnamed
+    - ID: 90
+      Name: Unnamed
+    - ID: 91
+      Name: Unnamed
+    - ID: 92
+      Name: Unnamed
+    - ID: 93
+      Name: Unnamed
+    - ID: 100
+      Name: Test Spawnpoint

@@ -96,6 +96,8 @@ void ECS::ConcurrentSystem::Process()
 			Sleep(10);
 		}
 	}
+
+	m_run = false;
 }
 
 bool ECS::ConcurrentSystem::IsRunning()

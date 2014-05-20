@@ -1,16 +1,16 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'AbstractComponentView.h'
+** Meta object code from reading C++ file 'CollisionResponderView.h'
 **
 ** Created by: The Qt Meta Object Compiler version 67 (Qt 5.2.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../Include/Components/AbstractComponentView.h"
+#include "../Include/Components/CollisionResponderView.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'AbstractComponentView.h' doesn't include <QObject>."
+#error "The header file 'CollisionResponderView.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
 #error "This file was generated using the moc from 5.2.0. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -18,24 +18,24 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-struct qt_meta_stringdata_AbstractComponentView_t {
+struct qt_meta_stringdata_CollisionResponderView_t {
     QByteArrayData data[1];
-    char stringdata[23];
+    char stringdata[24];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    offsetof(qt_meta_stringdata_AbstractComponentView_t, stringdata) + ofs \
+    offsetof(qt_meta_stringdata_CollisionResponderView_t, stringdata) + ofs \
         - idx * sizeof(QByteArrayData) \
     )
-static const qt_meta_stringdata_AbstractComponentView_t qt_meta_stringdata_AbstractComponentView = {
+static const qt_meta_stringdata_CollisionResponderView_t qt_meta_stringdata_CollisionResponderView = {
     {
-QT_MOC_LITERAL(0, 0, 21)
+QT_MOC_LITERAL(0, 0, 22)
     },
-    "AbstractComponentView\0"
+    "CollisionResponderView\0"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_AbstractComponentView[] = {
+static const uint qt_meta_data_CollisionResponderView[] = {
 
  // content:
        7,       // revision
@@ -51,7 +51,7 @@ static const uint qt_meta_data_AbstractComponentView[] = {
        0        // eod
 };
 
-void AbstractComponentView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void CollisionResponderView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     Q_UNUSED(_o);
     Q_UNUSED(_id);
@@ -59,28 +59,28 @@ void AbstractComponentView::qt_static_metacall(QObject *_o, QMetaObject::Call _c
     Q_UNUSED(_a);
 }
 
-const QMetaObject AbstractComponentView::staticMetaObject = {
-    { &QFrame::staticMetaObject, qt_meta_stringdata_AbstractComponentView.data,
-      qt_meta_data_AbstractComponentView,  qt_static_metacall, 0, 0}
+const QMetaObject CollisionResponderView::staticMetaObject = {
+    { &AbstractComponentView::staticMetaObject, qt_meta_stringdata_CollisionResponderView.data,
+      qt_meta_data_CollisionResponderView,  qt_static_metacall, 0, 0}
 };
 
 
-const QMetaObject *AbstractComponentView::metaObject() const
+const QMetaObject *CollisionResponderView::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *AbstractComponentView::qt_metacast(const char *_clname)
+void *CollisionResponderView::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_AbstractComponentView.stringdata))
-        return static_cast<void*>(const_cast< AbstractComponentView*>(this));
-    return QFrame::qt_metacast(_clname);
+    if (!strcmp(_clname, qt_meta_stringdata_CollisionResponderView.stringdata))
+        return static_cast<void*>(const_cast< CollisionResponderView*>(this));
+    return AbstractComponentView::qt_metacast(_clname);
 }
 
-int AbstractComponentView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int CollisionResponderView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QFrame::qt_metacall(_c, _id, _a);
+    _id = AbstractComponentView::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     return _id;

@@ -9,7 +9,7 @@ namespace RootForce
 {
 	void PhysicsSystem::Init()
 	{
-		m_physicsAccessor.Init(m_world->GetEntityManager());
+		//m_physicsAccessor.Init(m_world->GetEntityManager());
 		m_collisions.Init(m_world->GetEntityManager());
 		m_transforms.Init(m_world->GetEntityManager());
 	}
@@ -26,17 +26,16 @@ namespace RootForce
 			Transform* transform = m_transforms.Get(p_entity);
 			Collision* collision = m_collisions.Get(p_entity);
 
-			Physics* accessor = m_physicsAccessor.Get(p_entity);
+			//Physics* accessor = m_physicsAccessor.Get(p_entity);
 
-			if(collision->m_handle)
+			transform->m_position = m_physics->GetPos(*(collision->m_handle));
+			transform->m_orientation.SetOrientation(m_physics->GetOrientation(*(collision->m_handle)));
+
+			Physics* accessor = m_world->GetEntityManager()->GetComponent<Physics>(p_entity);
+			if (accessor != nullptr && m_physics->GetType(*collision->m_handle) != RootEngine::Physics::PhysicsType::TYPE_PLAYER)
 			{
-				transform->m_position = m_physics->GetPos(*(collision->m_handle));
-				transform->m_orientation.SetOrientation(m_physics->GetOrientation(*(collision->m_handle)));
-				if (m_physics->GetType(*collision->m_handle) != RootEngine::Physics::PhysicsType::TYPE_PLAYER)
-				{
-					// Players do not have a current velocity.
-					accessor->m_velocity = m_physics->GetVelocity(*collision->m_handle);
-				}
+				// Players do not have a current velocity.
+				accessor->m_velocity = m_physics->GetVelocity(*collision->m_handle);
 			}
 		}
 	}
@@ -65,7 +64,7 @@ namespace RootForce
 
 	void PhysicsTransformCorrectionSystem::Init()
 	{
-		m_physicsAccessor.Init(m_world->GetEntityManager());
+		//m_physicsAccessor.Init(m_world->GetEntityManager());
 		m_collisions.Init(m_world->GetEntityManager());
 		m_transforms.Init(m_world->GetEntityManager());
 	}
@@ -82,16 +81,15 @@ namespace RootForce
 			Transform* transform = m_transforms.Get(p_entity);
 			Collision* collision = m_collisions.Get(p_entity);
 
-			Physics* accessor = m_physicsAccessor.Get(p_entity);
+			//Physics* accessor = m_physicsAccessor.Get(p_entity);
 
-			if(collision->m_handle)
+			g_engineContext.m_physics->SetPosition(*collision->m_handle, transform->m_position);
+			g_engineContext.m_physics->SetOrientation(*collision->m_handle, transform->m_orientation.GetQuaternion());
+
+			Physics* accessor = m_world->GetEntityManager()->GetComponent<Physics>(p_entity);
+			if (accessor != nullptr && g_engineContext.m_physics->GetType(*collision->m_handle) != RootEngine::Physics::PhysicsType::TYPE_PLAYER)
 			{
-				g_engineContext.m_physics->SetPosition(*collision->m_handle, transform->m_position);
-				g_engineContext.m_physics->SetOrientation(*collision->m_handle, transform->m_orientation.GetQuaternion());
-				if (g_engineContext.m_physics->GetType(*collision->m_handle) != RootEngine::Physics::PhysicsType::TYPE_PLAYER)
-				{
-					g_engineContext.m_physics->SetVelocity(*collision->m_handle, accessor->m_velocity);
-				}
+				g_engineContext.m_physics->SetVelocity(*collision->m_handle, accessor->m_velocity);
 			}
 		}
 	}

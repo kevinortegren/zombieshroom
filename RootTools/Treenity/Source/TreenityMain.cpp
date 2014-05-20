@@ -458,6 +458,7 @@ void TreenityMain::Update(float dt)
 		m_world.SetDelta(dt);
 
 		HandleEditorEvents();
+		m_treenityEditor.Update(dt);
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
@@ -466,8 +467,13 @@ void TreenityMain::Update(float dt)
 		m_waterSystem->Process();
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();
-		m_scriptSystem->Process();		
-		m_lookAtSystem->Process();		
+		m_scriptSystem->Process();
+
+		m_physicsTransformCorrectionSystem->Process();
+		g_engineContext.m_physics->DrawDebug();
+		
+		m_lookAtSystem->Process();
+		
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
@@ -490,6 +496,9 @@ void TreenityMain::Update(float dt)
 		m_world.SetDelta(dt);
 
 		HandleIngameEvents();
+		if (m_engineActions.GetMode() != EditorMode::GAME)
+			return;
+		m_treenityEditor.Update(dt);
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
@@ -515,7 +524,7 @@ void TreenityMain::Update(float dt)
 		m_stateSystem->Process();
 
 		// Update collision
-		//m_collisionSystem->Process();
+		m_collisionSystem->Process();
 
 		// Update the scripts?
 		//m_controllerActionSystem->Process();	
@@ -583,6 +592,16 @@ void TreenityMain::RenderSelectedEntity()
 	for(auto itr = m_treenityEditor.GetSelection().begin(); itr != m_treenityEditor.GetSelection().end(); ++itr)
 	{
 		ECS::Entity* entity = (*itr);
+
+		// Do not render if we are already rendering a physics mesh.
+		RootForce::Collision* collision = g_world->GetEntityManager()->GetComponent<RootForce::Collision>(*itr);
+		if (collision != nullptr)
+		{
+			if (g_engineContext.m_physics->GetShape(*collision->m_handle) == RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH)
+			{
+				continue;
+			}
+		}
 
 		RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(entity);
 		RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
