@@ -12,6 +12,7 @@
 #include <RootTools/Treenity/Include/KeyHelper.h>
 
 #include <QPushButton>
+#include <QScrollArea>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -65,9 +66,14 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the main UI.
 	ui.setupUi(this);
 
-	// Setup the component view and its items.
 	m_compView = new ComponentView();
-	ui.verticalLayout->addWidget(m_compView);
+	QScrollArea* scroll = new QScrollArea();
+	scroll->setWidgetResizable(true);
+	scroll->setWidget(m_compView);
+
+	// Setup the component view and its items.
+	
+	ui.verticalLayout->addWidget(scroll);
 	m_componentViews[RootForce::ComponentType::TRANSFORM]			= new TransformView();
 	m_componentViews[RootForce::ComponentType::RENDERABLE]			= new RenderableView();
 	m_componentViews[RootForce::ComponentType::COLLISION]			= new PhysicsView();
