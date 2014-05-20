@@ -9,6 +9,7 @@
 
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <PieMenu.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -94,8 +95,8 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 void Canvas3D::mousePressEvent( QMouseEvent* event )
 {
 	if (event->button() == Qt::RightButton) {
-		QPieMenu* paj = new QPieMenu(nullptr);
-		paj->setIconSize(QSize(40,40));
+		PieMenu* paj = new PieMenu(nullptr);
+		/*paj->setIconSize(QSize(40,40));
 		paj->addAction("", QIcon("Resources/resizeButton.png"), nullptr, nullptr);
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
@@ -103,8 +104,13 @@ void Canvas3D::mousePressEvent( QMouseEvent* event )
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
+		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);*/
 		paj->showMenu();
 	}
+}
+
+void Canvas3D::mouseReleaseEvent( QMouseEvent *event )
+{
+	
 }
 
