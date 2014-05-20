@@ -37,6 +37,8 @@ class PieMenu : public QWidget
 public:
 	PieMenu(QWidget* parent);
 	~PieMenu();
+
+	bool canSee() const;
 public slots:
 	void showMenu();
 	void closeMenu();

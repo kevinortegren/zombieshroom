@@ -5,6 +5,7 @@
 #include <memory>
 #include <SDL2/SDL.h>
 #include <qpiemenu.h>
+#include <PieMenu.h>
 
 class Canvas3D : public QWidget
 {
@@ -27,5 +28,6 @@ protected:
 	
 private:
 	std::shared_ptr<SDL_Window> m_window;
+	std::shared_ptr<PieMenu> m_pieMenu;
 
 };

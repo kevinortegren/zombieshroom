@@ -9,7 +9,7 @@
 
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
-#include <PieMenu.h>
+
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -56,6 +56,8 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 		std::cout << SDL_GetError() << std::endl;
 		throw std::runtime_error("Failed to create window");
 	}
+
+	m_pieMenu = std::shared_ptr<PieMenu>(new PieMenu(nullptr));
 }
 
 Canvas3D::~Canvas3D()
@@ -95,7 +97,6 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 void Canvas3D::mousePressEvent( QMouseEvent* event )
 {
 	if (event->button() == Qt::RightButton) {
-		PieMenu* paj = new PieMenu(nullptr);
 		/*paj->setIconSize(QSize(40,40));
 		paj->addAction("", QIcon("Resources/resizeButton.png"), nullptr, nullptr);
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
@@ -105,12 +106,13 @@ void Canvas3D::mousePressEvent( QMouseEvent* event )
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);*/
-		paj->showMenu();
+		m_pieMenu->showMenu();
 	}
 }
 
 void Canvas3D::mouseReleaseEvent( QMouseEvent *event )
 {
-	
+	if (m_pieMenu->canSee())
+		m_pieMenu->closeMenu();
 }
 

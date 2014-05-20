@@ -9,7 +9,7 @@
 PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent)
 	: m_startAngle((360 / 8) * index), m_radius(radius), m_center(position), m_parent(parent)
 {
-	m_shapePath.moveTo(m_center);
+	m_shapePath.moveTo(QPointF(0, 0));
 	m_shapePath.arcTo(boundingRect(), m_startAngle, 360 / 8);
 	m_shapePath.closeSubpath();
 
@@ -25,17 +25,17 @@ QPainterPath PiePiece::shape() const
 
 QRectF PiePiece::boundingRect() const
 {
-	return QRectF(QPointF(m_center.x() - m_radius, m_center.y() - m_radius), QPointF(m_center.x() + m_radius, m_center.y() + m_radius));
+	return QRectF(QPointF(-m_radius, -m_radius), QPointF(m_radius, m_radius));
 }
 
 void PiePiece::updatePosition()
 {
 	m_center = QCursor::pos();
 
-	m_shapePath = QPainterPath(m_center);
+	/*m_shapePath = QPainterPath(m_center);
 
 	m_shapePath.arcTo(boundingRect(), m_startAngle, 360 / 8);
-	m_shapePath.closeSubpath();
+	m_shapePath.closeSubpath();*/
 }
 
 void PiePiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*)
@@ -44,10 +44,14 @@ void PiePiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	QLinearGradient grad(-m_radius / 2, -m_radius / 2, m_radius / 2, m_radius / 2);
 	grad.setColorAt(down ? 1 : 0, Qt::white);
 	grad.setColorAt(down ? 0 : 1, Qt::darkGray);
-	painter->setPen(Qt::darkGray);
+	if (isSelected()) 
+		painter->setPen(Qt::darkGray);
+	else
+		painter->setPen(Qt::lightGray);
 	painter->setBrush(grad);
 	//painter->drawEllipse(boundingRect());
-	painter->drawPie(boundingRect(), m_startAngle, 720); // 720 is 45 * 8
+	painter->drawPath(m_shapePath);
+	painter->fillPath(m_shapePath, painter->brush());
 
 
 	grad.setColorAt(down ? 1 : 0, Qt::darkGray);
@@ -71,21 +75,24 @@ void PiePiece::hide()
 void PiePiece::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
 	setSelected(true);
+	update();
 }
 
 void PiePiece::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 {
 	setSelected(false);
+	update();
 }
 
 void PiePiece::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
 	emit clicked();
+	update();
 }
 
 PieMenu::PieMenu(QWidget* parent)
 	: QWidget(parent)
-	, m_radius(200)
+	, m_radius(100)
 {
 	m_scene = new QGraphicsScene(this);
 	m_view = new QGraphicsView(m_scene, this);
@@ -115,9 +122,15 @@ PieMenu::~PieMenu()
 	delete m_view;
 }
 
+bool PieMenu::canSee() const
+{
+	return m_view->isVisible();
+}
+
 void PieMenu::showMenu()
 {
 	QScreen* screen = QGuiApplication::primaryScreen();
+	m_center = QCursor::pos();
 
 	int bgRadius = m_radius + 20;
 	QPixmap bg(screen->grabWindow(qApp->desktop()->winId(), m_center.x() - bgRadius, m_center.y() - bgRadius, bgRadius * 2, bgRadius * 2));
