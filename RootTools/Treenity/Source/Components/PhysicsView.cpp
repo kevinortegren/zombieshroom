@@ -18,7 +18,7 @@ PhysicsView::PhysicsView(QWidget* p_parent)
 	connect(ui.doubleSpinBox_sphereRadius,		SIGNAL(valueChanged(double)),		this,	SLOT(SphereRadiusChanged(double)));
 	connect(ui.doubleSpinBox_gravityX,			SIGNAL(valueChanged(double)),		this,	SLOT(GravityXChanged(double)));
 	connect(ui.doubleSpinBox_gravityY,			SIGNAL(valueChanged(double)),		this,	SLOT(GravityYChanged(double)));
-	connect(ui.doubleSpinBox_gravityX,			SIGNAL(valueChanged(double)),		this,	SLOT(GravityXChanged(double)));
+	connect(ui.doubleSpinBox_gravityZ,			SIGNAL(valueChanged(double)),		this,	SLOT(GravityZChanged(double)));
 	connect(ui.lineEdit_physicsMesh,			SIGNAL(editingFinished()),			this,	SLOT(PhysicsMeshChanged()));
 	connect(ui.toolButton_physicsMesh,			SIGNAL(clicked()),					this,	SLOT(PhysicsMeshBrowse()));
 }
@@ -34,7 +34,7 @@ void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 	ui.comboBox_type->setCurrentIndex(type);
 	ui.stackedWidget_type->setCurrentIndex(type);
 
-	if (type == 0)
+	if (type == TYPE_DYNAMIC)
 	{
 		ui.checkBox_collideWithWorld->setChecked(m_engineInterface->GetCollideWithWorld(p_entity));
 		ui.checkBox_collideWithStatic->setChecked(m_engineInterface->GetCollideWithStatic(p_entity));
@@ -82,6 +82,21 @@ void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 void PhysicsView::TypeChanged( int p_value )
 {
 	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
+
+	if (p_value == TYPE_DYNAMIC)
+	{
+		if (m_engineInterface->GetPhysicsShape(selection) == RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH)
+		{
+			m_engineInterface->SetPhysicsShape(selection, RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER);
+		}
+
+		ui.comboBox_shape->setItemData(SHAPE_MESH, 0, Qt::UserRole - 1);
+	}
+	else
+	{
+		ui.comboBox_shape->setItemData(SHAPE_MESH, 33, Qt::UserRole - 1);
+	}
+
 	m_engineInterface->SetPhysicsType(selection, p_value ? false : true);
 	DisplayEntity(selection);
 }
@@ -137,8 +152,19 @@ void PhysicsView::MassChanged(double p_value)
 void PhysicsView::ShapeChanged( int p_value )
 {
 	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
-	m_engineInterface->SetPhysicsShape(selection, (RootEngine::Physics::PhysicsShape::PhysicsShape)p_value);
-	DisplayEntity(selection);
+	
+	// A dynamic physics entity cannot have a mesh shape.
+	if (p_value == SHAPE_MESH && m_engineInterface->GetPhysicsType(selection) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+	{
+		ui.comboBox_shape->setCurrentIndex(SHAPE_CYLINDER);
+		m_engineInterface->SetPhysicsShape(selection, RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER);
+		DisplayEntity(selection);
+	}
+	else
+	{
+		m_engineInterface->SetPhysicsShape(selection, (RootEngine::Physics::PhysicsShape::PhysicsShape)p_value);
+		DisplayEntity(selection);
+	}
 }
 
 void PhysicsView::SphereRadiusChanged( double p_value )

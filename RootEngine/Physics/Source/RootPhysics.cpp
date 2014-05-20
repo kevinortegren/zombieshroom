@@ -1254,7 +1254,9 @@ namespace Physics
 		{
 			m_shapelessObjects.at(m_userPointer.at(p_objectHandle)->m_vectorIndex)->SetPos(p_position);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY && !m_userPointer.at(p_objectHandle)->m_externalControlled)
+		else if((m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || 
+			     m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC ||
+				 m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_STATIC) && !m_userPointer.at(p_objectHandle)->m_externalControlled)
 		{
 			m_dynamicObjects.at(index)->getWorldTransform().setOrigin(temp);
 		}
@@ -1625,7 +1627,7 @@ namespace Physics
 				return (float)((btConeShape*)beteShape)->getHeight();
 			break;
 		case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
-				return (float)((btCylinderShape*)beteShape)->getHalfExtentsWithoutMargin().y();
+				return (float)((btCylinderShape*)beteShape)->getHalfExtentsWithMargin().y();
 			break;
 		default:
 			break;

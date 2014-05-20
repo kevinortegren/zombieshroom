@@ -454,6 +454,7 @@ void TreenityMain::Update(float dt)
 		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
 
+		m_physicsTransformCorrectionSystem->Process();
 		g_engineContext.m_physics->DrawDebug();
 		
 		m_lookAtSystem->Process();

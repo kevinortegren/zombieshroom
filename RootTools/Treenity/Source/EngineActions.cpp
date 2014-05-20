@@ -215,6 +215,7 @@ void EngineActions::EnterPlayMode()
 	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(playerEntity);
 	transform->m_position = spawnTransform->m_position;
 	transform->m_orientation = spawnTransform->m_orientation;
+	transform->m_scale = spawnTransform->m_scale;
 	g_engineContext.m_physics->SetPosition(*collision->m_handle, transform->m_position);
 	g_engineContext.m_physics->SetOrientation(*collision->m_handle, transform->m_orientation.GetQuaternion());
 

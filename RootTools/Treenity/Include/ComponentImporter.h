@@ -276,17 +276,11 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					p_node["ShapeMass"] >> physics->m_mass;
 					if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 						physics->m_mass = 0;
-
-					//Set physics gravity
-					glm::vec3 gravity;
-					p_node["ShapeGravity"][0] >> gravity.x;
-					p_node["ShapeGravity"][1] >> gravity.y;
-					p_node["ShapeGravity"][2] >> gravity.z;
-					g_engineContext.m_physics->SetGravity(*collision->m_handle, gravity);
 				}
 
 				//Create physics shape
-			/*	if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
+				/*	
+				if (type == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 				{
 					std::string meshHandle;
 					p_node["MeshHandle"] >> meshHandle;
@@ -297,14 +291,22 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					break;
 				}
 				*/
+
 				int shape;
 				p_node["PhysicsShape"] >> shape;
 
 				bool collideWithWorld;
-				p_node["CollideWithWorld"] >> collideWithWorld;
-
 				bool collideWithStatic;
-				p_node["CollideWithStatic"] >> collideWithStatic;
+				if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+				{
+					p_node["CollideWithWorld"] >> collideWithWorld;
+					p_node["CollideWithStatic"] >> collideWithStatic;
+				}
+				else
+				{
+					collideWithWorld = true;
+					collideWithStatic = true;
+				}
 
 				RootEngine::Physics::PhysicsShape::PhysicsShape pshape = (RootEngine::Physics::PhysicsShape::PhysicsShape)shape;
 				switch (pshape)
@@ -356,6 +358,15 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					break;
 				}
 
+				// If dynamic, set physics gravity (must be done after a shape has been created).
+				if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+				{
+					glm::vec3 gravity;
+					p_node["ShapeGravity"][0] >> gravity.x;
+					p_node["ShapeGravity"][1] >> gravity.y;
+					p_node["ShapeGravity"][2] >> gravity.z;
+					g_engineContext.m_physics->SetGravity(*collision->m_handle, gravity);
+				}
 			}
 			break;
 		case RootForce::ComponentType::PARTICLE:

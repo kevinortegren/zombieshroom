@@ -168,8 +168,12 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				RootEngine::Physics::PhysicsShape::PhysicsShape shape = g_engineContext.m_physics->GetShape(*collision->m_handle);
 
 				p_emitter << YAML::Key << "PhysicsShape" << YAML::Value << (int)shape;
-				p_emitter << YAML::Key << "CollideWithWorld"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithWorld(*collision->m_handle);
-				p_emitter << YAML::Key << "CollideWithStatic"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithStatic(*collision->m_handle);
+
+				if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+				{
+					p_emitter << YAML::Key << "CollideWithWorld"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithWorld(*collision->m_handle);
+					p_emitter << YAML::Key << "CollideWithStatic"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithStatic(*collision->m_handle);
+				}
 
 				switch (shape)
 				{

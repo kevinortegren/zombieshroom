@@ -90,7 +90,6 @@ void ECS::ConcurrentSystem::Process()
 			End();
 
 			m_run = false;
-			std::cout << "Setting run = false (1)" << std::endl;
 		}
 		else
 		{
@@ -99,7 +98,6 @@ void ECS::ConcurrentSystem::Process()
 	}
 
 	m_run = false;
-	std::cout << "Setting run = false (2)" << std::endl;
 }
 
 bool ECS::ConcurrentSystem::IsRunning()
@@ -110,7 +108,6 @@ bool ECS::ConcurrentSystem::IsRunning()
 void ECS::ConcurrentSystem::Run()
 {
 	m_run = true;
-	std::cout << "Setting run = true" << std::endl;
 }
 
 void ECS::ConcurrentSystem::Start()
@@ -121,10 +118,8 @@ void ECS::ConcurrentSystem::Start()
 
 void ECS::ConcurrentSystem::Terminate()
 {
-	std::cout << "Setting terminate = true" << std::endl;
 	m_terminate = true;
 	m_thread.join();
-	std::cout << "Threads joined" << std::endl;
 }
 
 void ECS::ConcurrentSystem::Synch()
