@@ -67,6 +67,9 @@ public:
 	//Called after RootEngine has been loaded from TreenityMain!
 	void Init();
 
+	// Called every frame by the main loop.
+	void Update(float p_dt);
+
 	ToolManager m_toolManager;
 
 private:

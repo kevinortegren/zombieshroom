@@ -481,3 +481,25 @@ void Treenity::Init()
 	m_assetManagerWidget = new AssetManagerWidget();
 	ui.verticalLayout_assetManager->addWidget(m_assetManagerWidget);
 }
+
+void Treenity::Update(float p_dt)
+{
+	// Poll for the component views (since we cannot get events when component data is changed).
+	if (m_selectedEntities.size() == 1)
+	{
+		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
+
+		uint64_t flag = selectedEntity->GetFlag();
+		for (int i = 0; i < 64; ++i)
+		{
+			uint64_t mask = 1ULL << i;
+			if ((flag & mask) != 0)
+			{
+				if (m_componentViews.find(i) != m_componentViews.end())
+				{
+					m_componentViews[i]->DisplayEntity(selectedEntity);
+				}
+			}
+		}
+	}
+}

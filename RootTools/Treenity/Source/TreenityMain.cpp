@@ -444,6 +444,7 @@ void TreenityMain::Update(float dt)
 		m_world.SetDelta(dt);
 
 		HandleEditorEvents();
+		m_treenityEditor.Update(dt);
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
@@ -488,6 +489,7 @@ void TreenityMain::Update(float dt)
 		HandleIngameEvents();
 		if (m_engineActions.GetMode() != EditorMode::GAME)
 			return;
+		m_treenityEditor.Update(dt);
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();
