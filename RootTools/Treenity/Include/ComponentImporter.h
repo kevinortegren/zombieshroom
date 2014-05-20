@@ -267,6 +267,8 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				//Create and store physics handle in collision component
 				collision->m_handle = g_engineContext.m_physics->CreateHandle(p_entity, (RootEngine::Physics::PhysicsType::PhysicsType)type, false);
 
+				g_engineContext.m_logger->LogText(LogTag::COMPONENT, LogLevel::PINK_PRINT, "Importing collision component on entity %d with handle: %d", p_entity->GetId(), *collision->m_handle);
+
 				//Create collision container
 				//g_engineContext.m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
 

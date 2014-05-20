@@ -1135,7 +1135,6 @@ namespace Physics
 		}
 		else if(!m_userPointer.at(p_objectHandle)->m_externalControlled && m_userPointer.at(p_objectHandle)->m_type != PhysicsType::TYPE_RAGDOLL)
 		{
-			
 			btVector3 gravity;
 			gravity.setX(p_gravity[0]);
 			gravity.setY(p_gravity[1]);
@@ -1467,7 +1466,7 @@ namespace Physics
 				p_body->setRestitution(0.8f);
 				p_body->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT /*| btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT*/);
 		}
-		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY)
+		else if(m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_ABILITY || m_userPointer.at(p_objectHandle)->m_type == PhysicsType::TYPE_DYNAMIC)
 		{
 				p_body->setCollisionFlags( btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 				p_body->setActivationState(DISABLE_DEACTIVATION);
