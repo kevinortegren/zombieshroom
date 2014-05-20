@@ -7,6 +7,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 
 #include <RootEngine/Physics/Include/RootPhysics.h>
+#include <RootEngine/Script/Include/RootScript.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -253,7 +254,6 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 		case RootForce::ComponentType::COLLISION:
 			{
 				RootForce::Collision* collision = p_world->GetEntityManager()->CreateComponent<RootForce::Collision>(p_entity);
-				//RootForce::CollisionResponder* collisionResp = p_world->GetEntityManager()->CreateComponent<RootForce::CollisionResponder>(p_entity);
 				RootForce::Physics* physics = p_world->GetEntityManager()->CreateComponent<RootForce::Physics>(p_entity);
 				RootForce::Transform* trans = p_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
 
@@ -369,6 +369,17 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				}
 			}
 			break;
+			case RootForce::ComponentType::COLLISIONRESPONDER:
+			{
+				RootForce::CollisionResponder* collisionResp = p_world->GetEntityManager()->CreateComponent<RootForce::CollisionResponder>(p_entity);
+				RootForce::Collision* collision = p_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+				if (collision != nullptr)
+				{
+					g_engineContext.m_physics->SetCollisionContainer(*collision->m_handle, &collisionResp->m_collisions);
+				}
+			}
+			break;
+
 		case RootForce::ComponentType::PARTICLE:
 			{
 				RootForce::ParticleEmitter* particleEmitter = p_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p_entity);
@@ -390,6 +401,15 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 
 				p_node["LightSlot"] >> shadow->m_directionalLightSlot;
 
+			}
+			break;
+
+		case RootForce::ComponentType::SCRIPT:
+			{
+				RootForce::Script* script = p_world->GetEntityManager()->CreateComponent<RootForce::Script>(p_entity);
+				
+				p_node["ScriptName"] >> script->Name;
+				g_engineContext.m_resourceManager->LoadScript(script->Name);
 			}
 			break;
 		default:

@@ -654,7 +654,17 @@ void EngineActions::SetScript( ECS::Entity* p_entity, std::string p_script )
 //Collision responder
 void EngineActions::AddCollisionResponder( ECS::Entity* p_entity )
 {
-	m_world->GetEntityManager()->CreateComponent<RootForce::CollisionResponder>(p_entity);
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	if (collision != nullptr)
+	{
+		RootForce::CollisionResponder* responder = m_world->GetEntityManager()->CreateComponent<RootForce::CollisionResponder>(p_entity);
+		g_engineContext.m_physics->SetCollisionContainer(*collision->m_handle, &responder->m_collisions);
+	}
+	else
+	{
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Cannot add collision responder with collision component.");
+		Utils::Write("Cannot add collision responder with collision component.");
+	}
 }
 
 void EngineActions::RemoveCollisionResponder( ECS::Entity* p_entity )

@@ -212,6 +212,8 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				}
 			}
 			break;
+
+		
 		case RootForce::ComponentType::PARTICLE:
 			{
 				RootForce::ParticleEmitter* particle = static_cast<RootForce::ParticleEmitter*>(p_component);
@@ -226,6 +228,15 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				p_emitter << YAML::Key << "LightSlot" << YAML::Value << shadow->m_directionalLightSlot;
 			}
 			break;
+
+		case RootForce::ComponentType::SCRIPT:
+		{
+			RootForce::Script* script = static_cast<RootForce::Script*>(p_component);
+
+			p_emitter << YAML::Key << "ScriptName" << YAML::Value << script->Name;
+		}
+		break;
+
 		default:
 			break;
 	}

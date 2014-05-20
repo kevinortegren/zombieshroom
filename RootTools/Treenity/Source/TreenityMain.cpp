@@ -513,7 +513,7 @@ void TreenityMain::Update(float dt)
 		m_stateSystem->Process();
 
 		// Update collision
-		//m_collisionSystem->Process();
+		m_collisionSystem->Process();
 
 		// Update the scripts?
 		//m_controllerActionSystem->Process();	
