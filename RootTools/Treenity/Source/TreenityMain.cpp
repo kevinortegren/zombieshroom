@@ -454,6 +454,7 @@ void TreenityMain::Update(float dt)
 		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
 
+		g_engineContext.m_physics->DrawDebug();
 		
 		m_lookAtSystem->Process();
 		
@@ -484,6 +485,8 @@ void TreenityMain::Update(float dt)
 		m_world.SetDelta(dt);
 
 		HandleIngameEvents();
+		if (m_engineActions.GetMode() != EditorMode::GAME)
+			return;
 
 		ProcessWorldMessages();
 		m_world.GetEntityManager()->CleanUp();

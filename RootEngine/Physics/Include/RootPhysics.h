@@ -97,6 +97,7 @@ namespace RootEngine
 			virtual void Init() = 0;
 			virtual void CreatePlane(glm::vec3 p_normal, glm::vec3 p_position) = 0;
 			virtual void Update(float p_dt) = 0;
+			virtual void DrawDebug() = 0;
 			virtual void EnableDebugDraw(bool p_enabled) = 0;
 			virtual void RemoveObject(int p_objectHandle) = 0;
 			virtual void RemoveAll() = 0;
@@ -187,6 +188,7 @@ namespace RootEngine
 			void CreatePlane(glm::vec3 p_normal, glm::vec3 p_position);
 			
 			void Update(float p_dt);
+			void DrawDebug();
 			
 			
 		

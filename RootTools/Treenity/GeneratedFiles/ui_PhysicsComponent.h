@@ -19,10 +19,10 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QWidget>
+#include <RootTools/Treenity/Include/DropLineEdit.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -68,7 +68,7 @@ public:
     QWidget *page_2;
     QGridLayout *gridLayout_6;
     QLabel *label_12;
-    QLineEdit *lineEdit_physicsMesh;
+    DropLineEdit *lineEdit_physicsMesh;
     QToolButton *toolButton_physicsMesh;
 
     void setupUi(QWidget *Physics)
@@ -263,7 +263,7 @@ public:
 
         gridLayout_6->addWidget(label_12, 0, 0, 1, 1);
 
-        lineEdit_physicsMesh = new QLineEdit(page_2);
+        lineEdit_physicsMesh = new DropLineEdit(page_2);
         lineEdit_physicsMesh->setObjectName(QStringLiteral("lineEdit_physicsMesh"));
 
         gridLayout_6->addWidget(lineEdit_physicsMesh, 0, 1, 1, 1);
@@ -282,7 +282,7 @@ public:
         QObject::connect(comboBox_type, SIGNAL(currentIndexChanged(int)), stackedWidget_type, SLOT(setCurrentIndex(int)));
         QObject::connect(comboBox_shape, SIGNAL(currentIndexChanged(int)), stackedWidget_shape, SLOT(setCurrentIndex(int)));
 
-        stackedWidget_shape->setCurrentIndex(3);
+        stackedWidget_shape->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(Physics);

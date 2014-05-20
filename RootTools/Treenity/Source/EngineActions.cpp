@@ -239,6 +239,7 @@ void EngineActions::ExitPlayMode()
 	qApp->processEvents(QEventLoop::AllEvents);
 
 	// Stop the animation system.
+	m_treenityMain->GetAnimationSystem()->Synch();
 	m_treenityMain->GetAnimationSystem()->Terminate();
 
 	// Clear whatever happened within the game session.
@@ -424,10 +425,12 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 					RootForce::Renderable* rend = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
 					if(rend && rend->m_model)
 					{
-						newMeshHandle = g_engineContext.m_resourceManager->ResolveStringFromModel(rend->m_model) + "0";
+						newMeshHandle = g_engineContext.m_resourceManager->ResolveStringFromModel(rend->m_model);
 
 						if(newMeshHandle == "")
 							newMeshHandle = "Primitives/box0";
+						else
+							newMeshHandle += "0";
 					}
 					else
 					{

@@ -13,6 +13,14 @@ public:
 	const QString& GetComponentName() const;
 	void DisplayEntity(ECS::Entity* p_entity);
 private:
+	static const int TYPE_DYNAMIC = 0;
+	static const int TYPE_STATIC = 1;
+
+	static const int SHAPE_SPHERE = 0;
+	static const int SHAPE_CONE = 1;
+	static const int SHAPE_CYLINDER = 2;
+	static const int SHAPE_MESH = 3;
+
 	QString m_name;
 	Ui::Physics ui;
 private slots:

@@ -146,6 +146,7 @@ namespace Physics
 		g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::INIT_PRINT, "Physics subsystem initialized!");
 		m_debugDrawer = new DebugDrawer();
 		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() | btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawContactPoints /*| btIDebugDraw::DBG_DrawAabb*/ |btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits);
+		m_debugDrawer->setDebugMode(m_debugDrawer->getDebugMode() & ~btIDebugDraw::DBG_DrawNormals);
 		m_dynamicWorld->setDebugDrawer(m_debugDrawer);
 		m_dynamicWorld->debugDrawWorld();
 		m_debugDrawEnabled = false;
@@ -176,6 +177,12 @@ namespace Physics
 			m_dynamicWorld->debugDrawWorld();
 		
 	}
+
+	void RootPhysics::DrawDebug()
+	{
+		m_dynamicWorld->debugDrawWorld();
+	}
+
 	void RootPhysics::RemoveObject( int p_objectHandle)
 	{
 		if(!DoesObjectExist(p_objectHandle))

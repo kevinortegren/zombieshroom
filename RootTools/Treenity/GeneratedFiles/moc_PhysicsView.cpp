@@ -86,8 +86,8 @@ static const uint qt_meta_data_PhysicsView[] = {
       13,    1,  119,    2, 0x08,
       14,    1,  122,    2, 0x08,
       15,    1,  125,    2, 0x08,
-      16,    1,  128,    2, 0x08,
-      17,    0,  131,    2, 0x08,
+      16,    0,  128,    2, 0x08,
+      17,    0,  129,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void, QMetaType::Int,    3,
@@ -103,7 +103,7 @@ static const uint qt_meta_data_PhysicsView[] = {
     QMetaType::Void, QMetaType::Double,    3,
     QMetaType::Void, QMetaType::Double,    3,
     QMetaType::Void, QMetaType::Double,    3,
-    QMetaType::Void, QMetaType::QString,    3,
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -127,7 +127,7 @@ void PhysicsView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         case 10: _t->ConeHeightChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 11: _t->CylinderRadiusChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 12: _t->CylinderHeightChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 13: _t->PhysicsMeshChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 13: _t->PhysicsMeshChanged(); break;
         case 14: _t->PhysicsMeshBrowse(); break;
         default: ;
         }
