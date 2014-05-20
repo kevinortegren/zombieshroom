@@ -26,6 +26,9 @@
 #include <RootSystems/Include/Network/Client.h>
 #include <RootSystems/Include/Network/MessageHandlers.h>
 
+#include <RootTools/Treenity/Include/MaterialExporter.h>
+#include <RootTools/Treenity/Include/MaterialImporter.h>
+
 RootEngine::GameSharedContext g_engineContext;
 ECS::World* g_world;
 RootForce::Network::NetworkEntityMap g_networkEntityMap;
@@ -305,6 +308,17 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	// Selected mesh material.
 	m_selectedEntityMaterial = g_engineContext.m_renderer->CreateMaterial("SelectedMaterial");
 	m_selectedEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Selected");
+	m_selectedEntityMaterial->m_textures[Render::TextureSemantic::DEPTH] = g_engineContext.m_resourceManager->LoadTexture("blowDartDiffuse", Render::TextureType::TEXTURE_2D);
+
+	MaterialExporter e;
+	e.Export(m_selectedEntityMaterial, "test.material");
+
+
+	Render::Material* test;
+
+	MaterialImporter i;
+	test = i.Import("test.material");
+
 
 	// Register listeners for global modifer keys.
 	GlobalKeys::InitializeKeyMap();

@@ -52,6 +52,12 @@ public:
 	std::string GetRenderableMaterialName(ECS::Entity* p_entity);
 	void SetRenderableModelName(ECS::Entity* p_entity, std::string p_modelName);
 	void SetRenderableMaterialName(ECS::Entity* p_entity, std::string p_materialName);
+	std::string GetMaterialEffectName(Render::Material* p_material);
+	Render::Material* GetMaterial(const std::string& p_string);
+	std::string GetTextureName(Render::TextureInterface* p_texture);
+	Render::TextureInterface* GetTexture(const std::string& p_path);
+	std::string GetContentPath();
+
 
 	//Physics
 	void AddPhysics(ECS::Entity* p_entity);

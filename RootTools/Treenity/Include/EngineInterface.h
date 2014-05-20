@@ -3,6 +3,7 @@
 #include <Utility/ECS/Include/World.h>
 #include <Utility/ECS/Include/Entity.h>
 #include <RootSystems/Include/Orientation.h>
+#include <RootEngine/Render/Include/Material.h>
 #include <glm/glm.hpp>
 #include <QString>
 
@@ -53,6 +54,12 @@ struct EngineInterface
 	virtual std::string GetRenderableMaterialName(ECS::Entity* p_entity) = 0;
 	virtual void SetRenderableModelName(ECS::Entity* p_entity, std::string p_modelName) = 0;
 	virtual void SetRenderableMaterialName(ECS::Entity* p_entity, std::string p_materialName) = 0;
+	virtual std::string GetMaterialEffectName(Render::Material* p_material) = 0;
+	virtual Render::Material* GetMaterial(const std::string& p_string) = 0;
+	virtual Render::TextureInterface* GetTexture(const std::string& p_path) = 0;
+	virtual std::string GetTextureName(Render::TextureInterface* p_texture) = 0;
+	virtual std::string GetContentPath() = 0;
+
 
 	//Physics
 	virtual void AddPhysics(ECS::Entity* p_entity) = 0;

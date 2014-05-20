@@ -105,7 +105,7 @@ function Player.OnTeamSelect(self, teamId)
         renderable:SetMaterialGlow("WSGlowRed");
       end
       renderable:SetMaterialDiffuse("WStexture");
-      renderable:SetMaterialSpecular("WSSpecular");
+      renderable:SetMaterialSpecular("WSspecular");
       renderable:SetMaterialNormal("WSNormal");
       renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
       renderable:SetAnimation(animation);
@@ -160,7 +160,7 @@ function Player.OnTeamSelect(self, teamId)
 			renderable:SetMaterialGlow("WSGlowRed");
 		end
 		renderable:SetMaterialDiffuse("WStexture");
-		renderable:SetMaterialSpecular("WSSpecular");
+		renderable:SetMaterialSpecular("WSspecular");
 		renderable:SetMaterialNormal("WSNormal");
 		renderable:SetMaterialEffect("Mesh_NormalMap_Anim");
   end

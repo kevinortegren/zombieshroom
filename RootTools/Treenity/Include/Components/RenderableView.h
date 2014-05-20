@@ -13,9 +13,23 @@ public:
 	const QString& GetComponentName() const;
 	void DisplayEntity(ECS::Entity* p_entity);
 private:
+	
+	QPixmap GetPixmap(Render::TextureInterface* p_texture);
+
+	void DisplayDiffuse();
+	void DisplayDiffuseNormal();
+
 	QString m_name;
 	Ui::Renderable ui;
+
+	Render::Material* m_currentMaterial;
 private slots:
 	void MaterialNameChanged();
 	void ModelNameChanged();
+
+	void DiffuseTextureDropped(const QString& p_path);
+	void SpecularTextureDropped(const QString& p_path);
+	void GlowTextureDropped(const QString& p_path);
+	void NormalTextureDropped(const QString& p_path);
+
 };

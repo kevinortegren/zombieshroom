@@ -391,6 +391,31 @@ void EngineActions::SetRenderableMaterialName( ECS::Entity* p_entity, std::strin
 	renderable->m_material = g_engineContext.m_renderer->CreateMaterial(p_materialName);
 }
 
+std::string EngineActions::GetMaterialEffectName(Render::Material* p_material) 
+{
+	return g_engineContext.m_resourceManager->ResolveStringFromEffect(p_material->m_effect);
+}
+
+Render::Material* EngineActions::GetMaterial(const std::string& p_string)
+{
+	return g_engineContext.m_renderer->CreateMaterial(p_string);
+}
+
+Render::TextureInterface* EngineActions::GetTexture(const std::string& p_path)
+{
+	return g_engineContext.m_resourceManager->LoadTexture(p_path, Render::TextureType::TEXTURE_2D);
+}
+
+std::string EngineActions::GetTextureName(Render::TextureInterface* p_texture)
+{
+	return g_engineContext.m_resourceManager->ResolveStringFromTexture(p_texture);
+}
+
+std::string EngineActions::GetContentPath()
+{
+	return g_engineContext.m_resourceManager->GetWorkingDirectory();
+}
+
 //Physics
 float EngineActions::GetMass(ECS::Entity* p_entity)
 {
