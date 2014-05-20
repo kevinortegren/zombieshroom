@@ -4,6 +4,8 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootTools/Treenity/Include/Utils.h>
 #include <QDesktopServices>
+#include <QPixmapCache>
+
 extern RootEngine::GameSharedContext g_engineContext;
 
 AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
@@ -23,6 +25,7 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	connect(ui.pushButton_expandall,			SIGNAL(clicked()),								this,				SLOT(ExpandAll()));
 	connect(ui.horizontalSlider_icon,			SIGNAL(valueChanged(int)),						this,				SLOT(IconSizeChanged(int)));
 
+	QtConcurrent::run(this, &AssetManagerWidget::CacheAllTextures);
 
 	//Create folder model for tree view
 	m_assetFolderModel = new QFileSystemModel();
@@ -69,6 +72,7 @@ AssetManagerWidget::AssetManagerWidget( QWidget* p_parent /*= 0*/ )
 	ui.label_fileResolution->setText("");
 	ui.label_res->setText("");
 
+	
 }
 
 AssetManagerWidget::~AssetManagerWidget()
@@ -395,5 +399,39 @@ void AssetManagerWidget::OpenExternally()
 		//This opens a file with the default program. If no program is selected it will prompt the user to find a program. Very nice... very nice indeed!
 		QString temp = "file:///" + m_rightClickFileInfo.filePath();
 		QDesktopServices::openUrl(QUrl(temp, QUrl::TolerantMode)); //Don't know if QDesktopServices is included in our external libs. If this is causing compile problems, comment it out!
+	}
+}
+
+void AssetManagerWidget::CacheAllTextures()
+{
+	QString texturePath = QString::fromStdString(g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets/Textures/");
+
+	QDir textureDir(texturePath);
+
+	textureDir.setFilter(QDir::Files);
+	textureDir.setNameFilters(QStringList("*.dds"));
+
+	foreach(QFileInfo file, textureDir.entryInfoList())
+	{
+		QString filePath = file.absoluteFilePath();
+
+		QPixmap pm;
+		if (!QPixmapCache::find(filePath, &pm))
+		{
+			QImageReader reader(filePath);
+
+			if(!reader.canRead())
+			{
+				continue;
+			}
+
+			QImage image = reader.read();
+			if(image.isNull())
+			{
+				continue;
+			}
+			pm = QPixmap::fromImage(image.scaled(QSize(200,200), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+			QPixmapCache::insert(filePath, pm);
+		}
 	}
 }
