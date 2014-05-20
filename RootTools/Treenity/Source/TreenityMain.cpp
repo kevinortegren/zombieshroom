@@ -547,6 +547,16 @@ void TreenityMain::RenderSelectedEntity()
 	{
 		ECS::Entity* entity = (*itr);
 
+		// Do not render if we are already rendering a physics mesh.
+		RootForce::Collision* collision = g_world->GetEntityManager()->GetComponent<RootForce::Collision>(*itr);
+		if (collision != nullptr)
+		{
+			if (g_engineContext.m_physics->GetShape(*collision->m_handle) == RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH)
+			{
+				continue;
+			}
+		}
+
 		RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(entity);
 		RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>(entity);
 
