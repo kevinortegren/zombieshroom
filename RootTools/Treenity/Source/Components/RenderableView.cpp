@@ -60,15 +60,11 @@ void RenderableView::DisplayEntity(ECS::Entity* p_entity)
 	if(effectName == "Mesh")
 	{
 		ui.stackedWidget_shaderProperties->setCurrentIndex(0);
-
-		//RenderableView::DisplayDiffuse();
 		QtConcurrent::run(this, &RenderableView::DisplayDiffuse, material);
 	}
 	else if(effectName == "Mesh_NormalMap")
 	{
 		ui.stackedWidget_shaderProperties->setCurrentIndex(1);
-
-		//RenderableView::DisplayDiffuseNormal();
 		QtConcurrent::run(this, &RenderableView::DisplayDiffuseNormal, material);
 	}
 	else

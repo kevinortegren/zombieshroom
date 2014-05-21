@@ -1,0 +1,8 @@
+- Name: CaveEntranceMaterial
+- Effect: Mesh_NormalMap
+- TileFactor: 0
+- Textures:
+    - Sem: 8
+      Texture: CaveEntrancediffuse
+    - Sem: 14
+      Texture: CaveEntranceNormals

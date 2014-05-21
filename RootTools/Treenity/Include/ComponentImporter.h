@@ -8,6 +8,8 @@
 
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RootEngine/Script/Include/RootScript.h>
+#include <fstream>
+#include <RootTools/Treenity/Include/MaterialImporter.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -37,7 +39,20 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 					{
 						std::string materialName;
 						p_node["Material"]["Name"] >> materialName;
-						renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
+
+						const std::string fullpath = g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets//Materials//" + materialName + ".material";
+
+						std::ifstream ifile(fullpath);
+						if (ifile) {
+							
+							MaterialImporter i;
+							renderable->m_material = i.Import(fullpath);
+							break;
+						}
+						else
+						{
+							renderable->m_material = g_engineContext.m_renderer->CreateMaterial(materialName);
+						}		
 					}
 
 					const YAML::Node* effectNode = materialNode->FindValue("Effect");

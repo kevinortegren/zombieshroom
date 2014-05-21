@@ -2,6 +2,7 @@
 
 #include <yaml-cpp\yaml.h>
 #include <RootSystems\Include\Components.h>
+#include <RootTools/Treenity/Include/MaterialExporter.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
@@ -21,6 +22,12 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				if(renderable->m_material != nullptr)
 				{
 					std::string s = g_engineContext.m_renderer->GetStringFromMaterial(renderable->m_material);
+
+					const std::string fullpath = g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets//Materials//" + s + ".material";
+
+					MaterialExporter e;
+					//e.Export(renderable->m_material, fullpath);
+
 					p_emitter << YAML::Key << "Material" << YAML::Value << YAML::BeginMap;
 					p_emitter << YAML::Key << "Name" << YAML::Value << s;
 					if(renderable->m_material->m_effect != nullptr)

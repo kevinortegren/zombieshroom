@@ -1,0 +1,78 @@
+- Entities:
+    - 6
+    - 7
+    - 8
+- Components:
+    - Type: 0
+      Data:
+        - Entity: 7
+          Model: testchar
+          Material:
+            Name: TestSpawnpoint
+            Effect: Mesh_NormalMap
+            Diffuse: ColorGrid
+            Specular: WSSpecular
+            Normal: WSNormal
+            Glow: WSGlowRed
+        - Entity: 8
+          Model: WaterModel
+          Material:
+            Name: waterrender
+            Effect: MeshWater
+            Normal: computeTex3
+            Glow: SkyBox
+    - Type: 1
+      Data:
+        - Entity: 6
+          Position: [-184.801, 139.358, -190.86]
+          Rotation: [0.221731, 0.364328, -0.0897563, 0.900025]
+          Scale: [1, 1, 1]
+        - Entity: 7
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [1, 1, 1]
+        - Entity: 8
+          Position: [0, 0, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [40, 1, 40]
+    - Type: 3
+      Data:
+        []
+    - Type: 8
+      Data:
+        []
+    - Type: 9
+      Data:
+        []
+    - Type: 10
+      Data:
+        []
+    - Type: 20
+      Data:
+        - Entity: 6
+          LightSlot: 0
+    - Type: 21
+      Data:
+        - Entity: 6
+          Color: [0.8, 0.8, 0.8, 1]
+    - Type: 37
+      Data:
+        []
+- Tags:
+    - Id: 6
+      Tag: Sun
+    - Id: 7
+      Tag: TestSpawnpoint
+    - Id: 8
+      Tag: Water
+- Groups:
+    []
+- Storage:
+    []
+- EntityNames:
+    - ID: 6
+      Name: Sun
+    - ID: 7
+      Name: Test Spawnpoint
+    - ID: 8
+      Name: Water
