@@ -1,0 +1,12 @@
+- Name: TestSpawnpoint
+- Effect: Mesh_NormalMap
+- TileFactor: 0
+- Textures:
+    - Sem: 8
+      Texture: ColorGrid
+    - Sem: 12
+      Texture: WSSpecular
+    - Sem: 14
+      Texture: WSNormal
+    - Sem: 21
+      Texture: WSGlowRed

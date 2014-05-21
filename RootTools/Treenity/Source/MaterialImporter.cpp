@@ -21,42 +21,42 @@ Render::Material* MaterialImporter::Import(const std::string& p_filepath)
 	parser.GetNextDocument(doc);
 
 	Render::Material* material;
-	if(doc[0].FindValue("Name"))
+	for(size_t i = 0; i < doc.size(); i++)
 	{
-		std::string name;
-		doc[0]["Name"] >> name; 
+		if(doc[i].FindValue("Name"))
+		{
+			std::string name;
+			doc[i]["Name"] >> name; 
 
-		material = g_engineContext.m_renderer->CreateMaterial(name);
-
-		if(doc[0].FindValue("Effect"))
+			material = g_engineContext.m_renderer->CreateMaterial(name);
+		}
+		else if(doc[i].FindValue("Effect"))
 		{
 			std::string effect;
-			doc[0]["Effect"] >> effect;
+			doc[i]["Effect"] >> effect;
 
 			material->m_effect = g_engineContext.m_resourceManager->LoadEffect(effect);
 		}
-
-		if(doc[0].FindValue("TileFactor"))
+		else if(doc[i].FindValue("TileFactor"))
 		{
 			float factor;
-			doc[0]["TileFactor"] >> factor;
+			doc[i]["TileFactor"] >> factor;
 			material->m_tileFactor = factor;
 		}
-
-		if(doc[0].FindValue("Textures"))
+		else if(doc[i].FindValue("Textures"))
 		{
-			const YAML::Node& textures = doc[0]["Textures"];
-			for(size_t i = 0; i < textures.size(); i++)
+			const YAML::Node& textures = doc[i]["Textures"];
+			for(size_t j = 0; j < textures.size(); j++)
 			{
-				int key;
-				textures[i]["Key"] >> key;
+				int sem;
+				textures[j]["Sem"] >> sem;
 
 				std::string value;
-				textures[i]["Texture"] >> value;
+				textures[j]["Texture"] >> value;
 
 				Render::TextureInterface* texture = g_engineContext.m_resourceManager->LoadTexture(value, Render::TextureType::TEXTURE_2D);
 
-				material->m_textures.insert(std::pair<Render::TextureSemantic::TextureSemantic, Render::TextureInterface*>((Render::TextureSemantic::TextureSemantic)key, texture));
+				material->m_textures.insert(std::pair<Render::TextureSemantic::TextureSemantic, Render::TextureInterface*>((Render::TextureSemantic::TextureSemantic)sem, texture));
 			}
 		}
 	}

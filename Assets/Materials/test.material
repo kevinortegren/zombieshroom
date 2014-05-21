@@ -1,6 +1,0 @@
-- Name: SelectedMaterial
-- Effect: Mesh_Selected
-- TileFactor: 0
-- Textures:
-    - Sem: 15
-      Texture: blowDartDiffuse
