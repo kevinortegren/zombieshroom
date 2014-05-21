@@ -108,11 +108,15 @@ void Canvas3D::mousePressEvent( QMouseEvent* event )
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);*/
 		m_pieMenu->showMenu();
 	}
+
+	QWidget::mousePressEvent(event);
 }
 
 void Canvas3D::mouseReleaseEvent( QMouseEvent *event )
 {
 	if (m_pieMenu->canSee())
 		m_pieMenu->closeMenu();
+
+	QWidget::mouseReleaseEvent(event);
 }
 

@@ -5,10 +5,14 @@
 #include <QScreen>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <qmath.h>
+#include <iostream>
 
 PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent)
-	: m_startAngle((360 / 8) * index), m_radius(radius), m_center(position), m_parent(parent)
+	: m_startAngle((360 / 8) * index), m_radius(radius), m_center(position), m_parent(parent), m_hovered(false)
 {
+	setParent((QObject*)m_parent);
+
 	m_shapePath.moveTo(QPointF(0, 0));
 	m_shapePath.arcTo(boundingRect(), m_startAngle, 360 / 8);
 	m_shapePath.closeSubpath();
@@ -20,12 +24,12 @@ PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent)
 
 QPainterPath PiePiece::shape() const 
 {
-	return m_shapePath;
+	return QPainterPath(m_shapePath);
 }
 
 QRectF PiePiece::boundingRect() const
 {
-	return QRectF(QPointF(-m_radius, -m_radius), QPointF(m_radius, m_radius));
+	return QRectF(-m_radius, -m_radius, m_radius * 2, m_radius * 2);
 }
 
 void PiePiece::updatePosition()
@@ -43,8 +47,9 @@ void PiePiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	bool down = option->state & QStyle::State_Sunken;
 	QLinearGradient grad(-m_radius / 2, -m_radius / 2, m_radius / 2, m_radius / 2);
 	grad.setColorAt(down ? 1 : 0, Qt::white);
+	grad.setColorAt(m_hovered ? 1 : 0, Qt::darkGreen);
 	grad.setColorAt(down ? 0 : 1, Qt::darkGray);
-	if (isSelected()) 
+	if (m_hovered) 
 		painter->setPen(Qt::darkGray);
 	else
 		painter->setPen(Qt::lightGray);
@@ -74,21 +79,51 @@ void PiePiece::hide()
 
 void PiePiece::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
 {
-	setSelected(true);
-	update();
+	event->ignore();
 }
 
 void PiePiece::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
+{ 
+	event->ignore();
+}
+
+void PiePiece::hoverMoveEvent( QGraphicsSceneHoverEvent * event )
 {
-	setSelected(false);
-	update();
+	event->ignore();
+}
+
+void PiePiece::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event )
+{
+	event->ignore();
+}
+
+void PiePiece::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
+{
+	event->ignore();
+}
+
+void PiePiece::mousePressEvent( QGraphicsSceneMouseEvent * event )
+{
+	event->ignore();
 }
 
 void PiePiece::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
-	emit clicked();
+	event->ignore();
+}
+
+bool PiePiece::isHovered() const
+{
+	return m_hovered;
+}
+
+void PiePiece::setHovered( bool state )
+{
+	m_hovered = state;
 	update();
 }
+
+
 
 PieMenu::PieMenu(QWidget* parent)
 	: QWidget(parent)
@@ -148,9 +183,13 @@ void PieMenu::showMenu()
 		m_pieces[i]->updatePosition();
 		m_pieces[i]->setAcceptHoverEvents(true);
 		m_pieces[i]->setAcceptedMouseButtons(Qt::RightButton);
+		m_pieces[i]->setEnabled(true);
 	}
 
 	m_view->show();
+	m_view->setEnabled(true);
+	setEnabled(true);
+	grabMouse();
 }
 
 void PieMenu::closeMenu()
@@ -159,7 +198,63 @@ void PieMenu::closeMenu()
 	{
 		m_pieces[i]->setAcceptHoverEvents(false);
 		m_pieces[i]->setAcceptedMouseButtons(Qt::NoButton);
+		m_pieces[i]->setHovered(false);
+		m_hoveredIndex = -1;
 	}
 
 	m_view->hide();
+}
+
+void PieMenu::mouseMoveEvent( QMouseEvent * event )
+{
+	QPointF vec = QCursor::pos() - m_center;
+	qreal ang = qAtan2(-vec.y(), vec.x());
+
+	setHovered(angleToIndex(ang), true);
+
+	QWidget::mouseMoveEvent(event);
+}
+
+void PieMenu::mouseReleaseEvent( QMouseEvent * event )
+{
+	releaseMouse();
+	closeMenu();
+
+	
+
+	/*std::cout << "vec: " << vec.x() << " " << vec.y() << std::endl;
+	
+	
+	std::cout << "Index of pie piece: " << angleToIndex(ang) << std::endl;
+	std::cout << "Angle is: " << (int)(360 * ang / (2 * M_PI)) % 360 << " degrees" << std::endl;*/
+
+	QWidget::mouseReleaseEvent(event);
+}
+
+int PieMenu::angleToIndex( qreal angle ) const
+{
+	while (angle < 0)
+		angle += (2 * M_PI);
+	while (angle > 2 * M_PI)
+		angle -= (2 * M_PI);
+
+	qreal test = M_PI_4;
+	int index = 0;
+	while (angle >= test)
+	{
+		test += M_PI_4;
+		index++;
+	}
+
+	return index;
+}
+
+void PieMenu::setHovered( int index, bool state )
+{
+	if (m_hoveredIndex >= 0 && m_hoveredIndex < 8)
+		m_pieces[m_hoveredIndex]->setHovered(false);
+	m_hoveredIndex = index;
+	m_pieces[m_hoveredIndex]->setHovered(state);
+	if (!state)
+		m_hoveredIndex = -1;
 }
