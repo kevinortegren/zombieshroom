@@ -17,6 +17,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
+#include <RootTools/Treenity/Include/TextureDrop.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -24,26 +25,34 @@ class Ui_diffuseShaderView
 {
 public:
     QGridLayout *gridLayout;
-    QPushButton *pushButton_2;
+    QWidget *widget;
+    QGridLayout *gridLayout_2;
+    TextureDrop *widget_2;
     QPushButton *pushButton;
 
     void setupUi(QWidget *diffuseShaderView)
     {
         if (diffuseShaderView->objectName().isEmpty())
             diffuseShaderView->setObjectName(QStringLiteral("diffuseShaderView"));
-        diffuseShaderView->resize(400, 628);
+        diffuseShaderView->resize(400, 125);
         gridLayout = new QGridLayout(diffuseShaderView);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        pushButton_2 = new QPushButton(diffuseShaderView);
-        pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
-        pushButton_2->setMinimumSize(QSize(0, 300));
+        widget = new QWidget(diffuseShaderView);
+        widget->setObjectName(QStringLiteral("widget"));
+        gridLayout_2 = new QGridLayout(widget);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        widget_2 = new TextureDrop(widget);
+        widget_2->setObjectName(QStringLiteral("widget_2"));
 
-        gridLayout->addWidget(pushButton_2, 2, 0, 1, 1);
+        gridLayout_2->addWidget(widget_2, 0, 0, 1, 1);
 
-        pushButton = new QPushButton(diffuseShaderView);
+        pushButton = new QPushButton(widget);
         pushButton->setObjectName(QStringLiteral("pushButton"));
 
-        gridLayout->addWidget(pushButton, 1, 0, 1, 1);
+        gridLayout_2->addWidget(pushButton, 1, 0, 1, 1);
+
+
+        gridLayout->addWidget(widget, 0, 0, 1, 1);
 
 
         retranslateUi(diffuseShaderView);
@@ -54,7 +63,6 @@ public:
     void retranslateUi(QWidget *diffuseShaderView)
     {
         diffuseShaderView->setWindowTitle(QApplication::translate("diffuseShaderView", "Form", 0));
-        pushButton_2->setText(QApplication::translate("diffuseShaderView", "PushButton", 0));
         pushButton->setText(QApplication::translate("diffuseShaderView", "PushButton", 0));
     } // retranslateUi
 
