@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
-    <height>500</height>
+    <width>374</width>
+    <height>147</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>500</height>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -34,11 +34,20 @@
   <property name="windowTitle">
    <string>Renderable</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_5">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
    <property name="topMargin">
     <number>0</number>
    </property>
-   <item row="0" column="0" alignment="Qt::AlignTop">
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
     <widget class="QWidget" name="widget_overview" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -92,6 +101,31 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="3">
+       <widget class="QPushButton" name="pushButton_newMaterial">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>32</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>New</string>
+        </property>
+       </widget>
+      </item>
      </layout>
      <zorder>label_model</zorder>
      <zorder>label_material</zorder>
@@ -99,10 +133,11 @@
      <zorder>lineEdit_materialName</zorder>
      <zorder>toolButton_modelBrowse</zorder>
      <zorder>toolButton_materialBrowse</zorder>
+     <zorder>pushButton_newMaterial</zorder>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QFrame" name="frame_material">
+   <item>
+    <widget class="QWidget" name="widget_material" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -118,23 +153,23 @@
      <property name="layoutDirection">
       <enum>Qt::LeftToRight</enum>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_5">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>0</number>
       </property>
       <property name="topMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0" alignment="Qt::AlignTop">
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="1" column="0" alignment="Qt::AlignTop">
        <widget class="QWidget" name="widget_shaderSelect" native="true">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -149,7 +184,7 @@
          <property name="topMargin">
           <number>9</number>
          </property>
-         <item>
+         <item alignment="Qt::AlignTop">
           <widget class="QComboBox" name="comboBox_shaderSelect">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -172,238 +207,8 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QStackedWidget" name="stackedWidget_shaderProperties">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>69</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>800</height>
-         </size>
-        </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="page_diffuse">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_diffuse">
-            <property name="text">
-             <string>Diffuse</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_specular">
-            <property name="text">
-             <string>Specular</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="DropLabel" name="label_image_specular">
-            <property name="minimumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_glow">
-            <property name="text">
-             <string>Glow</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="DropLabel" name="label_image_glow">
-            <property name="minimumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="DropLabel" name="label_image_diffuse">
-            <property name="minimumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-         <zorder>label_diffuse</zorder>
-         <zorder>label_image_specular</zorder>
-         <zorder>label_specular</zorder>
-         <zorder>label_glow</zorder>
-         <zorder>label_image_glow</zorder>
-         <zorder>label_image_diffuse</zorder>
-        </widget>
-        <widget class="QWidget" name="page_diffuse_normal">
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_diffuse_1">
-            <property name="text">
-             <string>Diffuse</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="DropLabel" name="label_image_diffuse_1">
-            <property name="minimumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_normal_1">
-            <property name="text">
-             <string>Normal</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="DropLabel" name="label_image_normal_1">
-            <property name="minimumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_specular_1">
-            <property name="text">
-             <string>Specular</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="DropLabel" name="label_image_specular_1">
-            <property name="minimumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_glow_1">
-            <property name="text">
-             <string>Glow</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="DropLabel" name="label_image_glow_1">
-            <property name="minimumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>64</width>
-              <height>64</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
+      <item row="2" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout_2"/>
       </item>
      </layout>
     </widget>
@@ -416,29 +221,7 @@
    <extends>QLineEdit</extends>
    <header location="global">RootTools/Treenity/Include/DropLineEdit.h</header>
   </customwidget>
-  <customwidget>
-   <class>DropLabel</class>
-   <extends>QLabel</extends>
-   <header location="global">RootTools/Treenity/Include/DropLabel.h</header>
-  </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>comboBox_shaderSelect</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>stackedWidget_shaderProperties</receiver>
-   <slot>setCurrentIndex(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>120</x>
-     <y>84</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>124</x>
-     <y>127</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

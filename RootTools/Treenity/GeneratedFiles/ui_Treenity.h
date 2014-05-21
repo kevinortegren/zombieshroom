@@ -279,6 +279,7 @@ public:
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
         groupBox = new QGroupBox(dockWidgetContents_6);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setMaximumSize(QSize(16777215, 120));
