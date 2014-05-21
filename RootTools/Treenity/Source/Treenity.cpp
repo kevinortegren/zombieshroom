@@ -108,6 +108,9 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addScript,					SIGNAL(triggered()),		this,					SLOT(AddScriptComponent()));
 	connect(ui.action_collisionResponder,			SIGNAL(triggered()),		this,					SLOT(AddCollisionResponder()));
 	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
+	connect(ui.pushButton_translateMode,			SIGNAL(clicked()),			this,					SLOT(SetTranslateTool()));
+	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
+	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
@@ -220,7 +223,7 @@ void Treenity::InitializeTools(ECS::World* p_world)
 {
 	m_toolManager.Initialize(p_world);
 	
-	m_toolManager.SetTool();
+	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
 }
 
 //TODO: Rename.
@@ -560,4 +563,19 @@ void Treenity::Update(float p_dt)
 			}
 		}
 	}
+}
+
+void Treenity::SetTranslateTool()
+{
+	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
+}
+
+void Treenity::SetRotateTool()
+{
+	m_toolManager.SetTool(ToolBox::ROTATION_TOOL);
+}
+
+void Treenity::SetResizeTool()
+{
+	m_toolManager.SetTool(ToolBox::RESIZE_TOOL);
 }
