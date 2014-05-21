@@ -77,11 +77,24 @@ void Utils::Run(  QFuture<void> p_future )
 {
 	// Start the computation.
 	m_futureWatcher.setFuture(p_future);
-	m_progressDialog->setWindowTitle("Loading");
-	m_progressDialog->setLabelText("Please wait...");
+	m_progressDialog->setLabelText("Loading\nPlease wait...");
 	m_progressDialog->setMinimum(0);
 	m_progressDialog->setMaximum(0);
+	m_progressDialog->setWindowFlags(Qt::FramelessWindowHint);
+	m_progressDialog->resize(m_progressDialog->size()*1.5f);
 	m_progressDialog->setWindowModality(Qt::WindowModal);
 	m_progressDialog->exec();
+}
+
+void Utils::ShowProgressBar(QProgressDialog* p_dialog, const QString& p_text)
+{
+	p_dialog->setLabelText("Loading...\n" + p_text);
+	p_dialog->setCancelButton(0);
+	p_dialog->setMinimum(0);
+	p_dialog->setMaximum(0);
+	p_dialog->setWindowFlags(Qt::FramelessWindowHint);
+	p_dialog->resize(p_dialog->size() * 1.5f);
+	p_dialog->show();
+	qApp->processEvents(QEventLoop::AllEvents);
 }
 
