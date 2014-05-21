@@ -3,6 +3,7 @@
 ComponentViewItem::ComponentViewItem(AbstractComponentView* p_item, QWidget* p_parent /*= 0*/ ) : QWidget(p_parent), m_item(p_item)
 {
 	m_headerButton = new QPushButton(p_item->GetComponentName(), this);
+	m_headerButton->setStyleSheet("QPushButton {background-color: #666666; padding-top: 3px; padding-bottom: 3px; }");
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->addWidget(m_headerButton);

@@ -9,6 +9,7 @@
 
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/InputManager/Include/InputManager.h>
 
 #include <RootTools/Treenity/Include/Utils.h>
 
@@ -49,7 +50,7 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 	HWND qtWindowHandle = (HWND)winId();
 	//SDL_CreateWindowFrom takes an already created native window handle and builds an SDL_Window for us
 	m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindowFrom((void*)qtWindowHandle), SDL_DestroyWindow);
-
+	
 	SDL_DestroyWindow(sdlwindow);
 
 	if (m_window == nullptr) 
@@ -79,10 +80,11 @@ void Canvas3D::resizeEvent( QResizeEvent * event)
 	//std::cout << "Resize Width: " << event->size().width() << "Resize Height: " << event->size().height() << std::endl;
 }
 
-void Canvas3D::CreateOpenGLContext()
+void Canvas3D::CreateOpenGLContext() //Horrible name
 {	
 	// Setup the SDL context
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+	g_engineContext.m_inputSys->SetWindow(m_window.get());
 }
 
 void Canvas3D::wheelEvent(QWheelEvent* event)

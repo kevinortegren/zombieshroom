@@ -96,7 +96,8 @@ namespace RootForce
 			throw std::runtime_error("Failed to create window");
 		}
 		
-		
+		g_engineContext.m_inputSys->SetWindow(m_window.get());
+
 		// Setup the SDL context
 		g_engineContext.m_renderer->SetupSDLContext(m_window.get());
 		g_engineContext.m_renderer->SetResolution(g_engineContext.m_configManager->GetConfigValueAsBool("settings-fullscreen"), width, height);

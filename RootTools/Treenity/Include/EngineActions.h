@@ -33,8 +33,10 @@ public:
 	// Entity
 	ECS::Entity* CreateEntity();
 	void DeleteEntity(ECS::Entity* p_entity);
-
 	void TargetEntity(ECS::Entity* p_entity);
+
+	// World
+	const ECS::World* GetWorld();
 
 	// Transform
 	void SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position);
@@ -48,14 +50,21 @@ public:
 	// Renderable
 	void AddRenderable(ECS::Entity* p_entity);
 	void RemoveRenderable(ECS::Entity* p_entity);
+
 	std::string GetRenderableModelName(ECS::Entity* p_entity);
 	std::string GetRenderableMaterialName(ECS::Entity* p_entity);
+
 	void SetRenderableModelName(ECS::Entity* p_entity, std::string p_modelName);
 	void SetRenderableMaterialName(ECS::Entity* p_entity, std::string p_materialName);
-	std::string GetMaterialEffectName(Render::Material* p_material);
+
 	Render::Material* GetMaterial(const std::string& p_string);
-	std::string GetTextureName(Render::TextureInterface* p_texture);
+	std::string GetMaterialEffectName(Render::Material* p_material);
+
 	Render::TextureInterface* GetTexture(const std::string& p_path);
+	std::string GetTextureName(Render::TextureInterface* p_texture);
+	
+	Render::EffectInterface* GetEffect(const std::string& p_path);
+
 	std::string GetContentPath();
 
 

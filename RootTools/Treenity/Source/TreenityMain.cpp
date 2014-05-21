@@ -378,9 +378,6 @@ void TreenityMain::HandleIngameEvents()
 	if (g_engineContext.m_inputSys != nullptr)
 	{
 		g_engineContext.m_inputSys->Reset();
-		g_engineContext.m_inputSys->SetMousePos(glm::ivec2(QCursor::pos().x(), QCursor::pos().y()));
-		QCursor::setPos(QApplication::primaryScreen(), m_treenityEditor.GetUi().widget_canvas3D->geometry().center());
-		g_engineContext.m_inputSys->SetMousePos(glm::ivec2(QCursor::pos().x(), QCursor::pos().y()));
 	}
 
 	SDL_Event event;

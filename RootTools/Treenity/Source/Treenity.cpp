@@ -67,14 +67,13 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the main UI.
 	ui.setupUi(this);
 
-	//setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
 	setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
-	//setCorner( Qt::BottomLeftCorner, Qt::LeftDockWidgetArea );
 	setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
 
 	m_compView = new ComponentView();
 	m_scrollArea = new VerticalScrollArea();
 	m_scrollArea->setWidget(m_compView);
+	m_scrollArea->setFrameStyle(QFrame::Plain);
 	// Setup the component view and its items.
 	
 	ui.verticalLayout->addWidget(m_scrollArea);
