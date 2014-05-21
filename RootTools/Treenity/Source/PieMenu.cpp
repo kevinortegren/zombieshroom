@@ -45,20 +45,26 @@ void PiePiece::updatePosition()
 void PiePiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*)
 {
 	bool down = option->state & QStyle::State_Sunken;
-	QLinearGradient grad(-m_radius / 2, -m_radius / 2, m_radius / 2, m_radius / 2);
-	grad.setColorAt(down ? 1 : 0, Qt::white);
-	grad.setColorAt(m_hovered ? 1 : 0, Qt::darkGreen);
-	grad.setColorAt(down ? 0 : 1, Qt::darkGray);
+	QLinearGradient grad(0, m_radius / 16, 0, (m_radius / 16) + 4);
+	
+	grad.setColorAt(down ? 1 : 0, QColor(80, 80, 80));
+	grad.setColorAt(down ? 0 : 1, QColor(50, 50, 50));
 	if (m_hovered) 
-		painter->setPen(Qt::darkGray);
+	{
+		grad.setColorAt(down ? 1 : 0, QColor(90, 90, 90));
+		grad.setColorAt(down ? 0 : 1, QColor(60, 60, 60));
+	}
 	else
-		painter->setPen(Qt::lightGray);
+	{
+		
+	}
+	painter->setPen(QColor(20, 20, 20));
 	painter->setBrush(grad);
 	//painter->drawEllipse(boundingRect());
 	painter->drawPath(m_shapePath);
 	painter->fillPath(m_shapePath, painter->brush());
 
-
+	/*
 	grad.setColorAt(down ? 1 : 0, Qt::darkGray);
 	grad.setColorAt(down ? 0 : 1, Qt::lightGray);
 	painter->setPen(Qt::NoPen);
@@ -66,7 +72,7 @@ void PiePiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	if (down)
 	{
 		painter->translate(1, 1);
-	}
+	}*/
 	//painter->drawEllipse(boundingRect().adjusted(3, 3, -3, -3));
 
 	//painter->drawPixmap(-m_Pixmap.width() / 2, -m_Pixmap.height() / 2, m_Pixmap);
