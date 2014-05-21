@@ -16,7 +16,11 @@ void MaterialExporter::Export(Render::Material* p_material, const std::string& p
 	out << YAML::BeginSeq;
 
 	out << YAML::BeginMap << YAML::Key << "Name" << YAML::Value << g_engineContext.m_renderer->GetStringFromMaterial(p_material) << YAML::EndMap;
+	
+	if(p_material->m_effect != nullptr)
 	out << YAML::BeginMap << YAML::Key << "Effect" << YAML::Value << g_engineContext.m_resourceManager->ResolveStringFromEffect(p_material->m_effect) << YAML::EndMap;
+	
+	if(p_material->m_tileFactor != 0)
 	out << YAML::BeginMap << YAML::Key << "TileFactor" << YAML::Value << p_material->m_tileFactor << YAML::EndMap;
 
 	if(p_material->m_textures.size() > 0)

@@ -71,6 +71,7 @@ Treenity::Treenity(QWidget *parent)
 	QScrollArea* scroll = new QScrollArea();
 	scroll->setWidgetResizable(true);
 	scroll->setWidget(m_compView);
+	scroll->setFrameStyle(QFrame::Plain);
 
 	// Setup the component view and its items.
 	

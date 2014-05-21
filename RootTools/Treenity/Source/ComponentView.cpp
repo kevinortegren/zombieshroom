@@ -3,6 +3,7 @@
 ComponentView::ComponentView( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent), m_layout(new QVBoxLayout())
 {
 	setLayout(m_layout);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSizeConstraint(QLayout::SetNoConstraint);
 }
 
