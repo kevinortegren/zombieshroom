@@ -22,6 +22,7 @@
 #include <RootTools/Treenity/Include/EditorInterface.h>
 #include <RootTools/Treenity/Include/AssetManagerWidget.h>
 #include <RootTools/Treenity/Include/ToolManager.h>
+#include <RootTools/Treenity/Include/VerticalScrollArea.h>
 
 
 class Treenity : public QMainWindow, public EditorInterface
@@ -98,6 +99,9 @@ private:
 
 	//Asset management
 	AssetManagerWidget* m_assetManagerWidget;
+
+	//Vertical scrollbar for components
+	VerticalScrollArea* m_scrollArea;
 protected:
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);

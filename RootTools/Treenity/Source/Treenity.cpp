@@ -67,14 +67,17 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the main UI.
 	ui.setupUi(this);
 
-	m_compView = new ComponentView();
-	QScrollArea* scroll = new QScrollArea();
-	scroll->setWidgetResizable(true);
-	scroll->setWidget(m_compView);
+	//setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
+	setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
+	//setCorner( Qt::BottomLeftCorner, Qt::LeftDockWidgetArea );
+	setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
 
+	m_compView = new ComponentView();
+	m_scrollArea = new VerticalScrollArea();
+	m_scrollArea->setWidget(m_compView);
 	// Setup the component view and its items.
 	
-	ui.verticalLayout->addWidget(scroll);
+	ui.verticalLayout->addWidget(m_scrollArea);
 	m_componentViews[RootForce::ComponentType::TRANSFORM]			= new TransformView();
 	m_componentViews[RootForce::ComponentType::RENDERABLE]			= new RenderableView();
 	m_componentViews[RootForce::ComponentType::COLLISION]			= new PhysicsView();
@@ -113,7 +116,7 @@ Treenity::Treenity(QWidget *parent)
 
 Treenity::~Treenity()
 {
-
+	
 }
 
 void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
