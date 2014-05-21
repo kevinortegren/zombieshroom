@@ -312,6 +312,11 @@ void EngineActions::DeleteEntity(ECS::Entity* p_entity)
 	m_world->GetEntityManager()->RemoveEntity(p_entity);
 }
 
+const ECS::World* EngineActions::GetWorld()
+{
+	return m_world;
+}
+
 // Transform
 void EngineActions::SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position)
 {
@@ -411,6 +416,11 @@ Render::TextureInterface* EngineActions::GetTexture(const std::string& p_path)
 std::string EngineActions::GetTextureName(Render::TextureInterface* p_texture)
 {
 	return g_engineContext.m_resourceManager->ResolveStringFromTexture(p_texture);
+}
+
+Render::EffectInterface* EngineActions::GetEffect(const std::string& p_path)
+{
+	return g_engineContext.m_resourceManager->LoadEffect(p_path);
 }
 
 std::string EngineActions::GetContentPath()

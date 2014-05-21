@@ -34,8 +34,10 @@ struct EngineInterface
 	// Entity
 	virtual ECS::Entity* CreateEntity() = 0;
 	virtual void DeleteEntity(ECS::Entity* p_entity) = 0;
-
 	virtual void TargetEntity(ECS::Entity* p_entity) = 0;
+
+	// World
+	virtual const ECS::World* GetWorld() = 0;
 
 	// Transform
 	virtual void SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position) = 0;
@@ -60,7 +62,7 @@ struct EngineInterface
 	virtual Render::TextureInterface* GetTexture(const std::string& p_path) = 0;
 	virtual std::string GetTextureName(Render::TextureInterface* p_texture) = 0;
 	virtual std::string GetContentPath() = 0;
-
+	virtual Render::EffectInterface* GetEffect(const std::string& p_path) = 0;
 
 	//Physics
 	virtual void AddPhysics(ECS::Entity* p_entity, bool p_dynamic) = 0;
