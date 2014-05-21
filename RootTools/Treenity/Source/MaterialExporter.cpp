@@ -30,10 +30,14 @@ void MaterialExporter::Export(Render::Material* p_material, const std::string& p
 		out << YAML::Value << YAML::BeginSeq;
 		for(auto pair : p_material->m_textures)
 		{
-			out << YAML::BeginMap;
-			out << YAML::Key << "Sem" << YAML::Value << pair.first;
-			out << YAML::Key << "Texture" << YAML::Value << g_engineContext.m_resourceManager->ResolveStringFromTexture(pair.second);
-			out << YAML::EndMap;
+			if(pair.second != nullptr)
+			{
+				out << YAML::BeginMap;
+				out << YAML::Key << "Sem" << YAML::Value << pair.first;
+				out << YAML::Key << "Texture" << YAML::Value << g_engineContext.m_resourceManager->ResolveStringFromTexture(pair.second);
+				out << YAML::EndMap;
+			}
+
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;

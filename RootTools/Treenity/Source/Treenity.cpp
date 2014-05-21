@@ -77,11 +77,15 @@ Treenity::Treenity(QWidget *parent)
 	
 	ui.verticalLayout->addWidget(scroll);
 	m_componentViews[RootForce::ComponentType::TRANSFORM]			= new TransformView();
-	m_componentViews[RootForce::ComponentType::RENDERABLE]			= new RenderableView();
+	m_componentViews[RootForce::ComponentType::RENDERABLE]			= new RenderableView();	
 	m_componentViews[RootForce::ComponentType::COLLISION]			= new PhysicsView();
 	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]		= new WaterColliderView();
 	m_componentViews[RootForce::ComponentType::SCRIPT]				= new ScriptView();
 	m_componentViews[RootForce::ComponentType::COLLISIONRESPONDER]	= new CollisionResponderView();
+
+	// Block component views from updates while in game mode.
+
+	m_componentViews[RootForce::ComponentType::RENDERABLE]->SetReceiveUpdates(false);
 
 	for (auto it : m_componentViews)
 	{
@@ -552,7 +556,10 @@ void Treenity::Update(float p_dt)
 				{
 					if (m_componentViews.find(i) != m_componentViews.end())
 					{
-						m_componentViews[i]->DisplayEntity(selectedEntity);
+						if(m_componentViews[i]->IsReceivingUpdates())
+						{
+							m_componentViews[i]->DisplayEntity(selectedEntity);
+						}		
 					}
 				}
 			}

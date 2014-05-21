@@ -1,5 +1,4 @@
-- Name: Test
-- Effect: Mesh
+- Name: DefaultMaterial
 - Textures:
     - Sem: 8
       Texture: customGrass3
