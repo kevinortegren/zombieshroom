@@ -238,7 +238,7 @@ public:
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         treeView_entityOutliner = new EntityOutliner(dockWidgetContents_4);
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-        __qtreewidgetitem->setText(0, QStringLiteral("Entities"));
+        __qtreewidgetitem->setText(0, QStringLiteral("1"));
         treeView_entityOutliner->setHeaderItem(__qtreewidgetitem);
         treeView_entityOutliner->setObjectName(QStringLiteral("treeView_entityOutliner"));
         sizePolicy.setHeightForWidth(treeView_entityOutliner->sizePolicy().hasHeightForWidth());
@@ -246,6 +246,7 @@ public:
         treeView_entityOutliner->setMinimumSize(QSize(0, 0));
         treeView_entityOutliner->setMaximumSize(QSize(16777215, 16777215));
         treeView_entityOutliner->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        treeView_entityOutliner->header()->setVisible(false);
 
         verticalLayout_3->addWidget(treeView_entityOutliner);
 

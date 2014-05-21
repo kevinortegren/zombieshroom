@@ -184,6 +184,7 @@ void EngineActions::CreateWater()
 // Mode switching
 void EngineActions::EnterPlayMode()
 {
+	QCursor::setPos(QApplication::primaryScreen(), m_treenityMain->GetEditor()->GetUi().widget_canvas3D->geometry().center());
 	m_editorMode = EditorMode::GAME;
 	g_engineContext.m_inputSys->LockMouseToCenter(true);
 

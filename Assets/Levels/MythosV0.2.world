@@ -113,12 +113,6 @@
     - Type: 0
       Data:
         - Entity: 1
-          Model: WaterModel
-          Material:
-            Name: waterrender
-            Effect: MeshWater
-            Normal: computeTex3
-            Glow: SkyBox
         - Entity: 30
           Model: CaveEntrance4Shape
           Material:
@@ -1135,12 +1129,6 @@
     - Type: 3
       Data:
         []
-    - Type: 4
-      Data:
-        []
-    - Type: 5
-      Data:
-        []
     - Type: 6
       Data:
         - Entity: 30
@@ -1195,9 +1183,6 @@
         - Entity: 79
         - Entity: 80
         - Entity: 102
-    - Type: 7
-      Data:
-        []
     - Type: 8
       Data:
         []
@@ -1212,324 +1197,211 @@
         - Entity: 30
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: CaveEntrance4Shape0
         - Entity: 31
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: CaveEntrance4Shape0
         - Entity: 32
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: CaveEntrance4Shape0
         - Entity: 33
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: LowGlowStoneShape0
         - Entity: 34
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: MountainPlaceHolderShape0
         - Entity: 35
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: FootIslandShape0
         - Entity: 36
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: TempleIslandShape0
         - Entity: 37
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: CaveTestTerrianShape0
         - Entity: 38
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: CaveTestRoofShape0
         - Entity: 39
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: LowGlowStoneShape0
         - Entity: 40
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: LowGlowStoneShape0
         - Entity: 41
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: LowGlowStoneShape0
         - Entity: 42
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMotherShape0
         - Entity: 43
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RCIMainShape20
         - Entity: 44
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RCIMainShape10
         - Entity: 45
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 46
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 47
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 48
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 49
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 50
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 51
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 52
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 53
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 54
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 55
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 56
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 57
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 58
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 59
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: LowGlowStoneShape0
         - Entity: 60
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: LowGlowStoneShape0
         - Entity: 61
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: FILowerBorderStonesShape0
         - Entity: 62
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: FIBorderStonesShape0
         - Entity: 63
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 64
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 65
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneWallShape0
         - Entity: 66
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: WoodPillarShape0
         - Entity: 67
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: TILowerBorderStonesShape0
         - Entity: 68
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 69
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 70
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 71
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RootCaveTreeMother1Shape0
         - Entity: 72
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: TIBorderStonesShape0
         - Entity: 73
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RCIMainBorderShape20
         - Entity: 74
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RCIMainBorderShape10
         - Entity: 75
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RCIStoneSlabsShape0
         - Entity: 76
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: BridgeWoodShape0
         - Entity: 77
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: BridgeRopeShape0
         - Entity: 78
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RCIMainLowBorderShape0
         - Entity: 79
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: AxeAndWoodShape0
         - Entity: 80
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StumpShape0
         - Entity: 102
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: ColumnsShape0
-    - Type: 12
-      Data:
-        []
-    - Type: 13
-      Data:
-        []
-    - Type: 14
-      Data:
-        []
     - Type: 15
       Data:
         - Entity: 16
@@ -1560,15 +1432,6 @@
           File: AbilitySpawn
         - Entity: 29
           File: AbilitySpawn
-    - Type: 17
-      Data:
-        []
-    - Type: 18
-      Data:
-        []
-    - Type: 19
-      Data:
-        []
     - Type: 20
       Data:
         - Entity: 0
@@ -1577,18 +1440,6 @@
       Data:
         - Entity: 0
           Color: [1, 1, 1, 1]
-    - Type: 24
-      Data:
-        []
-    - Type: 25
-      Data:
-        []
-    - Type: 27
-      Data:
-        []
-    - Type: 35
-      Data:
-        []
     - Type: 37
       Data:
         []
