@@ -36,7 +36,6 @@ private:
 
 	float m_axisLength;
 	float m_dragOffset;
-	bool m_show;
 	bool m_firstDrag;
 	
 	struct AxisBoundingBox

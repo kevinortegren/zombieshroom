@@ -577,5 +577,5 @@ void Treenity::SetRotateTool()
 
 void Treenity::SetResizeTool()
 {
-	m_toolManager.SetTool(ToolBox::RESIZE_TOOL);
+	//Set resize tool
 }

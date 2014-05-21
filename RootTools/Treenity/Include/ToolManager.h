@@ -3,6 +3,7 @@
 #include <RootTools/Treenity/Include/RotationTool.h>
 #include <RootTools/Treenity/Include/TranslationTool.h>
 #include <RootTools/Treenity/Include/Tool.h>
+#include <map>
 
 namespace ToolBox
 {
@@ -10,7 +11,6 @@ namespace ToolBox
 	{
 		ROTATION_TOOL,
 		TRANSLATION_TOOL,
-		RESIZE_TOOL,
 	};
 }
 
@@ -23,7 +23,6 @@ public:
 	void SetTool(ToolBox::ToolBox p_tool);
 
 private:
-	RotationTool m_rotation;
-	TranslationTool m_translationTool;
+	std::map<ToolBox::ToolBox, Tool*> m_tools; 
 	Tool* m_selectedTool;
 };

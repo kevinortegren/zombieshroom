@@ -10,6 +10,7 @@ public:
 	void UpdateRenderingPosition();
 	void SetSelectedEntity(ECS::Entity* p_entity);
 	ECS::Entity* GetSelectedEntity();
+	bool IsVisible();
 
 	virtual void LoadResources(ECS::World* p_world) = 0;
 	virtual bool Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray) = 0;
@@ -20,4 +21,5 @@ public:
 protected:
 	ECS::World* m_world;
 	ECS::Entity* m_selectedEntity;
+	bool m_visible;
 };

@@ -1,15 +1,22 @@
 #include <RootTools/Treenity/Include/ToolManager.h>
 
 ToolManager::ToolManager()
-	: m_selectedTool(&m_translationTool)
 {
+	//Add tools to the toolbox here
+	m_tools[ToolBox::ROTATION_TOOL] = new RotationTool();
+	m_tools[ToolBox::TRANSLATION_TOOL] = new TranslationTool();
 
+	//This is the default tool, must correspond to what is selected by the GUI by default (Currently translation tool)
+	m_selectedTool = m_tools[ToolBox::TRANSLATION_TOOL];
 }
 
 void ToolManager::Initialize(ECS::World* p_world)
 {
-	m_rotation.LoadResources(p_world);
-	m_translationTool.LoadResources(p_world);
+	//Load all the tools by looping through and running LoadResources
+	for(auto tool = m_tools.begin(); tool != m_tools.end(); tool++)
+	{
+		tool->second->LoadResources(p_world);
+	}
 }
 
 Tool* ToolManager::GetSelectedTool()
@@ -19,22 +26,21 @@ Tool* ToolManager::GetSelectedTool()
 
 void ToolManager::SetTool(ToolBox::ToolBox p_tool)
 {
-	m_rotation.Hide();
-	m_translationTool.Hide();
-	switch (p_tool)
+	//Disregard tool change if setting same tool as currently selected
+	if(m_tools[p_tool] != m_selectedTool)
 	{
-	case ToolBox::ROTATION_TOOL:
-		m_rotation.SetSelectedEntity(GetSelectedTool()->GetSelectedEntity());
-		m_selectedTool = &m_rotation;
-		break;
-	case ToolBox::TRANSLATION_TOOL:
-		m_translationTool.SetSelectedEntity(GetSelectedTool()->GetSelectedEntity());
-		m_selectedTool = &m_translationTool;
-		break;
-	case ToolBox::RESIZE_TOOL:
-		break;
-	default:
-		break;
+		//Hide the current tool
+		m_selectedTool->Hide();
+
+		//Transfer the selected entity from the previous tool
+		m_tools[p_tool]->SetSelectedEntity(m_selectedTool->GetSelectedEntity());
+
+		//Check if the new tool is visible and show it if its not
+		if(!m_tools[p_tool]->IsVisible())
+			m_tools[p_tool]->Show();
+
+		//Set new selected tool
+		m_selectedTool = m_tools[p_tool];
 	}
-	
+		
 }

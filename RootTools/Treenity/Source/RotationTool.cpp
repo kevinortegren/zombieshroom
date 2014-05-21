@@ -11,7 +11,7 @@ const float RotationTool::s_pickMargin = 0.25f; // Acceptable margin when pickin
 const glm::vec4 RotationTool::s_hightlightColor = glm::vec4(1,1,0,1); // Yellow highlight color.
 
 RotationTool::RotationTool()
-	: m_selectedAxis(RotationAxis::AXIS_NONE), m_angle0(0.0f)
+	: Tool(), m_selectedAxis(RotationAxis::AXIS_NONE), m_angle0(0.0f)
 {}
 
 RotationTool::~RotationTool()
@@ -329,6 +329,8 @@ void RotationTool::Hide()
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y]);
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z]);
+
+	Tool::Hide();
 }
 
 void RotationTool::Show()
@@ -340,4 +342,6 @@ void RotationTool::Show()
 	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
 	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
 	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+
+	Tool::Show();
 }

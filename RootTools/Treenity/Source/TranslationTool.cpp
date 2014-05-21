@@ -9,9 +9,9 @@
 extern RootEngine::GameSharedContext g_engineContext;
 
 TranslationTool::TranslationTool()
-	: m_firstDrag(true), 
+	:Tool(),
+	m_firstDrag(true), 
 	m_dragOffset(0.0f), 
-	m_show(false),
 	m_selectedAxis(TranslationAxis::AXIS_NONE), 
 	m_hoverAxis(TranslationAxis::AXIS_NONE),
 	m_axisLength(1.0f)
@@ -63,7 +63,7 @@ bool TranslationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 
 void TranslationTool::SetPosition(const glm::vec3& p_position)
 {
-	if(m_show)
+	if(m_visible)
 	{
 		//X
 		if(m_hoverAxis == TranslationAxis::AXIS_X)
@@ -85,12 +85,12 @@ void TranslationTool::SetPosition(const glm::vec3& p_position)
 
 void TranslationTool::Hide()
 {
-	m_show = false;
+	Tool::Hide();
 }
 
 void TranslationTool::Show()
 {
-	m_show = true;
+	Tool::Show();
 }
 
 TranslationTool::PointOnPlane TranslationTool::GetPointOnPlane( const glm::vec3& p_camPos, const glm::vec3& p_worldCamPos, const glm::vec3& p_rayDir  )
