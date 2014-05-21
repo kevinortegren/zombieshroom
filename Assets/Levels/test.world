@@ -1,41 +1,100 @@
 - Entities:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
     - 6
-    - 7
-    - 8
 - Components:
     - Type: 0
       Data:
-        - Entity: 7
+        - Entity: 1
           Model: testchar
           Material:
             Name: TestSpawnpoint
             Effect: Mesh_NormalMap
-            Diffuse: ColorGrid
+            Diffuse: WStexture
             Specular: WSSpecular
             Normal: WSNormal
             Glow: WSGlowRed
-        - Entity: 8
+        - Entity: 2
           Model: WaterModel
           Material:
             Name: waterrender
             Effect: MeshWater
             Normal: computeTex3
             Glow: SkyBox
+        - Entity: 3
+          Model: Primitives/box
+          Material:
+            Name: Test
+            Effect: Mesh
+            Diffuse: customGrass3
+        - Entity: 4
+          Model: Primitives/sphere
+          Material:
+            Name: Test2
+            Effect: Mesh
+            Diffuse: CaveStones
+        - Entity: 5
+          Model: Primitives/box
+          Material:
+            Name: Test4
+            Effect: Mesh
+            Diffuse: AbilityTest
+        - Entity: 6
+          Model: Primitives/box
+          Material:
+            Name: Test4
+            Effect: Mesh
+            Diffuse: AbilityTest
     - Type: 1
       Data:
-        - Entity: 6
+        - Entity: 0
           Position: [-184.801, 139.358, -190.86]
           Rotation: [0.221731, 0.364328, -0.0897563, 0.900025]
           Scale: [1, 1, 1]
-        - Entity: 7
-          Position: [0, 0, 0]
+        - Entity: 1
+          Position: [0, 13, -3]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 8
+        - Entity: 2
           Position: [0, 0, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [40, 1, 40]
+        - Entity: 3
+          Position: [0, 9, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [575, 2, 370]
+        - Entity: 4
+          Position: [0, 10, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [0.5, 0.5, 0.5]
+        - Entity: 5
+          Position: [26, 10.5, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [5, 30, 90]
+        - Entity: 6
+          Position: [-26, 10.5, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [5, 30, 90]
     - Type: 3
+      Data:
+        []
+    - Type: 4
+      Data:
+        []
+    - Type: 5
+      Data:
+        []
+    - Type: 6
+      Data:
+        - Entity: 3
+        - Entity: 4
+        - Entity: 5
+        - Entity: 6
+    - Type: 7
       Data:
         []
     - Type: 8
@@ -46,33 +105,98 @@
         []
     - Type: 10
       Data:
+        - Entity: 4
+          ScriptName: SoccerBall
+        - Entity: 6
+          ScriptName: SoccerBall
+    - Type: 11
+      Data:
+        - Entity: 3
+          PhysicsType: 0
+          PhysicsShape: 2
+          ShapeRadius: 60
+          ShapeHeight: 0.1
+        - Entity: 4
+          PhysicsType: 2
+          ShapeMass: 1
+          ShapeGravity: [0, -9.82, 0]
+          PhysicsShape: 0
+          CollideWithWorld: true
+          CollideWithStatic: true
+          ShapeRadius: 0.5
+        - Entity: 5
+          PhysicsType: 0
+          PhysicsShape: 0
+          ShapeRadius: 3
+        - Entity: 6
+          PhysicsType: 0
+          PhysicsShape: 0
+          ShapeRadius: 3
+    - Type: 12
+      Data:
+        []
+    - Type: 13
+      Data:
+        []
+    - Type: 14
+      Data:
+        []
+    - Type: 17
+      Data:
+        []
+    - Type: 18
+      Data:
+        []
+    - Type: 19
+      Data:
         []
     - Type: 20
       Data:
-        - Entity: 6
+        - Entity: 0
           LightSlot: 0
     - Type: 21
       Data:
-        - Entity: 6
+        - Entity: 0
           Color: [0.8, 0.8, 0.8, 1]
+    - Type: 24
+      Data:
+        []
+    - Type: 25
+      Data:
+        []
+    - Type: 27
+      Data:
+        []
+    - Type: 35
+      Data:
+        []
     - Type: 37
       Data:
         []
 - Tags:
-    - Id: 6
+    - Id: 0
       Tag: Sun
-    - Id: 7
+    - Id: 1
       Tag: TestSpawnpoint
-    - Id: 8
+    - Id: 2
       Tag: Water
 - Groups:
     []
 - Storage:
-    []
+    - Key: Ambient
+      Value: 1 1 1 1
 - EntityNames:
-    - ID: 6
+    - ID: 0
       Name: Sun
-    - ID: 7
+    - ID: 1
       Name: Test Spawnpoint
-    - ID: 8
+    - ID: 2
       Name: Water
+    - ID: 3
+      Name: Field
+    - ID: 4
+      Name: Ball
+    - ID: 5
+      Name: Goal1
+    - ID: 6
+      Name: Goal2

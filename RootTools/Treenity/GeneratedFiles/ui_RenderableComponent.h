@@ -17,7 +17,6 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
@@ -34,7 +33,7 @@ public:
     QGridLayout *gridLayout_4;
     DropLineEdit *lineEdit_modelName;
     QLabel *label_model;
-    QLineEdit *lineEdit_materialName;
+    DropLineEdit *lineEdit_materialName;
     QLabel *label_material;
     QToolButton *toolButton_modelBrowse;
     QToolButton *toolButton_materialBrowse;
@@ -83,7 +82,7 @@ public:
 
         gridLayout_4->addWidget(label_model, 0, 0, 1, 1);
 
-        lineEdit_materialName = new QLineEdit(widget_overview);
+        lineEdit_materialName = new DropLineEdit(widget_overview);
         lineEdit_materialName->setObjectName(QStringLiteral("lineEdit_materialName"));
         lineEdit_materialName->setReadOnly(false);
 

@@ -12,32 +12,24 @@ class RenderableView : public AbstractComponentView
 public:
 	RenderableView(QWidget* p_parent = 0);
 
+	void SetEngineInterface(EngineInterface* p_engineInterface);
+
 	const QString& GetComponentName() const;
 	void DisplayEntity(ECS::Entity* p_entity);
 private:
-	
-	QPixmap GetPixmap(Render::TextureInterface* p_texture);
 
-	void DisplayDiffuse(Render::Material* p_material);
-	void DisplayDiffuseNormal(Render::Material* p_material);
+	void Clear();
 
 	QString m_name;
 	Ui::Renderable ui;
-
-	ECS::Entity* m_currentEntity;
 	Render::Material* m_currentMaterial;
-
+	AbstractShaderView* m_currentView;
 	std::vector<AbstractShaderView*> m_shaderViews;
+	std::map<const std::string, int> m_effectToShaderIndex;
 
 private slots:
 	void NewMaterial();
 	void MaterialNameChanged();
 	void ModelNameChanged();
 	void ShaderChanged(int index);
-
-	void DiffuseTextureDropped(const QString& p_path);
-	void SpecularTextureDropped(const QString& p_path);
-	void GlowTextureDropped(const QString& p_path);
-	void NormalTextureDropped(const QString& p_path);
-
 };

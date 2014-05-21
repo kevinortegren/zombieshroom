@@ -64,6 +64,11 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						p_emitter << YAML::Key << "Glow" << YAML::Value << s;
 					}
 
+					if(renderable->m_material->m_effect != nullptr)
+					{
+
+					
+
 					if(g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material->m_effect) == "Mesh_Blend" )
 					{
 					if(renderable->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP] != nullptr)
@@ -110,6 +115,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						
 						std::string s = oss.str();
 						p_emitter << YAML::Key << "TileFactor" << YAML::Value << s;
+					}
 					}
 					}
 					p_emitter << YAML::EndMap;
