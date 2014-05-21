@@ -4,6 +4,7 @@ AbstractComponentView::AbstractComponentView(QWidget* p_parent)
 	: QFrame(p_parent)
 	, m_engineInterface(nullptr)
 	, m_editorInterface(nullptr)
+	, m_receiveUpdates(true)
 {
 	setVisible(false);
 	setFrameStyle(QFrame::StyledPanel);
@@ -22,4 +23,14 @@ void AbstractComponentView::SetEngineInterface(EngineInterface* p_engineInterfac
 void AbstractComponentView::SetEditorInterface(EditorInterface* p_editorInterface)
 {
 	m_editorInterface = p_editorInterface;
+}
+
+void AbstractComponentView::SetReceiveUpdates(bool p_value)
+{
+	m_receiveUpdates = p_value;
+}
+
+bool AbstractComponentView::IsReceivingUpdates() const
+{
+	return m_receiveUpdates;
 }

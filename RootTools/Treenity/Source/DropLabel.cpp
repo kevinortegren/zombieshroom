@@ -1,5 +1,6 @@
 #include <RootTools/Treenity/Include/DropLabel.h>
 #include <RootTools/Treenity/Include/Utils.h>
+#include <iostream>
 
 DropLabel::DropLabel( QWidget* p_parent /*= 0*/ )
 {
@@ -19,8 +20,10 @@ void DropLabel::dragEnterEvent( QDragEnterEvent* event )
 
 		QFileInfo fileInfo(event->mimeData()->text());
 
+		std::cout << fileInfo.suffix().toStdString() << std::endl;
 		for(QString str : m_filter)
 		{
+			std::cout << str.toStdString() << std::endl;
 			if(fileInfo.suffix() == str)
 			{
 				filterExists = true;

@@ -53,7 +53,7 @@ void EngineActions::ClearScene()
 void EngineActions::AddDefaultEntities()
 {
 	// Process entities from world import.
-    m_treenityMain->ProcessWorldMessages();
+	m_treenityMain->ProcessWorldMessages();
  
 	// Add non-editable entities.
 	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
@@ -62,7 +62,7 @@ void EngineActions::AddDefaultEntities()
 	m_world->GetEntityManager()->CleanUp();
 
 	// Add editable entities.
-    ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
+	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
 	CreateTestSpawnpoint();
 	CreateWater();
 	m_treenityMain->ProcessWorldMessages();
@@ -93,11 +93,11 @@ void EngineActions::LoadScene( const QString& p_filePath )
 	QProgressDialog dialog(0,0);
 	Utils::ShowProgressBar(&dialog, "Level: " + fileInfo.completeBaseName());
 
-    ClearScene();
-    //Utils::RunWithProgressBar(QtConcurrent::run(m_treenityMain->GetProjectManager(), &ProjectManager::Import, p_filePath));
-    m_treenityMain->GetProjectManager()->Import(p_filePath);
-    AddDefaultEntities();
-    InitializeScene();
+	ClearScene();
+	//Utils::RunWithProgressBar(QtConcurrent::run(m_treenityMain->GetProjectManager(), &ProjectManager::Import, p_filePath));
+	m_treenityMain->GetProjectManager()->Import(p_filePath);
+	AddDefaultEntities();
+	InitializeScene();
 	m_treenityMain->GetEditor()->GetUi().statusBar->showMessage("Level loaded: " + p_filePath, 5000);
 }
 
@@ -362,7 +362,7 @@ void EngineActions::AddRenderable(ECS::Entity* p_entity)
 {
 	RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
 	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/box");
-	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("TestSpawnpoint");
+	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("DefaultMaterial");
 }
 
 void EngineActions::RemoveRenderable(ECS::Entity* p_entity)

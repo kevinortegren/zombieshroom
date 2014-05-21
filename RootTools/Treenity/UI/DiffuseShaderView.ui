@@ -7,35 +7,28 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>628</height>
+    <height>125</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
-    <widget class="QPushButton" name="pushButton_2">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>300</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>PushButton</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string>PushButton</string>
-     </property>
+   <item row="0" column="0">
+    <widget class="TextureDrop" name="diffuse_textureDrop" native="true">
+     <layout class="QGridLayout" name="gridLayout_2"/>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TextureDrop</class>
+   <extends>QWidget</extends>
+   <header location="global">RootTools/Treenity/Include/TextureDrop.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

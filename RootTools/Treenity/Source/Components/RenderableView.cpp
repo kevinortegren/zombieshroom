@@ -4,45 +4,34 @@
 #include <qimage.h>
 #include <QtConcurrent/QtConcurrent>
 #include <RootTools/Treenity/Include/Utils.h>
-#include <qfiledialog.h>
+#include <QInputDialog.h>
 
 #include <RootTools/Treenity/Include/MaterialExporter.h>
+#include <RootTools/Treenity/Include/MaterialImporter.h>
+
 #include <RootSystems/Include/RenderingSystem.h>
 
 RenderableView::RenderableView(QWidget* p_parent)
 	: AbstractComponentView(p_parent)
 	, m_name("Renderable")
+	, m_currentView(nullptr)
 {
 	ui.setupUi(this);
-
 	ui.lineEdit_modelName->AddDropFilter("dae");
+	ui.lineEdit_materialName->AddDropFilter("material");
 
 	// Create shader views.
 	m_shaderViews.resize(1);
 	m_shaderViews[0] = new DiffuseShaderView();
-
-	/*ui.label_image_diffuse->AddDropFilter("dds");
-	ui.label_image_diffuse_1->AddDropFilter("dds");
-	ui.label_image_specular->AddDropFilter("dds");
-	ui.label_image_specular_1->AddDropFilter("dds");
-	ui.label_image_glow->AddDropFilter("dds");
-	ui.label_image_glow_1->AddDropFilter("dds");
-	ui.label_image_normal_1->AddDropFilter("dds");*/
-
+	
+	// Map root engine effect names to shader views.
+	m_effectToShaderIndex["Mesh"] = 0;
+	m_effectToShaderIndex["Mesh_NormalMap"] = 1;
 
 	connect(ui.lineEdit_materialName,		SIGNAL(editingFinished()),			this,		SLOT(MaterialNameChanged()));
 	connect(ui.lineEdit_modelName,			SIGNAL(editingFinished()),			this,		SLOT(ModelNameChanged()));
 	connect(ui.pushButton_newMaterial,		SIGNAL(pressed()),					this,		SLOT(NewMaterial()));
-	connect(ui.comboBox_shaderSelect,		SIGNAL(currentIndexChanged(int)),	this,		SLOT(ShaderChanged(int)));
-
-	/*connect(ui.label_image_diffuse,			SIGNAL(dropped(const QString&)),		   this,		SLOT(DiffuseTextureDropped(const QString&)));
-	connect(ui.label_image_diffuse_1,		SIGNAL(dropped(const QString&)),		   this,		SLOT(DiffuseTextureDropped(const QString&)));
-	connect(ui.label_image_specular,		SIGNAL(dropped(const QString&)),		   this,		SLOT(SpecularTextureDropped(const QString&)));
-	connect(ui.label_image_specular_1,		SIGNAL(dropped(const QString&)),		   this,		SLOT(SpecularTextureDropped(const QString&)));
-	connect(ui.label_image_glow,			SIGNAL(dropped(const QString&)),		   this,		SLOT(GlowTextureDropped(const QString&)));
-	connect(ui.label_image_glow_1,			SIGNAL(dropped(const QString&)),		   this,		SLOT(GlowTextureDropped(const QString&)));
-	connect(ui.label_image_normal_1,		SIGNAL(dropped(const QString&)),		   this,		SLOT(NormalTextureDropped(const QString&)));*/
-
+	connect(ui.comboBox_shaderSelect,		SIGNAL(activated(int)),				this,		SLOT(ShaderChanged(int)));
 }
 
 const QString& RenderableView::GetComponentName() const
@@ -50,86 +39,91 @@ const QString& RenderableView::GetComponentName() const
 	return m_name;
 }
 
+void RenderableView::SetEngineInterface(EngineInterface* p_engineInterface)
+{
+	// Set interface in shader views.
+	m_shaderViews[0]->SetEngineInterface(p_engineInterface);
+
+	AbstractComponentView::SetEngineInterface(p_engineInterface);
+}
+
 void RenderableView::DisplayEntity(ECS::Entity* p_entity)
 {
 	ui.lineEdit_modelName->setText(QString::fromUtf8(m_engineInterface->GetRenderableModelName(p_entity).c_str()));
 	ui.lineEdit_materialName->setText(QString::fromUtf8(m_engineInterface->GetRenderableMaterialName(p_entity).c_str()));
 
-	Render::Material* material = m_engineInterface->GetMaterial(ui.lineEdit_materialName->text().toStdString());
-
-	m_currentEntity = p_entity;
-	m_currentMaterial = material;
+	m_currentMaterial = m_engineInterface->GetMaterial(ui.lineEdit_materialName->text().toStdString());
 	
-	/*if(material->m_effect != nullptr)
+	if(m_currentMaterial->m_effect != nullptr)
 	{
 		// Get effect name.
 		const std::string effectName = m_engineInterface->GetMaterialEffectName(m_currentMaterial);
 
-		// Switch to correct page.
-		if(effectName == "Mesh")
+		if(m_effectToShaderIndex.find(effectName) != m_effectToShaderIndex.end())
 		{
-			ui.stackedWidget_shaderProperties->setCurrentIndex(0);
-			QtConcurrent::run(this, &RenderableView::DisplayDiffuse, material);
-		}
-		else if(effectName == "Mesh_NormalMap")
-		{
-			ui.stackedWidget_shaderProperties->setCurrentIndex(1);
-			QtConcurrent::run(this, &RenderableView::DisplayDiffuseNormal, material);
+			ui.comboBox_shaderSelect->setCurrentIndex(m_effectToShaderIndex[effectName]);
+
+			ShaderChanged(m_effectToShaderIndex[effectName]);
 		}
 		else
 		{
-			Utils::GetInstance()->Write("No widget implemented for effect" + QString::fromStdString(effectName));
-
-			ui.label_image_diffuse->setPixmap(QPixmap());
-			ui.label_image_specular->setPixmap(QPixmap());
-			ui.label_image_glow->setPixmap(QPixmap());
-			ui.label_image_diffuse_1->setPixmap(QPixmap());
-			ui.label_image_specular_1->setPixmap(QPixmap());
-			ui.label_image_normal_1->setPixmap(QPixmap());
-			ui.label_image_glow_1->setPixmap(QPixmap());
+			Clear();
 		}
-	}*/
+	}
 }
 
 void RenderableView::NewMaterial()
 {
-	QString fileName = QFileDialog::getSaveFileName(this, "Save Material", "", "Material File (*.material)");
-	if (fileName != "")
-	{
-		// Get material.
-		QFileInfo info(fileName);
-		QString baseName = info.completeBaseName();
+	bool ok;
+	QString name = QInputDialog::getText(this, tr("Enter Material Name"), tr("Name:"), QLineEdit::Normal, "DefaultMaterial", &ok);
 
+	if (ok && !name.isEmpty())
+	{
 		// Create new material.
-		Render::Material* material = m_engineInterface->GetMaterial(baseName.toStdString());
+		Render::Material* material = m_engineInterface->GetMaterial(name.toStdString());
 		material->m_effect = m_engineInterface->GetEffect("Mesh");
 
-		// Export a file.
+		const std::string savePath = m_engineInterface->GetContentPath() + "Assets\\Materials\\" + name.toStdString() + ".material";
+
 		MaterialExporter e;
-		e.Export(material, fileName.toStdString());
+		e.Export(material, savePath);
 
-		m_engineInterface->SetRenderableMaterialName(*m_editorInterface->GetSelection().begin(), baseName.toStdString());
+		m_engineInterface->SetRenderableMaterialName(*m_editorInterface->GetSelection().begin(), name.toStdString());
 
-		DisplayEntity(m_currentEntity);
+		DisplayEntity(*m_editorInterface->GetSelection().begin());
 	}
 }
 
 void RenderableView::MaterialNameChanged()
 {
 	QString p_materialName = ui.lineEdit_materialName->text();
+	if(p_materialName.size() == 0)
+		return;
+
 	if (m_editorInterface->GetSelection().size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
 
 		std::string materialName = m_engineInterface->GetRenderableMaterialName(selectedEntity);
 		materialName = p_materialName.toStdString();
-		m_engineInterface->SetRenderableMaterialName(selectedEntity, materialName);
+
+		const std::string loadPath = m_engineInterface->GetContentPath() + "Assets\\Materials\\" + materialName + ".material";
+
+		MaterialImporter i;
+		i.Import(loadPath);
+
+		m_engineInterface->SetRenderableMaterialName(*m_editorInterface->GetSelection().begin(), materialName);
+
+		DisplayEntity(selectedEntity);
 	}	
 }
 
 void RenderableView::ModelNameChanged()
 {
 	QString p_modelName = ui.lineEdit_modelName->text();
+	if(p_modelName.size() == 0)
+		return;
+
 	if (m_editorInterface->GetSelection().size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_editorInterface->GetSelection().begin();
@@ -142,120 +136,30 @@ void RenderableView::ModelNameChanged()
 
 void RenderableView::ShaderChanged(int index)
 {
+	Clear();
+
 	if((size_t)index < m_shaderViews.size())
 	{
-		m_shaderViews[0]->show();
-		ui.verticalLayout_2->addWidget(m_shaderViews[0]);
-		//ui.verticalLayout_2->addStretch();
+		m_shaderViews[index]->show();
+		m_shaderViews[index]->SetMaterialName(ui.lineEdit_materialName->text());
+		m_shaderViews[index]->SetMaterial(m_currentMaterial);
+		m_shaderViews[index]->Display();
+
+		ui.verticalLayout_2->addWidget(m_shaderViews[index]);
+
+		m_currentView = m_shaderViews[index];
 	}
 }
 
-void RenderableView::DiffuseTextureDropped(const QString& p_path)
+void RenderableView::Clear()
 {
-	m_currentMaterial->m_textures[Render::TextureSemantic::DIFFUSE] = m_engineInterface->GetTexture(p_path.toStdString());
-}
-
-void RenderableView::SpecularTextureDropped(const QString& p_path)
-{
-	m_currentMaterial->m_textures[Render::TextureSemantic::SPECULAR] = m_engineInterface->GetTexture(p_path.toStdString());
-}
-
-void RenderableView::GlowTextureDropped(const QString& p_path)
-{
-	m_currentMaterial->m_textures[Render::TextureSemantic::GLOW] = m_engineInterface->GetTexture(p_path.toStdString());
-}
-
-void RenderableView::NormalTextureDropped(const QString& p_path)
-{
-	m_currentMaterial->m_textures[Render::TextureSemantic::NORMAL] = m_engineInterface->GetTexture(p_path.toStdString()); 
-}
-
-QPixmap RenderableView::GetPixmap(Render::TextureInterface* p_texture)
-{
-	std::string fullTexturePath = m_engineInterface->GetContentPath() + "Assets\\Textures\\" +  m_engineInterface->GetTextureName(p_texture) + ".dds";
-			
-	std::replace( fullTexturePath.begin(), fullTexturePath.end(), '\\', '/');
-			
-	// find textures.
-	int limit = QPixmapCache::cacheLimit();
-	QPixmap pm;
-	if (!QPixmapCache::find(QString::fromStdString(fullTexturePath), &pm))
+	QLayoutItem *wItem;
+	while ((wItem = ui.verticalLayout_2->takeAt(0)) != 0)
 	{
-		QImageReader reader(QString::fromStdString(fullTexturePath));
-
-		if(!reader.canRead())
-		{
-			return pm;
-		}
-
-		QImage image = reader.read();
-		if(image.isNull())
-		{
-			return pm;
-		}
-
-		pm = QPixmap::fromImage(image);
-
-		QPixmapCache::insert(QString::fromStdString(fullTexturePath), pm);
+		if (wItem->widget())
+			wItem->widget()->setParent(NULL);
+		delete wItem;
 	}
-
-	return pm;
 }
 
-void RenderableView::DisplayDiffuse(Render::Material* p_material)
-{
-	/*ui.label_image_diffuse->setPixmap(QPixmap());
-	ui.label_image_specular->setPixmap(QPixmap());
-	ui.label_image_glow->setPixmap(QPixmap());
 
-	for(auto itr = p_material->m_textures.begin(); itr != p_material->m_textures.end(); ++itr)
-	{
-		if((*itr).first == Render::TextureSemantic::DIFFUSE)
-		{
-			QPixmap pm = GetPixmap((*itr).second);			
-			ui.label_image_diffuse->setPixmap(pm.scaled(ui.label_image_diffuse->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		}
-		else if((*itr).first == Render::TextureSemantic::SPECULAR)
-		{
-			QPixmap pm = GetPixmap((*itr).second);
-			ui.label_image_specular->setPixmap(pm.scaled(ui.label_image_specular->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		}
-		else if((*itr).first == Render::TextureSemantic::GLOW)
-		{
-			QPixmap pm = GetPixmap((*itr).second);
-			ui.label_image_glow->setPixmap(pm.scaled(ui.label_image_glow->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		}
-	}*/
-}
-
-void RenderableView::DisplayDiffuseNormal(Render::Material* p_material)
-{	
-	/*ui.label_image_diffuse_1->setPixmap(QPixmap());
-	ui.label_image_specular_1->setPixmap(QPixmap());
-	ui.label_image_normal_1->setPixmap(QPixmap());
-	ui.label_image_glow_1->setPixmap(QPixmap());
-
-	for(auto itr = p_material->m_textures.begin(); itr != p_material->m_textures.end(); ++itr)
-	{
-		if((*itr).first == Render::TextureSemantic::DIFFUSE)
-		{
-			QPixmap pm = GetPixmap((*itr).second);			
-			ui.label_image_diffuse_1->setPixmap(pm.scaled(ui.label_image_diffuse_1->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		}
-		else if((*itr).first == Render::TextureSemantic::SPECULAR)
-		{
-			QPixmap pm = GetPixmap((*itr).second);		
-			ui.label_image_specular_1->setPixmap(pm.scaled(ui.label_image_specular_1->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		}
-		else if((*itr).first == Render::TextureSemantic::NORMAL)
-		{
-			QPixmap pm = GetPixmap((*itr).second);	
-			ui.label_image_normal_1->setPixmap(pm.scaled(ui.label_image_normal_1->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		}
-		else if((*itr).first == Render::TextureSemantic::GLOW)
-		{
-			QPixmap pm = GetPixmap((*itr).second);		
-			ui.label_image_glow_1->setPixmap(pm.scaled(ui.label_image_glow_1->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		}
-	}*/
-}
