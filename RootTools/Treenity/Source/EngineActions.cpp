@@ -89,11 +89,9 @@ void EngineActions::InitializeScene()
 
 void EngineActions::LoadScene( const QString& p_filePath )
 {
-	
-	QProgressDialog prog( "Loading", "", 0, 0, nullptr,  0);
-	prog.setCancelButton(0);
-	prog.show();
-	qApp->processEvents(QEventLoop::AllEvents);
+	QFileInfo fileInfo(p_filePath);
+	QProgressDialog dialog(0,0);
+	Utils::ShowProgressBar(&dialog, "Level: " + fileInfo.completeBaseName());
 
 	ClearScene();
 	//Utils::RunWithProgressBar(QtConcurrent::run(m_treenityMain->GetProjectManager(), &ProjectManager::Import, p_filePath));
@@ -186,13 +184,17 @@ void EngineActions::CreateWater()
 // Mode switching
 void EngineActions::EnterPlayMode()
 {
+	QCursor::setPos(QApplication::primaryScreen(), m_treenityMain->GetEditor()->GetUi().widget_canvas3D->geometry().center());
 	m_editorMode = EditorMode::GAME;
 	g_engineContext.m_inputSys->LockMouseToCenter(true);
 
 	// Get the spawn position/orientation.
 	RootForce::Transform* spawnTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("TestSpawnpoint"));
 
-	Utils::RunWithProgressBar(QtConcurrent::run(this, &EngineActions::ParallelPlayModeEnter));
+	QProgressDialog dialog(0,0);
+	Utils::ShowProgressBar(&dialog, "Entering play mode");
+
+	ParallelPlayModeEnter();
 
 	// Create a player.
 	g_engineContext.m_script->SetGlobalNumber("UserID", 0);
@@ -234,10 +236,8 @@ void EngineActions::EnterPlayMode()
 
 void EngineActions::ExitPlayMode()
 {
-	QProgressDialog prog( "Loading", "", 0, 0, nullptr,  0);
-	prog.setCancelButton(0);
-	prog.show();
-	qApp->processEvents(QEventLoop::AllEvents);
+	QProgressDialog dialog(0,0);
+	Utils::ShowProgressBar(&dialog, "Exiting play mode");
 
 	// Stop the animation system.
 	m_treenityMain->GetAnimationSystem()->Synch();

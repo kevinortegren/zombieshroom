@@ -6,6 +6,7 @@
 
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
+extern ECS::World* g_world;
 
 static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_component, int p_type)
 {
@@ -13,7 +14,13 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 	{
 		case RootForce::ComponentType::RENDERABLE:
 			{
+				ECS::Entity* water = g_world->GetTagManager()->GetEntityByTag("Water");
+				RootForce::Renderable* waterRenderable = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(water);
 				RootForce::Renderable* renderable = static_cast<RootForce::Renderable*>(p_component);	
+				if(waterRenderable == renderable)
+				{
+					return;
+				}
 				if(renderable->m_model != nullptr)
 				{
 					std::string s = g_engineContext.m_resourceManager->ResolveStringFromModel(renderable->m_model);

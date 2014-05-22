@@ -6,15 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
-    <height>300</height>
+    <width>339</width>
+    <height>256</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="maximumSize">
    <size>
@@ -100,6 +106,18 @@
        </item>
        <item row="2" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityX">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="minimum">
           <double>-10000.000000000000000</double>
          </property>
@@ -110,6 +128,18 @@
        </item>
        <item row="2" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityY">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="minimum">
           <double>-10000.000000000000000</double>
          </property>
@@ -120,6 +150,18 @@
        </item>
        <item row="2" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_gravityZ">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="minimum">
           <double>-10000.000000000000000</double>
          </property>
@@ -137,6 +179,18 @@
        </item>
        <item row="3" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_mass">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximum">
           <double>10000.000000000000000</double>
          </property>
@@ -202,6 +256,18 @@
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_sphereRadius">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximum">
           <double>10000.000000000000000</double>
          </property>
@@ -246,6 +312,18 @@
        </item>
        <item row="1" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_coneHeight">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximum">
           <double>10000.000000000000000</double>
          </property>
@@ -253,6 +331,18 @@
        </item>
        <item row="0" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_coneRadius">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximum">
           <double>10000.000000000000000</double>
          </property>
@@ -277,6 +367,18 @@
        </item>
        <item row="0" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_cylinderRadius">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximum">
           <double>10000.000000000000000</double>
          </property>
@@ -291,6 +393,18 @@
        </item>
        <item row="1" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_cylinderHeight">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximum">
           <double>10000.000000000000000</double>
          </property>
@@ -308,7 +422,14 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="DropLineEdit" name="lineEdit_physicsMesh"/>
+        <widget class="DropLineEdit" name="lineEdit_physicsMesh">
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
        </item>
        <item row="0" column="2">
         <widget class="QToolButton" name="toolButton_physicsMesh">

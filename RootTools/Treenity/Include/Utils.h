@@ -17,12 +17,12 @@ public:
 	static Utils* GetInstance();
 	static void Write(const QString& p_text);
 	static void RunWithProgressBar( QFuture<void> p_future);
+	static void ShowProgressBar(QProgressDialog* p_dialog, const QString& p_text = "");
 
 	~Utils();
 
 	void WriteToConsole(const QString& p_text);
 	void Run( QFuture<void> p_future);
-	
 
 private:
 	static bool m_instanceFlag;

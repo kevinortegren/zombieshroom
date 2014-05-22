@@ -2,7 +2,8 @@
 #include <RootSystems/Include/Transform.h>
 
 Tool::Tool()
-	: m_selectedEntity(nullptr)
+	: m_selectedEntity(nullptr),
+	m_visible(false)
 {
 
 }
@@ -47,4 +48,19 @@ void Tool::SetSelectedEntity(ECS::Entity* p_entity)
 ECS::Entity* Tool::GetSelectedEntity()
 {
 	return m_selectedEntity;
+}
+
+bool Tool::IsVisible()
+{
+	return m_visible;
+}
+
+void Tool::Hide()
+{
+	m_visible = false;
+}
+
+void Tool::Show()
+{
+	m_visible = true;
 }

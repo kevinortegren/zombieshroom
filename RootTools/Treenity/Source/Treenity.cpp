@@ -67,15 +67,16 @@ Treenity::Treenity(QWidget *parent)
 	// Setup the main UI.
 	ui.setupUi(this);
 
-	m_compView = new ComponentView();
-	QScrollArea* scroll = new QScrollArea();
-	scroll->setWidgetResizable(true);
-	scroll->setWidget(m_compView);
-	scroll->setFrameStyle(QFrame::Plain);
+	setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
+	setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
 
+	m_compView = new ComponentView();
+	m_scrollArea = new VerticalScrollArea();
+	m_scrollArea->setWidget(m_compView);
+	m_scrollArea->setFrameStyle(QFrame::Plain);
 	// Setup the component view and its items.
 	
-	ui.verticalLayout->addWidget(scroll);
+	ui.verticalLayout->addWidget(m_scrollArea);
 	m_componentViews[RootForce::ComponentType::TRANSFORM]			= new TransformView();
 	m_componentViews[RootForce::ComponentType::RENDERABLE]			= new RenderableView();	
 	m_componentViews[RootForce::ComponentType::COLLISION]			= new PhysicsView();
@@ -110,6 +111,9 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addScript,					SIGNAL(triggered()),		this,					SLOT(AddScriptComponent()));
 	connect(ui.action_collisionResponder,			SIGNAL(triggered()),		this,					SLOT(AddCollisionResponder()));
 	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
+	connect(ui.pushButton_translateMode,			SIGNAL(clicked()),			this,					SLOT(SetTranslateTool()));
+	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
+	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
@@ -118,7 +122,7 @@ Treenity::Treenity(QWidget *parent)
 
 Treenity::~Treenity()
 {
-
+	
 }
 
 void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
@@ -222,7 +226,7 @@ void Treenity::InitializeTools(ECS::World* p_world)
 {
 	m_toolManager.Initialize(p_world);
 	
-	m_toolManager.SetTool();
+	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
 }
 
 //TODO: Rename.
@@ -565,4 +569,19 @@ void Treenity::Update(float p_dt)
 			}
 		}
 	}
+}
+
+void Treenity::SetTranslateTool()
+{
+	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
+}
+
+void Treenity::SetRotateTool()
+{
+	m_toolManager.SetTool(ToolBox::ROTATION_TOOL);
+}
+
+void Treenity::SetResizeTool()
+{
+	//Set resize tool
 }

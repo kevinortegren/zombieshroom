@@ -75,12 +75,13 @@ public:
     {
         if (Physics->objectName().isEmpty())
             Physics->setObjectName(QStringLiteral("Physics"));
-        Physics->resize(346, 300);
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        Physics->resize(339, 256);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(Physics->sizePolicy().hasHeightForWidth());
         Physics->setSizePolicy(sizePolicy);
+        Physics->setMinimumSize(QSize(0, 0));
         Physics->setMaximumSize(QSize(16777215, 300));
         gridLayout = new QGridLayout(Physics);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
@@ -124,6 +125,12 @@ public:
 
         doubleSpinBox_gravityX = new QDoubleSpinBox(page_5);
         doubleSpinBox_gravityX->setObjectName(QStringLiteral("doubleSpinBox_gravityX"));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(doubleSpinBox_gravityX->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_gravityX->setSizePolicy(sizePolicy1);
+        doubleSpinBox_gravityX->setMinimumSize(QSize(30, 0));
         doubleSpinBox_gravityX->setMinimum(-10000);
         doubleSpinBox_gravityX->setMaximum(10000);
 
@@ -131,6 +138,9 @@ public:
 
         doubleSpinBox_gravityY = new QDoubleSpinBox(page_5);
         doubleSpinBox_gravityY->setObjectName(QStringLiteral("doubleSpinBox_gravityY"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_gravityY->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_gravityY->setSizePolicy(sizePolicy1);
+        doubleSpinBox_gravityY->setMinimumSize(QSize(30, 0));
         doubleSpinBox_gravityY->setMinimum(-10000);
         doubleSpinBox_gravityY->setMaximum(10000);
 
@@ -138,6 +148,9 @@ public:
 
         doubleSpinBox_gravityZ = new QDoubleSpinBox(page_5);
         doubleSpinBox_gravityZ->setObjectName(QStringLiteral("doubleSpinBox_gravityZ"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_gravityZ->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_gravityZ->setSizePolicy(sizePolicy1);
+        doubleSpinBox_gravityZ->setMinimumSize(QSize(30, 0));
         doubleSpinBox_gravityZ->setMinimum(-10000);
         doubleSpinBox_gravityZ->setMaximum(10000);
 
@@ -150,6 +163,9 @@ public:
 
         doubleSpinBox_mass = new QDoubleSpinBox(page_5);
         doubleSpinBox_mass->setObjectName(QStringLiteral("doubleSpinBox_mass"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_mass->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_mass->setSizePolicy(sizePolicy1);
+        doubleSpinBox_mass->setMinimumSize(QSize(30, 0));
         doubleSpinBox_mass->setMaximum(10000);
 
         gridLayout_5->addWidget(doubleSpinBox_mass, 3, 1, 1, 1);
@@ -187,6 +203,9 @@ public:
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
         doubleSpinBox_sphereRadius = new QDoubleSpinBox(page);
         doubleSpinBox_sphereRadius->setObjectName(QStringLiteral("doubleSpinBox_sphereRadius"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_sphereRadius->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_sphereRadius->setSizePolicy(sizePolicy1);
+        doubleSpinBox_sphereRadius->setMinimumSize(QSize(30, 0));
         doubleSpinBox_sphereRadius->setMaximum(10000);
 
         gridLayout_4->addWidget(doubleSpinBox_sphereRadius, 0, 1, 1, 1);
@@ -215,12 +234,18 @@ public:
 
         doubleSpinBox_coneHeight = new QDoubleSpinBox(page_3);
         doubleSpinBox_coneHeight->setObjectName(QStringLiteral("doubleSpinBox_coneHeight"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_coneHeight->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_coneHeight->setSizePolicy(sizePolicy1);
+        doubleSpinBox_coneHeight->setMinimumSize(QSize(20, 0));
         doubleSpinBox_coneHeight->setMaximum(10000);
 
         gridLayout_2->addWidget(doubleSpinBox_coneHeight, 1, 1, 1, 1);
 
         doubleSpinBox_coneRadius = new QDoubleSpinBox(page_3);
         doubleSpinBox_coneRadius->setObjectName(QStringLiteral("doubleSpinBox_coneRadius"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_coneRadius->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_coneRadius->setSizePolicy(sizePolicy1);
+        doubleSpinBox_coneRadius->setMinimumSize(QSize(20, 0));
         doubleSpinBox_coneRadius->setMaximum(10000);
 
         gridLayout_2->addWidget(doubleSpinBox_coneRadius, 0, 1, 1, 1);
@@ -238,6 +263,9 @@ public:
 
         doubleSpinBox_cylinderRadius = new QDoubleSpinBox(page_4);
         doubleSpinBox_cylinderRadius->setObjectName(QStringLiteral("doubleSpinBox_cylinderRadius"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_cylinderRadius->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_cylinderRadius->setSizePolicy(sizePolicy1);
+        doubleSpinBox_cylinderRadius->setMinimumSize(QSize(20, 0));
         doubleSpinBox_cylinderRadius->setMaximum(10000);
 
         gridLayout_3->addWidget(doubleSpinBox_cylinderRadius, 0, 1, 1, 1);
@@ -249,6 +277,9 @@ public:
 
         doubleSpinBox_cylinderHeight = new QDoubleSpinBox(page_4);
         doubleSpinBox_cylinderHeight->setObjectName(QStringLiteral("doubleSpinBox_cylinderHeight"));
+        sizePolicy1.setHeightForWidth(doubleSpinBox_cylinderHeight->sizePolicy().hasHeightForWidth());
+        doubleSpinBox_cylinderHeight->setSizePolicy(sizePolicy1);
+        doubleSpinBox_cylinderHeight->setMinimumSize(QSize(20, 0));
         doubleSpinBox_cylinderHeight->setMaximum(10000);
 
         gridLayout_3->addWidget(doubleSpinBox_cylinderHeight, 1, 1, 1, 1);
@@ -265,6 +296,7 @@ public:
 
         lineEdit_physicsMesh = new DropLineEdit(page_2);
         lineEdit_physicsMesh->setObjectName(QStringLiteral("lineEdit_physicsMesh"));
+        lineEdit_physicsMesh->setMinimumSize(QSize(20, 0));
 
         gridLayout_6->addWidget(lineEdit_physicsMesh, 0, 1, 1, 1);
 
