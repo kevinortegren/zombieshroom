@@ -363,6 +363,7 @@ void EngineActions::AddRenderable(ECS::Entity* p_entity)
 	RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
 	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/box");
 	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("DefaultMaterial");
+	renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 }
 
 void EngineActions::RemoveRenderable(ECS::Entity* p_entity)

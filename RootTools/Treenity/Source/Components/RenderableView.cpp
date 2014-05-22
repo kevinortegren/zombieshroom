@@ -110,7 +110,8 @@ void RenderableView::MaterialNameChanged()
 		const std::string loadPath = m_engineInterface->GetContentPath() + "Assets\\Materials\\" + materialName + ".material";
 
 		MaterialImporter i;
-		i.Import(loadPath);
+		if(i.Import(loadPath) == nullptr)
+			return;
 
 		m_engineInterface->SetRenderableMaterialName(*m_editorInterface->GetSelection().begin(), materialName);
 
