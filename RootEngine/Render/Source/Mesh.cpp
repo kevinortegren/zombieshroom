@@ -103,7 +103,7 @@ namespace Render
 	{
 		m_vertexAttributes->Unbind();
 	}
-
+	
 	void Mesh::Draw()
 	{
 		if(m_elementBuffer != nullptr)
@@ -147,7 +147,7 @@ namespace Render
 		}
 		else
 		{
-			glDrawArrays(m_primitive, 0, m_elementBuffer->GetNumElements());
+			glDrawArrays(m_primitive, 0, m_vertexBuffer->GetNumElements());
 		}
 	}
 
