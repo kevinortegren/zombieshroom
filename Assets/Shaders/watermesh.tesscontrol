@@ -1,7 +1,6 @@
 #version 410 core                                                                               
                                                                                                 
-// define the number of CPs in the output patch  
-layout (vertices = 3) in;                                                
+// define the number of CPs in the output patch                                              
 layout (vertices = 3) out;   
                                                                    
 layout(std140) uniform PerObject
@@ -9,7 +8,12 @@ layout(std140) uniform PerObject
 	mat4 modelMatrix;
 	mat4 normalMatrix;
 	vec3 gEyeWorldPos;
-};                                                                                    
+	float gTime;
+	vec4 gOptions;
+	vec4 SunColor;
+	vec3 SunDirection;
+	float dx2; //Length between height values
+};                                                                                  
                                                                                                                                                                
 // attributes of the input CPs                                                                  
 in vec3 WorldPos_CS_in[];                                                                  

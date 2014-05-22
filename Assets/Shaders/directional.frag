@@ -97,7 +97,7 @@ vec3 FindBlocker(vec3 coord, int useCascade, float offset)
 	int i;
 	for(i = 0; i < PCF_NUM_SAMPLES; i++)
 	{
-		float shadowMapDepth = texture(g_ShadowDepth, vec3(coord.xy + poissonDisk[i] * searchWidth, useCascade));
+		float shadowMapDepth = texture(g_ShadowDepth, vec3(coord.xy + poissonDisk[i] * searchWidth, useCascade)).x;
 		if(shadowMapDepth < coord.z)
 		{
 			blockersum += shadowMapDepth;
@@ -188,7 +188,7 @@ void main() {
 		}
 	}
 
-	float occluderDepth = texture(g_ShadowDepth, vec3(shadowCoord.xy, useCascade));
+	float occluderDepth = texture(g_ShadowDepth, vec3(shadowCoord.xy, useCascade)).x;
 	occluderDepth = shadowCoord.z - occluderDepth;
 	
 
