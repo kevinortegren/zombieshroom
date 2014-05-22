@@ -20,7 +20,7 @@ namespace RootForce
 
 	void RenderingSystem::Begin()
 	{
-		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
+		m_matrices.clear();
 	}
 
 	void RenderingSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -59,7 +59,8 @@ namespace RootForce
 		m_matrices[p_entity].m_model = glm::scale(m_matrices[p_entity].m_model, transform->m_scale);
 		m_matrices[p_entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_matrices[p_entity].m_model))));
 
-		
+		renderable->m_model->m_obb.m_transform = m_matrices[p_entity].m_model;
+	
 		Render::RenderJob job;	
 		job.m_mesh = renderable->m_model->m_meshes[0];
 		job.m_shadowMesh = renderable->m_model->m_meshes[0];
@@ -74,11 +75,14 @@ namespace RootForce
 		//Put forward object above or under water
 		if((job.m_material->m_effect->GetTechniques().at(0)->m_flags & Render::TechniqueFlags::RENDER_DEFERRED1) == Render::TechniqueFlags::RENDER_DEFERRED1 || job.m_forward)
 		{
-			if(m_world->GetStorage()->DoesKeyExist("Water"))
+
+			ECS::Entity* waterEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+			if(waterEnt)
 			{
-				if(transform->m_interpolatedPosition.y > m_waterHeight)
+				RootForce::Transform* waterTrans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(waterEnt);
+				if(transform->m_interpolatedPosition.y > waterTrans->m_position.y)
 					job.m_renderPass = RenderPass::RENDERPASS_PARTICLES1;
-				else if(transform->m_interpolatedPosition.y < m_waterHeight)
+				else if(transform->m_interpolatedPosition.y < waterTrans->m_position.y)
 					job.m_renderPass = RenderPass::RENDERPASS_PARTICLES0;
 			}
 			else
@@ -112,7 +116,7 @@ namespace RootForce
 
 	void RenderingSystem::End()
 	{
-
+		
 	}
 
 	void RenderingSystem::SetRendererInterface(Render::RendererInterface* p_renderer)

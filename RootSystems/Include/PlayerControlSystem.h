@@ -11,13 +11,9 @@
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Physics/Include/RootPhysics.h>
 #include <RakNet/RakPeerInterface.h>
-#include <RootForce/Include/HUD.h>
 
 namespace RootForce
 {
-	/** Component owned by a player entity that will be controlled via input. */
-	
-
 	/** 
 		Enumerate all the actions a player can do via input.
 
@@ -76,13 +72,13 @@ namespace RootForce
 		void SetLoggingInterface(Logging* p_logger);
 		void SetInputInterface(RootEngine::InputManager::InputInterface* p_inputManager);
 		void SetPhysicsInterface(RootEngine::Physics::PhysicsInterface* p_physics);
-		void SetHUD(HUD* p_hud) {m_hud = p_hud;}
 		
 		void Process();
 		void SetClientPeer(RakNet::RakPeerInterface* p_clientPeer);
 	private:
 		void HandleAbilityPressed(float p_dt, bool p_push);
 		void HandleAbilityReleased();
+		void SetDefaultKeybindings();
 
 		struct PlayerActionData
 		{
@@ -101,8 +97,6 @@ namespace RootForce
 		RootEngine::InputManager::InputInterface* m_inputManager;
 		RootEngine::Physics::PhysicsInterface* m_physics;
 		RakNet::RakPeerInterface* m_clientPeer;
-		
-		HUD* m_hud;
 	};
 }
 

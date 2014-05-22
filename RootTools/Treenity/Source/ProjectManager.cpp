@@ -1,5 +1,5 @@
 #include <RootTools/Treenity/Include/ProjectManager.h>
-#include <RootTools/Treenity/Include/Log.h>
+#include <RootTools/Treenity/Include/Utils.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <yaml-cpp/yaml.h>
@@ -73,7 +73,7 @@ void ProjectManager::Export(const QString& p_name)
 	QFileInfo info(p_name);
 	m_projectName = info.baseName();
 
-	Log::Write("Project saved as " + info.fileName());
+	Utils::Write("Project saved as " + info.fileName());
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Project saved as %s", p_name.toStdString().c_str());
 }
 
@@ -86,6 +86,16 @@ void ProjectManager::Import(const QString& p_name)
 	QFileInfo info(p_name);
 	m_projectName = info.baseName();
 
-	Log::Write("Project loaded from " + info.fileName());
+	Utils::Write("Project loaded from " + info.fileName());
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Project loaded from %s", p_name.toStdString().c_str());
+}
+
+std::map<ECS::Entity*, std::string>& ProjectManager::GetEntityNames()
+{
+	return m_entityNames;
+}
+
+void ProjectManager::SetEntityNames(const std::map<ECS::Entity*, std::string>& p_entityNames)
+{
+	m_entityNames = p_entityNames;
 }

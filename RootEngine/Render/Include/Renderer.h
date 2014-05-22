@@ -59,6 +59,8 @@ namespace Render
 		virtual void SetCameraPosition(glm::vec3 p_camPos) = 0;
 
 		virtual const glm::mat4& GetProjectionMatrix() = 0;
+		virtual const glm::mat4& GetViewMatrix() = 0;
+
 
 		// Shadows
 		virtual void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index) = 0;
@@ -130,6 +132,7 @@ namespace Render
 		void SetCameraPosition(glm::vec3 p_camPos);
 
 		const glm::mat4& GetProjectionMatrix();
+		const glm::mat4& GetViewMatrix();
 
 		// Shadows
 		void AddShadowcaster(const Render::Shadowcaster& p_shadowcaster, int p_index);

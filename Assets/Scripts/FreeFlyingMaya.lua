@@ -56,9 +56,7 @@ function FreeFlyingMaya.OnUpdate(self)
 	
 	local aimTransform = Entity.GetEntityByTag("AimingDevice"):GetTransformation();
 	
-	local worldDisplace = aimTransform:GetOrient():GetFront() * Vec3.New(-FreeFlyingMaya.Displacement, -FreeFlyingMaya.Displacement, -FreeFlyingMaya.Displacement);
-
-	transform:SetPos(aimTransform:GetPos() + worldDisplace);
+	
 
 	if controllerActions:IsActivated("Alt") then
 	
@@ -70,12 +68,12 @@ function FreeFlyingMaya.OnUpdate(self)
 			aimTransform:GetOrient():Pitch(-mouseDelta.y * FreeFlyingMaya.RotateSens);
 		
 		elseif controllerActions:IsActivated("MiddleClick") then
-		
+			FreeFlyingMaya.Time = 1.1;
 			local panDeltaY = -mouseDelta.y * FreeFlyingMaya.PanSens;
 			local panDeltaX = mouseDelta.x * FreeFlyingMaya.PanSens;
 		
-			aimTransform:SetPos(aimTransform:GetPos() + transform:GetOrient():GetUp() * Vec3.New(panDeltaY, panDeltaY, panDeltaY));
-			aimTransform:SetPos(aimTransform:GetPos() + transform:GetOrient():GetRight() * Vec3.New(panDeltaX, panDeltaX, panDeltaX));
+			aimTransform:SetPos(aimTransform:GetPos() + aimTransform:GetOrient():GetUp() * Vec3.New(panDeltaY, panDeltaY, panDeltaY));
+			aimTransform:SetPos(aimTransform:GetPos() + aimTransform:GetOrient():GetRight() * Vec3.New(panDeltaX, panDeltaX, panDeltaX));
 		
 		elseif controllerActions:IsActivated("RightClick") then
 
@@ -88,6 +86,11 @@ function FreeFlyingMaya.OnUpdate(self)
 		end
         
 	end
+
+	local worldDisplace = aimTransform:GetOrient():GetFront() * Vec3.New(-FreeFlyingMaya.Displacement, -FreeFlyingMaya.Displacement, -FreeFlyingMaya.Displacement);
+
+	transform:SetPos(aimTransform:GetPos() + worldDisplace);
+
 	FreeFlyingMaya.Displacement = FreeFlyingMaya.Displacement - Static.GetScroll() * speedZoomFactor;
 
     

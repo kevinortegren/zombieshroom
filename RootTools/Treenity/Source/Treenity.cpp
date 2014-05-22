@@ -4,70 +4,89 @@
 #include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
 
-#include <RootTools/Treenity/Include/Log.h>
+#include <RootTools/Treenity/Include/Utils.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/InputManager/Include/InputManager.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <QFileDialog>
 
 #include <RootTools/Treenity/Include/KeyHelper.h>
 
 #include <QPushButton>
+#include <QScrollArea>
+
 extern RootEngine::GameSharedContext g_engineContext;
 
 Treenity::Treenity(QWidget *parent)
 	: QMainWindow(parent), m_running(true)
 {
-	//Set some logging init things
-	Log::GetInstance()->setParent(this);
-	Log::GetInstance()->setFloating(true);
+	//Set some utility init things
+	Utils::GetInstance()->setParent(this);
+	Utils::GetInstance()->setFloating(true);
 
 	// Setup component names in the editor.
-	m_componentNames[RootForce::ComponentType::RENDERABLE] = "Renderable";
-	m_componentNames[RootForce::ComponentType::TRANSFORM] = "Transform";
-	m_componentNames[RootForce::ComponentType::POINTLIGHT] = "Point Light";
-	m_componentNames[RootForce::ComponentType::CAMERA] = "Camera";
-	m_componentNames[RootForce::ComponentType::HEALTH] = "Health";
-	m_componentNames[RootForce::ComponentType::PLAYERCONTROL] = "Player Control";
-	m_componentNames[RootForce::ComponentType::PHYSICS] = "Physics";
-	m_componentNames[RootForce::ComponentType::NETWORK] = "Network";
-	m_componentNames[RootForce::ComponentType::LOOKATBEHAVIOR] = "Look-At Behaviour";
+	m_componentNames[RootForce::ComponentType::RENDERABLE]			= "Renderable";
+	m_componentNames[RootForce::ComponentType::TRANSFORM]			= "Transform";
+	m_componentNames[RootForce::ComponentType::POINTLIGHT]			= "Point Light";
+	m_componentNames[RootForce::ComponentType::CAMERA]				= "Camera";
+	m_componentNames[RootForce::ComponentType::HEALTH]				= "Health";
+	m_componentNames[RootForce::ComponentType::PLAYERCONTROL]		= "Player Control";
+	m_componentNames[RootForce::ComponentType::PHYSICS]				= "Physics";
+	m_componentNames[RootForce::ComponentType::NETWORK]				= "Network";
+	m_componentNames[RootForce::ComponentType::LOOKATBEHAVIOR]		= "Look-At Behaviour";
 	m_componentNames[RootForce::ComponentType::THIRDPERSONBEHAVIOR] = "Third Person Behaviour";
-	m_componentNames[RootForce::ComponentType::SCRIPT] = "Script";
-	m_componentNames[RootForce::ComponentType::COLLISION] = "Collision";
-	m_componentNames[RootForce::ComponentType::COLLISIONRESPONDER] = "Collision Responder";
-	m_componentNames[RootForce::ComponentType::PLAYER] = "Player";
-	m_componentNames[RootForce::ComponentType::ANIMATION] = "Animation";
-	m_componentNames[RootForce::ComponentType::PARTICLE] = "Particle";
-	m_componentNames[RootForce::ComponentType::TDMRULES] = "Team-Deathmatch Rules";
-	m_componentNames[RootForce::ComponentType::PLAYERACTION] = "Player Action";
-	m_componentNames[RootForce::ComponentType::PLAYERPHYSICS] = "Player Physics";
-	m_componentNames[RootForce::ComponentType::ENTITYSTATE] = "Entity State";
-	m_componentNames[RootForce::ComponentType::SHADOWCASTER] = "Shadowcaster";
-	m_componentNames[RootForce::ComponentType::DIRECTIONALLIGHT] = "Directional Light";
-	m_componentNames[RootForce::ComponentType::SERVERINFORMATION] = "Server Information";
-	m_componentNames[RootForce::ComponentType::CLIENT] = "Client";
-	m_componentNames[RootForce::ComponentType::RAGDOLL] = "Ragdoll";
-	m_componentNames[RootForce::ComponentType::WATERCOLLIDER] = "Water Collider";
-	m_componentNames[RootForce::ComponentType::ABILITYSPAWN] = "Ability Spawn";
-	m_componentNames[RootForce::ComponentType::TRYPICKUPCOMPONENT] = "Try Pickup";
-	m_componentNames[RootForce::ComponentType::SOUND] = "Sound";
-	m_componentNames[RootForce::ComponentType::TIMER] = "Timer";
-	m_componentNames[RootForce::ComponentType::FOLLOW] = "Follow";
-	m_componentNames[RootForce::ComponentType::HOMING] = "Homing";
-	m_componentNames[RootForce::ComponentType::RAY] = "Ray";
-	m_componentNames[RootForce::ComponentType::DAMAGEANDKNOCKBACK] = "Damage and Knockback";
-	m_componentNames[RootForce::ComponentType::SCALABLE] = "Scalable";
-	m_componentNames[RootForce::ComponentType::STATCHANGE] = "Stat Change";
-	m_componentNames[RootForce::ComponentType::KILLANNOUNCEMENT] = "Kill Announcement";
-	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS] = "Controller Action";
+	m_componentNames[RootForce::ComponentType::SCRIPT]				= "Script";
+	m_componentNames[RootForce::ComponentType::COLLISION]			= "Physics";	// Required since the component list searches on name.
+	m_componentNames[RootForce::ComponentType::COLLISIONRESPONDER]	= "Collision Responder";
+	m_componentNames[RootForce::ComponentType::PLAYER]				= "Player";
+	m_componentNames[RootForce::ComponentType::ANIMATION]			= "Animation";
+	m_componentNames[RootForce::ComponentType::PARTICLE]			= "Particle";
+	m_componentNames[RootForce::ComponentType::TDMRULES]			= "Team-Deathmatch Rules";
+	m_componentNames[RootForce::ComponentType::PLAYERACTION]		= "Player Action";
+	m_componentNames[RootForce::ComponentType::PLAYERPHYSICS]		= "Player Physics";
+	m_componentNames[RootForce::ComponentType::ENTITYSTATE]			= "Entity State";
+	m_componentNames[RootForce::ComponentType::SHADOWCASTER]		= "Shadowcaster";
+	m_componentNames[RootForce::ComponentType::DIRECTIONALLIGHT]	= "Directional Light";
+	m_componentNames[RootForce::ComponentType::SERVERINFORMATION]	= "Server Information";
+	m_componentNames[RootForce::ComponentType::CLIENT]				= "Client";
+	m_componentNames[RootForce::ComponentType::RAGDOLL]				= "Ragdoll";
+	m_componentNames[RootForce::ComponentType::WATERCOLLIDER]		= "Water Collider";
+	m_componentNames[RootForce::ComponentType::ABILITYSPAWN]		= "Ability Spawn";
+	m_componentNames[RootForce::ComponentType::TRYPICKUPCOMPONENT]	= "Try Pickup";
+	m_componentNames[RootForce::ComponentType::SOUND]				= "Sound";
+	m_componentNames[RootForce::ComponentType::TIMER]				= "Timer";
+	m_componentNames[RootForce::ComponentType::FOLLOW]				= "Follow";
+	m_componentNames[RootForce::ComponentType::HOMING]				= "Homing";
+	m_componentNames[RootForce::ComponentType::RAY]					= "Ray";
+	m_componentNames[RootForce::ComponentType::DAMAGEANDKNOCKBACK]	= "Damage and Knockback";
+	m_componentNames[RootForce::ComponentType::SCALABLE]			= "Scalable";
+	m_componentNames[RootForce::ComponentType::STATCHANGE]			= "Stat Change";
+	m_componentNames[RootForce::ComponentType::KILLANNOUNCEMENT]	= "Kill Announcement";
+	m_componentNames[RootForce::ComponentType::CONTROLLERACTIONS]	= "Controller Action";
 
 	// Setup the main UI.
 	ui.setupUi(this);
 
-	// Setup the component view and its items.
+	setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
+	setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
+
 	m_compView = new ComponentView();
-	ui.verticalLayout->addWidget(m_compView);
-	m_componentViews[RootForce::ComponentType::TRANSFORM] = new TransformView(this);
+	m_scrollArea = new VerticalScrollArea();
+	m_scrollArea->setWidget(m_compView);
+	m_scrollArea->setFrameStyle(QFrame::Plain);
+	// Setup the component view and its items.
+	
+	ui.verticalLayout->addWidget(m_scrollArea);
+	m_componentViews[RootForce::ComponentType::TRANSFORM]			= new TransformView();
+	m_componentViews[RootForce::ComponentType::RENDERABLE]			= new RenderableView();	
+	m_componentViews[RootForce::ComponentType::COLLISION]			= new PhysicsView();
+	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]		= new WaterColliderView();
+	m_componentViews[RootForce::ComponentType::SCRIPT]				= new ScriptView();
+	m_componentViews[RootForce::ComponentType::COLLISIONRESPONDER]	= new CollisionResponderView();
+
+	// Block component views from updates while in game mode.
+
+	m_componentViews[RootForce::ComponentType::RENDERABLE]->SetReceiveUpdates(false);
 
 	for (auto it : m_componentViews)
 	{
@@ -77,24 +96,33 @@ Treenity::Treenity(QWidget *parent)
 	ui.treeView_entityOutliner->SetEditorInterface(this);
 
 	// Match signals with slots.
-	connect(ui.actionNew,							SIGNAL(triggered()), this,				SLOT(New()));
-	connect(ui.actionOpen_Project,					SIGNAL(triggered()), this,				SLOT(OpenProject()));
-	connect(ui.action_saveAs,						SIGNAL(triggered()), this,				SLOT(SaveAs()));
-	connect(ui.action_save,							SIGNAL(triggered()), this,				SLOT(Save()));
-	connect(ui.actionExit,							SIGNAL(triggered()), this,				SLOT(close()));
-	connect(ui.actionLog,							SIGNAL(triggered()), Log::GetInstance(), SLOT(Show()));
-	connect(ui.action_addEntity,					SIGNAL(triggered()), this,				SLOT(CreateEntity()));
-	connect(ui.action_removeEntity,					SIGNAL(triggered()), this,				SLOT(DestroyEntity()));
-	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()), this,		SLOT(RenameEntity()));
-	connect(ui.action_renderable,					SIGNAL(triggered()), this,				SLOT(AddRenderable()));
+	connect(ui.actionNew,							SIGNAL(triggered()),		this,					SLOT(New()));
+	connect(ui.actionOpen_Project,					SIGNAL(triggered()),		this,					SLOT(OpenProject()));
+	connect(ui.action_saveAs,						SIGNAL(triggered()),		this,					SLOT(SaveAs()));
+	connect(ui.action_save,							SIGNAL(triggered()),		this,					SLOT(Save()));
+	connect(ui.actionExit,							SIGNAL(triggered()),		this,					SLOT(close()));
+	connect(ui.actionLog,							SIGNAL(triggered()),		Utils::GetInstance(),	SLOT(Show()));
+	connect(ui.action_addEntity,					SIGNAL(triggered()),		this,					SLOT(CreateEntity()));
+	connect(ui.action_removeEntity,					SIGNAL(triggered()),		this,					SLOT(DestroyEntity()));
+	connect(ui.lineEdit_entityName,					SIGNAL(editingFinished()),	this,					SLOT(RenameEntity()));
+	connect(ui.action_addRenderable,				SIGNAL(triggered()),		this,					SLOT(AddRenderable()));
+	connect(ui.action_addPhysics,					SIGNAL(triggered()),		this,					SLOT(AddPhysics()));
+	connect(ui.action_addWaterCollider,				SIGNAL(triggered()),		this,					SLOT(AddWaterCollider()));
+	connect(ui.action_addScript,					SIGNAL(triggered()),		this,					SLOT(AddScriptComponent()));
+	connect(ui.action_collisionResponder,			SIGNAL(triggered()),		this,					SLOT(AddCollisionResponder()));
+	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
+	connect(ui.pushButton_translateMode,			SIGNAL(clicked()),			this,					SLOT(SetTranslateTool()));
+	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
+	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
+
 }
 
 Treenity::~Treenity()
 {
-
+	
 }
 
 void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
@@ -106,6 +134,7 @@ void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 	{
 		it.second->SetEngineInterface(p_engineInterface);
 	}
+	ui.widget_canvas3D->SetEngineInterface(p_engineInterface);
 }
 
 void Treenity::SetProjectManager(ProjectManager* p_projectManager)
@@ -137,7 +166,7 @@ void Treenity::EntityCreated(ECS::Entity* p_entity)
 {
 	ui.treeView_entityOutliner->EntityCreated(p_entity, m_projectManager->GetEntityName(p_entity));
 
-	Log::Write("Entity added: " + QString::number(p_entity->GetId()));
+	Utils::Write("Entity added: " + QString::number(p_entity->GetId()));
 }
 
 void Treenity::EntityRemoved(ECS::Entity* p_entity)
@@ -149,8 +178,12 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 {
 	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
-		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+		// Temporary solution to deal with physics and collider
+		if(p_componentType == RootForce::ComponentType::PHYSICS)
+			return;
 
+		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+		m_componentViews[p_componentType]->DisplayEntity(p_entity);
 		//QWidget* widget = new QWidget();
 		//SetupUIForComponent(widget, p_componentType);
 		//m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
@@ -161,6 +194,10 @@ void Treenity::ComponentRemoved(ECS::Entity* p_entity, int p_componentType)
 {
 	if (m_selectedEntities.find(p_entity) != m_selectedEntities.end() && m_selectedEntities.size() == 1)
 	{
+		// Temporary solution to deal with physics and collider
+		if(p_componentType == RootForce::ComponentType::PHYSICS)
+			return;
+
 		m_compView->RemoveItem(m_componentNames[p_componentType]);
 	}
 }
@@ -185,11 +222,35 @@ void Treenity::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& 
 	ui.treeView_entityOutliner->EntityRemovedFromGroup(p_entity, p_group);
 }
 
+void Treenity::InitializeTools(ECS::World* p_world)
+{
+	m_toolManager.Initialize(p_world);
+	
+	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
+}
+
+//TODO: Rename.
 void Treenity::CreateOpenGLContext()
 {
 	ui.widget_canvas3D->CreateOpenGLContext();
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::START_PRINT, "Creating OpenGL context in treenity.");
+
+	//Set application full screen 
+	showFullScreen();
+	showMaximized();
 }
+
+Ui::TreenityClass& Treenity::GetUi()
+{
+	return ui;
+}
+
+/*
+QPoint Treenity::GetCanvasCenter() const
+{
+	return ui.widget_canvas3D->geometry().center();
+}
+*/
 
 void Treenity::New()
 {
@@ -200,16 +261,20 @@ void Treenity::OpenProject()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, "Open Project", "", "World File (*.world)");
 
-	m_currentProjectFile = fileName;
+	if (fileName != "")
+	{
+		m_currentProjectFile = fileName;
 
-	UpdateWindowTitle();
+		UpdateWindowTitle();
 
-	m_engineInterface->ClearScene();
-	m_engineInterface->AddDefaultEntities();
+		m_engineInterface->ClearScene();
+	
+		m_projectManager->Import(fileName);
 
-	m_projectManager->Import(fileName);
 
-	m_engineInterface->InitializeScene();
+		m_engineInterface->AddDefaultEntities();
+		m_engineInterface->InitializeScene();
+	}
 }
 
 void Treenity::Save()
@@ -221,15 +286,26 @@ void Treenity::SaveAs()
 {
 	QString fileName = QFileDialog::getSaveFileName(this, "Save Project", "", "World File (*.world)");
 
-	m_currentProjectFile = fileName;
+	if (fileName != "")
+	{
+		m_currentProjectFile = fileName;
 
-	UpdateWindowTitle();
+		UpdateWindowTitle();
 
-	m_projectManager->Export(fileName);
+		m_projectManager->Export(fileName);
+	}
+}
+
+void Treenity::Play()
+{
+	Utils::Write("Starting game session");
+
+	m_engineInterface->EnterPlayMode();
 }
 
 void Treenity::Select(ECS::Entity* p_entity)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.clear();
 
 	if(p_entity != nullptr)
@@ -240,6 +316,7 @@ void Treenity::Select(ECS::Entity* p_entity)
 
 void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities = p_entities;
 
 	UpdateOnSelection();
@@ -247,6 +324,7 @@ void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
 
 void Treenity::AddToSelection(ECS::Entity* p_entity)
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.insert(p_entity);
 
 	UpdateOnSelection();
@@ -254,6 +332,7 @@ void Treenity::AddToSelection(ECS::Entity* p_entity)
 
 void Treenity::ClearSelection()
 {
+	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities.clear();
 
 	UpdateOnSelection();
@@ -264,9 +343,10 @@ const std::set<ECS::Entity*>& Treenity::GetSelection() const
 	return m_selectedEntities;
 }
 
-void Treenity::RenameEntity(ECS::Entity* p_entity, const std::string& p_name)
+void Treenity::RenameEntity(ECS::Entity* p_entity, const QString& p_name)
 {
-	ui.treeView_entityOutliner->EntityRenamed(p_entity, QString::fromStdString(p_name));
+	ui.treeView_entityOutliner->EntityRenamed(p_entity, p_name);
+	m_projectManager->SetEntityName(p_entity, p_name);
 }
 
 void Treenity::CreateEntity()
@@ -288,9 +368,7 @@ void Treenity::RenameEntity()
 {
 	for (auto entity : m_selectedEntities)
 	{
-		m_projectManager->SetEntityName(entity, ui.lineEdit_entityName->text());
-		
-		ui.treeView_entityOutliner->EntityRenamed(entity, ui.lineEdit_entityName->text());
+		RenameEntity(entity, ui.lineEdit_entityName->text());
 	}
 }
 
@@ -302,22 +380,70 @@ void Treenity::AddRenderable()
 	}
 }
 
+void Treenity::AddPhysics()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddPhysics(*m_selectedEntities.begin(), true);
+	}
+}
+
+void Treenity::AddWaterCollider()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddWaterCollider(*m_selectedEntities.begin());
+	}
+}
+
+void Treenity::AddScriptComponent()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddScript(*m_selectedEntities.begin());
+	}
+}
+
+void Treenity::AddCollisionResponder()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddCollisionResponder(*m_selectedEntities.begin());
+	}
+}
+
+
 void Treenity::UpdateOnSelection()
 {
+	ui.treeView_entityOutliner->SetCurrentItems(m_selectedEntities);
+
 	if (m_selectedEntities.size() == 0)
 	{
+		if(m_toolManager.GetSelectedTool() != nullptr)
+		{
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+		}
+
 		// Disable name entry.
 		ui.lineEdit_entityName->setText("");
 		ui.lineEdit_entityName->setEnabled(false);
 
 		// Clear component list.
 		m_compView->RemoveItems();
+
+		// Update rotation tool selection.
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+
 	}
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
 
-		//ui.treeView_entityOutliner->setS
+		if(m_toolManager.GetSelectedTool() != nullptr)
+		{
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(selectedEntity);
+		}
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);
@@ -343,13 +469,49 @@ void Treenity::UpdateOnSelection()
 	}
 	else if (m_selectedEntities.size() > 1)
 	{
+		if(m_toolManager.GetSelectedTool() != nullptr)
+		{
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+		}
+
 		// Enable name, allow all names to be changed.
 		ui.lineEdit_entityName->setText("");
 		ui.lineEdit_entityName->setEnabled(true);
 
 		// Clear component list (potential change in future, show transforms).
 		m_compView->RemoveItems();
+
+		// Update rotation tool selection.
+		if(m_toolManager.GetSelectedTool() != nullptr)
+			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 	}
+
+	// For all selected entities that has a collision component, visualize their shape.
+	for (auto entity : m_selectedEntities)
+	{
+		if ((entity->GetFlag() & (1ULL << RootForce::ComponentType::COLLISION)) != 0)
+		{
+			m_engineInterface->SetCollisionVisualized(entity, true);
+		}
+	}
+
+	// Remove collision visualization for deselected entities.
+	for (auto entity : m_previouslySelectedEntities)
+	{
+		if ((entity->GetFlag() & (1ULL << RootForce::ComponentType::COLLISION)) != 0)
+		{
+			if (m_selectedEntities.find(entity) == m_selectedEntities.end())
+			{
+				m_engineInterface->SetCollisionVisualized(entity, false);
+			}
+		}
+	}
+}
+
+void Treenity::DisplayEntity(ECS::Entity* p_selectedEntity)
+{
+	// Update information about the selected entity.
+	static_cast<TransformView*>(m_componentViews[RootForce::ComponentType::TRANSFORM])->DisplayEntity(p_selectedEntity);
 }
 
 void Treenity::keyPressEvent( QKeyEvent* event )
@@ -359,6 +521,14 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 		if(m_selectedEntities.size() > 0)
 		m_engineInterface->TargetEntity(*m_selectedEntities.begin());
 	}
+	if (event->key() == Qt::Key_Escape)
+	{
+		if (m_engineInterface->GetMode() == EditorMode::GAME)
+		{
+			Utils::Write("Stopping game session. Restoring world.");
+			m_engineInterface->ExitPlayMode();
+		}
+	}
 	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
 }
 
@@ -367,3 +537,51 @@ void Treenity::keyReleaseEvent( QKeyEvent* event )
 	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::HELP_PRINT, "Key released: %d", event->key() );
 }
 
+void Treenity::Init()
+{
+	m_assetManagerWidget = new AssetManagerWidget();
+	ui.verticalLayout_assetManager->addWidget(m_assetManagerWidget);
+}
+
+void Treenity::Update(float p_dt)
+{
+	if(m_engineInterface->GetMode() == EditorMode::GAME)
+	{
+		// Poll for the component views (since we cannot get events when component data is changed).
+		if (m_selectedEntities.size() == 1)
+		{
+			ECS::Entity* selectedEntity = *m_selectedEntities.begin();
+
+			uint64_t flag = selectedEntity->GetFlag();
+			for (int i = 0; i < 64; ++i)
+			{
+				uint64_t mask = 1ULL << i;
+				if ((flag & mask) != 0)
+				{
+					if (m_componentViews.find(i) != m_componentViews.end())
+					{
+						if(m_componentViews[i]->IsReceivingUpdates())
+						{
+							m_componentViews[i]->DisplayEntity(selectedEntity);
+						}		
+					}
+				}
+			}
+		}
+	}
+}
+
+void Treenity::SetTranslateTool()
+{
+	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
+}
+
+void Treenity::SetRotateTool()
+{
+	m_toolManager.SetTool(ToolBox::ROTATION_TOOL);
+}
+
+void Treenity::SetResizeTool()
+{
+	//Set resize tool
+}

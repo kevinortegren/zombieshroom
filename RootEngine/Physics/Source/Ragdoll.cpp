@@ -655,4 +655,10 @@ namespace Ragdoll
 			i[m_bodies]->setGravity(p_gravity);
 	}
 
+	glm::vec3 Ragdoll::GetGravity()
+	{
+		btVector3 tempGrav = m_bodies[0]->getGravity();
+		return glm::vec3(tempGrav.x(), tempGrav.y(), tempGrav.z());
+	}
+
 }

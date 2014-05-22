@@ -20,7 +20,8 @@ static SDL_Scancode GetScanCodeFromQtKey(int key)
 	} 
 	else // misc keys & modifiers needs to be identified.
 	{
-		return s_keymap[key&0x000000FF];
+		int v = key&0x000000FF;
+		return s_keymap[v];
 	}
 }
 
@@ -35,6 +36,7 @@ static void InitialiseKeymap()
 	s_keymap[Qt::Key_Right&0x000000FF] = SDL_SCANCODE_RIGHT;
 	s_keymap[Qt::Key_Up&0x000000FF] = SDL_SCANCODE_UP;
 	s_keymap[Qt::Key_Down&0x000000FF] = SDL_SCANCODE_DOWN;
+
 
 	/*Qt::Key_Escape	0x01000000	 
 		Qt::Key_Tab	0x01000001	 

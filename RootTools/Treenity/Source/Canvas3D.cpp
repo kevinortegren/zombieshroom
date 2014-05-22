@@ -9,6 +9,9 @@
 
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Render/Include/Renderer.h>
+#include <RootEngine/InputManager/Include/InputManager.h>
+
+#include <RootTools/Treenity/Include/Utils.h>
 
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -18,7 +21,7 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 	//Flicker fix
 	setAttribute(Qt::WA_PaintOnScreen);
 	setUpdatesEnabled(false);
-
+	setAcceptDrops(true);
 	//Standard setup
 	//setGeometry(QRect(2, 28, 1173, 899));
 	setFocusPolicy(Qt::ClickFocus);
@@ -48,7 +51,7 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 	HWND qtWindowHandle = (HWND)winId();
 	//SDL_CreateWindowFrom takes an already created native window handle and builds an SDL_Window for us
 	m_window = std::shared_ptr<SDL_Window>(SDL_CreateWindowFrom((void*)qtWindowHandle), SDL_DestroyWindow);
-
+	
 	SDL_DestroyWindow(sdlwindow);
 
 	if (m_window == nullptr) 
@@ -77,13 +80,14 @@ void Canvas3D::resizeEvent( QResizeEvent * event)
 	}
 	
 
-	std::cout << "Resize Width: " << event->size().width() << "Resize Height: " << event->size().height() << std::endl;
+	//std::cout << "Resize Width: " << event->size().width() << "Resize Height: " << event->size().height() << std::endl;
 }
 
-void Canvas3D::CreateOpenGLContext()
+void Canvas3D::CreateOpenGLContext() //Horrible name
 {	
 	// Setup the SDL context
 	g_engineContext.m_renderer->SetupSDLContext(m_window.get());
+	g_engineContext.m_inputSys->SetWindow(m_window.get());
 }
 
 void Canvas3D::wheelEvent(QWheelEvent* event)
@@ -120,3 +124,73 @@ void Canvas3D::mouseReleaseEvent( QMouseEvent *event )
 	QWidget::mouseReleaseEvent(event);
 }
 
+
+void Canvas3D::dragEnterEvent( QDragEnterEvent *event )
+{
+	QFileInfo fileInfo(event->mimeData()->text());
+
+	if (event->mimeData()->hasText())
+	{
+		if(fileInfo.suffix() == "world")
+		{
+			event->acceptProposedAction();
+		}
+		else
+		{
+			event->ignore();
+		}
+		
+	}
+}
+
+void Canvas3D::keyPressEvent( QKeyEvent *k )
+{
+	SDL_Event e;
+	e.type = SDL_KEYDOWN;
+	e.key.keysym.scancode = GetScanCodeFromQtKey( k->key() );
+	e.key.repeat = k->isAutoRepeat();
+	SDL_PushEvent(&e);
+
+	QWidget::keyPressEvent(k);
+}
+
+void Canvas3D::keyReleaseEvent( QKeyEvent *k )
+{
+	if (!k->isAutoRepeat())
+	{
+		SDL_Event e;
+		e.type = SDL_KEYUP;
+		e.key.keysym.scancode = GetScanCodeFromQtKey( k->key() );
+		SDL_PushEvent(&e);
+
+		QWidget::keyReleaseEvent(k);
+	}
+}
+
+void Canvas3D::dropEvent( QDropEvent *event )
+{	
+	QFileInfo fileInfo(event->mimeData()->text());
+
+	//if statements with logic for dropping specific files
+	if(fileInfo.suffix() == "world")
+	{
+		//A little sting manuipulation to remove the "file:///"-prefix on the file path if dragged from asset browser
+		QString filePath;
+		if (fileInfo.filePath().startsWith(QLatin1String("file:///")))
+		{
+			filePath =  fileInfo.filePath().mid(8);
+		}
+		else
+		{
+			filePath =  fileInfo.filePath();	
+		}
+		
+		//Load new scene!
+		m_engineInterface->LoadScene(filePath);
+	}
+}
+
+void Canvas3D::SetEngineInterface( EngineInterface* p_engineInterface )
+{
+	m_engineInterface = p_engineInterface;
+}

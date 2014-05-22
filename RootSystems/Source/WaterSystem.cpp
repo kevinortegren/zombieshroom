@@ -35,10 +35,9 @@ namespace RootForce
 
 	void WaterSystem::Begin()
 	{
-		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
+		ECS::Entity* waterEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+		if(waterEnt == nullptr || m_pause)
 			return;
-
-		UpdateWaterHeight();
 
 		m_dt += m_world->GetDelta();
 		m_totalTime += m_world->GetDelta();
@@ -59,13 +58,15 @@ namespace RootForce
 
 	void WaterSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
-		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
+		ECS::Entity* waterEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+		if(waterEnt == nullptr || m_pause)
 			return;
 
 		RootForce::Transform*		transform = m_transform.Get(p_entity);
 		RootForce::WaterCollider*	waterCollider = m_waterCollider.Get(p_entity);
-		
-		float waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
+		RootForce::Transform* waterTrans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(waterEnt);
+
+		float waterHeight = waterTrans->m_position.y;
 
 		if(m_showDebugDraw)
 		{
@@ -112,11 +113,13 @@ namespace RootForce
 
 	void WaterSystem::CreateWater()
 	{
-		if(!m_world->GetStorage()->DoesKeyExist("Water"))
+		ECS::Entity* waterEntity = m_world->GetTagManager()->GetEntityByTag("Water");
+
+		if(waterEntity == nullptr)
 			return;
 
-		float waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
-
+		RootForce::Transform* waterTrans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(waterEntity);
+		
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Pouring water into level!");
 
 		//Create empty textures for compute shader swap. Texture 0 and 1 are used for height values and texture 2 is used for normals.
@@ -151,7 +154,7 @@ namespace RootForce
 
 		//Set standard values
 		m_speed		= 13.0f;
-		m_dx		= (m_scale*64.0f) / m_texSize;
+		m_dx		= (waterTrans->m_scale.x * 64.0f) / m_texSize;
 		m_timeStep	= 0.032f;
 		m_damping	= 0.0f;
 
@@ -159,13 +162,10 @@ namespace RootForce
 		CalculateWaterConstants();
 
 		//Create water entity
-		ECS::Entity*			waterEnt	= m_world->GetEntityManager()->CreateEntity();
-		RootForce::Transform*	trans		= m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(waterEnt);
-		trans->m_position = glm::vec3(0,waterHeight,0); //Set Y-position to in-parameter
-		trans->m_scale = glm::vec3(m_scale,1,m_scale);
+		//waterTrans->m_scale = glm::vec3(m_scale,1,m_scale);
 
 		//Create a renderable component for the water
-		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEnt);
+		m_renderable				= m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(waterEntity);
 		CreateWaterMesh();
 		m_renderable->m_material	= m_context->m_renderer->CreateMaterial("waterrender");
 		
@@ -197,8 +197,7 @@ namespace RootForce
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 
 		m_renderable->m_material->m_effect										= m_context->m_resourceManager->LoadEffect("MeshWater");
 
-		m_world->GetTagManager()->RegisterEntity("Water", waterEnt);
-		m_world->GetTagManager()->RegisterEntity("NonExport", waterEnt);
+		m_world->GetTagManager()->RegisterEntity("Water", waterEntity);
 
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::SUCCESS, "Water created!");
 
@@ -267,7 +266,8 @@ namespace RootForce
 
 	void WaterSystem::Disturb( float p_x, float p_z, float p_power, int p_radius )
 	{
-		if(!m_world->GetStorage()->DoesKeyExist("Water") || m_pause)
+		ECS::Entity* waterEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+		if(waterEnt == nullptr || m_pause)
 			return;
 
 #ifdef RENDER_USE_COMPUTE
@@ -421,11 +421,6 @@ namespace RootForce
 		CalculateWaterConstants();
 	}
 
-	void WaterSystem::UpdateWaterHeight()
-	{
-		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Water"))->m_position.y = m_world->GetStorage()->GetValueAsFloat("Water");
-	}
-
 	bool WaterSystem::ValidValues()
 	{
 		float calc = (m_dx/(2*m_timeStep))*std::sqrtf(m_damping*m_timeStep+2);
@@ -456,7 +451,8 @@ namespace RootForce
 
 	void WaterSystem::ParseCommands(std::stringstream* p_data )
 	{
-		if(!m_world->GetStorage()->DoesKeyExist("Water"))
+		ECS::Entity* waterEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+		if(waterEnt == nullptr)
 			return;
 
 		std::string module;
@@ -606,7 +602,8 @@ namespace RootForce
 		{
 			std::getline(*p_data, value, ' ');
 
-			m_world->GetStorage()->SetValue("Water", (float)atof(value.c_str()));
+			RootForce::Transform* waterTrans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(waterEnt);
+			waterTrans->m_position.y = (float)atof(value.c_str());
 		}
 		else if(module == "disturb" || module == "dis")
 		{
@@ -689,6 +686,17 @@ namespace RootForce
 			g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::NON_FATAL_ERROR, "Init texture 1 not loaded!");
 
 		m_context->m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water is moving!");
+	}
+
+	ECS::Entity* WaterSystem::CreateDefaultWater()
+	{
+		ECS::Entity* water = m_world->GetEntityManager()->CreateEntity();
+		m_world->GetTagManager()->RegisterEntity("Water", water);
+		RootForce::Transform* waterTrans = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(water);
+
+		waterTrans->m_scale = glm::vec3(m_scale, 1, m_scale);
+
+		return water;
 	}
 
 }

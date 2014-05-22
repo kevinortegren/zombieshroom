@@ -70,6 +70,7 @@ namespace Render
 		FillMode m_fillMode;
 		glm::ivec4 m_viewport;
 		bool m_wireframe;
+		float m_lineSize;
 
 	private:
 		GLuint m_glHandle;

@@ -2,9 +2,11 @@
 
 #include <yaml-cpp\yaml.h>
 #include <RootSystems\Include\Components.h>
+#include <RootTools/Treenity/Include/MaterialExporter.h>
 
 #include <RootEngine/Include/GameSharedContext.h>
 extern RootEngine::GameSharedContext g_engineContext;
+extern ECS::World* g_world;
 
 static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_component, int p_type)
 {
@@ -12,7 +14,13 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 	{
 		case RootForce::ComponentType::RENDERABLE:
 			{
+				ECS::Entity* water = g_world->GetTagManager()->GetEntityByTag("Water");
+				RootForce::Renderable* waterRenderable = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(water);
 				RootForce::Renderable* renderable = static_cast<RootForce::Renderable*>(p_component);	
+				if(waterRenderable == renderable)
+				{
+					return;
+				}
 				if(renderable->m_model != nullptr)
 				{
 					std::string s = g_engineContext.m_resourceManager->ResolveStringFromModel(renderable->m_model);
@@ -21,6 +29,12 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				if(renderable->m_material != nullptr)
 				{
 					std::string s = g_engineContext.m_renderer->GetStringFromMaterial(renderable->m_material);
+
+					const std::string fullpath = g_engineContext.m_resourceManager->GetWorkingDirectory() + "Assets//Materials//" + s + ".material";
+
+					MaterialExporter e;
+					//e.Export(renderable->m_material, fullpath);
+
 					p_emitter << YAML::Key << "Material" << YAML::Value << YAML::BeginMap;
 					p_emitter << YAML::Key << "Name" << YAML::Value << s;
 					if(renderable->m_material->m_effect != nullptr)
@@ -49,6 +63,11 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						std::string s = g_engineContext.m_resourceManager->ResolveStringFromTexture(renderable->m_material->m_textures[Render::TextureSemantic::GLOW]);
 						p_emitter << YAML::Key << "Glow" << YAML::Value << s;
 					}
+
+					if(renderable->m_material->m_effect != nullptr)
+					{
+
+					
 
 					if(g_engineContext.m_resourceManager->ResolveStringFromEffect(renderable->m_material->m_effect) == "Mesh_Blend" )
 					{
@@ -98,6 +117,7 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 						p_emitter << YAML::Key << "TileFactor" << YAML::Value << s;
 					}
 					}
+					}
 					p_emitter << YAML::EndMap;
 				}
 			}
@@ -145,16 +165,75 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 			break;
 		case RootForce::ComponentType::PHYSICS:
 			{
-				RootForce::Physics* physics = static_cast<RootForce::Physics*>(p_component);
-				p_emitter << YAML::Key << "Mass" << YAML::Value << physics->m_mass;
+				/*RootForce::Physics* physics = static_cast<RootForce::Physics*>(p_component);
+				p_emitter << YAML::Key << "Mass" << YAML::Value << physics->m_mass;*/
 			}
 			break;
 		case RootForce::ComponentType::COLLISION:
 			{
 				RootForce::Collision* collision = static_cast<RootForce::Collision*>(p_component);
-				p_emitter << YAML::Key << "MeshHandle" << YAML::Value << collision->m_meshHandle;
+
+				
+				p_emitter << YAML::Key << "PhysicsType" << YAML::Value << g_engineContext.m_physics->GetType(*collision->m_handle);
+
+				// If the entity is dynamic and has a physics component.
+				if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+				{
+					p_emitter << YAML::Key << "ShapeMass" << YAML::Value << g_engineContext.m_physics->GetMass(*collision->m_handle);
+
+					glm::vec3 gravity = g_engineContext.m_physics->GetGravity(*collision->m_handle);
+					p_emitter << YAML::Key << "ShapeGravity" << YAML::Value << YAML::Flow << YAML::BeginSeq << gravity.x << gravity.y << gravity.z << YAML::EndSeq;
+				}
+
+				RootEngine::Physics::PhysicsShape::PhysicsShape shape = g_engineContext.m_physics->GetShape(*collision->m_handle);
+
+				p_emitter << YAML::Key << "PhysicsShape" << YAML::Value << (int)shape;
+
+				if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+				{
+					p_emitter << YAML::Key << "CollideWithWorld"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithWorld(*collision->m_handle);
+					p_emitter << YAML::Key << "CollideWithStatic"	<< YAML::Value << g_engineContext.m_physics->GetCollideWithStatic(*collision->m_handle);
+				}
+
+				switch (shape)
+				{
+				case RootEngine::Physics::PhysicsShape::SHAPE_SPHERE:
+					{
+
+						p_emitter << YAML::Key << "ShapeRadius"			<< YAML::Value << g_engineContext.m_physics->GetRadius(*collision->m_handle);
+					}
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_CONE:
+					{
+						p_emitter << YAML::Key << "ShapeRadius"			<< YAML::Value << g_engineContext.m_physics->GetRadius(*collision->m_handle);
+						p_emitter << YAML::Key << "ShapeHeight"			<< YAML::Value << g_engineContext.m_physics->GetHeight(*collision->m_handle);
+					}
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_CYLINDER:
+					{
+						p_emitter << YAML::Key << "ShapeRadius"			<< YAML::Value << g_engineContext.m_physics->GetRadius(*collision->m_handle);
+						p_emitter << YAML::Key << "ShapeHeight"			<< YAML::Value << g_engineContext.m_physics->GetHeight(*collision->m_handle);
+					}
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH:
+					{
+						p_emitter << YAML::Key << "MeshHandle" << YAML::Value << g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
+					}
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_HULL:
+					{
+						// Possibly not needed to export?
+					}
+					break;
+				case RootEngine::Physics::PhysicsShape::SHAPE_NONE:
+					break;
+				default:
+					break;
+				}
 			}
 			break;
+
+		
 		case RootForce::ComponentType::PARTICLE:
 			{
 				RootForce::ParticleEmitter* particle = static_cast<RootForce::ParticleEmitter*>(p_component);
@@ -169,6 +248,15 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 				p_emitter << YAML::Key << "LightSlot" << YAML::Value << shadow->m_directionalLightSlot;
 			}
 			break;
+
+		case RootForce::ComponentType::SCRIPT:
+		{
+			RootForce::Script* script = static_cast<RootForce::Script*>(p_component);
+
+			p_emitter << YAML::Key << "ScriptName" << YAML::Value << script->Name;
+		}
+		break;
+
 		default:
 			break;
 	}

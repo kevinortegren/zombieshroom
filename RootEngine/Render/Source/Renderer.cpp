@@ -177,7 +177,6 @@ namespace Render
 #if defined (_DEBUG)
 		flags = SDL_GL_CONTEXT_DEBUG_FLAG;
 #endif
-
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -213,7 +212,7 @@ namespace Render
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
 		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
-		glClearColor(1,0,0,0);
+		glClearColor(0,0,0,0);
 		
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -981,6 +980,11 @@ namespace Render
 	const glm::mat4& GLRenderer::GetProjectionMatrix()
 	{
 		return m_cameraVars.m_projection;
+	}
+
+	const glm::mat4& GLRenderer::GetViewMatrix()
+	{
+		return m_cameraVars.m_view;
 	}
 
 	void GLRenderer::GetResourceUsage(int& p_bufferUsage, int& p_textureUsage, int& p_numBuffers, int& p_numTextures)

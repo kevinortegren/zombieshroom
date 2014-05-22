@@ -12,6 +12,33 @@ namespace RootForce
 		: m_minX(p_minX), m_maxX(p_maxX), m_minY(p_minY), m_maxY(p_maxY), m_minZ(p_minZ), m_maxZ(p_maxZ), m_transform(p_transform)
 	{}
 
+	void OBB::Expand(const glm::vec3& p_expansion)
+	{
+		if(p_expansion.x > m_maxX)
+		{
+			m_maxX = p_expansion.x;
+		}
+		if(p_expansion.x < m_minX)
+		{
+			m_minX = p_expansion.x;
+		}
+		if(p_expansion.y > m_maxY)
+		{
+			m_maxY = p_expansion.y;
+		}
+		if(p_expansion.y < m_minY)
+		{
+			m_minY = p_expansion.y;
+		}
+		if(p_expansion.z > m_maxZ)
+		{
+			m_maxZ = p_expansion.z;
+		}
+		if(p_expansion.z < m_minZ)
+		{
+			m_minZ = p_expansion.z;
+		}
+	}
 
 	void OBB::DebugDraw(Render::RendererInterface* p_renderer, glm::vec3& p_color, glm::mat4 p_space) const
 	{

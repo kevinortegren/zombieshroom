@@ -50,6 +50,8 @@ public:
 
 	ECS::Entity* GetSelectedEntity();
 
+	void SetCurrentItems(const std::set<ECS::Entity*> p_selected);
+
 private:
 	EntityOutlinerItem* FindItemWithEntity(ECS::Entity* p_entity);
 	EngineInterface* m_engineInterface;

@@ -7,14 +7,21 @@ project(${PROJECT_NAME})
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 file(GLOB_RECURSE SOURCES Source/*.cpp)
 file(GLOB_RECURSE HEADERS Include/*.h)
 file(GLOB_RECURSE UI_FILES UI/*.ui)
 file(GLOB_RECURSE QRC_FILES UI/*.qrc)
-file(GLOB_RECURSE GEN_FILES GeneratedFiles/*.*)
+file(GLOB_RECURSE GEN_CPP_FILES GeneratedFiles/*.cpp)
+file(GLOB_RECURSE GEN_H_FILES GeneratedFiles/*.h)
 file(GLOB_RECURSE RESOURCE_FILES *.rc)
+
+SOURCE_GROUP(Generated\\MOC FILES ${GEN_CPP_FILES})
+SOURCE_GROUP(Generated\\UI FILES ${GEN_H_FILES})
+SOURCE_GROUP(UI_Files FILES ${UI_FILES})
+
 set(LIBRARIES ${EXTERNAL_LIBRARIES} DynamicLoader ECS RootSystems)
 
 foreach(it ${UI_FILES})
@@ -46,10 +53,7 @@ endforeach()
 # Set search paths
 include_directories(Include GeneratedFiles ${QT_INCLUDE_DIRS}/QtGui ${QT_INCLUDE_DIRS}/QtWidgets ${QT_INCLUDE_DIRS}/QtCore)
 
-  
-  message("${CMAKE_CURRENT_BUILD_DIR} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${PROJECT_NAME}")
-
-add_executable(${PROJECT_NAME} ${UI_FILES} ${GEN_FILES} ${QRC_FILES} ${HEADERS} ${SOURCES} ${RESOURCE_FILES})
+add_executable(${PROJECT_NAME} ${UI_FILES} ${GEN_CPP_FILES} ${GEN_H_FILES} ${QRC_FILES} ${HEADERS} ${SOURCES} ${RESOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

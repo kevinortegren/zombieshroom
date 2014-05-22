@@ -1,4 +1,5 @@
 #include "InputManager.h"
+#include <iostream>
 
 namespace RootEngine
 {
@@ -6,10 +7,16 @@ namespace RootEngine
 	{
 		RootEngine::SubsystemSharedContext g_context;
 		InputManager* InputManager::s_inputSys = nullptr;
+
+		InputManager::InputManager()
+		{
+			m_window = nullptr;
+		}
+
 		void InputManager::Startup(void)
 		{
 			m_lockDownInput = false;
-			int err = SDL_SetRelativeMouseMode(SDL_TRUE);
+			int err = SDL_SetRelativeMouseMode(SDL_FALSE);
 			m_globMousePos = glm::ivec2(0, 0);
 			m_deltaMousePos = glm::ivec2(0, 0);
 
@@ -37,7 +44,9 @@ namespace RootEngine
 				break;
 			case SDL_KEYDOWN:
 				if(!p_event.key.repeat)
+				{
 					m_keyState[p_event.key.keysym.scancode] = KeyState::DOWN;
+				}
 				break;
 			case SDL_KEYUP:
 				m_keyState[p_event.key.keysym.scancode] = KeyState::UP;
@@ -71,9 +80,18 @@ namespace RootEngine
 				}
 				if(m_lockMouseEnabled)
 				{
-					//int w, h;
-					//SDL_GetWindowSize(NULL, &w, &h);
-					SDL_WarpMouseInWindow(NULL, 500, 400);
+					int w, h;
+					if(m_window != nullptr)
+					{
+						SDL_GetWindowSize(m_window, &w, &h);
+					}
+					else
+					{
+						w = 1280;
+						h = 720;
+					}
+					
+					SDL_WarpMouseInWindow(NULL, w/2, h/2);
 				}
 				break;
 			default:
@@ -156,13 +174,18 @@ namespace RootEngine
 		void InputManager::LockMouseToCenter(bool p_enable)
 		{
 			m_lockMouseEnabled = p_enable;
-			SDL_SetRelativeMouseMode((SDL_bool) p_enable);
+			//SDL_SetRelativeMouseMode((SDL_bool) p_enable);
 			SDL_ShowCursor(!p_enable);
 		}
 		//Get scroll count, negative is scroll down (backwards) and positive is scroll up (forward)
 		int InputManager::GetScroll()
 		{
 			return m_scroll;
+		}
+
+		void InputManager::SetWindow( SDL_Window* p_window )
+		{
+			m_window = p_window;
 		}
 
 	}

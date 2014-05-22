@@ -84,6 +84,7 @@ namespace Render
 		m_depthState.depthWrite = true;
 		m_viewport = glm::ivec4(0, 0, 1280, 720);
 		m_wireframe = false;
+		m_lineSize = 1.0f;
 	}
 
 	Program::~Program(void)
@@ -199,6 +200,11 @@ namespace Render
 		else
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
+		if(m_lineSize != 1.0f)
+		{
+			glLineWidth(m_lineSize);
 		}
 
 		// Use program.

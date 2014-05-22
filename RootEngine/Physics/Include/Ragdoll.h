@@ -40,6 +40,7 @@ namespace Ragdoll
 		btVector3 GetPos();
 		glm::mat4* GetBones();
 		btQuaternion GetOrientation();
+		glm::vec3 GetGravity();
 		void SetOrientation(glm::quat p_orientation);
 		void SetVelocity(const btVector3& p_velocity);
 		void SetGravity(const btVector3& p_gravity);

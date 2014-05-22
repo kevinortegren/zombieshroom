@@ -13,7 +13,7 @@ namespace RootForce
 	{
 	public:
 		CameraSystem(ECS::World* p_world, RootEngine::GameSharedContext* p_engineContext)
-			: ECS::EntitySystem(p_world), m_engineContext(p_engineContext)
+			: ECS::EntitySystem(p_world), m_engineContext(p_engineContext), m_lockToWater(true)
 		{
 			SetUsage<Camera>();
 			SetUsage<Transform>();
@@ -26,11 +26,13 @@ namespace RootForce
 		}
 
 		void ProcessEntity(ECS::Entity* p_entity);
+		void LockToWater(bool p_lock){ m_lockToWater = p_lock;}
 
 	private:
 		RootEngine::GameSharedContext* m_engineContext;
 		ECS::ComponentMapper<Camera> m_cameras;
 		ECS::ComponentMapper<Transform> m_transforms;
+		bool m_lockToWater;
 	};
 
 	struct LookAtBehavior : public ECS::Component<LookAtBehavior>

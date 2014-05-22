@@ -17,7 +17,6 @@
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
@@ -47,9 +46,13 @@ public:
     QAction *actionPlay;
     QAction *actionLog;
     QAction *action_removeEntity;
-    QAction *action_renderable;
-    QAction *actionOpen_Project;
+    QAction *action_addRenderable;
+    QAction *action_addPhysics;
     QAction *actionNew;
+    QAction *actionOpen_Project;
+    QAction *action_addWaterCollider;
+    QAction *action_addScript;
+    QAction *action_collisionResponder;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     Canvas3D *widget_canvas3D;
@@ -69,8 +72,11 @@ public:
     QStatusBar *statusBar;
     QDockWidget *dockWidget_4;
     QWidget *dockWidgetContents_4;
-    QHBoxLayout *horizontalLayout_3;
+    QVBoxLayout *verticalLayout_3;
     EntityOutliner *treeView_entityOutliner;
+    QWidget *widget;
+    QPushButton *pushButton_addEntity;
+    QPushButton *pushButton_removeEntity;
     QDockWidget *dockWidget_6;
     QWidget *dockWidgetContents_6;
     QVBoxLayout *verticalLayout;
@@ -78,13 +84,19 @@ public:
     QFormLayout *formLayout;
     QLineEdit *lineEdit_entityName;
     QLabel *label;
+    QDockWidget *dockWidget_assetManager;
+    QWidget *dockWidgetContents;
+    QVBoxLayout *verticalLayout_5;
+    QVBoxLayout *verticalLayout_assetManager;
 
     void setupUi(QMainWindow *TreenityClass)
     {
         if (TreenityClass->objectName().isEmpty())
             TreenityClass->setObjectName(QStringLiteral("TreenityClass"));
-        TreenityClass->resize(1292, 902);
+        TreenityClass->resize(1292, 878);
         TreenityClass->setStyleSheet(QStringLiteral(""));
+        TreenityClass->setTabShape(QTabWidget::Rounded);
+        TreenityClass->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
         action_addEntity = new QAction(TreenityClass);
         action_addEntity->setObjectName(QStringLiteral("action_addEntity"));
         actionExit = new QAction(TreenityClass);
@@ -120,12 +132,20 @@ public:
         actionLog->setObjectName(QStringLiteral("actionLog"));
         action_removeEntity = new QAction(TreenityClass);
         action_removeEntity->setObjectName(QStringLiteral("action_removeEntity"));
-        action_renderable = new QAction(TreenityClass);
-        action_renderable->setObjectName(QStringLiteral("action_renderable"));
-        actionOpen_Project = new QAction(TreenityClass);
-        actionOpen_Project->setObjectName(QStringLiteral("actionOpen_Project"));
+        action_addRenderable = new QAction(TreenityClass);
+        action_addRenderable->setObjectName(QStringLiteral("action_addRenderable"));
+        action_addPhysics = new QAction(TreenityClass);
+        action_addPhysics->setObjectName(QStringLiteral("action_addPhysics"));
         actionNew = new QAction(TreenityClass);
         actionNew->setObjectName(QStringLiteral("actionNew"));
+        actionOpen_Project = new QAction(TreenityClass);
+        actionOpen_Project->setObjectName(QStringLiteral("actionOpen_Project"));
+        action_addWaterCollider = new QAction(TreenityClass);
+        action_addWaterCollider->setObjectName(QStringLiteral("action_addWaterCollider"));
+        action_addScript = new QAction(TreenityClass);
+        action_addScript->setObjectName(QStringLiteral("action_addScript"));
+        action_collisionResponder = new QAction(TreenityClass);
+        action_collisionResponder->setObjectName(QStringLiteral("action_collisionResponder"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -140,7 +160,7 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(widget_canvas3D->sizePolicy().hasHeightForWidth());
         widget_canvas3D->setSizePolicy(sizePolicy);
-        widget_canvas3D->setStyleSheet(QStringLiteral(""));
+        widget_canvas3D->setStyleSheet(QStringLiteral("background-color: #000000;"));
 
         verticalLayout_2->addWidget(widget_canvas3D);
 
@@ -170,6 +190,7 @@ public:
         pushButton_scaleMode->setGeometry(QRect(64, 0, 32, 32));
         pushButton_scaleMode->setMinimumSize(QSize(32, 32));
         pushButton_scaleMode->setMaximumSize(QSize(32, 32));
+        pushButton_scaleMode->setStyleSheet(QStringLiteral(""));
         pushButton_scaleMode->setIcon(icon1);
         pushButton_scaleMode->setCheckable(true);
         pushButton_scaleMode->setAutoExclusive(true);
@@ -177,6 +198,7 @@ public:
         comboBox->setObjectName(QStringLiteral("comboBox"));
         comboBox->setGeometry(QRect(96, 0, 70, 32));
         comboBox->setMinimumSize(QSize(70, 32));
+        comboBox->setStyleSheet(QStringLiteral(""));
 
         verticalLayout_2->addWidget(treedeetoolbar);
 
@@ -209,38 +231,60 @@ public:
         dockWidget_4->setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
         dockWidgetContents_4 = new QWidget();
         dockWidgetContents_4->setObjectName(QStringLiteral("dockWidgetContents_4"));
-        horizontalLayout_3 = new QHBoxLayout(dockWidgetContents_4);
-        horizontalLayout_3->setSpacing(0);
-        horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_3 = new QVBoxLayout(dockWidgetContents_4);
+        verticalLayout_3->setSpacing(0);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         treeView_entityOutliner = new EntityOutliner(dockWidgetContents_4);
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-        __qtreewidgetitem->setText(0, QStringLiteral("Entities"));
+        __qtreewidgetitem->setText(0, QStringLiteral("1"));
         treeView_entityOutliner->setHeaderItem(__qtreewidgetitem);
         treeView_entityOutliner->setObjectName(QStringLiteral("treeView_entityOutliner"));
         sizePolicy.setHeightForWidth(treeView_entityOutliner->sizePolicy().hasHeightForWidth());
         treeView_entityOutliner->setSizePolicy(sizePolicy);
         treeView_entityOutliner->setMinimumSize(QSize(0, 0));
         treeView_entityOutliner->setMaximumSize(QSize(16777215, 16777215));
-        treeView_entityOutliner->setSelectionMode(QAbstractItemView::MultiSelection);
+        treeView_entityOutliner->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        treeView_entityOutliner->header()->setVisible(false);
 
-        horizontalLayout_3->addWidget(treeView_entityOutliner);
+        verticalLayout_3->addWidget(treeView_entityOutliner);
+
+        widget = new QWidget(dockWidgetContents_4);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setMinimumSize(QSize(64, 32));
+        widget->setMaximumSize(QSize(16777215, 32));
+        pushButton_addEntity = new QPushButton(widget);
+        pushButton_addEntity->setObjectName(QStringLiteral("pushButton_addEntity"));
+        pushButton_addEntity->setGeometry(QRect(0, 0, 32, 32));
+        pushButton_addEntity->setMinimumSize(QSize(32, 32));
+        pushButton_addEntity->setMaximumSize(QSize(32, 32));
+        pushButton_removeEntity = new QPushButton(widget);
+        pushButton_removeEntity->setObjectName(QStringLiteral("pushButton_removeEntity"));
+        pushButton_removeEntity->setGeometry(QRect(32, 0, 32, 32));
+        pushButton_removeEntity->setMinimumSize(QSize(32, 32));
+        pushButton_removeEntity->setMaximumSize(QSize(32, 32));
+
+        verticalLayout_3->addWidget(widget);
 
         dockWidget_4->setWidget(dockWidgetContents_4);
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockWidget_4);
         dockWidget_6 = new QDockWidget(TreenityClass);
         dockWidget_6->setObjectName(QStringLiteral("dockWidget_6"));
+        dockWidget_6->setAcceptDrops(true);
         dockWidget_6->setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
         dockWidgetContents_6 = new QWidget();
         dockWidgetContents_6->setObjectName(QStringLiteral("dockWidgetContents_6"));
+        dockWidgetContents_6->setAcceptDrops(true);
         verticalLayout = new QVBoxLayout(dockWidgetContents_6);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
         groupBox = new QGroupBox(dockWidgetContents_6);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setMaximumSize(QSize(16777215, 120));
+        groupBox->setAcceptDrops(true);
         groupBox->setFlat(false);
         groupBox->setCheckable(false);
         formLayout = new QFormLayout(groupBox);
@@ -262,6 +306,24 @@ public:
 
         dockWidget_6->setWidget(dockWidgetContents_6);
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_6);
+        dockWidget_assetManager = new QDockWidget(TreenityClass);
+        dockWidget_assetManager->setObjectName(QStringLiteral("dockWidget_assetManager"));
+        dockWidget_assetManager->setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+        dockWidgetContents = new QWidget();
+        dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
+        verticalLayout_5 = new QVBoxLayout(dockWidgetContents);
+        verticalLayout_5->setSpacing(0);
+        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        verticalLayout_5->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_assetManager = new QVBoxLayout();
+        verticalLayout_assetManager->setSpacing(0);
+        verticalLayout_assetManager->setObjectName(QStringLiteral("verticalLayout_assetManager"));
+
+        verticalLayout_5->addLayout(verticalLayout_assetManager);
+
+        dockWidget_assetManager->setWidget(dockWidgetContents);
+        TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget_assetManager);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
@@ -276,7 +338,11 @@ public:
         menuEntity->addAction(action_addEntity);
         menuEntity->addAction(action_removeEntity);
         menuComponent->addAction(menu_addComponent->menuAction());
-        menu_addComponent->addAction(action_renderable);
+        menu_addComponent->addAction(action_addRenderable);
+        menu_addComponent->addAction(action_addPhysics);
+        menu_addComponent->addAction(action_addWaterCollider);
+        menu_addComponent->addAction(action_addScript);
+        menu_addComponent->addAction(action_collisionResponder);
         menuView->addAction(actionLog);
         mainToolBar->addAction(actionPlay);
 
@@ -311,9 +377,19 @@ public:
 #endif // QT_NO_TOOLTIP
         actionLog->setText(QApplication::translate("TreenityClass", "Log", 0));
         action_removeEntity->setText(QApplication::translate("TreenityClass", "Remove entity", 0));
-        action_renderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
-        actionOpen_Project->setText(QApplication::translate("TreenityClass", "Open Project ...", 0));
+        action_addRenderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
+#ifndef QT_NO_TOOLTIP
+        action_addRenderable->setToolTip(QApplication::translate("TreenityClass", "Add a Renderable component to the selected entity.", 0));
+#endif // QT_NO_TOOLTIP
+        action_addPhysics->setText(QApplication::translate("TreenityClass", "Physics", 0));
+#ifndef QT_NO_TOOLTIP
+        action_addPhysics->setToolTip(QApplication::translate("TreenityClass", "Add mass and velocity to the selected entity.", 0));
+#endif // QT_NO_TOOLTIP
         actionNew->setText(QApplication::translate("TreenityClass", "New", 0));
+        actionOpen_Project->setText(QApplication::translate("TreenityClass", "Open Project...", 0));
+        action_addWaterCollider->setText(QApplication::translate("TreenityClass", "Water Collider", 0));
+        action_addScript->setText(QApplication::translate("TreenityClass", "Script", 0));
+        action_collisionResponder->setText(QApplication::translate("TreenityClass", "Collision responder", 0));
         pushButton_translateMode->setText(QString());
         pushButton_rotateMode->setText(QString());
         pushButton_scaleMode->setText(QString());
@@ -328,10 +404,14 @@ public:
         menuComponent->setTitle(QApplication::translate("TreenityClass", "Component", 0));
         menu_addComponent->setTitle(QApplication::translate("TreenityClass", "Add component", 0));
         menuView->setTitle(QApplication::translate("TreenityClass", "View", 0));
+        mainToolBar->setWindowTitle(QApplication::translate("TreenityClass", "Play toolbar", 0));
         dockWidget_4->setWindowTitle(QApplication::translate("TreenityClass", "Outline", 0));
+        pushButton_addEntity->setText(QApplication::translate("TreenityClass", "+", 0));
+        pushButton_removeEntity->setText(QApplication::translate("TreenityClass", "-", 0));
         dockWidget_6->setWindowTitle(QApplication::translate("TreenityClass", "Properties", 0));
         groupBox->setTitle(QApplication::translate("TreenityClass", "General", 0));
         label->setText(QApplication::translate("TreenityClass", "Name", 0));
+        dockWidget_assetManager->setWindowTitle(QApplication::translate("TreenityClass", "Asset browser", 0));
     } // retranslateUi
 
 };

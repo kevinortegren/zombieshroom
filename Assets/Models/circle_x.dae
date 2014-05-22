@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.70.0 commit date:2014-04-10, commit time:11:49, hash:f93bc76</authoring_tool>
+    </contributor>
+    <created>2014-05-13T10:35:57</created>
+    <modified>2014-05-13T10:35:57</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images/>
+  <library_geometries>
+    <geometry id="Circle_002-mesh" name="Circle.002">
+      <mesh>
+        <source id="Circle_002-mesh-positions">
+          <float_array id="Circle_002-mesh-positions-array" count="192">5.95581e-7 1 5.95581e-7 5.88596e-7 0.9951847 0.09801769 5.81145e-7 0.9807853 0.1950909 5.66244e-7 0.9569404 0.2902852 5.66244e-7 0.9238795 0.3826841 5.66244e-7 0.8819212 0.4713973 5.36442e-7 0.8314696 0.5555709 5.36442e-7 0.7730105 0.6343939 5.36442e-7 0.7071068 0.7071074 5.36442e-7 0.6343933 0.773011 5.36442e-7 0.5555703 0.8314702 5.36442e-7 0.4713968 0.8819218 5.36442e-7 0.3826834 0.9238801 5.36442e-7 0.2902846 0.956941 5.36442e-7 0.1950902 0.9807859 5.36442e-7 0.09801697 0.9951853 4.76837e-7 -1.62921e-7 1.000001 5.36442e-7 -0.09801733 0.9951853 5.36442e-7 -0.1950905 0.9807859 5.36442e-7 -0.2902849 0.9569408 5.36442e-7 -0.3826837 0.92388 5.36442e-7 -0.4713971 0.8819217 5.36442e-7 -0.5555706 0.83147 5.36442e-7 -0.6343936 0.7730108 5.36442e-7 -0.7071071 0.707107 5.36442e-7 -0.7730108 0.6343935 5.36442e-7 -0.83147 0.5555704 5.66244e-7 -0.8819215 0.4713968 5.66244e-7 -0.9238798 0.3826834 5.66244e-7 -0.9569405 0.2902846 5.81145e-7 -0.9807854 0.1950902 5.88596e-7 -0.9951848 0.09801697 5.95581e-7 -1 -2.07098e-7 6.03497e-7 -0.9951847 -0.09801733 6.10948e-7 -0.9807851 -0.1950905 6.25849e-7 -0.9569401 -0.2902849 6.25849e-7 -0.9238792 -0.3826837 6.25849e-7 -0.8819208 -0.471397 6.55651e-7 -0.8314691 -0.5555705 6.55651e-7 -0.7730098 -0.6343935 6.55651e-7 -0.707106 -0.707107 6.55651e-7 -0.6343926 -0.7730104 6.55651e-7 -0.5555697 -0.8314694 6.55651e-7 -0.4713963 -0.8819209 6.55651e-7 -0.3826831 -0.9238791 6.55651e-7 -0.2902845 -0.9569398 6.55651e-7 -0.1950904 -0.9807847 6.55651e-7 -0.09801739 -0.9951841 6.55651e-7 -4.64912e-7 -0.9999994 6.55651e-7 0.09801644 -0.9951842 6.55651e-7 0.1950895 -0.9807848 6.55651e-7 0.2902836 -0.9569401 6.55651e-7 0.3826823 -0.9238795 6.55651e-7 0.4713954 -0.8819214 6.55651e-7 0.5555689 -0.83147 6.55651e-7 0.6343919 -0.773011 6.55651e-7 0.7071053 -0.7071077 6.55651e-7 0.773009 -0.6343944 6.55651e-7 0.8314682 -0.5555717 6.25849e-7 0.88192 -0.4713985 6.25849e-7 0.9238784 -0.3826854 6.25849e-7 0.9569395 -0.290287 6.10948e-7 0.9807847 -0.1950929 6.03497e-7 0.9951844 -0.09801995</float_array>
+          <technique_common>
+            <accessor source="#Circle_002-mesh-positions-array" count="64" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Circle_002-mesh-normals">
+          <float_array id="Circle_002-mesh-normals-array" count="0"/>
+          <technique_common>
+            <accessor source="#Circle_002-mesh-normals-array" count="0" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Circle_002-mesh-vertices">
+          <input semantic="POSITION" source="#Circle_002-mesh-positions"/>
+        </vertices>
+        <lines count="64">
+          <input semantic="VERTEX" source="#Circle_002-mesh-vertices" offset="0"/>
+          <p>0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 21 21 22 22 23 23 24 24 25 25 26 26 27 27 28 28 29 29 30 30 31 31 32 32 33 33 34 34 35 35 36 36 37 37 38 38 39 39 40 40 41 41 42 42 43 43 44 44 45 45 46 46 47 47 48 48 49 49 50 50 51 51 52 52 53 53 54 54 55 55 56 56 57 57 58 58 59 59 60 60 61 61 62 62 63 63 0</p>
+        </lines>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_controllers/>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="Circle_x" name="Circle_x" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+        <instance_geometry url="#Circle_002-mesh"/>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

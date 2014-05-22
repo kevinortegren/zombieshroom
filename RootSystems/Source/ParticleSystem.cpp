@@ -23,8 +23,6 @@ namespace RootForce
 	void ParticleSystem::Begin()
 	{
 		g_engineContext.m_renderer->BeginTransform(m_world->GetDelta());
-		
-		m_waterHeight = m_world->GetStorage()->GetValueAsFloat("Water");
 	}
 
 	void ParticleSystem::ProcessEntity(ECS::Entity* p_entity)
@@ -52,9 +50,12 @@ namespace RootForce
 
 			// Simple sort of particle based on water height.
 			unsigned pass = 0;
-			if(m_world->GetStorage()->DoesKeyExist("Water"))
+			ECS::Entity* waterEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+			if(waterEnt)
 			{
-				if(trans->m_position.y > m_waterHeight)
+				RootForce::Transform* waterTrans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(waterEnt);
+
+				if(trans->m_position.y > waterTrans->m_position.y)
 					pass = RenderPass::RENDERPASS_PARTICLES1;
 				else
 					pass = RenderPass::RENDERPASS_PARTICLES0;
