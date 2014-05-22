@@ -44,7 +44,8 @@ bool TranslationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	{
 		//Set selected axis when clicked
 		m_selectedAxis = m_hoverAxis;
-		return true;
+		if(m_selectedAxis != TranslationAxis::AXIS_NONE)
+			return true;
 	}
 	else if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN && m_selectedAxis != TranslationAxis::AXIS_NONE )
 	{

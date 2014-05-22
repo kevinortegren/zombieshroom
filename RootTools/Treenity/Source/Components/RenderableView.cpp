@@ -141,7 +141,6 @@ void RenderableView::ShaderChanged(int index)
 
 	if((size_t)index < m_shaderViews.size())
 	{
-		m_shaderViews[index]->show();
 		m_shaderViews[index]->SetMaterialName(ui.lineEdit_materialName->text());
 		m_shaderViews[index]->SetMaterial(m_currentMaterial);
 		m_shaderViews[index]->Display();

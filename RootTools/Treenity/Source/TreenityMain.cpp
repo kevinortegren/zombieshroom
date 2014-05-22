@@ -564,23 +564,20 @@ void TreenityMain::UpdateTools()
 		// Construct ray.
 		glm::vec3 ray = ConstructRay();
 
-		if(selectedTool != nullptr)
-		{
-			// Returns true when being used by picking, hovering, dragging etc.
-			bool inUse = m_treenityEditor.m_toolManager.GetSelectedTool()->Pick(cameraPos, ray);
+		// Returns true when being used by picking, hovering, dragging etc.
+		bool inUse = m_treenityEditor.m_toolManager.GetSelectedTool()->Pick(cameraPos, ray);
 		
-			if(inUse)
+		if(inUse)
+		{
+			if(selectedTool->GetSelectedEntity() != nullptr) 
 			{
-				if(selectedTool->GetSelectedEntity() != nullptr) 
-				{
-					m_treenityEditor.DisplayEntity(selectedTool->GetSelectedEntity());
-				}
-			}
-			else
-			{
-				SelectPick(cameraPos, ray);
+				m_treenityEditor.DisplayEntity(selectedTool->GetSelectedEntity());
 			}
 		}
+		else
+		{
+			SelectPick(cameraPos, ray);
+		}	
 	}	
 }
 
@@ -712,8 +709,7 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 		{
 			m_treenityEditor.Select(nullptr);
 
-			if(m_treenityEditor.m_toolManager.GetSelectedTool() != nullptr)
-				m_treenityEditor.m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+			m_treenityEditor.m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 		}
 	}
 	
