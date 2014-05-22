@@ -1,6 +1,5 @@
 #version 410 core                                                                               
-                                                                                                
-layout (vertices = 3) in;                                                
+                                                                                                                                          
 layout (vertices = 3) out;   
 
 uniform sampler2D g_Density;

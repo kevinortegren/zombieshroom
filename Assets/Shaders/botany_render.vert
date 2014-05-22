@@ -9,6 +9,7 @@ layout(std140) uniform PerTech
     vec3 g_PlayerPosition;
     float g_Lod1Distance;
     float g_Lod2Distance;
+	float g_GrassAmbient;
 };
 
 out vec3 gs_normal_in;
