@@ -4,7 +4,7 @@
 AbstractShaderView::AbstractShaderView(QWidget* p_parent)
 	: QWidget(p_parent)
 {
-	setVisible(false);
+
 }
 
 void AbstractShaderView::SetMaterialName(const QString& p_name)

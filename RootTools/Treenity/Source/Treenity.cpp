@@ -420,10 +420,7 @@ void Treenity::UpdateOnSelection()
 
 	if (m_selectedEntities.size() == 0)
 	{
-		if(m_toolManager.GetSelectedTool() != nullptr)
-		{
-			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
-		}
+		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 
 		// Disable name entry.
 		ui.lineEdit_entityName->setText("");
@@ -432,19 +429,14 @@ void Treenity::UpdateOnSelection()
 		// Clear component list.
 		m_compView->RemoveItems();
 
-		// Update rotation tool selection.
-		if(m_toolManager.GetSelectedTool() != nullptr)
-			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 
 	}
 	else if (m_selectedEntities.size() == 1)
 	{
 		ECS::Entity* selectedEntity = *m_selectedEntities.begin();
 
-		if(m_toolManager.GetSelectedTool() != nullptr)
-		{
-			m_toolManager.GetSelectedTool()->SetSelectedEntity(selectedEntity);
-		}
+		m_toolManager.GetSelectedTool()->SetSelectedEntity(selectedEntity);	
 
 		// Enable and print name.
 		QString name = m_projectManager->GetEntityName(selectedEntity);
@@ -470,10 +462,8 @@ void Treenity::UpdateOnSelection()
 	}
 	else if (m_selectedEntities.size() > 1)
 	{
-		if(m_toolManager.GetSelectedTool() != nullptr)
-		{
-			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
-		}
+
+		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 
 		// Enable name, allow all names to be changed.
 		ui.lineEdit_entityName->setText("");
@@ -483,8 +473,7 @@ void Treenity::UpdateOnSelection()
 		m_compView->RemoveItems();
 
 		// Update rotation tool selection.
-		if(m_toolManager.GetSelectedTool() != nullptr)
-			m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
+		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 	}
 
 	// For all selected entities that has a collision component, visualize their shape.

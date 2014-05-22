@@ -14,6 +14,7 @@ public:
 	void SetEngineInterface(EngineInterface* p_engineInterface);
 	void SetName(const QString& p_textureName);
 	void SetTexture(Render::TextureInterface* p_texture);
+	void Clear();
 
 private:
 	QPixmap GetPixmap(Render::TextureInterface* p_texture);

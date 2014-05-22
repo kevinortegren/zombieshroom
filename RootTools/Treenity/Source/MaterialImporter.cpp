@@ -14,6 +14,10 @@ MaterialImporter::MaterialImporter()
 Render::Material* MaterialImporter::Import(const std::string& p_filepath)
 {
 	std::ifstream file(p_filepath, std::ifstream::in);
+	if(!file.is_open())
+	{
+		return nullptr;
+	}
 
 	YAML::Parser parser(file);
 

@@ -17,4 +17,6 @@ class DiffuseShaderView : public AbstractShaderView
 
 	private slots:
 		void DiffuseTextureChanged(Render::TextureInterface* p_texture);
+		void SpecularTextureChanged(Render::TextureInterface* p_texture);
+		void GlowTextureChanged(Render::TextureInterface* p_texture);
 };
