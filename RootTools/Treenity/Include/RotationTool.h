@@ -34,7 +34,7 @@ private:
 	bool RayVsPlane(const glm::vec3& center, const glm::vec3& normal, const glm::vec3& cameraPos, const glm::vec3& ray, float& t);
 
 	static const float s_pickMargin;
-	static const glm::vec4 s_hightlightColor;
+	static const glm::vec4 s_highlightColor;
 
 	Render::Material* m_axisMaterial;
 	ECS::Entity* m_axisEntities[3];

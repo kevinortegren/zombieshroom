@@ -35,19 +35,29 @@ bool TranslationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	if(m_selectedEntity == nullptr)
 		return false;
 
+	RootForce::Transform* selectedTrans =  m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
+
 	RootEngine::InputManager::KeyState::KeyState leftMouseButtonState = g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT);
+	RootEngine::InputManager::KeyState::KeyState rightMouseButtonState = g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::RIGHT);
 
 	if(m_selectedAxis == TranslationAxis::AXIS_NONE)
 		m_hoverAxis = RayVsAxis(p_cameraPos, p_ray);
 	
 	if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN_EDGE)
 	{
+		m_position_t0 = selectedTrans->m_position;
 		//Set selected axis when clicked
 		m_selectedAxis = m_hoverAxis;
 		return true;
 	}
 	else if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN && m_selectedAxis != TranslationAxis::AXIS_NONE )
 	{
+		if(rightMouseButtonState == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			m_selectedAxis = TranslationAxis::AXIS_NONE;
+			selectedTrans->m_position = m_position_t0;
+			return true;
+		}
 		//If mouse is pressed and there is a selection -> drag away
 		Drag(p_ray, p_cameraPos);
 		return true;

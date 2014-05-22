@@ -34,6 +34,8 @@ private:
 	TranslationAxis::TranslationAxis m_selectedAxis;
 	TranslationAxis::TranslationAxis m_hoverAxis;
 
+	glm::vec3 m_position_t0;
+
 	float m_axisLength;
 	float m_dragOffset;
 	bool m_firstDrag;

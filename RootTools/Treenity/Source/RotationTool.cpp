@@ -8,7 +8,7 @@
 extern RootEngine::GameSharedContext g_engineContext;
 
 const float RotationTool::s_pickMargin = 0.25f; // Acceptable margin when picking axis.
-const glm::vec4 RotationTool::s_hightlightColor = glm::vec4(1,1,0,1); // Yellow highlight color.
+const glm::vec4 RotationTool::s_highlightColor = glm::vec4(1,1,0,1); // Yellow highlight color.
 
 RotationTool::RotationTool()
 	: Tool(), m_selectedAxis(RotationAxis::AXIS_NONE), m_angle0(0.0f)
@@ -134,8 +134,8 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	m_axisColors[RotationAxis::AXIS_Z] = glm::vec4(0,0,1,1);
 
 	// Get orientation of gimbal.
-	m_gimbalOrientation = gimbalTransform->m_orientation;
-	m_entityOrientation = selectedTransform->m_orientation;
+	//m_gimbalOrientation = gimbalTransform->m_orientation;
+	//m_entityOrientation = selectedTransform->m_orientation;
 
 	glm::vec3 normalX = m_gimbalOrientation.GetRight();
 	glm::vec3 normalY = m_gimbalOrientation.GetUp();
@@ -176,6 +176,7 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	using namespace RootEngine::InputManager::KeyState;
 
 	KeyState leftMouseButtonState = g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT);
+	KeyState rightMouseButtonState = g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::RIGHT);
 
 	if(m_selectedAxis == RotationAxis::AXIS_NONE)
 	{
@@ -210,12 +211,18 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 		if(axis != RotationAxis::AXIS_NONE)
 		{
 			// Highlight hovered axis.
-			m_axisColors[axis] = s_hightlightColor;
+			m_axisColors[axis] = s_highlightColor;
 		}
 	}
 
 	if(leftMouseButtonState == KeyState::DOWN_EDGE && axis != RotationAxis::AXIS_NONE)
 	{
+		RootForce::Transform* gimbalTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
+		m_gimbalOrientation = gimbalTransform->m_orientation;
+
+		RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
+		m_entityOrientation = selectedTransform->m_orientation;
+
 		if(cameraToHitX <= cameraToGimbal)
 		{
 			if(distx < (1.0f + s_pickMargin) && distx > (1.0f - s_pickMargin))
@@ -246,6 +253,7 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 
 		// Set selected axis to hovered axis and store the current rotation of gimbal.
 		m_angle0 = GetAngleFromAxis(axis, hits[axis] - gimbalTransform->m_position);
+		std::cout << "m_angle0: " << m_angle0 << "\n";
 		m_selectedAxis = axis;
 		return true;
 	}
@@ -253,16 +261,27 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	{
 		// Reset.
 		m_angle0 = 0.0f;
+		std::cout << "m_angle0: " << m_angle0 << " RESET\n";
 		m_selectedAxis = RotationAxis::AXIS_NONE;
 		return true;
 	}
 	else if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN && m_selectedAxis != RotationAxis::AXIS_NONE)
 	{
-		m_axisColors[m_selectedAxis] = s_hightlightColor;
+		m_axisColors[m_selectedAxis] = s_highlightColor;
 
 		g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, hits[m_selectedAxis], glm::vec4(1,1,0,1));
 
 		float angle = GetAngleFromAxis(m_selectedAxis, hits[m_selectedAxis] - gimbalTransform->m_position);
+
+		if(rightMouseButtonState == RootEngine::InputManager::KeyState::DOWN_EDGE)
+		{
+			selectedTransform->m_orientation = m_entityOrientation;
+			for(int i = 0; i < 3; i++)
+			{
+				m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
+				m_selectedAxis = RotationAxis::AXIS_NONE;
+			}
+		}
 
 		switch(m_selectedAxis)
 		{
@@ -272,10 +291,9 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 					{
 						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
 						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Pitch(glm::degrees(m_angle0 - angle));
-
-						selectedTransform->m_orientation = m_entityOrientation;
-						selectedTransform->m_orientation.Pitch(glm::degrees(m_angle0 - angle));
 					}
+					selectedTransform->m_orientation = m_entityOrientation;
+					selectedTransform->m_orientation.Pitch(glm::degrees(m_angle0 - angle));
 
 					std::cout << "X plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(m_angle0) << std::endl << std::endl;
 				}
@@ -287,9 +305,10 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
 						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Yaw(glm::degrees(m_angle0 - angle));
 
-						selectedTransform->m_orientation = m_entityOrientation;
-						selectedTransform->m_orientation.Yaw(glm::degrees(m_angle0 - angle));
+
 					}
+					selectedTransform->m_orientation = m_entityOrientation;
+					selectedTransform->m_orientation.Yaw(glm::degrees(m_angle0 - angle));
 
 					std::cout << "Y plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(m_angle0) << std::endl << std::endl;
 				}
@@ -301,9 +320,9 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
 						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Roll(-glm::degrees(m_angle0 - angle));
 
-						selectedTransform->m_orientation = m_entityOrientation;
-						selectedTransform->m_orientation.Roll(-glm::degrees(m_angle0 - angle));
 					}
+					selectedTransform->m_orientation = m_entityOrientation;
+					selectedTransform->m_orientation.Roll(-glm::degrees(m_angle0 - angle));
 
 					std::cout << "Z plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(m_angle0) << std::endl << std::endl;
 				}
@@ -342,6 +361,12 @@ void RotationTool::Show()
 	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
 	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
 	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+
+	RootForce::Transform* gimbalTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
+	m_gimbalOrientation = gimbalTransform->m_orientation;
+
+	RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
+	m_entityOrientation = selectedTransform->m_orientation;
 
 	Tool::Show();
 }
