@@ -353,6 +353,7 @@ void Treenity::RenameEntity(ECS::Entity* p_entity, const QString& p_name)
 void Treenity::CreateEntity()
 {
 	ECS::Entity* e = m_engineInterface->CreateEntity();
+	Select(e);
 }
 
 void Treenity::DestroyEntity()
@@ -510,6 +511,16 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 	{
 		if(m_selectedEntities.size() > 0)
 		m_engineInterface->TargetEntity(*m_selectedEntities.begin());
+	}
+	if(event->key() == Qt::Key_Delete)
+	{
+		if(m_selectedEntities.size() > 0)
+		{
+			for(auto e : m_selectedEntities)
+			{
+				m_engineInterface->DeleteEntity(e);
+			}
+		}
 	}
 	if (event->key() == Qt::Key_Escape)
 	{
