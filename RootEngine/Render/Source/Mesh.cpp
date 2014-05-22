@@ -111,18 +111,18 @@ namespace Render
 			if(m_wireFrame)
 			{
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				glDrawElements(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
+				glDrawElements(m_primitive, m_elementBuffer->GetNumElements(), GL_UNSIGNED_INT, 0);
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 			else if(m_noCulling)
 			{
 				glDisable(GL_CULL_FACE);
-				glDrawElements(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
+				glDrawElements(m_primitive, m_elementBuffer->GetNumElements(), GL_UNSIGNED_INT, 0);
 				glEnable(GL_CULL_FACE);
 			}
 			else
 			{
-				glDrawElements(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0);
+				glDrawElements(m_primitive, m_elementBuffer->GetNumElements(), GL_UNSIGNED_INT, 0);
 			}
 		}
 		else if(m_transformFeedback != 0)
@@ -147,13 +147,13 @@ namespace Render
 		}
 		else
 		{
-			glDrawArrays(m_primitive, 0, m_vertexBuffer->GetBufferSize());
+			glDrawArrays(m_primitive, 0, m_elementBuffer->GetNumElements());
 		}
 	}
 
 	void Mesh::DrawInstanced(GLsizei p_instances)
 	{
-		glDrawElementsInstanced(m_primitive, m_elementBuffer->GetBufferSize(), GL_UNSIGNED_INT, 0, p_instances);
+		glDrawElementsInstanced(m_primitive, m_elementBuffer->GetNumElements(), GL_UNSIGNED_INT, 0, p_instances);
 	}
 
 	GLenum Mesh::GetPrimitiveType()
