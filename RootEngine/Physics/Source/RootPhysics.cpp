@@ -1653,6 +1653,15 @@ namespace Physics
 			return m_userPointer.at(p_objectHandle)->m_collideWithWorld;
 	}
 
+	bool RootPhysics::IsVisualizeEnabled(int p_objectHandle)
+	{
+		if(!DoesObjectExist(p_objectHandle))
+			return false;
+		
+		int flags = m_dynamicObjects[m_userPointer.at(p_objectHandle)->m_vectorIndex]->getCollisionFlags();
+		return (flags & btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT) == 0;
+	}
+
 
 }
 }

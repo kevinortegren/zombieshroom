@@ -81,6 +81,7 @@ public:
 	float GetShapeRadius(ECS::Entity* p_entity);
 	float GetShapeHeight(ECS::Entity* p_entity);
 	std::string GetPhysicsMesh(ECS::Entity* p_entity);
+	bool GetCollisionVisualized(ECS::Entity* p_entity);
 	void SetPhysicsType(ECS::Entity* p_entity, bool p_dynamic);
 	void SetCollideWithWorld(ECS::Entity* p_entity, bool p_collide);
 	void SetCollideWithStatic(ECS::Entity* p_entity, bool p_collide);
