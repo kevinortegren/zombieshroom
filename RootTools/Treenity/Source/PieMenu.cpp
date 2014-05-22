@@ -13,8 +13,15 @@ PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent)
 {
 	setParent((QObject*)m_parent);
 
+	QPointF thereVec = angleToVector(2 * M_PI * m_startAngle / 360.0);
+	QPointF backVec = angleToVector(2 * M_PI * ((int)m_startAngle + 45) / 360.0);
+	QRectF smallRect(-m_radius / 2, -m_radius / 2, m_radius, m_radius);
+
 	m_shapePath.moveTo(QPointF(0, 0));
+	m_shapePath.moveTo(thereVec * m_radius * 0.5);
 	m_shapePath.arcTo(boundingRect(), m_startAngle, 360 / 8);
+	m_shapePath.lineTo(backVec * m_radius * 0.5);
+	m_shapePath.arcTo(smallRect, m_startAngle + 45, -360 / 8);
 	m_shapePath.closeSubpath();
 
 	m_pixmap = QPixmap("Resources/resizeButton.png");
@@ -133,16 +140,21 @@ void PiePiece::setHovered( bool state )
 
 PieMenu::PieMenu(QWidget* parent)
 	: QWidget(parent)
-	, m_radius(100)
+	, m_radius(150)
 {
+	setAttribute(Qt::WA_TranslucentBackground);
+	setWindowFlags(Qt::FramelessWindowHint);
+	setStyleSheet("background: transparent; background-color: none");
+
 	m_scene = new QGraphicsScene(this);
 	m_view = new QGraphicsView(m_scene, this);
-	m_view->setStyleSheet("border: none;");
+	m_view->setStyleSheet("background: transparent");
 	m_view->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_view->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
 	m_view->setAttribute(Qt::WA_AlwaysShowToolTips);
+	m_view->setAttribute(Qt::WA_TranslucentBackground);
 	m_view->hide();
 
 	for (int i = 0; i < 8; ++i)
@@ -153,8 +165,9 @@ PieMenu::PieMenu(QWidget* parent)
 		m_scene->addItem(piece);
 	}
 
-	m_background = new QGraphicsPixmapItem();
-	m_scene->addItem(m_background);
+	//m_background = new QGraphicsPixmapItem();
+	//m_scene->addItem(m_background);
+	
 }
 
 PieMenu::~PieMenu()
@@ -172,13 +185,15 @@ void PieMenu::showMenu()
 {
 	QScreen* screen = QGuiApplication::primaryScreen();
 	m_center = QCursor::pos();
-
+	
 	int bgRadius = m_radius + 20;
+
 	QPixmap bg(screen->grabWindow(qApp->desktop()->winId(), m_center.x() - bgRadius, m_center.y() - bgRadius, bgRadius * 2, bgRadius * 2));
 
-	m_background->setPixmap(bg);
-	m_background->setPos(-bg.width() / 2, -bg.height() / 2);
-	m_background->setZValue(-1);
+	//m_background->setPixmap(bg);
+	//m_background->setPos(-bg.width() / 2, -bg.height() / 2);
+	//m_background->setZValue(-1);
+	
 
 	QRect bgRect(-bgRadius, -bgRadius, bgRadius * 2, bgRadius * 2);
 	m_view->setSceneRect(bgRect);
@@ -216,7 +231,10 @@ void PieMenu::mouseMoveEvent( QMouseEvent * event )
 	QPointF vec = QCursor::pos() - m_center;
 	qreal ang = qAtan2(-vec.y(), vec.x());
 
-	setHovered(angleToIndex(ang), true);
+	if (QPointF::dotProduct(vec, vec) > m_radius * m_radius * 0.5 * 0.5)
+		setHovered(angleToIndex(ang), true);
+	else
+		setHovered(angleToIndex(ang), false);
 
 	QWidget::mouseMoveEvent(event);
 }
@@ -263,4 +281,13 @@ void PieMenu::setHovered( int index, bool state )
 	m_pieces[m_hoveredIndex]->setHovered(state);
 	if (!state)
 		m_hoveredIndex = -1;
+}
+
+QPointF angleToVector( qreal radians )
+{
+	QPointF vec;
+	vec.setX(qCos(radians));
+	vec.setY(-qSin(radians));
+
+	return vec;
 }

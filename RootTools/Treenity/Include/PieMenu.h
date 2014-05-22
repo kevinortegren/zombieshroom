@@ -64,3 +64,5 @@ private:
 	QGraphicsView* m_view;
 	QGraphicsPixmapItem* m_background;
 };
+
+QPointF angleToVector(qreal radians);
