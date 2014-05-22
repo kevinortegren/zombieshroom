@@ -300,6 +300,7 @@ void Treenity::Play()
 {
 	Utils::Write("Starting game session");
 
+	ClearSelection();
 	m_engineInterface->EnterPlayMode();
 }
 

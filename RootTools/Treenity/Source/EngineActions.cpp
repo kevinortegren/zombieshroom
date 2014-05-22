@@ -510,7 +510,7 @@ void EngineActions::AddPhysics( ECS::Entity* p_entity, bool p_dynamic )
 {
 	RootForce::Transform* trans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(p_entity);
 	RootForce::Collision* collision = m_world->GetEntityManager()->CreateComponent<RootForce::Collision>(p_entity);
-	ReconstructPhysicsObject(p_entity, p_dynamic, true, true, 1.0f, RootEngine::Physics::PhysicsShape::SHAPE_SPHERE, 1.0f, 0.0f, "");
+	ReconstructPhysicsObject(p_entity, p_dynamic, true, true, 1.0f, RootEngine::Physics::PhysicsShape::SHAPE_SPHERE, 1.0f, 0.0f, "", false);
 }
 
 void EngineActions::RemovePhysics( ECS::Entity* p_entity )
@@ -575,19 +575,25 @@ std::string EngineActions::GetPhysicsMesh(ECS::Entity* p_entity)
 	return g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
 }
 
+bool EngineActions::GetCollisionVisualized(ECS::Entity* p_entity)
+{
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	return g_engineContext.m_physics->IsVisualizeEnabled(*collision->m_handle);
+}
+
 void EngineActions::SetPhysicsType(ECS::Entity* p_entity, bool p_dynamic)
 {
-	ReconstructPhysicsObject(p_entity, p_dynamic, GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
+	ReconstructPhysicsObject(p_entity, p_dynamic, GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), GetCollisionVisualized(p_entity));
 }
 
 void EngineActions::SetCollideWithWorld(ECS::Entity* p_entity, bool p_collide)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), p_collide, GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), p_collide, GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), GetCollisionVisualized(p_entity));
 }
 
 void EngineActions::SetCollideWithStatic(ECS::Entity* p_entity, bool p_collide)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), p_collide, GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), p_collide, GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), GetCollisionVisualized(p_entity));
 }
 
 void EngineActions::SetGravity(ECS::Entity* p_entity, const glm::vec3& p_gravity)
@@ -614,22 +620,22 @@ void EngineActions::SetMass( ECS::Entity* p_entity, float p_mass)
 
 void EngineActions::SetPhysicsShape(ECS::Entity* p_entity, RootEngine::Physics::PhysicsShape::PhysicsShape p_shape)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), p_shape, GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), p_shape, GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), GetCollisionVisualized(p_entity));
 }
 
 void EngineActions::SetShapeRadius(ECS::Entity* p_entity, float p_radius)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), p_radius, GetShapeHeight(p_entity), GetPhysicsMesh(p_entity));
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), p_radius, GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), GetCollisionVisualized(p_entity));
 }
 
 void EngineActions::SetShapeHeight(ECS::Entity* p_entity, float p_height)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), p_height, GetPhysicsMesh(p_entity));
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), p_height, GetPhysicsMesh(p_entity), GetCollisionVisualized(p_entity));
 }
 
 void EngineActions::SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_mesh)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH, GetShapeRadius(p_entity), GetShapeHeight(p_entity), p_mesh);
+	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH, GetShapeRadius(p_entity), GetShapeHeight(p_entity), p_mesh, GetCollisionVisualized(p_entity));
 }
 
 void EngineActions::SetCollisionVisualized(ECS::Entity* p_entity, bool p_visualize)
