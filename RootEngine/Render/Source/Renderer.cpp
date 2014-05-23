@@ -1180,7 +1180,21 @@ namespace Render
 
 		glGetIntegerv(GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS, &out);
 		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS: %d", out);
+
+		glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS: %d", out);
+
+		glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS: %d", out);
+
+		glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TRANSFORM_FEEDBACK_BUFFERS: %d", out);
+
 		//Tessellaions
+
+		glGetIntegerv(GL_MAX_TESS_PATCH_COMPONENTS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TESS_PATCH_COMPONENTS: %d", out);
+
 		//Compute
 		glGetIntegerv(GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS, &out);
 		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS: %d", out);
