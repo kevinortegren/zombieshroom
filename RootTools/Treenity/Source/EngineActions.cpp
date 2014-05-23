@@ -726,3 +726,34 @@ void EngineActions::RemoveCollisionResponder( ECS::Entity* p_entity )
 {
 	m_world->GetEntityManager()->RemoveComponent<RootForce::CollisionResponder>(p_entity);
 }
+
+void EngineActions::AddParticle(ECS::Entity* p_entity)
+{
+	m_world->GetEntityManager()->CreateComponent<RootForce::ParticleEmitter>(p_entity);
+}
+
+void EngineActions::RemoveParticle(ECS::Entity* p_entity)
+{
+	m_world->GetEntityManager()->RemoveComponent<RootForce::ParticleEmitter>(p_entity);
+}
+
+void EngineActions::SetParticleEmitter(ECS::Entity* p_entity, const std::string& p_name)
+{
+	RootForce::ParticleEmitter* particle = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(p_entity);
+
+	for(unsigned i = 0; i < particle->m_particleSystems.size(); i++)
+		g_engineContext.m_renderer->FreeParticleSystem(particle->m_systems[i]);
+
+	particle->m_systems.clear();
+
+	particle->m_particleSystems = g_engineContext.m_resourceManager->LoadParticleEmitter(p_name, false);
+	particle->m_name = p_name;
+
+	for(unsigned i = 0; i < particle->m_particleSystems.size(); i++)
+		particle->m_systems.push_back(g_engineContext.m_renderer->CreateParticleSystem());
+}
+
+std::string	EngineActions::GetParticleEmitter(ECS::Entity* p_entity)
+{
+	return m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(p_entity)->m_name;
+}

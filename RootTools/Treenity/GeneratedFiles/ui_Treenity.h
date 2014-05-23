@@ -53,6 +53,7 @@ public:
     QAction *action_addWaterCollider;
     QAction *action_addScript;
     QAction *action_collisionResponder;
+    QAction *action_addParticle;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     Canvas3D *widget_canvas3D;
@@ -146,6 +147,8 @@ public:
         action_addScript->setObjectName(QStringLiteral("action_addScript"));
         action_collisionResponder = new QAction(TreenityClass);
         action_collisionResponder->setObjectName(QStringLiteral("action_collisionResponder"));
+        action_addParticle = new QAction(TreenityClass);
+        action_addParticle->setObjectName(QStringLiteral("action_addParticle"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -343,6 +346,7 @@ public:
         menu_addComponent->addAction(action_addWaterCollider);
         menu_addComponent->addAction(action_addScript);
         menu_addComponent->addAction(action_collisionResponder);
+        menu_addComponent->addAction(action_addParticle);
         menuView->addAction(actionLog);
         mainToolBar->addAction(actionPlay);
 
@@ -390,6 +394,7 @@ public:
         action_addWaterCollider->setText(QApplication::translate("TreenityClass", "Water Collider", 0));
         action_addScript->setText(QApplication::translate("TreenityClass", "Script", 0));
         action_collisionResponder->setText(QApplication::translate("TreenityClass", "Collision responder", 0));
+        action_addParticle->setText(QApplication::translate("TreenityClass", "Particle", 0));
         pushButton_translateMode->setText(QString());
         pushButton_rotateMode->setText(QString());
         pushButton_scaleMode->setText(QString());

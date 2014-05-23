@@ -28,6 +28,8 @@ void DiffuseShaderView::Display()
 	auto itr = m_material->m_textures.find(Render::TextureSemantic::DIFFUSE);
 	if(itr != m_material->m_textures.end())
 	{
+		
+
 		ui.textureDrop_diffuse->SetTexture(itr->second);
 	}
 	else

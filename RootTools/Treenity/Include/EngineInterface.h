@@ -106,4 +106,10 @@ struct EngineInterface
 	//Collision responder
 	virtual void		AddCollisionResponder(ECS::Entity* p_entity) = 0;
 	virtual void		RemoveCollisionResponder(ECS::Entity* p_entity) = 0;
+
+	//Particle
+	virtual void		AddParticle(ECS::Entity* p_entity) = 0;
+	virtual void		RemoveParticle(ECS::Entity* p_entity) = 0;
+	virtual void		SetParticleEmitter(ECS::Entity* p_entity, const std::string& p_name) = 0;
+	virtual std::string	GetParticleEmitter(ECS::Entity* p_entity) = 0;
 };
