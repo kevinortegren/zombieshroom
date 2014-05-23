@@ -1171,9 +1171,16 @@ namespace Render
 		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TEXTURE_SIZE: %d", out);
 
 		//Geometry
-		glGetIntegerv(GL_GEOMETRY_VERTICES_OUT, &out);
-		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_GEOMETRY_VERTICES_OUT: %d", out);
 
+		glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_GEOMETRY_OUTPUT_VERTICES: %d", out);
+
+		glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_COMPONENTS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_GEOMETRY_OUTPUT_COMPONENTSf: %d", out);
+
+		glGetIntegerv(GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS: %d", out);
+		//Tessellaions
 		//Compute
 		glGetIntegerv(GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS, &out);
 		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS: %d", out);
