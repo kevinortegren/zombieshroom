@@ -66,8 +66,11 @@ namespace Render
 
 		std::getline(*p_ss, module, ' ');
 		std::getline(*p_ss, module, ' ');
-
-		if(module == "help")
+		if(module == "print")
+		{
+			PrintOpenGLMaxValues();
+		}
+		else if(module == "help")
 		{
 			g_context.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "[RENDER COMMANDS]");
 			g_context.m_logger->LogText(LogTag::NOTAG, LogLevel::HELP_PRINT, "/r la [int] [1/0] -Activate or deactivate layer of choice");
@@ -348,6 +351,8 @@ namespace Render
 		g_context.m_profiler->InitQuery();
 
 		m_showForward = true;
+
+		PrintOpenGLMaxValues();
 	}
 
 	void GLRenderer::InitializeSemanticSizes()
@@ -1145,6 +1150,64 @@ namespace Render
 	{
 		return m_lighting.GetDirectionalLight();
 	}
+	void GLRenderer::PrintOpenGLMaxValues()
+	{
+		int out;
+
+		//Textures
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TEXTURE_IMAGE_UNITS: %d", out);
+	
+		glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS: %d", out);
+
+		glGetIntegerv(GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS: %d", out);
+
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS: %d", out);
+
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TEXTURE_SIZE: %d", out);
+
+		//Geometry
+		glGetIntegerv(GL_GEOMETRY_VERTICES_OUT, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_GEOMETRY_VERTICES_OUT: %d", out);
+
+		//Compute
+		glGetIntegerv(GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS: %d", out);
+
+		glGetIntegerv(GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS: %d", out);
+
+		glGetIntegerv(GL_MAX_COMPUTE_UNIFORM_BLOCKS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMPUTE_UNIFORM_BLOCKS: %d", out);
+
+		glGetIntegerv(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS: %d", out);
+
+		glGetIntegerv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMPUTE_UNIFORM_COMPONENTS: %d", out);
+
+		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS: %d", out);
+
+		glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_IMPLEMENTATION_COLOR_READ_FORMAT: %d", out);
+
+		glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_IMPLEMENTATION_COLOR_READ_TYPE: %d", out);
+
+		glGetIntegerv(GL_MAX_ELEMENTS_INDICES, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_ELEMENTS_INDICES: %d", out);
+
+		glGetIntegerv(GL_MAX_ELEMENTS_VERTICES, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_ELEMENTS_VERTICES: %d", out);
+
+		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_VERTEX_ATTRIBS: %d", out);
+	}
 }
 
 Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_context)
@@ -1153,3 +1216,5 @@ Render::RendererInterface* CreateRenderer(RootEngine::SubsystemSharedContext p_c
 
 	return new Render::GLRenderer;
 }
+
+

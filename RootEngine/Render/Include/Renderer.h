@@ -186,6 +186,8 @@ namespace Render
 		void RemoveMesh(MeshInterface* p_mesh);
 		void RemoveVAO(VertexAttributesInterface* p_vao);
 
+		void PrintOpenGLMaxValues();
+
 		glm::vec3 m_camPos;
 
 		struct SortOnDistanceFunctor
