@@ -88,8 +88,8 @@ public:
         doubleSpinBox_translationX->setSizePolicy(sizePolicy1);
         doubleSpinBox_translationX->setMinimumSize(QSize(20, 0));
         doubleSpinBox_translationX->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_translationX->setMinimum(-1000);
-        doubleSpinBox_translationX->setMaximum(1000);
+        doubleSpinBox_translationX->setMinimum(-1e+09);
+        doubleSpinBox_translationX->setMaximum(1e+09);
 
         gridLayout->addWidget(doubleSpinBox_translationX, 1, 1, 1, 1);
 
@@ -99,8 +99,8 @@ public:
         doubleSpinBox_translationY->setSizePolicy(sizePolicy1);
         doubleSpinBox_translationY->setMinimumSize(QSize(20, 0));
         doubleSpinBox_translationY->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_translationY->setMinimum(-1000);
-        doubleSpinBox_translationY->setMaximum(1000);
+        doubleSpinBox_translationY->setMinimum(-1e+09);
+        doubleSpinBox_translationY->setMaximum(1e+09);
 
         gridLayout->addWidget(doubleSpinBox_translationY, 1, 2, 1, 1);
 
@@ -116,7 +116,7 @@ public:
         doubleSpinBox_orientationZ->setSizePolicy(sizePolicy1);
         doubleSpinBox_orientationZ->setMinimumSize(QSize(20, 0));
         doubleSpinBox_orientationZ->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_orientationZ->setMinimum(-360);
+        doubleSpinBox_orientationZ->setMinimum(-1e+09);
         doubleSpinBox_orientationZ->setMaximum(360);
 
         gridLayout->addWidget(doubleSpinBox_orientationZ, 2, 3, 1, 1);
@@ -127,8 +127,8 @@ public:
         doubleSpinBox_translationZ->setSizePolicy(sizePolicy1);
         doubleSpinBox_translationZ->setMinimumSize(QSize(20, 0));
         doubleSpinBox_translationZ->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_translationZ->setMinimum(-1000);
-        doubleSpinBox_translationZ->setMaximum(1000);
+        doubleSpinBox_translationZ->setMinimum(-1e+09);
+        doubleSpinBox_translationZ->setMaximum(1e+09);
 
         gridLayout->addWidget(doubleSpinBox_translationZ, 1, 3, 1, 1);
 
@@ -143,7 +143,7 @@ public:
         doubleSpinBox_scaleY->setSizePolicy(sizePolicy1);
         doubleSpinBox_scaleY->setMinimumSize(QSize(20, 0));
         doubleSpinBox_scaleY->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_scaleY->setMinimum(-10000);
+        doubleSpinBox_scaleY->setMinimum(-1e+09);
         doubleSpinBox_scaleY->setMaximum(10000);
         doubleSpinBox_scaleY->setValue(1);
 
@@ -155,8 +155,8 @@ public:
         doubleSpinBox_orientationX->setSizePolicy(sizePolicy1);
         doubleSpinBox_orientationX->setMinimumSize(QSize(20, 0));
         doubleSpinBox_orientationX->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_orientationX->setMinimum(-360);
-        doubleSpinBox_orientationX->setMaximum(360);
+        doubleSpinBox_orientationX->setMinimum(-1e+09);
+        doubleSpinBox_orientationX->setMaximum(1e+09);
 
         gridLayout->addWidget(doubleSpinBox_orientationX, 2, 1, 1, 1);
 
@@ -166,7 +166,7 @@ public:
         doubleSpinBox_scaleX->setSizePolicy(sizePolicy1);
         doubleSpinBox_scaleX->setMinimumSize(QSize(20, 0));
         doubleSpinBox_scaleX->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_scaleX->setMinimum(-10000);
+        doubleSpinBox_scaleX->setMinimum(-1e+09);
         doubleSpinBox_scaleX->setMaximum(10000);
         doubleSpinBox_scaleX->setValue(1);
 
@@ -178,7 +178,7 @@ public:
         doubleSpinBox_scaleZ->setSizePolicy(sizePolicy1);
         doubleSpinBox_scaleZ->setMinimumSize(QSize(20, 0));
         doubleSpinBox_scaleZ->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_scaleZ->setMinimum(-10000);
+        doubleSpinBox_scaleZ->setMinimum(-1e+09);
         doubleSpinBox_scaleZ->setMaximum(10000);
         doubleSpinBox_scaleZ->setValue(1);
 
@@ -190,8 +190,8 @@ public:
         doubleSpinBox_orientationY->setSizePolicy(sizePolicy1);
         doubleSpinBox_orientationY->setMinimumSize(QSize(20, 0));
         doubleSpinBox_orientationY->setMaximumSize(QSize(16777215, 16777215));
-        doubleSpinBox_orientationY->setMinimum(-360);
-        doubleSpinBox_orientationY->setMaximum(360);
+        doubleSpinBox_orientationY->setMinimum(-1e+09);
+        doubleSpinBox_orientationY->setMaximum(1e+09);
 
         gridLayout->addWidget(doubleSpinBox_orientationY, 2, 2, 1, 1);
 

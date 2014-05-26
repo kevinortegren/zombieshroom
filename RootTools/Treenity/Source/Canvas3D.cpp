@@ -207,6 +207,24 @@ void Canvas3D::dropEvent( QDropEvent *event )
 	}
 }
 
+void Canvas3D::focusInEvent(QFocusEvent* event)
+{
+	if (m_engineInterface->GetMode() == EditorMode::GAME)
+	{
+		//g_engineContext.m_inputSys->LockInput(true);
+		g_engineContext.m_inputSys->LockMouseToCenter(true);
+	}
+}
+
+void Canvas3D::focusOutEvent(QFocusEvent* event)
+{
+	if (m_engineInterface->GetMode() == EditorMode::GAME)
+	{
+		//g_engineContext.m_inputSys->LockInput(false);
+		g_engineContext.m_inputSys->LockMouseToCenter(false);
+	}
+}
+
 void Canvas3D::SetEngineInterface( EngineInterface* p_engineInterface )
 {
 	m_engineInterface = p_engineInterface;

@@ -33,18 +33,19 @@ protected:
 	void keyReleaseEvent( QKeyEvent *k );
 	void resizeEvent( QResizeEvent * event );
 	//void enterEvent( QEvent * event );
+
 	void mousePressEvent(QMouseEvent* event);
 	void mouseReleaseEvent(QMouseEvent *event);
-	
+	void dragEnterEvent(QDragEnterEvent* event);
+	void dropEvent(QDropEvent* event);
+	void focusInEvent(QFocusEvent* event);
+	void focusOutEvent(QFocusEvent* event);
 private:
 	std::shared_ptr<SDL_Window> m_window;
 	std::shared_ptr<PieMenu> m_pieMenu;
 	EngineInterface* m_engineInterface;
 	EditorInterface* m_editorInterface;
 	ECS::World* m_world;
-
-	void dragEnterEvent(QDragEnterEvent* event);
-	void dropEvent(QDropEvent* event);
 	
 private slots:
 	void pieMenuClickTest();
