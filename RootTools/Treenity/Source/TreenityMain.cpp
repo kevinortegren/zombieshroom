@@ -529,14 +529,15 @@ void TreenityMain::Update(float dt)
 
 		// Update the rendering.
 		m_worldSystem->Process();
-		m_transformInterpolationSystem->Process();
 		m_actionSystem->UpdateAimingDevice(false);
 		m_thirdPersonBehaviorSystem->Process();
 		m_lookAtSystem->Process();
-		m_cameraSystem->Process();
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
+
+		m_cameraSystem->Process();
+		m_transformInterpolationSystem->Process();
 		m_renderingSystem->Process();
 
 		m_animationSystem->Synch();

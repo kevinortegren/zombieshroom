@@ -398,6 +398,12 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidget_6">
+   <property name="minimumSize">
+    <size>
+     <width>200</width>
+     <height>75</height>
+    </size>
+   </property>
    <property name="acceptDrops">
     <bool>true</bool>
    </property>

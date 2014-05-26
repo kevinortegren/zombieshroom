@@ -108,7 +108,7 @@ private:
 protected:
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);
-
+	
 private slots:
 	void New();
 	void OpenProject();
