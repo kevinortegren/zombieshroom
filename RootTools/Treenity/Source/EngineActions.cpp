@@ -480,7 +480,13 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 						newMeshHandle = "Primitives/box0";
 					}					
 				}
-				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle, transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
+				else
+				{
+					// Load the model if necessary
+					g_engineContext.m_resourceManager->LoadCollada(newMeshHandle);
+				}
+
+				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle + "0", transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
 
 			}
 		break;
@@ -573,7 +579,8 @@ float EngineActions::GetShapeHeight(ECS::Entity* p_entity)
 std::string EngineActions::GetPhysicsMesh(ECS::Entity* p_entity)
 {
 	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
-	return g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
+	std::string mesh = g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
+	return mesh.substr(0, mesh.size() - 1);
 }
 
 bool EngineActions::GetCollisionVisualized(ECS::Entity* p_entity)
@@ -641,7 +648,12 @@ void EngineActions::SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_m
 
 void EngineActions::SetCollisionVisualized(ECS::Entity* p_entity, bool p_visualize)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), p_visualize);
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_STATIC ||
+		g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+	{
+		ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), p_visualize);
+	}
 }
 
 

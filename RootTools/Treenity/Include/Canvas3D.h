@@ -31,6 +31,8 @@ protected:
 	//void enterEvent( QEvent * event );
 	void dragEnterEvent(QDragEnterEvent* event);
 	void dropEvent(QDropEvent* event);
+	void focusInEvent(QFocusEvent* event);
+	void focusOutEvent(QFocusEvent* event);
 	
 private:
 	std::shared_ptr<SDL_Window> m_window;

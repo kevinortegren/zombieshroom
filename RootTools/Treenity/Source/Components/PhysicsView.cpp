@@ -30,9 +30,39 @@ const QString& PhysicsView::GetComponentName() const
 
 void PhysicsView::DisplayEntity(ECS::Entity* p_entity)
 {
+	RootEngine::Physics::PhysicsType::PhysicsType physicsType = m_engineInterface->GetPhysicsType(p_entity);
+	if (physicsType == RootEngine::Physics::PhysicsType::TYPE_PLAYER || 
+		physicsType == RootEngine::Physics::PhysicsType::TYPE_RAGDOLL ||
+		physicsType == RootEngine::Physics::PhysicsType::TYPE_ABILITYSPAWN)
+	{
+		ui.comboBox_type->setHidden(true);
+		ui.checkBox_collideWithWorld->setHidden(true);
+		ui.checkBox_collideWithStatic->setHidden(true);
+		ui.doubleSpinBox_gravityX->setHidden(true);
+		ui.doubleSpinBox_gravityY->setHidden(true);
+		ui.doubleSpinBox_gravityZ->setHidden(true);
+		ui.doubleSpinBox_mass->setHidden(true);
+		ui.comboBox_shape->setHidden(true);
+		ui.stackedWidget_shape->setHidden(true);
+	}
+	else
+	{
+		ui.comboBox_type->setHidden(false);
+		ui.checkBox_collideWithWorld->setHidden(false);
+		ui.checkBox_collideWithStatic->setHidden(false);
+		ui.doubleSpinBox_gravityX->setHidden(false);
+		ui.doubleSpinBox_gravityY->setHidden(false);
+		ui.doubleSpinBox_gravityZ->setHidden(false);
+		ui.doubleSpinBox_mass->setHidden(false);
+		ui.comboBox_shape->setHidden(false);
+		ui.stackedWidget_shape->setHidden(false);
+	}
+
 	BlockAllSignals(true);
 
-	int type = m_engineInterface->GetPhysicsType(p_entity) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC ? TYPE_DYNAMIC : TYPE_STATIC;
+	int type = (m_engineInterface->GetPhysicsType(p_entity) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC || 
+				m_engineInterface->GetPhysicsType(p_entity) == RootEngine::Physics::PhysicsType::TYPE_ABILITY) 
+				? TYPE_DYNAMIC : TYPE_STATIC;
 	ui.comboBox_type->setCurrentIndex(type);
 	ui.stackedWidget_type->setCurrentIndex(type);
 
@@ -225,7 +255,7 @@ void PhysicsView::CylinderHeightChanged( double p_value )
 void PhysicsView::PhysicsMeshChanged()
 {
 	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
-	m_engineInterface->SetPhysicsMesh(selection, (ui.lineEdit_physicsMesh->text() + "0").toStdString());
+	m_engineInterface->SetPhysicsMesh(selection, ui.lineEdit_physicsMesh->text().toStdString());
 }
 
 void PhysicsView::PhysicsMeshBrowse()
