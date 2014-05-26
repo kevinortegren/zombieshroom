@@ -14,6 +14,7 @@
 
 #include <QPushButton>
 #include <QScrollArea>
+#include <QShortcut>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -531,7 +532,7 @@ void Treenity::DisplayEntity(ECS::Entity* p_selectedEntity)
 
 void Treenity::keyPressEvent( QKeyEvent* event )
 {
-	if(event->key() == 70)
+	if(event->key() == Qt::Key_F)
 	{
 		if(m_selectedEntities.size() > 0)
 		m_engineInterface->TargetEntity(*m_selectedEntities.begin());
@@ -560,19 +561,20 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 	}
 	else if( event->key() == Qt::Key_Q)
 	{
-		emit ui.pushButton_translateMode->pressed();
+		ui.pushButton_translateMode->click();
 	}
 	else if( event->key() == Qt::Key_W)
 	{
-		emit ui.pushButton_rotateMode->pressed();
+		ui.pushButton_rotateMode->click();
 	}
 	else if( event->key() == Qt::Key_E)
 	{
-		emit ui.pushButton_scaleMode->pressed();
+		ui.pushButton_scaleMode->click();
 	}
 	else if( event->key() == Qt::Key_S)
 	{
-		emit ui.comboBox_mode->currentIndexChanged((m_toolMode == ToolMode::GLOBAL) ? 1 : 0);
+		int index = (m_toolMode == ToolMode::GLOBAL) ? 0 : 1;
+		ui.comboBox_mode->setCurrentIndex(index);
 	}
 
 	g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
@@ -634,7 +636,6 @@ void Treenity::SetResizeTool()
 
 void Treenity::ChangeToolMode(int index)
 {
+	std::cout << "Change to index: " << index << std::endl;
 	m_toolMode = (ToolMode::ToolMode)index;
-
-
 }

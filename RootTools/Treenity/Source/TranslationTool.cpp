@@ -169,7 +169,6 @@ void TranslationTool::SetPosition(const glm::vec3& p_position)
 	//Debug(&m_axisOBB[0], m_transformMatrix, glm::vec3(1,0,0));
 	//Debug(&m_axisOBB[1], m_transformMatrix, glm::vec3(1,0,0));
 	//Debug(&m_axisOBB[2], m_transformMatrix, glm::vec3(1,0,0));
-	
 }
 
 void TranslationTool::Hide()

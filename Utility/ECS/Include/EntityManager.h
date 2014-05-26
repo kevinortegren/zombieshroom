@@ -40,6 +40,14 @@ namespace ECS
 			if(p_entity == nullptr)
 				return nullptr;
 
+			// Slow but usefull!
+			auto itr = std::find(m_componentsToBeRemoved.begin(), m_componentsToBeRemoved.end(),
+				std::pair<unsigned int, unsigned int>(Component<T>::GetTypeId(), p_entity->GetId()));
+			if(itr != m_componentsToBeRemoved.end())
+			{
+				m_componentsToBeRemoved.erase(itr);
+			}
+
 			assert(Component<T>::GetTypeId() != UINT_MAX);
 
 			// Allocate component.

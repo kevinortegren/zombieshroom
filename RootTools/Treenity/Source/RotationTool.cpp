@@ -265,7 +265,6 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 
 		// Set selected axis to hovered axis and store the current rotation of gimbal.
 		m_angle0 = GetAngleFromAxis(axis, hits[axis] - gimbalTransform->m_position);
-		std::cout << "m_angle0: " << m_angle0 << "\n";
 		m_selectedAxis = axis;
 		return true;
 	}
@@ -273,7 +272,6 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	{
 		// Reset.
 		m_angle0 = 0.0f;
-		std::cout << "m_angle0: " << m_angle0 << " RESET\n";
 		m_selectedAxis = RotationAxis::AXIS_NONE;
 		return true;
 	}
@@ -386,7 +384,6 @@ void RotationTool::Hide()
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y]);
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z]);
-
 	Tool::Hide();
 }
 
@@ -410,6 +407,5 @@ void RotationTool::Show()
 	// Store orientation for the selected entity.
 	RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
 	m_entityOrientation = selectedTransform->m_orientation;
-
 	Tool::Show();
 }

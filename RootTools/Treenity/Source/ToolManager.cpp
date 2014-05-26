@@ -36,14 +36,15 @@ Tool* ToolManager::GetSelectedTool()
 
 void ToolManager::SetTool(ToolBox::ToolBox p_tool)
 {
-	m_selectedTool->SetSelectedEntity(nullptr);
+	// If changing tool.
+	if(m_tools[p_tool] != m_selectedTool)
+	{
+		m_selectedTool->SetSelectedEntity(nullptr);
+		m_selectedTool = m_tools[p_tool];
+	}
 
 	if(m_editorInterface->GetSelection().size() != 0)
 	{
-		//Transfer the selected entity from the previous tool
-		m_tools[p_tool]->SetSelectedEntity(*m_editorInterface->GetSelection().begin());
+		m_selectedTool->SetSelectedEntity(*m_editorInterface->GetSelection().begin());
 	}
-
-
-	m_selectedTool = m_tools[p_tool];
 }

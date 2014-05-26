@@ -677,7 +677,7 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 						{
 							closestEntity = (*itr);
 							closestDist = newt;
-							g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
+							//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
 						}
 					}
 				}
@@ -693,7 +693,7 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 				{
 					closestEntity = (*itr);
 					closestDist = t;
-					g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
+					//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
 
 				}
 			}
@@ -701,7 +701,7 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 
 		if(closestEntity != nullptr)
 		{
-			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
+			//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
 
 			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LSHIFT))
 			{
@@ -854,9 +854,6 @@ bool TreenityMain::RayVsTriangle(const glm::vec3& cameraPos, const glm::vec3& ra
 	if(model->m_faceIndexCount == 2)
 		return false;
 
-	std::cout << model->m_indices.size() << std::endl;
-	std::cout << model->m_positions.size() << std::endl;
- 
 	glm::mat4x4 inverseWorld = glm::inverse(transform);
  
 	glm::vec4 rayLocal = inverseWorld * glm::vec4(ray.x, ray.y, ray.z, 0.0f);
