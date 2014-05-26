@@ -532,49 +532,65 @@ void Treenity::DisplayEntity(ECS::Entity* p_selectedEntity)
 
 void Treenity::keyPressEvent( QKeyEvent* event )
 {
-	if(event->key() == Qt::Key_F)
+	if(m_engineInterface->GetMode() == EditorMode::EDITOR)
 	{
-		if(m_selectedEntities.size() > 0)
-		m_engineInterface->TargetEntity(*m_selectedEntities.begin());
-	}
-	else if(event->key() == Qt::Key_Delete)
-	{
-		if(m_selectedEntities.size() > 0)
+		if(event->key() == Qt::Key_F)
 		{
-			for(auto e : m_selectedEntities)
+			if(m_selectedEntities.size() > 0)
+			m_engineInterface->TargetEntity(*m_selectedEntities.begin());
+		}
+		else if(event->key() == Qt::Key_Delete)
+		{
+			if(m_selectedEntities.size() > 0)
 			{
-				m_engineInterface->DeleteEntity(e);
+				for(auto e : m_selectedEntities)
+				{
+					m_engineInterface->DeleteEntity(e);
+				}
 			}
 		}
-	}
-	else if(event->key() == Qt::Key_A)
-	{
-		ClearSelection();
-	}
-	else if (event->key() == Qt::Key_Escape)
-	{
-		if (m_engineInterface->GetMode() == EditorMode::GAME)
+		else if(event->key() == Qt::Key_A)
 		{
-			Utils::Write("Stopping game session. Restoring world.");
-			m_engineInterface->ExitPlayMode();
+			ClearSelection();
+		}
+		else if( event->key() == Qt::Key_Q)
+		{
+			ui.pushButton_translateMode->click();
+		}
+		else if( event->key() == Qt::Key_W)
+		{
+			ui.pushButton_rotateMode->click();
+		}
+		else if( event->key() == Qt::Key_E)
+		{
+			ui.pushButton_scaleMode->click();
+		}
+		else if( event->key() == Qt::Key_S)
+		{
+			int index = (m_toolMode == ToolMode::GLOBAL) ? 0 : 1;
+			ui.comboBox_mode->setCurrentIndex(index);
 		}
 	}
-	else if( event->key() == Qt::Key_Q)
+	else if(m_engineInterface->GetMode() == EditorMode::GAME)
 	{
-		ui.pushButton_translateMode->click();
-	}
-	else if( event->key() == Qt::Key_W)
-	{
-		ui.pushButton_rotateMode->click();
-	}
-	else if( event->key() == Qt::Key_E)
-	{
-		ui.pushButton_scaleMode->click();
-	}
-	else if( event->key() == Qt::Key_S)
-	{
-		int index = (m_toolMode == ToolMode::GLOBAL) ? 0 : 1;
-		ui.comboBox_mode->setCurrentIndex(index);
+		if (event->key() == Qt::Key_Escape)
+		{
+			if (m_engineInterface->GetMode() == EditorMode::GAME)
+			{
+				Utils::Write("Stopping game session. Restoring world.");
+				m_engineInterface->ExitPlayMode();
+			}
+		}
+		else if(event->key() == Qt::Key_Delete)
+		{
+			if(m_selectedEntities.size() > 0)
+			{
+				for(auto e : m_selectedEntities)
+				{
+					m_engineInterface->DeleteEntity(e);
+				}
+			}
+		}
 	}
 
 	g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
