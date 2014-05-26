@@ -18,7 +18,7 @@ namespace RootEngine
 		
 	}
 
-	Model* ModelImporter::LoadModel(const std::string p_fileName, bool p_noRender)
+	Model* ModelImporter::LoadModel(const std::string p_fileName, const std::string& p_handle, bool p_noRender)
 	{	
 		m_noRender = p_noRender;
 		m_model = new Model(); //Owned by ResourceManager
@@ -30,16 +30,18 @@ namespace RootEngine
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Error parsing scene %s: %s", p_fileName, m_importer->GetErrorString());
 		}
 
+		/*
 		char fileName[128];
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
+		*/
 
 		if (aiscene) 
 		{
-			TraverseSceneHierarchy(aiscene, p_fileName);
+			TraverseSceneHierarchy(aiscene, p_handle);
 		}
 		else 
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", fileName, m_importer->GetErrorString());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", p_handle.c_str(), m_importer->GetErrorString());
 		}
 
 		if(aiscene->HasAnimations() && m_model->m_animation )
@@ -54,19 +56,19 @@ namespace RootEngine
 		return m_model;
 	}
 
-	void ModelImporter::TraverseSceneHierarchy(const aiScene* p_scene, const std::string p_filename )
+	void ModelImporter::TraverseSceneHierarchy(const aiScene* p_scene, const std::string p_handle )
 	{
-		Traverse(p_scene->mRootNode, p_scene,p_filename);
+		Traverse(p_scene->mRootNode, p_scene,p_handle);
 	}
 
-	void ModelImporter::Traverse(const aiNode* p_node, const aiScene* p_scene, const std::string p_filename )
+	void ModelImporter::Traverse(const aiNode* p_node, const aiScene* p_scene, const std::string p_handle )
 	{
 		for(unsigned i = 0; i < p_node->mNumMeshes; ++i)
 		{
 			if(m_noRender)
-				InitPhysicsMesh(i, p_scene->mMeshes[i], p_filename);
+				InitPhysicsMesh(i, p_scene->mMeshes[i], p_handle);
 			else
-				InitMesh(i, p_scene->mMeshes[i], p_filename);
+				InitMesh(i, p_scene->mMeshes[i], p_handle);
 
 			memcpy(&m_model->m_transform, &p_node->mTransformation, sizeof(aiMatrix4x4));
 			m_model->m_transform = glm::transpose(m_model->m_transform);
@@ -74,11 +76,11 @@ namespace RootEngine
 
 		for(unsigned i = 0; i < p_node->mNumChildren; ++i)
 		{
-			Traverse(p_node->mChildren[i], p_scene, p_filename);
+			Traverse(p_node->mChildren[i], p_scene, p_handle);
 		}
 	}
 
-	void ModelImporter::InitFromScene( const aiScene* p_scene, const std::string p_filename )
+	void ModelImporter::InitFromScene( const aiScene* p_scene, const std::string p_handle )
 	{
 		// Initialize the meshes in the scene one by one
 		for (unsigned int i = 0 ; i < p_scene->mNumMeshes ; i++) 
@@ -88,14 +90,14 @@ namespace RootEngine
 		}
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Created %d meshes",p_scene->mNumMeshes);
 
-		InitMaterials(p_scene, p_filename);	
+		InitMaterials(p_scene, p_handle);	
 	}
 
-	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
+	void ModelImporter::InitMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_handle )
 	{
 		static const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
-		std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
+		std::string handle = p_handle + std::to_string(p_index);
 
 		if(!p_aiMesh->HasPositions())
 		{
@@ -264,11 +266,11 @@ namespace RootEngine
 		m_model->m_meshes[1] = mesh1P;
 	}
 
-	void ModelImporter::InitPhysicsMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename )
+	void ModelImporter::InitPhysicsMesh( unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_handle )
 	{
 		if(m_context->m_physics)
 		{
-			std::string handle = GetNameFromPath(p_filename) + std::to_string(p_index);
+			std::string handle = p_handle + std::to_string(p_index);
 
 			if(!p_aiMesh->HasPositions())
 			{
@@ -311,7 +313,7 @@ namespace RootEngine
 		}
 	}
 
-	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_filename )
+	void ModelImporter::InitMaterials( const aiScene* p_scene, const std::string p_handle )
 	{
 		m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Starting to load %d materials to model", p_scene->mNumMaterials);
 		// Initialize the materials

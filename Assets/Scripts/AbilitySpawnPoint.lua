@@ -1,5 +1,10 @@
 AbilitySpawnPoint = {}
 
+function AbilitySpawnPoint.OnLoad()
+  --This function is not triggered...
+  ResourceManager.LoadSound("Feedback/switch1-1.wav");
+end
+
 function AbilitySpawnPoint.OnCreate (userId, actionId)
 end
 
@@ -16,11 +21,10 @@ function AbilitySpawnPoint.OnCollide (self, entity)
         abilitySpawn:SetClaimed(playerId);
         tryPickup:SetTryPickup(false);
         Logging.Log(LogLevel.DEBUG_PRINT, "Pick up successful");
-        Static.Play3DSound("CC-BY3.0/sfx_fly.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0);
+        Static.PlaySound("Feedback/switch1-1.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
       end
     end
 end
-
 
 function AbilitySpawnPoint.OnDestroy (self)
 	self:RemoveCollision();

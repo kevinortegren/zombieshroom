@@ -31,7 +31,49 @@ namespace RootForce
 		AddStaticEntitiesToPhysics();
 
 		//LOL THIS IS NOT THE PLACE
-		g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00200011);
+		//LOL NOW IT IS :D:D:D:D:D
+		g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath1-1.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-3.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-4.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-5.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-6.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-7.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-7.wav");
+
+		//Ability pickup
+		g_engineContext.m_resourceManager->LoadSoundAudio("Feedback/switch1-1.wav");
+		
+		//Water sounds
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-1.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-2.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-3.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-1.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-2.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-3.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-4.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-5.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-6.wav");
+
+		//Push
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump2-6.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump2-7.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump2-8.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump2-9.wav");
+
+		//Movement
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-1.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-2.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-3.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-4.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump1-1.wav");
+
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-1.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-2.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-3.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-4.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-5.wav");
+		g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-6.wav");
+
 	}
 #endif
 

@@ -93,17 +93,11 @@
     - 91
     - 92
     - 93
-    - 100
+    - 94
 - Components:
     - Type: 0
       Data:
         - Entity: 14
-          Model: WaterModel
-          Material:
-            Name: waterrender
-            Effect: MeshWater
-            Normal: computeTex3
-            Glow: SkyBox
         - Entity: 39
           Model: CharacterShape
           Material:
@@ -396,176 +390,168 @@
             TextureGreen: customGrass3
             TextureBlue: rock_clear2
             TileFactor: 48
-        - Entity: 100
-          Model: testchar
-          Material:
-            Name: TestSpawnpoint
-            Effect: Mesh_NormalMap
-            Diffuse: WStexture
-            Specular: WSSpecular
-            Normal: WSNormal
-            Glow: WSGlowRed
+        - Entity: 94
     - Type: 1
       Data:
         - Entity: 0
-          Position: [-4.25607, 217.774, 30.5396]
-          Rotation: [-0.466304, 0.704338, -0.236195, -0.480293]
+          Position: [-4.26, 217.77, 30.54]
+          Rotation: [0.46626, -0.704351, 0.236172, 0.480327]
           Scale: [1, 1, 1]
         - Entity: 1
-          Position: [175.078, 33.8895, 116.99]
-          Rotation: [0, 0.9479, 0, -0.318568]
+          Position: [175.08, 33.89, 116.99]
+          Rotation: [-5.53584e-008, 0.947908, -5.53584e-008, -0.318546]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [56.5468, 19.5069, 42.5689]
-          Rotation: [0, 0.829545, 0, -0.55844]
+          Position: [56.55, 19.51, 42.57]
+          Rotation: [-6.06712e-008, 0.829525, -6.06712e-008, -0.558469]
           Scale: [1, 1, 1]
         - Entity: 3
-          Position: [36.5521, 85.6569, -163.918]
-          Rotation: [0, 0.186886, 0, 0.982382]
+          Position: [36.55, 85.66, -163.92]
+          Rotation: [0, 0.186867, 0, 0.982385]
           Scale: [1, 1, 1]
         - Entity: 4
-          Position: [-123.355, 33.587, -43.9994]
-          Rotation: [0, 0.70538, 0, 0.70883]
+          Position: [-123.36, 33.59, -44]
+          Rotation: [0, 0.705439, 0, 0.708771]
           Scale: [1, 1, 1]
         - Entity: 5
-          Position: [436.748, 38.674, -171.096]
-          Rotation: [0, -0.395373, 0, 0.918521]
+          Position: [436.75, 38.67, -171.1]
+          Rotation: [0, -0.395385, 0, 0.918515]
           Scale: [1, 1, 1]
         - Entity: 6
-          Position: [399.077, 19.4229, 19.9458]
-          Rotation: [0, -0.661028, 0, 0.750361]
+          Position: [399.08, 19.42, 19.95]
+          Rotation: [0, -0.66105, 0, 0.750342]
           Scale: [1, 1, 1]
         - Entity: 7
-          Position: [308.903, 70.8426, 255.291]
-          Rotation: [0, 0.942234, 0, -0.334956]
+          Position: [308.9, 70.84, 255.29]
+          Rotation: [-5.58278e-008, 0.942233, -5.58278e-008, -0.334958]
           Scale: [1, 1, 1]
         - Entity: 8
-          Position: [-204.655, 135.798, -39.2852]
-          Rotation: [0, 0.679821, 0, 0.733378]
+          Position: [-204.65, 135.8, -39.29]
+          Rotation: [0, 0.679825, 0, 0.733374]
           Scale: [1, 1, 1]
         - Entity: 9
-          Position: [-134.567, 107.328, -102.466]
-          Rotation: [0, 0.459287, 0, 0.888288]
+          Position: [-134.57, 107.33, -102.47]
+          Rotation: [0, 0.45927, 0, 0.888297]
           Scale: [1, 1, 1]
         - Entity: 10
-          Position: [399.077, 633.062, 19.9458]
-          Rotation: [0, -0.661028, 0, 0.750361]
+          Position: [399.08, 633.06, 19.95]
+          Rotation: [0, -0.66105, 0, 0.750342]
           Scale: [1, 1, 1]
         - Entity: 11
-          Position: [-129.047, 210.692, -211.798]
+          Position: [-129.05, 210.69, -211.8]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 12
-          Position: [-33.0166, 11.4425, 129.726]
+          Position: [-33.02, 11.44, 129.73]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 13
-          Position: [-421.467, 21.9553, -7.08853]
+          Position: [-421.47, 21.96, -7.09]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 14
-          Position: [0, 1.3976, 0]
+          Position: [0, 1.4, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [40, 1, 40]
         - Entity: 15
-          Position: [235.956, 18.6599, 175.801]
+          Position: [235.96, 18.66, 175.8]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 16
-          Position: [21.9056, 31.7291, 60.6137]
+          Position: [21.91, 31.73, 60.61]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 17
-          Position: [77.9471, 8.53765, 1.44814]
+          Position: [77.95, 8.54, 1.45]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 18
-          Position: [-79.8664, 65.856, 210.804]
+          Position: [-79.87, 65.86, 210.8]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 19
-          Position: [-433.876, 18.665, 23.538]
+          Position: [-433.88, 18.67, 23.54]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 20
-          Position: [436.571, 11.6582, -88.6327]
+          Position: [436.57, 11.66, -88.63]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 21
-          Position: [391.764, 14.2557, 30.4072]
+          Position: [391.76, 14.26, 30.41]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 22
-          Position: [369.799, 60.7207, 326.7]
+          Position: [369.8, 60.72, 326.7]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 23
-          Position: [-114.714, 182.466, -205.006]
+          Position: [-114.71, 182.47, -205.01]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 24
-          Position: [-136.211, 82.6601, -97.4946]
+          Position: [-136.21, 82.66, -97.49]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 25
-          Position: [80.9391, 89.5169, 117.999]
+          Position: [80.94, 89.52, 118]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 26
-          Position: [-7.14007, 34.9295, -34.7855]
+          Position: [-7.14, 34.93, -34.79]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 27
-          Position: [-87.9062, 61.8024, -6.05375]
+          Position: [-87.91, 61.8, -6.05]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 28
-          Position: [192.729, 7.26519, 2.27759]
+          Position: [192.73, 7.27, 2.28]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 29
-          Position: [-27.7183, 12.4411, 100.025]
+          Position: [-27.72, 12.44, 100.03]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 30
-          Position: [42.959, 59.1372, -143.148]
+          Position: [42.96, 59.14, -143.15]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 31
-          Position: [-136.211, 124.608, -152.681]
+          Position: [-136.21, 124.61, -152.68]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 32
-          Position: [293.411, 8.69434, -84.5188]
+          Position: [293.41, 8.69, -84.52]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 33
-          Position: [239.719, 42.1608, -273.67]
+          Position: [239.72, 42.16, -273.67]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 34
-          Position: [-13.1028, 65.8252, 101.033]
+          Position: [-13.1, 65.83, 101.03]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 35
-          Position: [-132.951, 79.5611, 31.9841]
+          Position: [-132.95, 79.56, 31.98]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 36
-          Position: [8.58671, 79.4159, -124.514]
+          Position: [8.59, 79.42, -124.51]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 37
-          Position: [-52.7952, 38.0941, 61.3033]
+          Position: [-52.8, 38.09, 61.3]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 38
-          Position: [399.077, 595.698, 19.9458]
+          Position: [399.08, 595.7, 19.95]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 39
-          Position: [-171.138, 164.491, -259.184]
-          Rotation: [0, 0, 0.27463, 0.96155]
+          Position: [-171.14, 164.49, -259.18]
+          Rotation: [0, 0, 0.274631, 0.96155]
           Scale: [1, 1, 1]
         - Entity: 40
           Position: [0, 0, 0]
@@ -648,7 +634,7 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 60
-          Position: [0, -3.43715, 0]
+          Position: [0, -3.44, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 61
@@ -660,12 +646,12 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 63
-          Position: [-32.9663, 11.1927, 130.308]
-          Rotation: [0.0226053, 0.541511, -0.0528149, 0.838729]
-          Scale: [0.762467, 0.762467, 0.762467]
+          Position: [-32.97, 11.19, 130.31]
+          Rotation: [0.0225701, 0.54152, -0.0527854, 0.838726]
+          Scale: [0.76, 0.76, 0.76]
         - Entity: 64
-          Position: [-421.035, 19.4572, -6.80124]
-          Rotation: [-0.0513788, 0.574902, -0.043957, 0.815424]
+          Position: [-421.04, 19.46, -6.8]
+          Rotation: [-0.0513683, 0.574925, -0.0439671, 0.815408]
           Scale: [0.762467, 0.762467, 0.762467]
         - Entity: 65
           Position: [0, 0, 0]
@@ -676,8 +662,8 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 67
-          Position: [12.403, -4.48597, -35.8729]
-          Rotation: [0, -0.105548, 0, 0.994414]
+          Position: [12.4, -4.49, -35.87]
+          Rotation: [0, -0.10557, 0, 0.994412]
           Scale: [1, 1, 1]
         - Entity: 68
           Position: [0, 0, 0]
@@ -704,87 +690,87 @@
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 74
-          Position: [-130.45, 17.4759, 263.628]
+          Position: [-130.45, 17.48, 263.63]
           Rotation: [0, 0, 0, 1]
-          Scale: [0.680022, 0.899104, 0.680022]
+          Scale: [0.68, 0.9, 0.68]
         - Entity: 75
-          Position: [0, 4.98636, 0]
+          Position: [0, 4.99, 0]
           Rotation: [0, 0, 0, 1]
-          Scale: [0.680022, 0.680022, 0.680022]
+          Scale: [0.680022, 0.68, 0.680022]
         - Entity: 76
-          Position: [81.8425, 78.3131, 117.645]
-          Rotation: [0, -0.807789, 0, 0.589472]
-          Scale: [0.347685, 0.212911, 0.347685]
+          Position: [81.84, 78.31, 117.64]
+          Rotation: [-6.10763e-008, 0.807784, -6.10763e-008, -0.589478]
+          Scale: [0.35, 0.21, 0.35]
         - Entity: 77
-          Position: [-129.743, 172.915, -213.487]
-          Rotation: [0, -0.411279, 0, 0.91151]
-          Scale: [0.515587, 0.515587, 0.515587]
+          Position: [-129.74, 172.91, -213.49]
+          Rotation: [0, -0.411276, 0, 0.911511]
+          Scale: [0.52, 0.52, 0.52]
         - Entity: 78
-          Position: [-6.03961e-015, 1.20792e-014, 4.83169e-014]
+          Position: [-0, 0, 0]
           Rotation: [0, 0, 0, 1]
-          Scale: [0.678427, 0.678427, 0.678427]
+          Scale: [0.68, 0.68, 0.68]
         - Entity: 79
-          Position: [-126.736, 219.986, -212.325]
+          Position: [-126.74, 219.99, -212.32]
           Rotation: [0, 0, 0, 1]
-          Scale: [0.578018, 0.578018, 0.578018]
+          Scale: [0.58, 0.58, 0.58]
         - Entity: 80
-          Position: [-41.2071, 23.8356, 162.161]
+          Position: [-41.21, 23.84, 162.16]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 81
-          Position: [-455.514, 24.4596, -382.999]
+          Position: [-455.51, 24.46, -383]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 82
-          Position: [-79.7248, 37.95, 2.4943]
+          Position: [-79.72, 37.95, 2.49]
           Rotation: [0, 0, 0, 1]
-          Scale: [0.578018, 0.578018, 0.578018]
+          Scale: [0.58, 0.58, 0.58]
         - Entity: 83
-          Position: [-45.0268, 22.193, 24.9689]
+          Position: [-45.03, 22.19, 24.97]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 84
-          Position: [-67.2069, 22.193, 24.9689]
+          Position: [-67.21, 22.193, 24.9689]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 85
-          Position: [-45.0268, 21.3873, 48.0006]
+          Position: [-45.03, 21.39, 48]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 86
-          Position: [-14.6123, 20.1338, 47.6973]
+          Position: [-14.61, 20.13, 47.7]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 87
-          Position: [17.7228, 14.5773, 48.0006]
+          Position: [17.72, 14.58, 48]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 88
-          Position: [17.7228, 14.8187, -43.1861]
+          Position: [17.7228, 14.82, -43.19]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 89
-          Position: [-7.6591, 13.1965, -43.1861]
+          Position: [-7.66, 13.2, -43.1861]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 90
-          Position: [-42.4417, 20.5792, -34.7255]
+          Position: [-42.44, 20.58, -34.73]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 91
-          Position: [-42.4417, 22.193, -6.28837]
+          Position: [-42.4417, 22.19, -6.29]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 92
-          Position: [-68.5286, 19.7343, -26.9699]
+          Position: [-68.53, 19.73, -26.97]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
         - Entity: 93
-          Position: [167.4, 19.806, -1.50299]
+          Position: [167.4, 19.81, -1.5]
           Rotation: [0, 0, 0, 1]
           Scale: [0.578018, 0.578018, 0.578018]
-        - Entity: 100
-          Position: [0, 0, 0]
+        - Entity: 94
+          Position: [0, 60.2863, -217.677]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
     - Type: 2
@@ -852,55 +838,7 @@
     - Type: 3
       Data:
         []
-    - Type: 4
-      Data:
-        []
-    - Type: 5
-      Data:
-        []
     - Type: 6
-      Data:
-        - Entity: 39
-        - Entity: 40
-        - Entity: 41
-        - Entity: 42
-        - Entity: 43
-        - Entity: 44
-        - Entity: 45
-        - Entity: 46
-        - Entity: 47
-        - Entity: 48
-        - Entity: 49
-        - Entity: 50
-        - Entity: 51
-        - Entity: 52
-        - Entity: 53
-        - Entity: 54
-        - Entity: 55
-        - Entity: 56
-        - Entity: 57
-        - Entity: 58
-        - Entity: 59
-        - Entity: 60
-        - Entity: 61
-        - Entity: 62
-        - Entity: 63
-        - Entity: 64
-        - Entity: 65
-        - Entity: 66
-        - Entity: 67
-        - Entity: 68
-        - Entity: 69
-        - Entity: 70
-        - Entity: 71
-        - Entity: 72
-        - Entity: 73
-        - Entity: 74
-        - Entity: 75
-        - Entity: 76
-        - Entity: 77
-        - Entity: 78
-    - Type: 7
       Data:
         []
     - Type: 8
@@ -917,246 +855,159 @@
         - Entity: 39
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: CharacterShape0
         - Entity: 40
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmCrownBigsShape0
         - Entity: 41
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmCrownIslandShape10
         - Entity: 42
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmCrownIslandShape0
         - Entity: 43
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmCrownsCenterShape0
         - Entity: 44
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmCrownsLeftShape0
         - Entity: 45
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmsCrownsRightShape0
         - Entity: 46
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmCrownRuinsShape0
         - Entity: 47
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RightPalmsShape0
         - Entity: 48
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: IslandPalmsShape0
         - Entity: 49
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmBridgeShape0
         - Entity: 50
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmBridge1Shape0
         - Entity: 51
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: LeftPalms1Shape0
         - Entity: 52
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinPalmsShape0
         - Entity: 53
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: IslandPalms1Shape0
         - Entity: 54
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmBridge2Shape0
         - Entity: 55
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: PalmLeefBridgeShape0
         - Entity: 57
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneBridgeShape0
         - Entity: 58
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneBridge1Shape0
         - Entity: 59
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneBridge2Shape0
         - Entity: 60
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneClusterShape0
         - Entity: 61
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneCluster1Shape0
         - Entity: 62
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneCluster2Shape0
         - Entity: 63
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneRing1Shape0
         - Entity: 64
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: StoneRing1Shape0
         - Entity: 65
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: CircleRuinShape0
         - Entity: 66
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinsShape0
         - Entity: 67
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinsShape10
         - Entity: 68
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinsShape30
         - Entity: 69
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinClusterShape0
         - Entity: 70
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinCluster1Shape0
         - Entity: 71
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinCluster2Shape0
         - Entity: 72
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinWallShape0
         - Entity: 73
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: RuinWall1Shape0
         - Entity: 74
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: BackIsland1Shape0
         - Entity: 75
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: ThreeIslands1Shape0
         - Entity: 76
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: LittleMountainShape0
         - Entity: 77
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: VolcanoShape0
         - Entity: 78
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: IslandTerrainShape0
-    - Type: 12
-      Data:
-        []
-    - Type: 13
-      Data:
-        []
-    - Type: 14
-      Data:
-        []
     - Type: 15
       Data:
         - Entity: 11
@@ -1213,15 +1064,6 @@
           File: AbilitySpawn
         - Entity: 38
           File: AbilitySpawn
-    - Type: 17
-      Data:
-        []
-    - Type: 18
-      Data:
-        []
-    - Type: 19
-      Data:
-        []
     - Type: 20
       Data:
         - Entity: 0
@@ -1230,18 +1072,6 @@
       Data:
         - Entity: 0
           Color: [1, 0.776791, 0.381842, 1]
-    - Type: 24
-      Data:
-        []
-    - Type: 25
-      Data:
-        []
-    - Type: 27
-      Data:
-        []
-    - Type: 35
-      Data:
-        []
     - Type: 37
       Data:
         []
@@ -1250,7 +1080,7 @@
       Tag: NonExport
     - Id: 0
       Tag: Sun
-    - Id: 100
+    - Id: 94
       Tag: TestSpawnpoint
     - Id: 14
       Tag: Water
@@ -1641,5 +1471,5 @@
       Name: Unnamed
     - ID: 93
       Name: Unnamed
-    - ID: 100
+    - ID: 94
       Name: Test Spawnpoint

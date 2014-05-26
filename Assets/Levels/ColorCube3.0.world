@@ -25,8 +25,9 @@
     - 23
     - 24
     - 25
-    - 32
-    - 33
+    - 26
+    - 27
+    - 34
 - Components:
     - Type: 0
       Data:
@@ -36,123 +37,115 @@
             Name: lambert2
             Effect: Mesh
             Diffuse: ColorGrid
-        - Entity: 32
-          Model: testchar
-          Material:
-            Name: TestSpawnpoint
-            Effect: Mesh_NormalMap
-            Diffuse: WStexture
-            Specular: WSSpecular
-            Normal: WSNormal
-            Glow: WSGlowRed
+        - Entity: 26
     - Type: 1
       Data:
         - Entity: 0
-          Position: [0, 9.34835, 0]
-          Rotation: [3.22274e-008, 0.67559, -0.737277, -2.9531e-008]
+          Position: [0, 9.35, 0]
+          Rotation: [2.67222e-008, -0.67559, 0.737277, -3.48012e-008]
           Scale: [1, 1, 1]
         - Entity: 1
-          Position: [-24.1224, 26.2418, 23.9302]
+          Position: [-24.12, 26.24, 23.93]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 2
-          Position: [23.5989, 26.2418, 23.9302]
+          Position: [23.6, 26.2418, 23.9302]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 3
-          Position: [23.5989, 26.2418, -23.854]
+          Position: [23.5989, 26.2418, -23.85]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 4
-          Position: [-23.9084, 26.2418, -23.854]
+          Position: [-23.91, 26.2418, -23.854]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 5
-          Position: [-4.46443, 4.92628, 170.841]
+          Position: [-4.46, 4.93, 170.84]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 6
-          Position: [168.476, 6.38947, -10.7031]
+          Position: [168.48, 6.39, -10.7]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 7
-          Position: [1.0341, 5.6255, 1.11879]
+          Position: [1.03, 5.63, 1.12]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 8
-          Position: [-170.685, 5.14577, 4.45738]
+          Position: [-170.68, 5.15, 4.46]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 9
-          Position: [-51.7887, 4.4431, -3.76491]
+          Position: [-51.79, 4.44, -3.76]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 10
-          Position: [-3.8762, 4.20245, 51.214]
+          Position: [-3.88, 4.2, 51.21]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 11
-          Position: [51.1752, 4.38794, 3.23827]
+          Position: [51.18, 4.39, 3.24]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 12
-          Position: [3.47767, 4.35236, -51.494]
+          Position: [3.48, 4.35, -51.49]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 13
-          Position: [-49.0998, 4.33627, 16.8951]
+          Position: [-49.1, 4.34, 16.9]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 14
-          Position: [16.5669, 4.23291, 48.6152]
+          Position: [16.57, 4.23, 48.62]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 15
-          Position: [48.3288, 4.25297, -17.1382]
+          Position: [48.33, 4.25, -17.14]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 16
-          Position: [-17.0434, 4.25718, -48.716]
+          Position: [-17.04, 4.26, -48.72]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 17
-          Position: [-46.0505, 4.33761, -23.9915]
+          Position: [-46.05, 4.34, -23.99]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 18
-          Position: [-23.8658, 4.22514, 45.4788]
+          Position: [-23.87, 4.23, 45.48]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 19
-          Position: [45.6962, 4.23325, 23.2648]
+          Position: [45.7, 4.23325, 23.26]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 20
-          Position: [23.6109, 4.20746, -45.8939]
+          Position: [23.61, 4.21, -45.89]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 21
-          Position: [0, 2.72062, 0]
+          Position: [0, 2.72, 0]
           Rotation: [0, 0, 0, 1]
-          Scale: [0.505477, 0.505477, 0.505477]
+          Scale: [0.51, 0.51, 0.51]
         - Entity: 22
-          Position: [-375.252, 90.8842, -375.037]
+          Position: [-375.25, 90.88, -375.04]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 23
-          Position: [374.61, 90.8842, -375.218]
+          Position: [374.61, 90.8842, -375.22]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 24
-          Position: [375.322, 112.415, 375.011]
+          Position: [375.32, 112.42, 375.01]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
         - Entity: 25
-          Position: [-374.342, 112.415, 374.499]
+          Position: [-374.34, 112.415, 374.5]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
-        - Entity: 32
-          Position: [0, 0, 0]
+        - Entity: 26
+          Position: [0, 5.73426, 0]
           Rotation: [0, 0, 0, 1]
           Scale: [1, 1, 1]
     - Type: 2
@@ -178,7 +171,7 @@
         []
     - Type: 6
       Data:
-        - Entity: 21
+        []
     - Type: 8
       Data:
         []
@@ -193,8 +186,6 @@
         - Entity: 21
           PhysicsType: 0
           PhysicsShape: 3
-          CollideWithWorld: true
-          CollideWithStatic: true
           MeshHandle: colorCube3.0Shape0
     - Type: 15
       Data:
@@ -244,7 +235,7 @@
 - Tags:
     - Id: 0
       Tag: Sun
-    - Id: 32
+    - Id: 26
       Tag: TestSpawnpoint
 - Groups:
     - Id: 5
@@ -351,5 +342,7 @@
       Name: Unnamed
     - ID: 25
       Name: Unnamed
-    - ID: 32
+    - ID: 26
       Name: Test Spawnpoint
+    - ID: 27
+      Name: Unnamed

@@ -318,7 +318,6 @@ namespace RootForce
 		control->m_invertMouse = g_engineContext.m_configManager->GetConfigValueAsBool("settings-mouse-invert");
 
 		g_engineContext.m_sound->PlayBackgroundSound("gustav4_2.mp3");
-		//g_engineContext->m_resourceManager->LoadSoundAudio("gustav4_2.mp3", SOUND_LOOP_NORMAL | )
 
 		// Setup the HUD manager.
 		m_hudManager->SetHUD(m_hud.get());

@@ -70,7 +70,7 @@ namespace RootEngine
 		if(m_models.find(p_path) == m_models.end())
 		{
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::START_PRINT, "[MODEL] Starting to load: '%s'", p_path.c_str());
-			Model* model = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + ".DAE", false);
+			Model* model = m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + p_path + ".DAE", p_path, false);
 
 			if(model)
 			{
@@ -92,7 +92,7 @@ namespace RootEngine
 		
 	}
 
-	Sound::SoundAudioInterface* ResourceManager::LoadSoundAudio( std::string p_name, unsigned p_flags )
+	Sound::SoundAudioInterface* ResourceManager::LoadSoundAudio( std::string p_name )
 	{
 		if(m_soundAudios.find(p_name) == m_soundAudios.end())
 		{
@@ -100,7 +100,7 @@ namespace RootEngine
 			if(soundaudio)
 			{
 				std::string filePath = m_workingDirectory + "Assets/Audio/" + p_name;
-				if(soundaudio->LoadSound(filePath, p_flags))
+				if(soundaudio->LoadSound(filePath))
 				{
 					m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[SOUND] Loaded: '%s'", p_name.c_str());
 					m_soundAudios[p_name] = soundaudio;
@@ -379,7 +379,7 @@ namespace RootEngine
 		else
 		{
 			std::string nonIndexed = p_handle.substr(0, p_handle.size()-1);
-			delete m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + nonIndexed + ".DAE", true);
+			delete m_modelImporter->LoadModel(m_workingDirectory + "Assets\\Models\\" + nonIndexed + ".DAE", p_handle, true);
 			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::PINK_PRINT, "TESTING LOADING PHYSICS MESH ONLY! %s", p_handle.c_str());
 			return m_physicMeshes[p_handle].get();
 		}

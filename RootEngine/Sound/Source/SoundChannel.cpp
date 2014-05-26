@@ -17,15 +17,17 @@ namespace RootEngine
 			m_channel->stop();
 		}
 
-		void SoundChannel::PlaySound( Sound::SoundAudioInterface* p_audio, float p_volume )
+		void SoundChannel::PlaySound( Sound::SoundAudioInterface* p_audio, float p_volume, unsigned p_flags )
 		{
 			HandleError(m_system->playSound(FMOD_CHANNEL_FREE, p_audio->GetFmodSound(), true, &m_channel));
 			HandleError(m_channel->setVolume(p_volume));
-			if(p_audio->Is3D())
+			HandleError(m_channel->setMode(p_flags));
+			if((p_flags & SOUND_3D) == SOUND_3D)
 			{
 				HandleError(m_channel->set3DDopplerLevel(0.0f)); //No doppler level
 				m_is3D = true;
 			}
+			
 			HandleError(m_channel->setPaused(false)); //Set attributes before starting sound
 		}
 

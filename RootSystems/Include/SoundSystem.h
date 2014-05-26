@@ -16,10 +16,10 @@ namespace RootForce
 {
 	struct SoundComponent : public ECS::Component<SoundComponent>
 	{
-		SoundComponent(): m_volume(0.5f), m_play(false), m_minDist(0.0f), m_maxDist(100.0f), m_soundChannel(nullptr), m_soundAudio(nullptr) {}
+		SoundComponent(): m_volume(0.5f), m_minDist(0.0f), m_maxDist(100.0f), m_soundChannel(nullptr), m_soundAudio(nullptr), m_flags(SOUND_DEFAULT) {}
 		~SoundComponent()
 		{
-			m_play = false;
+
 			m_soundChannel->SetVolume(0.0f);
 			m_soundChannel->SetPaused(true);
 			delete m_soundChannel;
@@ -27,10 +27,20 @@ namespace RootForce
 
 		RootEngine::Sound::SoundAudioInterface* m_soundAudio;
 		RootEngine::Sound::SoundChannelInterface* m_soundChannel;
-		bool m_play;
+
 		float m_volume;
 		float m_minDist;
 		float m_maxDist;
+		unsigned m_flags;
+
+		void PlaySound()
+		{
+			if (m_soundAudio == nullptr || m_soundChannel == nullptr)
+				return;
+
+			m_soundChannel->PlaySound(m_soundAudio, m_volume, m_flags);
+			m_soundChannel->SetMinMaxDistance(m_minDist, m_maxDist);
+		}
 	};
 
 	struct SoundSystem : public ECS::EntitySystem

@@ -8,6 +8,7 @@ ShroomExplosion.duration = 1.0;
 
 function ShroomExplosion.OnLoad()
 	ResourceManager.LoadParticle("Explosion_G-stuf");
+	ResourceManager.LoadSound("Abilities/Mine/mineexplode1-1.wav");
 end
 
 function ShroomExplosion.OnCreate (userId, actionId)
@@ -67,7 +68,9 @@ function ShroomExplosion.OnCollide (self, entity)
           if not health:IsDead() then
 				    health:Damage(abilityOwnerId, ShroomExplosion.damage * entity:GetStatChange():GetDamageResistance(), "ExplodingShroom");
 			    end
-			   Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), ShroomExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+			   	Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), ShroomExplosion.pushback * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
+				Static.PlaySound("Abilities/Mine/mineexplode1-1.wav", 1.0, selfPos, 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+
 			end
 		end
 	end

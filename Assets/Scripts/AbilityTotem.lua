@@ -12,6 +12,9 @@ function AbilityTotem.OnLoad()
 	ResourceManager.LoadTexture("TotemPoleDiffuse");
 	ResourceManager.LoadTexture("TotemPoleNormal");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
+	ResourceManager.LoadSound("Abilities/Turret/turretactive1-1.wav");
+	ResourceManager.LoadSound("Abilities/Turret/turretdeath1-1.wav");
+	--ResourceManager.LoadSound("Abilities/Turret/turretdeploy1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	TotemProjectile.OnLoad();
 end
 
@@ -68,6 +71,13 @@ function AbilityTotem.OnCreate (userId, actionId)
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
+		local soundable = Soundable.New(self);
+		soundable:SetSound("Abilities/Turret/turretactive1-1.wav");
+		soundable:SetFlags(bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+		soundable:SetRange(10.0, 100.0);
+		soundable:SetVolume(0.5);
+		soundable:Play();
+
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("TotemPole");
 		renderComp:SetMaterial("TotemPole");
@@ -86,6 +96,8 @@ end
 function AbilityTotem.Disappear(self)
 	if Global.IsClient then
 		self:RemoveRenderable();
+		self:RemoveSoundable();
+		Static.PlaySound("Abilities/Turret/turretdeath1-1.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	end
 
 	local network = self:GetNetwork();
