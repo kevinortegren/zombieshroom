@@ -949,7 +949,31 @@ namespace RootForce
 						health->LastDamageAbilityName = m.LastDamageSourceName;
 
 						RootForce::SoundComponent* soundable = m_world->GetEntityManager()->CreateComponent<RootForce::SoundComponent>(player);
-						soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("CC-BY3.0/death_crack11.wav", 0x00400011);
+						int random = rand() % 6;
+
+						switch (random)
+						{
+							case 0:
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath1-1.wav", 0x00400011);
+								break;
+							case 1:
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-3.wav", 0x00400011);
+								break;
+							case 2:
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-4.wav", 0x00400011);
+								break;
+							case 3:
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-5.wav", 0x00400011);
+								break;
+							case 4:
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-6.wav", 0x00400011);
+								break;
+							case 5:
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-7.wav", 0x00400011);
+								break;
+						default:
+							break;
+						}
 						soundable->m_soundChannel = g_engineContext.m_sound->CreateSoundChannel();
 						soundable->m_minDist = 1.0f;
 						soundable->m_maxDist = 50.0f;

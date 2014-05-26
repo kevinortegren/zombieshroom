@@ -10,6 +10,7 @@ HealCharges.crosshair = "crosshairNone";
 
 function HealCharges.OnLoad()
 	ResourceManager.LoadParticle("HealCharges");
+	ResourceManager.LoadSound("Abilities/heal1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 end
 
 function HealCharges.ChargeStart(userId, actionId)
@@ -51,6 +52,8 @@ function HealCharges.OnCreate (userId, actionId)
 	
   if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "HealCharges");
+		Static.Play3DSound("Abilities/heal1-1.wav", 1.0, tempPos, 10.0, 100.0);
+
   end
 end
 

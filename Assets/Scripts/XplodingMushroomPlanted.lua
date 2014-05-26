@@ -10,6 +10,7 @@ function XplodingMushroomPlanted.OnLoad()
 	ResourceManager.LoadTexture("XplodingMushroomNormal");
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadScript("ShroomExplosion");
+	ResourceManager.LoadSound("Abilities/Mine/mineland1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	ShroomExplosion.OnLoad();
 end
 
@@ -61,6 +62,8 @@ function XplodingMushroomPlanted.OnCreate (userId, actionId)
 		renderComp:SetMaterialDiffuse("XplodingMushroomDiffuse");
 		renderComp:SetMaterialNormal("XplodingMushroomNormal");
 		renderComp:SetMaterialEffect("Mesh_NormalMap");
+
+		Static.Play3DSound("Abilities/Mine/mineland1-1.wav", 1.0, startPos, 10.0, 100.0);
 	end
 end
 

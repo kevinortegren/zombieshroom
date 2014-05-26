@@ -8,6 +8,7 @@ SlowNova.crosshair = "crosshairNone";
 
 function SlowNova.OnLoad()
 	ResourceManager.LoadParticle("frostBlast");
+	ResourceManager.LoadSound("Abilities/frostshock1-2.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 end
 
 function SlowNova.ChargeStart(userId, actionId)
@@ -49,6 +50,7 @@ function SlowNova.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		ParticleEmitter.New(self, "frostBlast");
+    	Static.Play3DSound("Abilities/frostshock1-2.wav", 1.0, startPos, 10.0, 100.0);
 	end
 end
 

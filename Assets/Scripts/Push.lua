@@ -9,7 +9,10 @@ Push.duration = 0.5;
 
 function Push.OnLoad()
 	ResourceManager.LoadParticle("fireball");
-	ResourceManager.LoadSound("swosh-08.wav", 0x00400011);
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-6.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-7.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-8.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-9.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 end
 
 function Push.ChargeStart(userId, actionId)
@@ -102,7 +105,19 @@ function Push.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "PushMeMaybe");
-		Static.Play3DSound("swosh-08.wav", 1.0, self:GetTransformation():GetPos(), 50.0, 400.0);
+		
+		math.randomseed(os.time());
+		local randomNumber = math.random(1,4);	
+	
+		if randomNumber == 1 then
+			Static.Play3DSound("Movement/JumpingOneshots/jump2-6.wav", 1.0, startPos, 10.0, 100.0);
+		elseif randomNumber == 2 then
+			Static.Play3DSound("Movement/JumpingOneshots/jump2-7.wav", 1.0, startPos, 10.0, 100.0);
+		elseif randomNumber == 3 then
+			Static.Play3DSound("Movement/JumpingOneshots/jump2-8.wav", 1.0, startPos, 10.0, 100.0);
+		elseif randomNumber == 4 then
+			Static.Play3DSound("Movement/JumpingOneshots/jump2-9.wav", 1.0, startPos, 10.0, 100.0);
+		end
 	end
 end
 

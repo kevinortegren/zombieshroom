@@ -1,6 +1,8 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include <AnimationSystem.h>
 #include <RootSystems/Include/StatChangeSystem.h>
+#include <RootSystems/Include/Transform.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 namespace RootForce
 {
@@ -16,7 +18,8 @@ namespace RootForce
 
 	void AnimationSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
-		
+		temptity = p_entity;
+
 		if(m_logger)
 		{
 			Renderable* renderable = m_renderables.Get(p_entity);
@@ -89,6 +92,8 @@ namespace RootForce
 
 		float TimeInTicks		= p_animation->UpperBodyAnim.m_animTime * p_ticksPerSecond;
 		m_upperAnimTime			= ((float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_startTime) + fmod(TimeInTicks, (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_duration);
+
+		
 	}
 
 	//LOWER
@@ -134,6 +139,49 @@ namespace RootForce
 
 		float TimeInTicks		= p_animation->LowerBodyAnim.m_animTime * p_ticksPerSecond;
 		m_lowerAnimTime			= ((float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_startTime) + fmod(TimeInTicks, (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_duration);
+		if(p_animation->LowerBodyAnim.m_animClip == AnimationClip::WALKING || p_animation->LowerBodyAnim.m_animClip == AnimationClip::LEFTFORWARD ||  p_animation->LowerBodyAnim.m_animClip == AnimationClip::RIGHTFORWARD)
+		{
+			float animTime = m_lowerAnimTime - (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_startTime * p_ticksPerSecond;
+			if((animTime >= 0.65f && animTime <= 0.75f) || (animTime >= 0.25f && animTime <= 0.35f))
+			{
+				if(!m_stepTaken)
+				{
+					glm::vec3 pos = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(temptity)->m_position;
+					
+					std::srand((int)(p_animation->LowerBodyAnim.m_animTime * 10000.0f));
+					int random = std::rand() % 6;
+
+					switch (random)
+					{
+					case 0:
+						m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-1.wav", 0x00400011)->PlayOnce3D(0.3f, pos, 10.0f, 100.0f);
+						break;
+					case 1:
+						m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-2.wav", 0x00400011)->PlayOnce3D(0.3f, pos, 10.0f, 100.0f);
+						break;
+					case 2:
+						m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-3.wav", 0x00400011)->PlayOnce3D(0.3f, pos, 10.0f, 100.0f);
+						break;
+					case 3:
+						m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-4.wav", 0x00400011)->PlayOnce3D(0.3f, pos, 10.0f, 100.0f);
+						break;
+					case 4:
+						m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-5.wav", 0x00400011)->PlayOnce3D(0.3f, pos, 10.0f, 100.0f);
+						break;
+					case 5:
+						m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-6.wav", 0x00400011)->PlayOnce3D(0.3f, pos, 10.0f, 100.0f);
+						break;
+					default:
+						break;
+					}
+					m_stepTaken = true;
+				}
+			}
+			else
+			{
+				m_stepTaken = false;
+			}
+		}
 	}
 
 	

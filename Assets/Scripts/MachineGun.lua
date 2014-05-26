@@ -10,6 +10,8 @@ MachineGun.crosshair = "crosshairPrecision";
 
 function MachineGun.OnLoad()
 	--ResourceManager.LoadParticle("MachineGun");
+	ResourceManager.LoadSound("Abilities/Machinegun/smg1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+
 end
 
 function MachineGun.ChargeStart(userId, actionId)
@@ -64,9 +66,11 @@ function MachineGun.OnCreate (userId, actionId)
 		renderComp:SetMaterialDiffuse("sandTiles");
 		renderComp:SetMaterialEffect("Mesh");
 		local waterComp = WaterCollider.New(self);
-		waterComp:SetDisturbPower(1);
+		waterComp:SetDisturbPower(0.3);
 		waterComp:SetDisturbInterval(0.3);
 		waterComp:SetRadius(1);
+		Static.Play3DSound("Abilities/Machinegun/smg1-1.wav", 0.5, startPos, 10.0, 100.0);
+
 	end
 end
 

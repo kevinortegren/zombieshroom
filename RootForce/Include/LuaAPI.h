@@ -92,7 +92,7 @@ namespace RootForce
 
 			RootEngine::Sound::SoundAudioInterface* sound = g_engineContext.m_resourceManager->LoadSoundAudio(name, SOUND_3D | SOUND_3D_LINEARSQUAREROLLOFF | SOUND_LOOP_OFF);
 			sound->PlayOnce3D(volume, position, minRange, maxRange);
-
+			
 			return 0;
 		}
 

@@ -102,6 +102,7 @@ namespace RootForce
 			SetUsage<Renderable>();
 			m_logger = nullptr;
 			m_blendTime = 0.1f;
+			m_stepTaken = false;
 		}
 		void Init();
 		void Begin();
@@ -140,5 +141,9 @@ namespace RootForce
 		float m_upperAnimTime;
 
 		glm::mat4 m_upperRootRotation;
+
+		bool m_stepTaken;
+
+		ECS::Entity* temptity;
 	};
 }
