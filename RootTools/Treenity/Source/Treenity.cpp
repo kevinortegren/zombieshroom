@@ -167,6 +167,7 @@ void Treenity::EntityCreated(ECS::Entity* p_entity)
 	ui.treeView_entityOutliner->EntityCreated(p_entity, m_projectManager->GetEntityName(p_entity));
 
 	Utils::Write("Entity added: " + QString::number(p_entity->GetId()));
+	Select(p_entity);
 }
 
 void Treenity::EntityRemoved(ECS::Entity* p_entity)
@@ -353,7 +354,6 @@ void Treenity::RenameEntity(ECS::Entity* p_entity, const QString& p_name)
 void Treenity::CreateEntity()
 {
 	ECS::Entity* e = m_engineInterface->CreateEntity();
-	Select(e);
 }
 
 void Treenity::DestroyEntity()
@@ -521,6 +521,10 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 				m_engineInterface->DeleteEntity(e);
 			}
 		}
+	}
+	if(event->key() == Qt::Key_A)
+	{
+		ClearSelection();
 	}
 	if (event->key() == Qt::Key_Escape)
 	{
