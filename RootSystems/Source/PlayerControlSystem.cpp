@@ -591,12 +591,6 @@ namespace RootForce
 
 		m_keybindings.push_back(Keybinding());
 		m_keybindings.back().Edge = false;
-		m_keybindings.back().ActionUp = PlayerAction::NONE;
-		m_keybindings.back().Action = PlayerAction::STRAFE_LEFT;
-		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_A);
-
-		m_keybindings.push_back(Keybinding());
-		m_keybindings.back().Edge = false;
 		m_keybindings.back().ActionUp = PlayerAction::JUMP_RELEASED;
 		m_keybindings.back().Action = PlayerAction::JUMP_PRESSED;
 		m_keybindings.back().Bindings.push_back(SDL_SCANCODE_SPACE);
