@@ -5,7 +5,7 @@
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
-
+#include <RootTools/Treenity/Include/Picking.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -24,34 +24,6 @@ TranslationTool::TranslationTool()
 	m_axisOBB[0] = RootForce::OBB(0.1f, m_axisLength, -0.1f, 0.1f, -0.1f, 0.1f, glm::mat4(1.0f));
 	m_axisOBB[1] = RootForce::OBB(-0.1f, 0.1f, 0.1f, m_axisLength, -0.1f, 0.1f, glm::mat4(1.0f));
 	m_axisOBB[2] = RootForce::OBB(-0.1f, 0.1f, -0.1f, 0.1f, 0.1f, m_axisLength, glm::mat4(1.0f));
-}
-
-void TranslationTool::Debug(RootForce::OBB* obb, const glm::mat4x4& p_space, const glm::vec3& p_color)
-{
-	glm::vec4 positions[8];
-	positions[0] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_minZ, 1.0f);
-	positions[1] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_minZ, 1.0f);
-	positions[2] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_maxZ, 1.0f);
-	positions[3] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_maxZ, 1.0f);
-	positions[4] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_minZ, 1.0f);
-	positions[5] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_minZ, 1.0f);
-	positions[6] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_maxZ, 1.0f);
-	positions[7] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_maxZ, 1.0f);
-
-	unsigned int indices[] = 
-	{ 
-		0, 2, 2, 3, 3, 1, 1, 0,
-		4, 6, 6, 7, 7, 5, 5, 4,
-		0, 4, 2, 6, 3, 7, 1, 5 
-	};
-
-	for(int i = 0; i < 24; i += 2)
-	{
-		glm::vec3 pos1, pos2;
-		pos1 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i]]);
-		pos2 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i+1]]);
-		g_engineContext.m_renderer->AddLine(pos1, pos2, glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
-	}
 }
 
 TranslationTool::~TranslationTool()
@@ -89,9 +61,38 @@ bool TranslationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	
 	if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN_EDGE)
 	{
-		m_position_t0 = selectedTrans->m_position;
-		//Set selected axis when clicked
 		m_selectedAxis = m_hoverAxis;
+
+		switch(m_selectedAxis)
+		{
+		case TranslationAxis::AXIS_X:
+			m_axis = -selectedTrans->m_orientation.GetRight();
+			break;
+			
+		case TranslationAxis::AXIS_Y:
+			m_axis = selectedTrans->m_orientation.GetUp();
+			break;
+			
+		case TranslationAxis::AXIS_Z:
+			m_axis = selectedTrans->m_orientation.GetFront();
+			break;
+		};
+
+		glm::vec3 cameraDir = glm::normalize(selectedTrans->m_position - p_cameraPos); 
+		glm::vec3 b = glm::normalize(glm::cross(cameraDir, m_axis));
+		m_pickedPlaneNormal = glm::cross(b, m_axis);
+
+		g_engineContext.m_renderer->AddLine(selectedTrans->m_position, selectedTrans->m_position + m_axis * 10.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		g_engineContext.m_renderer->AddLine(selectedTrans->m_position, selectedTrans->m_position + b * 10.0f, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		g_engineContext.m_renderer->AddLine(selectedTrans->m_position, selectedTrans->m_position + m_pickedPlaneNormal * 10.0f, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+
+		float t = 999999.0f;
+		RayVsPlane(selectedTrans->m_position, m_pickedPlaneNormal, p_cameraPos, p_ray, t);
+		glm::vec3 hit = p_cameraPos + t * p_ray;		
+		m_dist0 = glm::dot(hit, m_axis);
+
+		m_position_t0 = selectedTrans->m_position;
+
 		if(m_selectedAxis != TranslationAxis::AXIS_NONE)
 			return true;
 	}
@@ -123,11 +124,11 @@ void TranslationTool::SetPosition(const glm::vec3& p_position)
 
 	if(m_visible)
 	{
-		glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), toolTransform->m_position);
+		m_transformMatrix = glm::translate(glm::mat4(1.0f), toolTransform->m_position);
 		if(m_editorInterface->GetToolMode() == ToolMode::LOCAL)
 		{
 			m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_orientation = selectedTransform->m_orientation;
-			transformMatrix = glm::rotate(transformMatrix, selectedTransform->m_orientation.GetAngle(), selectedTransform->m_orientation.GetAxis());
+			m_transformMatrix = glm::rotate(m_transformMatrix, selectedTransform->m_orientation.GetAngle(), selectedTransform->m_orientation.GetAxis());
 		}
 		else
 		{
@@ -136,9 +137,9 @@ void TranslationTool::SetPosition(const glm::vec3& p_position)
 
 		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_position = p_position;
 
-		Debug(&m_axisOBB[0], transformMatrix, glm::vec3(1,0,0));
-		Debug(&m_axisOBB[1], transformMatrix, glm::vec3(1,0,0));
-		Debug(&m_axisOBB[2], transformMatrix, glm::vec3(1,0,0));
+		Debug(&m_axisOBB[0], m_transformMatrix, glm::vec3(1,0,0));
+		Debug(&m_axisOBB[1], m_transformMatrix, glm::vec3(1,0,0));
+		Debug(&m_axisOBB[2], m_transformMatrix, glm::vec3(1,0,0));
 
 
 		/*//X
@@ -244,35 +245,13 @@ void TranslationTool::Drag( const glm::vec3& p_ray, const glm::vec3& p_camPos)
 	RootForce::Transform* selectedTrans =  m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
 	glm::vec3 selectedPos = selectedTrans->m_position;
 
-	switch (m_selectedAxis)
-	{
-	case TranslationAxis::AXIS_X: 
-		{
-			glm::vec3 camPos = glm::vec3(selectedPos.x, p_camPos.y, p_camPos.z);
-			PointOnPlane pointOnPlane = GetPointOnPlane(camPos, p_camPos, p_ray);
-			if(pointOnPlane.Hit)
-				selectedTrans->m_position.x = pointOnPlane.Point.x - GetDragOffset(pointOnPlane.Point.x, selectedTrans->m_position.x);
-		}
-		break;
-	case TranslationAxis::AXIS_Y: 
-		{
-			glm::vec3 camPos = glm::vec3(p_camPos.x, selectedPos.y, p_camPos.z);
-			PointOnPlane pointOnPlane = GetPointOnPlane(camPos, p_camPos, p_ray);
-			if(pointOnPlane.Hit)
-				selectedTrans->m_position.y = pointOnPlane.Point.y - GetDragOffset(pointOnPlane.Point.y, selectedTrans->m_position.y);
-		}
-		break;
-	case TranslationAxis::AXIS_Z: 
-		{
-			glm::vec3 camPos = glm::vec3(p_camPos.x, p_camPos.y, selectedPos.z);
-			PointOnPlane pointOnPlane = GetPointOnPlane(camPos, p_camPos, p_ray);
-			if(pointOnPlane.Hit)
-				selectedTrans->m_position.z = pointOnPlane.Point.z - GetDragOffset(pointOnPlane.Point.z, selectedTrans->m_position.z);
-		}
-		break;
-	default:
-		break;
-	}
+	float t = 999999.0f;
+	RayVsPlane(selectedPos, m_pickedPlaneNormal, p_camPos, p_ray, t);
+	glm::vec3 hit = p_camPos + t * p_ray;
+			
+	float distDelta = m_dist0 - glm::dot(hit, m_axis);
+
+	selectedTrans->m_position = m_position_t0 - distDelta * m_axis;
 }
 
 TranslationAxis::TranslationAxis TranslationTool::RayVsAxis( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
@@ -295,7 +274,10 @@ TranslationAxis::TranslationAxis TranslationTool::RayVsAxis( const glm::vec3& p_
 	//Test Axis selection
 	for(int i = 0; i < 3; ++i)
 	{
-		float collisionDistance = CheckRayVsAABB(p_ray, p_cameraPos, toolPos + m_axisAABB[i].m_lower, toolPos + m_axisAABB[i].m_upper);
+		float collisionDistance = 999999.0f;
+		RayVsOBB(p_cameraPos, p_ray, &m_axisOBB[i], m_transformMatrix, collisionDistance);
+		
+		//float collisionDistance = CheckRayVsAABB(p_ray, p_cameraPos, toolPos + m_axisAABB[i].m_lower, toolPos + m_axisAABB[i].m_upper);
 		if(collisionDistance < closestDist && collisionDistance >= 0.0f)
 		{
 			//An axis is hit! Must loop through all axis to be sure of the closet.
