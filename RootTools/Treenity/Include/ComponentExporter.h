@@ -14,13 +14,26 @@ static void Exporter(YAML::Emitter& p_emitter, ECS::ComponentInterface* p_compon
 	{
 		case RootForce::ComponentType::RENDERABLE:
 			{
+				RootForce::Renderable* renderable = static_cast<RootForce::Renderable*>(p_component);	
+				
+				// Ignore exporting water renderable.
 				ECS::Entity* water = g_world->GetTagManager()->GetEntityByTag("Water");
 				RootForce::Renderable* waterRenderable = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(water);
-				RootForce::Renderable* renderable = static_cast<RootForce::Renderable*>(p_component);	
 				if(waterRenderable == renderable)
 				{
 					return;
 				}
+
+				// Ignore exporting test spawnpoint renderable.
+				ECS::Entity* spawnpoint = g_world->GetTagManager()->GetEntityByTag("TestSpawnpoint");
+				RootForce::Renderable* spawnpointRenderable = g_world->GetEntityManager()->GetComponent<RootForce::Renderable>(spawnpoint);
+				if(spawnpointRenderable == renderable)
+				{
+					return;
+				}
+
+
+
 				if(renderable->m_model != nullptr)
 				{
 					std::string s = g_engineContext.m_resourceManager->ResolveStringFromModel(renderable->m_model);

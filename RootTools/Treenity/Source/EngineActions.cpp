@@ -146,28 +146,33 @@ void EngineActions::CreateFreeFlyingCamera()
 void EngineActions::CreateTestSpawnpoint()
 {
 	m_testSpawnpoint = m_world->GetTagManager()->GetEntityByTag("TestSpawnpoint");
+	RootForce::Transform* transform;
+	RootForce::Renderable* renderable;
+
 	if (m_testSpawnpoint == nullptr)
 	{
 		m_testSpawnpoint = m_world->GetEntityManager()->CreateEntity();
 
-		RootForce::Transform* transform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_testSpawnpoint);
-		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_testSpawnpoint);
-
-		renderable->m_material = g_engineContext.m_renderer->CreateMaterial("TestSpawnpoint");
-		renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
-		renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TextureType::TEXTURE_2D);
-		renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture("WSGlowRed", Render::TextureType::TextureType::TEXTURE_2D);
-		renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TextureType::TEXTURE_2D);
-		renderable->m_material->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TextureType::TEXTURE_2D);
-		renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
-
-		//m_world->GetGroupManager()->RegisterEntity("NonExport", m_testSpawnpoint);
-		m_world->GetTagManager()->RegisterEntity("TestSpawnpoint", m_testSpawnpoint);
+		transform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_testSpawnpoint);
+		renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_testSpawnpoint);
+	}
+	else
+	{
+		transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_testSpawnpoint);
+		renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_testSpawnpoint);
 	}
 
-	// Add a shadow technique to the spawn point (which is not exported).
-	RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_testSpawnpoint);
+	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("TestSpawnpoint");
+	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
+	renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture("WSGlowRed", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 	renderable->m_shadowTech = Render::ShadowTechnique::SHADOW_DYNAMIC;
+
+	//m_world->GetGroupManager()->RegisterEntity("NonExport", m_testSpawnpoint);
+	m_world->GetTagManager()->RegisterEntity("TestSpawnpoint", m_testSpawnpoint);
 }
 
 void EngineActions::CreateWater()
