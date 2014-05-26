@@ -11,6 +11,8 @@
 #include <RootEngine/Render/Include/Renderer.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
 
+#include <RootSystems/Include/Transform.h>
+
 #include <RootTools/Treenity/Include/Utils.h>
 
 
@@ -61,6 +63,20 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 	}
 
 	m_pieMenu = std::shared_ptr<PieMenu>(new PieMenu(nullptr));
+	
+	PiePiece* tempPiece;
+
+	tempPiece = m_pieMenu->addPiece("Resources/folder.png");
+	connect(tempPiece, SIGNAL(clicked()), this, SLOT(pieMenuClickTest()));
+	tempPiece = m_pieMenu->addPiece("Resources/genericicon.png");
+	connect(tempPiece, SIGNAL(clicked()), this, SLOT(PieMenuAddComponent()));
+	tempPiece = m_pieMenu->addPiece("Resources/nopreview.png");
+	tempPiece = m_pieMenu->addPiece("Resources/playButton.png");
+	tempPiece = m_pieMenu->addPiece("Resources/resizeButton.png");
+	tempPiece = m_pieMenu->addPiece("Resources/rotateButton.png");
+	tempPiece = m_pieMenu->addPiece("Resources/translateButton.png");
+	tempPiece = m_pieMenu->addPiece("Resources/xmlicon.png");
+	
 }
 
 Canvas3D::~Canvas3D()
@@ -100,7 +116,8 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 
 void Canvas3D::mousePressEvent( QMouseEvent* event )
 {
-	if (event->button() == Qt::RightButton) {
+
+	if (event->button() == Qt::RightButton && !(event->modifiers() & Qt::AltModifier)) {
 		/*paj->setIconSize(QSize(40,40));
 		paj->addAction("", QIcon("Resources/resizeButton.png"), nullptr, nullptr);
 		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
@@ -194,3 +211,25 @@ void Canvas3D::SetEngineInterface( EngineInterface* p_engineInterface )
 {
 	m_engineInterface = p_engineInterface;
 }
+
+void Canvas3D::pieMenuClickTest()
+{
+	Utils::Write("We clicked PieMenu :)");
+	ECS::Entity* entity = m_engineInterface->CreateEntity();
+	m_engineInterface->SetPosition(entity, m_engineInterface->GetPosition(m_engineInterface->GetEntityByTag("AimingDevice")));
+	//trans->m_position =  m_engineInterface->GetWorld()->GetEntityManager()->GetComponent<RootForce::Transform>(m_engineInterface->GetWorld()->GetTagManager()->GetEntityByTag("AimingDevice"))->m_position;
+}
+
+void Canvas3D::PieMenuAddComponent()
+{
+	if(m_editorInterface->GetSelection().size() == 1)
+	{
+		m_engineInterface->AddRenderable(*m_editorInterface->GetSelection().begin());
+	}
+}
+
+void Canvas3D::SetEditorInterface( EditorInterface* p_editorInterface )
+{
+	m_editorInterface = p_editorInterface;
+}
+

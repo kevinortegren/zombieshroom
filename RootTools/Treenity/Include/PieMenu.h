@@ -9,13 +9,14 @@ class PiePiece : public QGraphicsObject
 {
 	Q_OBJECT
 public:
-	PiePiece(int index, int radius, QPoint position, PieMenu* parent);
+	PiePiece(int index, int radius, QPoint position, PieMenu* parent, const QString& p_imageName);
 	QPainterPath shape() const;
 	QRectF boundingRect() const;
 	void updatePosition();
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*);
 	bool isHovered() const;
 	void setHovered(bool state);
+	void trigger();
 public slots:
 	void hide();
 protected:
@@ -46,6 +47,7 @@ public:
 	~PieMenu();
 
 	bool canSee() const;
+	PiePiece* addPiece(const QString& p_imageName);
 public slots:
 	void showMenu();
 	void closeMenu();

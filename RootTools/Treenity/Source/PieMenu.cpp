@@ -8,7 +8,7 @@
 #include <qmath.h>
 #include <iostream>
 
-PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent)
+PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent, const QString& p_imageName)
 	: m_startAngle((360 / 8) * index), m_radius(radius), m_center(position), m_parent(parent), m_hovered(false)
 {
 	setParent((QObject*)m_parent);
@@ -24,9 +24,7 @@ PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent)
 	m_shapePath.arcTo(smallRect, m_startAngle + 45, -360 / 8);
 	m_shapePath.closeSubpath();
 
-	m_pixmap = QPixmap("Resources/resizeButton.png").scaled(QSize(32, 32), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-	
-	connect(this, SIGNAL(clicked()), m_parent, SLOT(closeMenu()));
+	m_pixmap = QPixmap(p_imageName).scaled(QSize(32, 32), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 QPainterPath PiePiece::shape() const 
@@ -64,7 +62,7 @@ void PiePiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	painter->drawPath(m_shapePath);
 	painter->fillPath(m_shapePath, painter->brush());
 
-	QPointF pixpoint = (0.6 * m_radius) * angleToVector(2 * M_PI * (m_startAngle + 22.5) / 360.0) - QPointF(-16, -16);
+	QPointF pixpoint = (0.75 * m_radius) * angleToVector(2 * M_PI * (m_startAngle + 22.5) / 360.0) + QPointF(-16, -16);
 	/*
 	grad.setColorAt(down ? 1 : 0, Qt::darkGray);
 	grad.setColorAt(down ? 0 : 1, Qt::lightGray);
@@ -133,6 +131,11 @@ void PiePiece::setHovered( bool state )
 	update();
 }
 
+void PiePiece::trigger()
+{
+	emit clicked();
+}
+
 
 
 PieMenu::PieMenu(QWidget* parent)
@@ -153,14 +156,6 @@ PieMenu::PieMenu(QWidget* parent)
 	m_view->setAttribute(Qt::WA_AlwaysShowToolTips);
 	m_view->setAttribute(Qt::WA_TranslucentBackground);
 	m_view->hide();
-
-	for (int i = 0; i < 8; ++i)
-	{
-		PiePiece* piece = new PiePiece(i, m_radius, QCursor::pos(), this);
-		piece->setAcceptedMouseButtons(Qt::NoButton);
-		m_pieces.push_back(piece);
-		m_scene->addItem(piece);
-	}
 
 	//m_background = new QGraphicsPixmapItem();
 	//m_scene->addItem(m_background);
@@ -212,6 +207,11 @@ void PieMenu::showMenu()
 
 void PieMenu::closeMenu()
 {
+	if (m_hoveredIndex >= 0 && m_hoveredIndex < 8)
+	{
+		m_pieces[m_hoveredIndex]->trigger();
+	}
+
 	for (int i = 0; i < m_pieces.size(); ++i)
 	{
 		m_pieces[i]->setAcceptHoverEvents(false);
@@ -280,6 +280,17 @@ void PieMenu::setHovered( int index, bool state )
 	if (!state)
 		m_hoveredIndex = -1;
 }
+
+PiePiece* PieMenu::addPiece( const QString& p_imageName )
+{
+	PiePiece* piece = new PiePiece(m_pieces.size(), m_radius, QCursor::pos(), this, p_imageName);
+	piece->setAcceptedMouseButtons(Qt::NoButton);
+	m_pieces.push_back(piece);
+	m_scene->addItem(piece);
+
+	return piece;
+}
+
 
 QPointF angleToVector( qreal radians )
 {

@@ -312,6 +312,11 @@ void EngineActions::DeleteEntity(ECS::Entity* p_entity)
 	m_world->GetEntityManager()->RemoveEntity(p_entity);
 }
 
+ECS::Entity* EngineActions::GetEntityByTag( const std::string& p_tag )
+{
+	return m_world->GetTagManager()->GetEntityByTag(p_tag);
+}
+
 const ECS::World* EngineActions::GetWorld()
 {
 	return m_world;
@@ -361,7 +366,7 @@ const glm::vec3& EngineActions::GetScale(ECS::Entity* p_entity)
 void EngineActions::AddRenderable(ECS::Entity* p_entity)
 {
 	RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
-	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/box");
+	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
 	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("DefaultMaterial");
 	renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 }
