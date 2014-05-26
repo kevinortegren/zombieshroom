@@ -12,9 +12,9 @@ Homing.crosshair = "crosshairPrecision";
 
 function Homing.OnLoad()
 	ResourceManager.LoadParticle("magic_missile_01");
-	ResourceManager.LoadSound("Abilities/MagicMissile/missilefire1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	ResourceManager.LoadSound("Abilities/MagicMissile/missilehit1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	ResourceManager.LoadSound("Abilities/MagicMissile/missilefly2-2.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/MagicMissile/missilefire1-1.wav");
+	ResourceManager.LoadSound("Abilities/MagicMissile/missilehit1-1.wav");
+	ResourceManager.LoadSound("Abilities/MagicMissile/missilefly2-2.wav");
 end
 
 function Homing.ChargeStart(userId, actionId)
@@ -94,7 +94,7 @@ function Homing.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));
 	if Global.IsClient then
 		
-		Static.Play3DSound("Abilities/MagicMissile/missilefire1-1.wav", 1.0, startPos, 10.0, 100.0);
+		Static.PlaySound("Abilities/MagicMissile/missilefire1-1.wav", 1.0, startPos, 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		
 		local particleComp = ParticleEmitter.New(self, "magic_missile_01");
 		local pointlightComp = PointLight.New(self);
@@ -103,7 +103,8 @@ function Homing.OnCreate (userId, actionId)
 		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
 
 		local soundable = Soundable.New(self);
-		soundable:SetSound("Abilities/MagicMissile/missilefly2-2.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+		soundable:SetSound("Abilities/MagicMissile/missilefly2-2.wav");
+		soundable:SetFlags(bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		soundable:SetRange(10.0, 100.0);
 		soundable:SetVolume(1.0);
 		soundable:Play();
@@ -125,7 +126,7 @@ if entity:DoesExist() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
 				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), "Homing");
-				Static.Play3DSound("Abilities/MagicMissile/missilehit1-1.wav", 1.0, entity:GetTransformation():GetPos(), 10.0, 100.0);
+				Static.PlaySound("Abilities/MagicMissile/missilehit1-1.wav", 1.0, entity:GetTransformation():GetPos(), 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 			end
 			Homing.OnDestroy(self);
 		end

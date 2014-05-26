@@ -12,7 +12,7 @@ IceCube.crosshair = "";
 function IceCube.OnLoad()
 	ResourceManager.LoadModel("PentagonSphere");
 	ResourceManager.LoadEffect("Mesh_Refractive_Clear");
-	ResourceManager.LoadSound("Abilities/Bubble/bubblefire1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/Bubble/bubblefire1-1.wav");
 end
 
 function IceCube.ChargeStart(userId, actionId)
@@ -61,7 +61,7 @@ function IceCube.OnCreate (userId, actionId)
 		renderComp:SetMaterial("IceCubeer");
 		renderComp:SetShadowTechnique(ShadowTechnique.SHADOW_NONE);
 		renderComp:SetMaterialEffect("Mesh_Refractive_Clear");
-		Static.Play3DSound("Abilities/Bubble/bubblefire1-1.wav", 1.0, startPos, 10.0, 100.0);
+		Static.PlaySound("Abilities/Bubble/bubblefire1-1.wav", 0.4, startPos, 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		local waterCollider = WaterCollider.New(self);
       	waterCollider:SetDisturbPower(0.5);
       	waterCollider:SetDisturbInterval(2.5);

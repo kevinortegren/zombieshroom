@@ -11,8 +11,8 @@ PowerRay.duration = 0.4;
 PowerRay.crosshair = "crosshairPrecision";
 
 function PowerRay.OnLoad()
-	ResourceManager.LoadSound("Abilities/SniperRay/sniperrayfire1-3.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	ResourceManager.LoadSound("Abilities/SniperRay/sniperrayhit1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/SniperRay/sniperrayfire1-3.wav");
+	ResourceManager.LoadSound("Abilities/SniperRay/sniperrayhit1-1.wav");
 end
 
 function PowerRay.ChargeStart(userId, actionId)
@@ -48,9 +48,10 @@ function PowerRay.OnCreate (userId, actionId)
 	local soundable = Soundable.New(self);
 	
 	--Setting stuff
-	soundable:SetSound("Abilities/SniperRay/sniperrayfire1-3.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	soundable:SetSound("Abilities/SniperRay/sniperrayfire1-3.wav");
 	soundable:SetRange(10.0, 50.0);
 	soundable:SetVolume(0.4);
+	soundable:SetFlags( bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	soundable:Play();
 
 	collisionComp:CreateHandle(self, 1, true);
@@ -102,7 +103,7 @@ if entity:DoesExist() then
 			Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 		end
 	end
-	Static.Play3DSound("Abilities/SniperRay/sniperrayhit1-1.wav", 0.6, entity:GetTransformation():GetPos(), 10.0, 50.0);
+	Static.PlaySound("Abilities/SniperRay/sniperrayhit1-1.wav", 0.6, entity:GetTransformation():GetPos(), 10.0, 50.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 end
 end
 

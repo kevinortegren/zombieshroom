@@ -715,22 +715,22 @@ namespace RootForce
 			switch (random)
 			{
 			case 0:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-1.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-1.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			case 1:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-2.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-2.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			case 2:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-3.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-3.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			case 3:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-4.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-4.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			case 4:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-5.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-5.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			case 5:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-6.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-6.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			default:
 				break;
@@ -742,13 +742,13 @@ namespace RootForce
 			switch (random)
 			{
 			case 0:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-1.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-1.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			case 1:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-2.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-2.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			case 2:
-				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-3.wav", 0x00400011)->PlayOnce3D(1.0f, p_pos, 10.0f, 100.0f);
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-3.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
 				break;
 			default:
 				break;

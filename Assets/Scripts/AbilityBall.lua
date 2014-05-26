@@ -19,8 +19,8 @@ function AbilityBall.OnLoad()
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("SmockeochElden");
 	ResourceManager.LoadScript("Explosion");
-	ResourceManager.LoadSound("Abilities/Fireball/fireballhit1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	ResourceManager.LoadSound("Abilities/Fireball/fireballfly1-2.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/Fireball/fireballhit1-1.wav");
+	ResourceManager.LoadSound("Abilities/Fireball/fireballfly1-2.wav");
 
 end
 
@@ -52,7 +52,7 @@ function AbilityBall.Explode(self)
 	self:GetParticleEmitter():SetAlive(-1.0);
 
 	self:RemoveSoundable();
-	Static.Play3DSound("Abilities/Fireball/fireballhit1-1.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0);
+	Static.PlaySound("Abilities/Fireball/fireballhit1-1.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 end
 
 function AbilityBall.OnCreate (userId, actionId)
@@ -87,9 +87,10 @@ function AbilityBall.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		local soundable = Soundable.New(self);
-		soundable:SetSound("Abilities/Fireball/fireballfly1-2.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+		soundable:SetSound("Abilities/Fireball/fireballfly1-2.wav");
 		soundable:SetRange(10.0, 100.0);
 		soundable:SetVolume(1.0);
+		soundable:SetFlags(bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		soundable:Play();
 
 		local renderComp = Renderable.New(self);

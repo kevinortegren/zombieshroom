@@ -20,8 +20,8 @@ function Cannonball.OnLoad()
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("CannonballTrail");
 	ResourceManager.LoadScript("BigExplosion");
-	ResourceManager.LoadSound("Abilities/Cannonball/cannonballhit1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	ResourceManager.LoadSound("Abilities/Cannonball/cannonballfire1-2.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/Cannonball/cannonballhit1-1.wav");
+	ResourceManager.LoadSound("Abilities/Cannonball/cannonballfire1-2.wav");
 	BigExplosion.OnLoad();
 end
 
@@ -51,7 +51,7 @@ function Cannonball.Explode(self)
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
 
-	Static.Play3DSound("Abilities/Cannonball/cannonballhit1-1.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 200.0);
+	Static.PlaySound("Abilities/Cannonball/cannonballhit1-1.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 200.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 
 	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "Cannonball", "OnDestroy", self);
 end
@@ -87,7 +87,7 @@ function Cannonball.OnCreate (userId, actionId)
 	transformComp:SetPos(startPos);
 
 	if Global.IsClient then
-		Static.Play3DSound("Abilities/Cannonball/cannonballfire1-2.wav", 0.6, self:GetTransformation():GetPos(), 10.0, 100.0);
+		Static.PlaySound("Abilities/Cannonball/cannonballfire1-2.wav", 0.6, self:GetTransformation():GetPos(), 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		local renderComp = Renderable.New(self);
 		renderComp:SetModel("Primitives/sphereTangents");
 		renderComp:SetMaterial("Cannonballs");

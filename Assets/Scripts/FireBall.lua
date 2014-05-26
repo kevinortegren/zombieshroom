@@ -12,7 +12,7 @@ FireBall.crosshair = "";
 function FireBall.OnLoad()
 	ResourceManager.LoadParticle("SmockeochElden");
 	ResourceManager.LoadScript("FireBallExplosion");
-	ResourceManager.LoadSound("Abilities/Fireball/fireballfly1-2.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/Fireball/fireballfly1-2.wav");
 	FireBallExplosion.OnLoad();
 end
 
@@ -58,7 +58,8 @@ function FireBall.OnCreate (userId, actionId)
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, -9.82, 0));
 	transformComp:SetPos(startPos);
 
-	soundable:SetSound("Abilities/Fireball/fireballfly1-2.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	soundable:SetSound("Abilities/Fireball/fireballfly1-2.wav");
+	soundable:SetFlags(bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 	soundable:SetRange(10.0, 100.0);
 	soundable:SetVolume(1.0);
 	soundable:Play();

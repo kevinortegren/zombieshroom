@@ -8,7 +8,7 @@ AbilityDash.power = 25;
 AbilityDash.crosshair = "crosshairNone";
 
 function AbilityDash.OnLoad()
-	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-7.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-7.wav");
 end
 
 function AbilityDash.ChargeStart(userId, actionId)
@@ -31,7 +31,7 @@ function AbilityDash.ChannelingDone(time, userId, actionId)
 	
     Static.KnockBack(handle, Vec3.New(0,0.4,0)+frontVec, AbilityDash.power, 100);
 
-    Static.Play3DSound("Movement/JumpingOneshots/jump2-7.wav", 1.0, playerEnt:GetTransformation():GetPos(), 10.0, 100.0);
+    Static.PlaySound("Movement/JumpingOneshots/jump2-7.wav", 1.0, playerEnt:GetTransformation():GetPos(), 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 end
 
 function AbilityDash.Interrupted(time, userId, actionId)

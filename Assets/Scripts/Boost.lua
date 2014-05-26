@@ -9,7 +9,7 @@ Boost.duration = 5;
 Boost.crosshair = "crosshairNone";
 
 function Boost.OnLoad()
-	ResourceManager.LoadSound("Abilities/powerup-speedrun1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/powerup-speedrun1-1.wav");
 end
 
 function Boost.ChargeStart(userId, actionId)
@@ -21,7 +21,7 @@ function Boost.ChargeDone (time, userId, actionId)
 	statComp:SetSpeed(1.5);
 	statComp:SetJumpHeight(1.5);
 	TimerEntity.StartTimer(userId, actionId, Boost.duration, "Boost", "Reset", casterEnt);
-	Static.Play3DSound("Abilities/powerup-speedrun1-1.wav", 0.5, casterEnt:GetTransformation():GetPos(), 10.0, 100.0);
+	Static.PlaySound("Abilities/powerup-speedrun1-1.wav", 0.5, casterEnt:GetTransformation():GetPos(), 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 end
 
 function Boost.Reset(self)

@@ -79,19 +79,20 @@ namespace RootForce
 			return 1;
 		}
 
-		static int Play3DSound(lua_State* p_luaState)
+		static int PlaySound(lua_State* p_luaState)
 		{
-			///NAME, VOLUME, POSITION, MINRANGE, MAXRANGE
-			NumberOfArgs(5);
+			///NAME, VOLUME, POSITION, MINRANGE, MAXRANGE, FLAGS
+			NumberOfArgs(6);
 
 			std::string name = luaL_checkstring(p_luaState, 1);
 			float volume = (float) luaL_checknumber(p_luaState, 2);
 			glm::vec3 position = (*(glm::vec3*)luaL_checkudata(p_luaState, 3, "Vec3"));
 			float minRange = (float) luaL_checknumber(p_luaState, 4);
 			float maxRange = (float) luaL_checknumber(p_luaState, 5);
+			unsigned flags = (unsigned)luaL_checknumber(p_luaState, 6);
 
-			RootEngine::Sound::SoundAudioInterface* sound = g_engineContext.m_resourceManager->LoadSoundAudio(name, SOUND_3D | SOUND_3D_LINEARSQUAREROLLOFF | SOUND_LOOP_OFF);
-			sound->PlayOnce3D(volume, position, minRange, maxRange);
+			RootEngine::Sound::SoundAudioInterface* sound = g_engineContext.m_resourceManager->LoadSoundAudio(name);
+			sound->PlayOnce(volume, flags, position, minRange, maxRange);
 			
 			return 0;
 		}
@@ -2802,10 +2803,9 @@ namespace RootForce
 		}
 		static int SoundableSetSound(lua_State* p_luaState)
 		{
-			NumberOfArgs(3);
+			NumberOfArgs(2);
 			RootForce::SoundComponent **s = (RootForce::SoundComponent**)luaL_checkudata(p_luaState, 1, "Soundable");
-			unsigned flags = (unsigned)luaL_checknumber(p_luaState, 3);
-			(*s)->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio(luaL_checkstring(p_luaState, 2), flags);
+			(*s)->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio(luaL_checkstring(p_luaState, 2));
 			return 0;
 		}
 		static int SoundableSetRange(lua_State* p_luaState)
@@ -2827,7 +2827,14 @@ namespace RootForce
 		{
 			NumberOfArgs(1);
 			RootForce::SoundComponent **s = (RootForce::SoundComponent**)luaL_checkudata(p_luaState, 1, "Soundable");
-			(*s)->m_play = true;
+			(*s)->PlaySound();
+			return 0;
+		}
+		static int SoundableSetFlags(lua_State* p_luaState)
+		{
+			NumberOfArgs(2);
+			RootForce::SoundComponent **s = (RootForce::SoundComponent**)luaL_checkudata(p_luaState, 1, "Soundable");
+			(*s)->m_flags = (unsigned)luaL_checknumber(p_luaState, 2);
 			return 0;
 		}
 
@@ -3029,9 +3036,8 @@ namespace RootForce
 		}
 		static int ResourceLoadSound(lua_State* p_luaState)
 		{
-			NumberOfArgs(2);
-			unsigned flags = (unsigned)luaL_checknumber(p_luaState, 2);
-			g_engineContext.m_resourceManager->LoadSoundAudio(luaL_checkstring(p_luaState, 1), flags);
+			NumberOfArgs(1);
+			g_engineContext.m_resourceManager->LoadSoundAudio(luaL_checkstring(p_luaState, 1));
 			return 0;
 		}
 		static int ResourceLoadScript(lua_State* p_luaState)
@@ -3194,7 +3200,7 @@ namespace RootForce
 			{"GetDeltaTime", GetDeltaTime},
 			{"GetMousePosition", GetMousePosition},
 			{"GetMouseDelta", GetMouseDelta},
-			{"Play3DSound", Play3DSound},
+			{"PlaySound", PlaySound},
 			{"GetScroll", GetScroll},
 			{NULL, NULL}
 		};
@@ -3767,6 +3773,7 @@ namespace RootForce
 			{"SetRange", SoundableSetRange},
 			{"SetVolume", SoundableSetVolume},
 			{"Play", SoundablePlay},
+			{"SetFlags", SoundableSetFlags},
 			{NULL, NULL}
 		};
 

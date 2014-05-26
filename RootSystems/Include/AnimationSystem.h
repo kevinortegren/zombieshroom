@@ -87,10 +87,11 @@ namespace RootForce
 
 	struct Animation : public ECS::Component<Animation>
 	{
-		Animation(){}
+		Animation() : m_stepTaken(false){}
 		glm::mat4 m_bones[20];
 		AnimBodyPart UpperBodyAnim;
 		AnimBodyPart LowerBodyAnim;
+		bool m_stepTaken;
 	};
 
 	struct AnimationSystem : public ECS::ConcurrentSystem
@@ -102,7 +103,6 @@ namespace RootForce
 			SetUsage<Renderable>();
 			m_logger = nullptr;
 			m_blendTime = 0.1f;
-			m_stepTaken = false;
 		}
 		void Init();
 		void Begin();
@@ -132,18 +132,18 @@ namespace RootForce
 		void CalcBlendedPosition(aiVector3D& Out, Animation* p_anim, const aiNodeAnim* pNodeAnim, unsigned int p_toKeyFrame, const aiVector3D& p_startPosInNewPose, float p_animBlendTime);
 		void CalcBlendedRotation(aiQuaternion& Out, Animation* p_anim, const aiNodeAnim* pNodeAnim, unsigned int p_toKeyFrame, const  aiQuaternion& p_startRotInNewPose, float p_animBlendTime);
 
+		void PlayAnimSound();
+
 		Logging::LoggingInterface* m_logger;
 		RootEngine::GameSharedContext* m_context;
 
 		float m_blendTime;
-
+		float m_animSeedTime;
 		float m_lowerAnimTime;
 		float m_upperAnimTime;
 
 		glm::mat4 m_upperRootRotation;
 
-		bool m_stepTaken;
-
-		ECS::Entity* temptity;
+		ECS::Entity* m_temptity;
 	};
 }

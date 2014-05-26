@@ -117,7 +117,7 @@ namespace RootSystems
 							m_engineContext->m_physics->PlayerJump(*(collision->m_handle), playphys->JumpForce * statChange->JumpHeightChange);
 							//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 							
-							g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump1-1.wav", 0x00400011)->PlayOnce3D(0.2f, transform->m_position, 10.0f, 100.0f );
+							g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump1-1.wav")->PlayOnce(0.2f, 0x00400011, transform->m_position, 10.0f, 100.0f );
 
 							animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 							state->CurrentState = RootForce::EntityState::ASCENDING;
@@ -189,17 +189,17 @@ namespace RootSystems
 				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
 				//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
 
-				std::srand((int)time(NULL));
-				int random = std::rand() % 4;
+				//std::srand((int)time(NULL));
+				//int random = std::rand() % 4;
 
-				if(random == 0)
-					g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-1.wav", 0x00400011)->PlayOnce3D(0.2f, transform->m_position, 10.0f, 100.0f );
-				else if(random == 1)
+				//if(random == 0)
+					g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-1.wav")->PlayOnce(0.2f, 0x00400011, transform->m_position, 10.0f, 100.0f );
+				/*else if(random == 1)
 					g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-2.wav", 0x00400011)->PlayOnce3D(0.2f, transform->m_position, 10.0f, 100.0f );
 				else if(random == 2)
 					g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-3.wav", 0x00400011)->PlayOnce3D(0.2f, transform->m_position, 10.0f, 100.0f );
 				else if(random == 3)
-					g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-4.wav", 0x00400011)->PlayOnce3D(0.2f, transform->m_position, 10.0f, 100.0f );
+					g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-4.wav", 0x00400011)->PlayOnce3D(0.2f, transform->m_position, 10.0f, 100.0f );*/
 
 				state->CurrentState = RootForce::EntityState::GROUNDED;
 				action->JumpTime = 0.0f;

@@ -10,7 +10,7 @@ MachineGun.crosshair = "crosshairPrecision";
 
 function MachineGun.OnLoad()
 	--ResourceManager.LoadParticle("MachineGun");
-	ResourceManager.LoadSound("Abilities/Machinegun/smg1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/Machinegun/smg1-1.wav");
 
 end
 
@@ -69,7 +69,7 @@ function MachineGun.OnCreate (userId, actionId)
 		waterComp:SetDisturbPower(0.3);
 		waterComp:SetDisturbInterval(0.3);
 		waterComp:SetRadius(1);
-		Static.Play3DSound("Abilities/Machinegun/smg1-1.wav", 0.5, startPos, 10.0, 100.0);
+		Static.PlaySound("Abilities/Machinegun/smg1-1.wav", 0.5, startPos, 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 
 	end
 end

@@ -9,10 +9,10 @@ Push.duration = 0.5;
 
 function Push.OnLoad()
 	ResourceManager.LoadParticle("fireball");
-	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-6.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-7.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-8.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
-	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-9.wav", bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-6.wav");
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-7.wav");
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-8.wav");
+	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-9.wav");
 end
 
 function Push.ChargeStart(userId, actionId)
@@ -110,13 +110,13 @@ function Push.OnCreate (userId, actionId)
 		local randomNumber = math.random(1,4);	
 	
 		if randomNumber == 1 then
-			Static.Play3DSound("Movement/JumpingOneshots/jump2-6.wav", 1.0, startPos, 10.0, 100.0);
+			Static.PlaySound("Movement/JumpingOneshots/jump2-6.wav", 1.0, startPos, 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		elseif randomNumber == 2 then
-			Static.Play3DSound("Movement/JumpingOneshots/jump2-7.wav", 1.0, startPos, 10.0, 100.0);
+			Static.PlaySound("Movement/JumpingOneshots/jump2-7.wav", 1.0, startPos, 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		elseif randomNumber == 3 then
-			Static.Play3DSound("Movement/JumpingOneshots/jump2-8.wav", 1.0, startPos, 10.0, 100.0);
+			Static.PlaySound("Movement/JumpingOneshots/jump2-8.wav", 1.0, startPos, 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		elseif randomNumber == 4 then
-			Static.Play3DSound("Movement/JumpingOneshots/jump2-9.wav", 1.0, startPos, 10.0, 100.0);
+			Static.PlaySound("Movement/JumpingOneshots/jump2-9.wav", 1.0, startPos, 10.0, 100.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		end
 	end
 end

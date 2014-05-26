@@ -12,7 +12,7 @@ RefractiveBall.crosshair = "crosshairNone";
 function RefractiveBall.OnLoad()
 	ResourceManager.LoadModel("HexagonSphere");
 	ResourceManager.LoadEffect("Mesh_Refractive");
-	ResourceManager.LoadSound("Abilities/chargeloop1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	ResourceManager.LoadSound("Abilities/chargeloop1-1.wav");
 	ResourceManager.LoadTexture("HexagonSpherTex");
 end
 
@@ -63,7 +63,8 @@ function RefractiveBall.OnCreate (userId, actionId)
 
 	if Global.IsClient then
 		local soundable = Soundable.New(self);
-		soundable:SetSound("Abilities/chargeloop1-1.wav", bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+		soundable:SetSound("Abilities/chargeloop1-1.wav");
+		soundable:SetFlags(bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		soundable:SetRange(1.0, 100.0);
 		soundable:SetVolume(0.3);
 		soundable:Play();

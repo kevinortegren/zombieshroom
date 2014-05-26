@@ -954,22 +954,22 @@ namespace RootForce
 						switch (random)
 						{
 							case 0:
-								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath1-1.wav", 0x00400011);
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath1-1.wav");
 								break;
 							case 1:
-								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-3.wav", 0x00400011);
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-3.wav");
 								break;
 							case 2:
-								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-4.wav", 0x00400011);
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-4.wav");
 								break;
 							case 3:
-								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-5.wav", 0x00400011);
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-5.wav");
 								break;
 							case 4:
-								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-6.wav", 0x00400011);
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-6.wav");
 								break;
 							case 5:
-								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-7.wav", 0x00400011);
+								soundable->m_soundAudio = g_engineContext.m_resourceManager->LoadSoundAudio("Player/plyrdeath3-7.wav");
 								break;
 						default:
 							break;
@@ -978,7 +978,8 @@ namespace RootForce
 						soundable->m_minDist = 1.0f;
 						soundable->m_maxDist = 50.0f;
 						soundable->m_volume = 0.1f;
-						soundable->m_play = true;
+						soundable->m_flags = 0x00400011;
+						soundable->PlaySound();
 
 						g_engineContext.m_logger->LogText(LogTag::CLIENT, LogLevel::PINK_PRINT, "Received death message.");
 					}
