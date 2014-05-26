@@ -41,7 +41,7 @@ function FireBallExplosion.OnCreate (userId, actionId, damage)
 	physicsComp:CheckRadius(collisionComp:GetHandle(), Vec3.New(posVec.x, posVec.y, posVec.z), 10);
 	if Global.IsClient then
 		local particleComp = ParticleEmitter.New(self, "Explosion_G-stuf");
-		Static.Play3DSound("Abilities/Fireball/fireballfire2-4.wav", 1.0, selfPos, 10.0, 100.0);
+		Static.Play3DSound("Abilities/Fireball/fireballfire2-4.wav", 1.0, posVec, 10.0, 100.0);
 	end
 	--Logging.Log(LogLevel.DEBUG_PRINT, "End of Oncreate");
 
