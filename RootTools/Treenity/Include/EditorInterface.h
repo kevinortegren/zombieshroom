@@ -2,6 +2,16 @@
 
 #include <set>
 #include <Utility/ECS/Include/Entity.h>
+#include <qstring.h>
+
+namespace ToolMode
+{
+	enum ToolMode
+	{
+		GLOBAL,
+		LOCAL
+	};
+}
 
 class EditorInterface
 {
@@ -12,4 +22,5 @@ public:
 	virtual void ClearSelection() = 0;
 	virtual const std::set<ECS::Entity*>& GetSelection() const = 0;
 	virtual void RenameEntity(ECS::Entity* p_entity, const QString& p_name) = 0;
+	virtual ToolMode::ToolMode GetToolMode() = 0;
 };

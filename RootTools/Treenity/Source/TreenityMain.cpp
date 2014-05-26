@@ -655,6 +655,9 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 			if(m_world.GetTagManager()->GetEntityByTag("Water") == (*itr))
 				continue;
 
+			if(m_world.GetTagManager()->GetEntityByTag("TranslationTool") == (*itr))
+				continue;
+
 			glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
 			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
 			RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));

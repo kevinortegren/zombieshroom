@@ -10,6 +10,14 @@ ToolManager::ToolManager()
 	m_selectedTool = m_tools[ToolBox::TRANSLATION_TOOL];
 }
 
+void ToolManager::SetEditorInterface(EditorInterface* p_editorInterface)
+{
+	for(auto tool = m_tools.begin(); tool != m_tools.end(); tool++)
+	{
+		tool->second->SetEditorInterface(p_editorInterface);
+	}
+}
+
 void ToolManager::Initialize(ECS::World* p_world)
 {
 	//Load all the tools by looping through and running LoadResources

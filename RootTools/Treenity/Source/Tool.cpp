@@ -8,6 +8,11 @@ Tool::Tool()
 
 }
 
+void Tool::SetEditorInterface(EditorInterface* p_interface)
+{
+	m_editorInterface = p_interface;
+}
+
 void Tool::UpdateRenderingPosition()
 {
 	if(m_selectedEntity == nullptr)

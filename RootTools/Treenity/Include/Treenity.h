@@ -24,7 +24,6 @@
 #include <RootTools/Treenity/Include/ToolManager.h>
 #include <RootTools/Treenity/Include/VerticalScrollArea.h>
 
-
 class Treenity : public QMainWindow, public EditorInterface
 {
 	Q_OBJECT
@@ -65,6 +64,7 @@ public:
 	void ClearSelection();
 	const std::set<ECS::Entity*>& GetSelection() const;
 	void RenameEntity(ECS::Entity* p_entity, const QString& p_name);
+	ToolMode::ToolMode GetToolMode();
 
 	//Called after RootEngine has been loaded from TreenityMain!
 	void Init();
@@ -102,6 +102,9 @@ private:
 
 	//Vertical scrollbar for components
 	VerticalScrollArea* m_scrollArea;
+
+	ToolMode::ToolMode m_toolMode;
+
 protected:
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);
@@ -123,8 +126,7 @@ private slots:
 	void SetTranslateTool();
 	void SetRotateTool();
 	void SetResizeTool();
-
-	
+	void ChangeToolMode(int index);
 };
 
 #endif // TREENITY_H

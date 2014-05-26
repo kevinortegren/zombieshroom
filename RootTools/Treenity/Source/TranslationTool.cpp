@@ -6,6 +6,7 @@
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/InputManager/Include/InputManager.h>
 
+
 extern RootEngine::GameSharedContext g_engineContext;
 
 TranslationTool::TranslationTool()
@@ -19,6 +20,38 @@ TranslationTool::TranslationTool()
 	m_axisAABB[0] = AxisBoundingBox(glm::vec3(0.1f, -0.1f, -0.1f), glm::vec3(m_axisLength, 0.1f, 0.1f));//X
 	m_axisAABB[1] = AxisBoundingBox(glm::vec3(-0.1f, 0.1f, -0.1f), glm::vec3(0.1f, m_axisLength, 0.1f));//Y
 	m_axisAABB[2] = AxisBoundingBox(glm::vec3(-0.1f, -0.1f, 0.1f), glm::vec3(0.1f, 0.1f, m_axisLength));//Z
+
+	m_axisOBB[0] = RootForce::OBB(0.1f, m_axisLength, -0.1f, 0.1f, -0.1f, 0.1f, glm::mat4(1.0f));
+	m_axisOBB[1] = RootForce::OBB(-0.1f, 0.1f, 0.1f, m_axisLength, -0.1f, 0.1f, glm::mat4(1.0f));
+	m_axisOBB[2] = RootForce::OBB(-0.1f, 0.1f, -0.1f, 0.1f, 0.1f, m_axisLength, glm::mat4(1.0f));
+}
+
+void TranslationTool::Debug(RootForce::OBB* obb, const glm::mat4x4& p_space, const glm::vec3& p_color)
+{
+	glm::vec4 positions[8];
+	positions[0] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[1] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_minZ, 1.0f);
+	positions[2] = p_space * glm::vec4(obb->m_minX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[3] = p_space * glm::vec4(obb->m_maxX, obb->m_minY, obb->m_maxZ, 1.0f);
+	positions[4] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[5] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_minZ, 1.0f);
+	positions[6] = p_space * glm::vec4(obb->m_minX, obb->m_maxY, obb->m_maxZ, 1.0f);
+	positions[7] = p_space * glm::vec4(obb->m_maxX, obb->m_maxY, obb->m_maxZ, 1.0f);
+
+	unsigned int indices[] = 
+	{ 
+		0, 2, 2, 3, 3, 1, 1, 0,
+		4, 6, 6, 7, 7, 5, 5, 4,
+		0, 4, 2, 6, 3, 7, 1, 5 
+	};
+
+	for(int i = 0; i < 24; i += 2)
+	{
+		glm::vec3 pos1, pos2;
+		pos1 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i]]);
+		pos2 = glm::swizzle<glm::X, glm::Y, glm::Z>(positions[indices[i+1]]);
+		g_engineContext.m_renderer->AddLine(pos1, pos2, glm::vec4(p_color.x, p_color.y, p_color.z, 1.0f));
+	}
 }
 
 TranslationTool::~TranslationTool()
@@ -28,6 +61,17 @@ TranslationTool::~TranslationTool()
 void TranslationTool::LoadResources(ECS::World* p_world)
 {
 	m_world = p_world;
+
+	m_toolEntityMaterial = g_engineContext.m_renderer->CreateMaterial("Axes");
+	m_toolEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
+	
+	m_toolEntity = m_world->GetEntityManager()->CreateEntity();
+	RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_toolEntity);
+	r->m_model = g_engineContext.m_resourceManager->LoadCollada("GUI/axes");
+	r->m_material = m_toolEntityMaterial;
+
+	m_world->GetTagManager()->RegisterEntity("TranslationTool", m_toolEntity);
+	m_world->GetGroupManager()->RegisterEntity("NonExport", m_toolEntity);
 }
 
 bool TranslationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
@@ -74,9 +118,30 @@ bool TranslationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 
 void TranslationTool::SetPosition(const glm::vec3& p_position)
 {
+	RootForce::Transform* toolTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity);
+	RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
+
 	if(m_visible)
 	{
-		//X
+		glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), toolTransform->m_position);
+		if(m_editorInterface->GetToolMode() == ToolMode::LOCAL)
+		{
+			m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_orientation = selectedTransform->m_orientation;
+			transformMatrix = glm::rotate(transformMatrix, selectedTransform->m_orientation.GetAngle(), selectedTransform->m_orientation.GetAxis());
+		}
+		else
+		{
+			m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_orientation = RootForce::Orientation();
+		}
+
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_position = p_position;
+
+		Debug(&m_axisOBB[0], transformMatrix, glm::vec3(1,0,0));
+		Debug(&m_axisOBB[1], transformMatrix, glm::vec3(1,0,0));
+		Debug(&m_axisOBB[2], transformMatrix, glm::vec3(1,0,0));
+
+
+		/*//X
 		if(m_hoverAxis == TranslationAxis::AXIS_X)
 			g_engineContext.m_renderer->AddLine(p_position, p_position + glm::vec3(m_axisLength, 0.0f, 0.0f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 		else
@@ -90,17 +155,21 @@ void TranslationTool::SetPosition(const glm::vec3& p_position)
 		if(m_hoverAxis == TranslationAxis::AXIS_Z)
 			g_engineContext.m_renderer->AddLine(p_position, p_position + glm::vec3(0.0f, 0.0f, m_axisLength), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
 		else
-			g_engineContext.m_renderer->AddLine(p_position, p_position + glm::vec3(0.0f, 0.0f, m_axisLength), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+			g_engineContext.m_renderer->AddLine(p_position, p_position + glm::vec3(0.0f, 0.0f, m_axisLength), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));*/
 	}
 }
 
 void TranslationTool::Hide()
 {
+	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_toolEntity);
+
 	Tool::Hide();
 }
 
 void TranslationTool::Show()
 {
+	m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_toolEntity);
+
 	Tool::Show();
 }
 

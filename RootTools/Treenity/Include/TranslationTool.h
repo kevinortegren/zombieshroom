@@ -3,6 +3,7 @@
 #include <RootTools/Treenity/Include/Tool.h>
 #include <RootEngine/Render/Include/Material.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>
+#include <RootSystems/Include/Shapes/OBB.h>
 
 namespace TranslationAxis
 {
@@ -40,6 +41,9 @@ private:
 	float m_dragOffset;
 	bool m_firstDrag;
 	
+	ECS::Entity* m_toolEntity;
+	Render::Material* m_toolEntityMaterial;
+
 	struct AxisBoundingBox
 	{
 		AxisBoundingBox(){}
@@ -64,5 +68,8 @@ private:
 	void Drag( const glm::vec3& p_ray, const glm::vec3& p_camPos );
 	TranslationAxis::TranslationAxis RayVsAxis(const glm::vec3& p_cameraPos, const glm::vec3& p_ray);
 
+	void Debug(RootForce::OBB* obb, const glm::mat4x4& p_space, const glm::vec3& p_color);
+
 	AxisBoundingBox m_axisAABB[3];
+	RootForce::OBB m_axisOBB[3];
 };

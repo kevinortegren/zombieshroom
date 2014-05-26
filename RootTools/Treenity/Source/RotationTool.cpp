@@ -118,9 +118,18 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	if(m_selectedEntity == nullptr)
 		return false;
 
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+	if(m_editorInterface->GetToolMode() == ToolMode::LOCAL)
+	{
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+	}
+	else
+	{
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = RootForce::Orientation();
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = RootForce::Orientation();
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = RootForce::Orientation();
+	}
 
 	// Transform of selected entity.
 	RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
@@ -137,14 +146,9 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	//m_gimbalOrientation = gimbalTransform->m_orientation;
 	//m_entityOrientation = selectedTransform->m_orientation;
 
-	glm::vec3 normalX = m_gimbalOrientation.GetRight();
-	glm::vec3 normalY = m_gimbalOrientation.GetUp();
-	glm::vec3 normalZ = m_gimbalOrientation.GetFront();
-
-	// Debug render plane normals.
-	//g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalX, glm::vec4(1,0,0,1));
-	//g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalY, glm::vec4(0,1,0,1));
-	//g_engineContext.m_renderer->AddLine(gimbalTransform->m_position, gimbalTransform->m_position - normalZ, glm::vec4(0,0,1,1));
+	glm::vec3 normalX = gimbalTransform->m_orientation.GetRight();
+	glm::vec3 normalY = gimbalTransform->m_orientation.GetUp();
+	glm::vec3 normalZ = gimbalTransform->m_orientation.GetFront();
 
 	float bestDist = 999999.0f;
 	RotationAxis::RotationAxis axis = RotationAxis::AXIS_NONE;
@@ -219,7 +223,7 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 	{
 		RootForce::Transform* gimbalTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
 		m_gimbalOrientation = gimbalTransform->m_orientation;
-
+	
 		RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
 		m_entityOrientation = selectedTransform->m_orientation;
 
@@ -282,49 +286,75 @@ bool RotationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
 				m_selectedAxis = RotationAxis::AXIS_NONE;
 			}
 		}
-
+		ToolMode::ToolMode toolMode = m_editorInterface->GetToolMode();
 		switch(m_selectedAxis)
 		{
 			case RotationAxis::AXIS_X:
 				{
 					for(int i = 0; i < 3; i++)
 					{
-						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
-						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Pitch(glm::degrees(m_angle0 - angle));
+						if(toolMode == ToolMode::LOCAL)
+						{
+							m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
+							m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Pitch(glm::degrees(m_angle0 - angle));
+						} 
 					}
 					selectedTransform->m_orientation = m_entityOrientation;
-					selectedTransform->m_orientation.Pitch(glm::degrees(m_angle0 - angle));
 
-					std::cout << "X plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(m_angle0) << std::endl << std::endl;
+					if(toolMode == ToolMode::LOCAL)
+					{
+						selectedTransform->m_orientation.Pitch(glm::degrees(m_angle0 - angle));
+					}
+					else
+					{
+						selectedTransform->m_orientation.PitchGlobal(glm::degrees(m_angle0 - angle));
+					}
 				}
 				break;
 			case RotationAxis::AXIS_Y:
 				{
 					for(int i = 0; i < 3; i++)
 					{
-						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
-						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Yaw(glm::degrees(m_angle0 - angle));
-
+						if(toolMode == ToolMode::LOCAL)
+						{	
+							m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
+							m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Yaw(glm::degrees(m_angle0 - angle));
+						} 
 
 					}
 					selectedTransform->m_orientation = m_entityOrientation;
-					selectedTransform->m_orientation.Yaw(glm::degrees(m_angle0 - angle));
 
-					std::cout << "Y plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(m_angle0) << std::endl << std::endl;
+					if(toolMode == ToolMode::LOCAL)
+					{
+						selectedTransform->m_orientation.Yaw(glm::degrees(m_angle0 - angle));
+					}
+					else
+					{
+						selectedTransform->m_orientation.YawGlobal(glm::degrees(m_angle0 - angle));
+					}
 				}
 				break;
 			case RotationAxis::AXIS_Z:
 				{
 					for(int i = 0; i < 3; i++)
 					{
-						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
-						m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Roll(-glm::degrees(m_angle0 - angle));
+						if(toolMode == ToolMode::LOCAL)
+						{	
+							m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation = m_gimbalOrientation;
+							m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[i])->m_orientation.Roll(-glm::degrees(m_angle0 - angle));
+						} 
 
 					}
 					selectedTransform->m_orientation = m_entityOrientation;
-					selectedTransform->m_orientation.Roll(-glm::degrees(m_angle0 - angle));
 
-					std::cout << "Z plane " << glm::degrees(angle) << " Angle0 " << glm::degrees(m_angle0) << std::endl << std::endl;
+					if(toolMode == ToolMode::LOCAL)
+					{
+						selectedTransform->m_orientation.Roll(-glm::degrees(m_angle0 - angle));
+					}
+					else
+					{
+						selectedTransform->m_orientation.RollGlobal(-glm::degrees(m_angle0 - angle));
+					}
 				}
 				break;
 			default:
@@ -358,13 +388,18 @@ void RotationTool::Show()
 	m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y]);
 	m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z]);
 
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
-	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+	if(m_editorInterface->GetToolMode() == ToolMode::LOCAL)
+	{
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Y])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_Z])->m_orientation = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity)->m_orientation;
+	}
 
+	// Store orientation for gimbal.
 	RootForce::Transform* gimbalTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_axisEntities[RotationAxis::AXIS_X]);
 	m_gimbalOrientation = gimbalTransform->m_orientation;
 
+	// Store orientation for the selected entity.
 	RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
 	m_entityOrientation = selectedTransform->m_orientation;
 

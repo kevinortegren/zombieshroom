@@ -114,10 +114,13 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.pushButton_translateMode,			SIGNAL(clicked()),			this,					SLOT(SetTranslateTool()));
 	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
 	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
+	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
 	
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
 
+	// Set tool mode.
+	m_toolMode = ToolMode::GLOBAL;
 }
 
 Treenity::~Treenity()
@@ -225,7 +228,7 @@ void Treenity::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& 
 void Treenity::InitializeTools(ECS::World* p_world)
 {
 	m_toolManager.Initialize(p_world);
-	
+	m_toolManager.SetEditorInterface(this);
 	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
 }
 
@@ -266,12 +269,8 @@ void Treenity::OpenProject()
 		m_currentProjectFile = fileName;
 
 		UpdateWindowTitle();
-
 		m_engineInterface->ClearScene();
-	
 		m_projectManager->Import(fileName);
-
-
 		m_engineInterface->AddDefaultEntities();
 		m_engineInterface->InitializeScene();
 	}
@@ -348,6 +347,11 @@ void Treenity::RenameEntity(ECS::Entity* p_entity, const QString& p_name)
 {
 	ui.treeView_entityOutliner->EntityRenamed(p_entity, p_name);
 	m_projectManager->SetEntityName(p_entity, p_name);
+}
+
+ToolMode::ToolMode Treenity::GetToolMode()
+{
+	return m_toolMode;
 }
 
 void Treenity::CreateEntity()
@@ -585,4 +589,9 @@ void Treenity::SetRotateTool()
 void Treenity::SetResizeTool()
 {
 	//Set resize tool
+}
+
+void Treenity::ChangeToolMode(int index)
+{
+	m_toolMode = (ToolMode::ToolMode)index;
 }
