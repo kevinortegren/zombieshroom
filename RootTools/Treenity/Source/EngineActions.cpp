@@ -641,7 +641,12 @@ void EngineActions::SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_m
 
 void EngineActions::SetCollisionVisualized(ECS::Entity* p_entity, bool p_visualize)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), p_visualize);
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_STATIC ||
+		g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+	{
+		ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), p_visualize);
+	}
 }
 
 
