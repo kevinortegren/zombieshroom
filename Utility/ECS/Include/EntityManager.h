@@ -105,6 +105,7 @@ namespace ECS
 			}
 		}
 
+		bool IsEntityActive(ECS::Entity* p_entity);
 		void CleanUp();
 
 		template<class T>
@@ -154,7 +155,7 @@ namespace ECS
 
 		int m_nextID;
 		std::vector<Entity> m_entities;
-		std::stack<int> m_recycledIds;
+		std::vector<int> m_recycledIds;
 		std::vector<std::vector<ComponentInterface*>> m_components; // CompID, EntityId, CompType.
 
 		ComponentAllocator m_allocator;

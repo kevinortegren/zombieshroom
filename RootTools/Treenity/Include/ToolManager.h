@@ -26,4 +26,5 @@ public:
 private:
 	std::map<ToolBox::ToolBox, Tool*> m_tools; 
 	Tool* m_selectedTool;
+	EditorInterface* m_editorInterface;
 };

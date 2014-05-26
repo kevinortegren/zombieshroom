@@ -393,6 +393,9 @@ void TreenityMain::ProcessWorldMessages()
 	auto msgs = m_world.GetMessages();
 	for(auto itr = msgs.begin(); itr != msgs.end(); ++itr) 
 	{
+		ECS::Entity* water = m_world.GetTagManager()->GetEntityByTag("Water");
+		RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(water);
+
 		switch (itr->m_type)
 		{
 			case ECS::MessageType::ENTITY_ADDED:
@@ -656,8 +659,8 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 			if(m_world.GetTagManager()->GetEntityByTag("Water") == (*itr))
 				continue;
 
-			if(m_world.GetTagManager()->GetEntityByTag("TranslationTool") == (*itr))
-				continue;
+			if(m_world.GetGroupManager()->IsEntityInGroup((*itr), "Tools"))
+				continue; 
 
 			glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
 			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;

@@ -121,7 +121,7 @@ Treenity::Treenity(QWidget *parent)
 
 	ui.widget_canvas3D->SetEditorInterface(this);
 	// Set tool mode.
-	m_toolMode = ToolMode::GLOBAL;
+	m_toolMode = ToolMode::LOCAL;
 }
 
 Treenity::~Treenity()
@@ -308,13 +308,16 @@ void Treenity::Play()
 
 void Treenity::Select(ECS::Entity* p_entity)
 {
-	m_previouslySelectedEntities = m_selectedEntities;
-	m_selectedEntities.clear();
+	if(!m_engineInterface->GetWorld()->GetGroupManager()->IsEntityInGroup(p_entity, "NonSelectable"))
+	{
+		m_previouslySelectedEntities = m_selectedEntities;
+		m_selectedEntities.clear();
 
-	if(p_entity != nullptr)
-		m_selectedEntities.insert(p_entity);
+		if(p_entity != nullptr)
+			m_selectedEntities.insert(p_entity);
 
-	UpdateOnSelection();
+		UpdateOnSelection();
+	}
 }
 
 void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
@@ -322,15 +325,30 @@ void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
 	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities = p_entities;
 
+	for(auto itr = m_selectedEntities.begin(); itr != m_selectedEntities.end();)
+	{
+		if(m_engineInterface->GetWorld()->GetGroupManager()->IsEntityInGroup((*itr), "NonSelectable"))
+		{
+			itr = m_selectedEntities.erase(itr);
+		}
+		else
+		{
+			itr++;
+		}
+	}
+
 	UpdateOnSelection();
 }
 
 void Treenity::AddToSelection(ECS::Entity* p_entity)
 {
-	m_previouslySelectedEntities = m_selectedEntities;
-	m_selectedEntities.insert(p_entity);
+	if(!m_engineInterface->GetWorld()->GetGroupManager()->IsEntityInGroup(p_entity, "NonSelectable"))
+	{
+		m_previouslySelectedEntities = m_selectedEntities;
+		m_selectedEntities.insert(p_entity);
 
-	UpdateOnSelection();
+		UpdateOnSelection();
+	}
 }
 
 void Treenity::ClearSelection()
@@ -518,7 +536,7 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 		if(m_selectedEntities.size() > 0)
 		m_engineInterface->TargetEntity(*m_selectedEntities.begin());
 	}
-	if(event->key() == Qt::Key_Delete)
+	else if(event->key() == Qt::Key_Delete)
 	{
 		if(m_selectedEntities.size() > 0)
 		{
@@ -528,11 +546,11 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 			}
 		}
 	}
-	if(event->key() == Qt::Key_A)
+	else if(event->key() == Qt::Key_A)
 	{
 		ClearSelection();
 	}
-	if (event->key() == Qt::Key_Escape)
+	else if (event->key() == Qt::Key_Escape)
 	{
 		if (m_engineInterface->GetMode() == EditorMode::GAME)
 		{
@@ -540,7 +558,24 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 			m_engineInterface->ExitPlayMode();
 		}
 	}
-	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
+	else if( event->key() == Qt::Key_Q)
+	{
+		emit ui.pushButton_translateMode->pressed();
+	}
+	else if( event->key() == Qt::Key_W)
+	{
+		emit ui.pushButton_rotateMode->pressed();
+	}
+	else if( event->key() == Qt::Key_E)
+	{
+		emit ui.pushButton_scaleMode->pressed();
+	}
+	else if( event->key() == Qt::Key_S)
+	{
+		emit ui.comboBox_mode->currentIndexChanged((m_toolMode == ToolMode::GLOBAL) ? 1 : 0);
+	}
+
+	g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
 }
 
 void Treenity::keyReleaseEvent( QKeyEvent* event )
@@ -600,4 +635,6 @@ void Treenity::SetResizeTool()
 void Treenity::ChangeToolMode(int index)
 {
 	m_toolMode = (ToolMode::ToolMode)index;
+
+
 }

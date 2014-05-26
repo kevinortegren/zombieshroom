@@ -12,6 +12,8 @@ ToolManager::ToolManager()
 
 void ToolManager::SetEditorInterface(EditorInterface* p_editorInterface)
 {
+	m_editorInterface = p_editorInterface;
+
 	for(auto tool = m_tools.begin(); tool != m_tools.end(); tool++)
 	{
 		tool->second->SetEditorInterface(p_editorInterface);
@@ -34,21 +36,14 @@ Tool* ToolManager::GetSelectedTool()
 
 void ToolManager::SetTool(ToolBox::ToolBox p_tool)
 {
-	//Disregard tool change if setting same tool as currently selected
-	if(m_tools[p_tool] != m_selectedTool)
+	m_selectedTool->SetSelectedEntity(nullptr);
+
+	if(m_editorInterface->GetSelection().size() != 0)
 	{
-		//Hide the current tool
-		m_selectedTool->Hide();
-
 		//Transfer the selected entity from the previous tool
-		m_tools[p_tool]->SetSelectedEntity(m_selectedTool->GetSelectedEntity());
-
-		//Check if the new tool is visible and show it if its not
-		if(!m_tools[p_tool]->IsVisible())
-			m_tools[p_tool]->Show();
-
-		//Set new selected tool
-		m_selectedTool = m_tools[p_tool];
+		m_tools[p_tool]->SetSelectedEntity(*m_editorInterface->GetSelection().begin());
 	}
-		
+
+
+	m_selectedTool = m_tools[p_tool];
 }

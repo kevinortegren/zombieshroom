@@ -40,12 +40,14 @@ void TranslationTool::LoadResources(ECS::World* p_world)
 	m_toolEntity = m_world->GetEntityManager()->CreateEntity();
 	RootForce::Renderable* r = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_toolEntity);
 	r->m_model = g_engineContext.m_resourceManager->LoadCollada("GUI/axes");
+	r->m_model->m_meshes[0]->SetNoCulling(true);
 	r->m_material = m_toolEntityMaterial;
 	r->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("GUI/axes", Render::TextureType::TEXTURE_2D);
 	
-
-	m_world->GetTagManager()->RegisterEntity("TranslationTool", m_toolEntity);
+	m_world->GetGroupManager()->RegisterEntity("Tools", m_toolEntity);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_toolEntity);
+	m_world->GetGroupManager()->RegisterEntity("NonSelectable", m_toolEntity);
+
 }
 
 bool TranslationTool::Pick(const glm::vec3& p_cameraPos, const glm::vec3& p_ray)
@@ -151,39 +153,33 @@ void TranslationTool::SetPosition(const glm::vec3& p_position)
 	RootForce::Transform* toolTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity);
 	RootForce::Transform* selectedTransform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_selectedEntity);
 
-	if(m_visible)
+	m_transformMatrix = glm::translate(glm::mat4(1.0f), toolTransform->m_position);
+	if(m_editorInterface->GetToolMode() == ToolMode::LOCAL)
 	{
-		m_transformMatrix = glm::translate(glm::mat4(1.0f), toolTransform->m_position);
-		if(m_editorInterface->GetToolMode() == ToolMode::LOCAL)
-		{
-			m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_orientation = selectedTransform->m_orientation;
-			m_transformMatrix = glm::rotate(m_transformMatrix, selectedTransform->m_orientation.GetAngle(), selectedTransform->m_orientation.GetAxis());
-		}
-		else
-		{
-			m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_orientation = RootForce::Orientation();
-		}
-
-		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_position = p_position;
-
-		//Debug(&m_axisOBB[0], m_transformMatrix, glm::vec3(1,0,0));
-		//Debug(&m_axisOBB[1], m_transformMatrix, glm::vec3(1,0,0));
-		//Debug(&m_axisOBB[2], m_transformMatrix, glm::vec3(1,0,0));
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_orientation = selectedTransform->m_orientation;
+		m_transformMatrix = glm::rotate(m_transformMatrix, selectedTransform->m_orientation.GetAngle(), selectedTransform->m_orientation.GetAxis());
 	}
+	else
+	{
+		m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_orientation = RootForce::Orientation();
+	}
+
+	m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_toolEntity)->m_position = p_position;
+
+	//Debug(&m_axisOBB[0], m_transformMatrix, glm::vec3(1,0,0));
+	//Debug(&m_axisOBB[1], m_transformMatrix, glm::vec3(1,0,0));
+	//Debug(&m_axisOBB[2], m_transformMatrix, glm::vec3(1,0,0));
+	
 }
 
 void TranslationTool::Hide()
 {
 	m_world->GetEntityManager()->RemoveComponent<RootForce::Transform>(m_toolEntity);
-
-	Tool::Hide();
 }
 
 void TranslationTool::Show()
 {
 	m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_toolEntity);
-
-	Tool::Show();
 }
 
 TranslationTool::PointOnPlane TranslationTool::GetPointOnPlane( const glm::vec3& p_camPos, const glm::vec3& p_worldCamPos, const glm::vec3& p_rayDir  )

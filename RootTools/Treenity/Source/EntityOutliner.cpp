@@ -116,7 +116,10 @@ void EntityOutliner::SetEditorInterface(EditorInterface* p_editorInterface)
 
 void EntityOutliner::EntityCreated(ECS::Entity* p_entity, const QString& p_name)
 {
-	addTopLevelItem(new EntityOutlinerItem(this, p_entity, p_name));
+	if(!m_engineInterface->GetWorld()->GetGroupManager()->IsEntityInGroup(p_entity, "NonSelectable"))
+	{
+		addTopLevelItem(new EntityOutlinerItem(this, p_entity, p_name));
+	}
 }
 
 void EntityOutliner::EntityRemoved(ECS::Entity* p_entity)

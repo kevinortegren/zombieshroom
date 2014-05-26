@@ -246,6 +246,8 @@ namespace RootForce
 		
 		m_world->GetTagManager()->RegisterEntity("Skybox", skybox);
 		m_world->GetGroupManager()->RegisterEntity("NonExport", skybox);
+		m_world->GetGroupManager()->RegisterEntity("NonSelectable", skybox);
+
 
 		return skybox;
 	}

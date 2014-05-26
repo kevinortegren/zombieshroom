@@ -392,8 +392,8 @@ public:
         pushButton_scaleMode->setText(QString());
         comboBox_mode->clear();
         comboBox_mode->insertItems(0, QStringList()
-         << QApplication::translate("TreenityClass", "Global", 0)
          << QApplication::translate("TreenityClass", "Local", 0)
+         << QApplication::translate("TreenityClass", "Global", 0)
         );
         menuFile->setTitle(QApplication::translate("TreenityClass", "File", 0));
         menuEdit->setTitle(QApplication::translate("TreenityClass", "Edit", 0));

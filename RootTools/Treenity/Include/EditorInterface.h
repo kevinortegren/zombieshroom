@@ -8,8 +8,8 @@ namespace ToolMode
 {
 	enum ToolMode
 	{
-		GLOBAL,
-		LOCAL
+		LOCAL,
+		GLOBAL
 	};
 }
 

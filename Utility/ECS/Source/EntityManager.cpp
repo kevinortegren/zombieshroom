@@ -13,8 +13,8 @@ ECS::Entity* ECS::EntityManager::CreateEntity()
 	int id = m_nextID;
 	if(m_recycledIds.size() > 0)
 	{
-		id = m_recycledIds.top();
-		m_recycledIds.pop();
+		id = m_recycledIds.back();
+		m_recycledIds.pop_back();
 		m_nextID--;
 	}
 
@@ -130,6 +130,11 @@ std::vector<ECS::Entity*> ECS::EntityManager::GetAllEntities()
 	return result;
 }
 
+bool ECS::EntityManager::IsEntityActive(ECS::Entity* p_entity)
+{
+	return (std::find(m_recycledIds.begin(), m_recycledIds.end(), p_entity->GetId()) != m_recycledIds.end());
+}
+
 void ECS::EntityManager::CleanUp()
 {
 	m_world->TestMessaging();
@@ -151,7 +156,7 @@ void ECS::EntityManager::CleanUp()
 	for(auto itr = m_entitiesToBeRemoved.begin(); itr != m_entitiesToBeRemoved.end(); ++itr)
 	{
 		// Recyle id.
-		m_recycledIds.push((*itr)->GetId());
+		m_recycledIds.push_back((*itr)->GetId());
 
 		(*itr)->m_flag = 0;
 
@@ -178,9 +183,6 @@ const std::set<int> ECS::EntityManager::GetEntitiesToBeRemoved() const
 void ECS::EntityManager::ClearRecyledEntitiesStack()
 {
 	// Clear stack.
-	while (!m_recycledIds.empty() )
-	{
-		m_recycledIds.pop();
-	}
+	m_recycledIds.clear();
 }
 

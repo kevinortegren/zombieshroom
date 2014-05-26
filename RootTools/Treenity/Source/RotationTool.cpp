@@ -55,9 +55,17 @@ void RotationTool::LoadResources(ECS::World* p_world)
 	r2->m_params[Render::Semantic::COLOR] = &m_axisColors[RotationAxis::AXIS_Z];
 	r2->m_model->m_meshes[0]->SetPrimitiveType(GL_LINES);
 
+	m_world->GetGroupManager()->RegisterEntity("Tools", m_axisEntities[RotationAxis::AXIS_X]);
+	m_world->GetGroupManager()->RegisterEntity("Tools", m_axisEntities[RotationAxis::AXIS_Y]);
+	m_world->GetGroupManager()->RegisterEntity("Tools", m_axisEntities[RotationAxis::AXIS_Z]);
+
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_axisEntities[RotationAxis::AXIS_X]);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_axisEntities[RotationAxis::AXIS_Y]);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_axisEntities[RotationAxis::AXIS_Z]);
+
+	m_world->GetGroupManager()->RegisterEntity("NonSelectable", m_axisEntities[RotationAxis::AXIS_X]);
+	m_world->GetGroupManager()->RegisterEntity("NonSelectable", m_axisEntities[RotationAxis::AXIS_Y]);
+	m_world->GetGroupManager()->RegisterEntity("NonSelectable", m_axisEntities[RotationAxis::AXIS_Z]);
 }
 
 float RotationTool::GetAngleFromAxis(RotationAxis::RotationAxis axis, const glm::vec3& position)

@@ -52,19 +52,16 @@ void EngineActions::ClearScene()
 
 void EngineActions::AddDefaultEntities()
 {
-	// Process entities from world import.
-	m_treenityMain->ProcessWorldMessages();
- 
 	// Add non-editable entities.
+	m_treenityMain->GetEditor()->InitializeTools(m_world);
 	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
 	CreateFreeFlyingCamera();
-	m_treenityMain->GetEditor()->InitializeTools(m_world);
-	m_world->GetEntityManager()->CleanUp();
 
 	// Add editable entities.
 	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
 	CreateTestSpawnpoint();
 	CreateWater();
+
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
 	
@@ -133,6 +130,8 @@ void EngineActions::CreateFreeFlyingCamera()
 
 	m_world->GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
+	m_world->GetGroupManager()->RegisterEntity("NonSelectable", m_cameraEntity);	
+
 
 	// Setup aiming device.
 	m_aimingDevice = m_world->GetEntityManager()->CreateEntity();
@@ -141,6 +140,7 @@ void EngineActions::CreateFreeFlyingCamera()
 
 	m_world->GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_aimingDevice);
+	m_world->GetGroupManager()->RegisterEntity("NonSelectable", m_aimingDevice);	
 }
 
 void EngineActions::CreateTestSpawnpoint()
@@ -184,6 +184,18 @@ void EngineActions::CreateWater()
 // Mode switching
 void EngineActions::EnterPlayMode()
 {
+	ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Tools");
+	std::vector<ECS::Entity*> m_entitiesToRemove;
+	for(std::multimap<std::string, ECS::Entity*>::iterator itr = range.first; itr != range.second; ++itr)
+	{
+		m_entitiesToRemove.push_back((*itr).second);
+	}
+	for(ECS::Entity* e : m_entitiesToRemove)
+	{
+		m_world->GetEntityManager()->RemoveEntity(e);
+	}
+	m_world->GetEntityManager()->CleanUp();
+
 	QCursor::setPos(QApplication::primaryScreen(), m_treenityMain->GetEditor()->GetUi().widget_canvas3D->geometry().center());
 	m_editorMode = EditorMode::GAME;
 	g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -248,6 +260,7 @@ void EngineActions::ExitPlayMode()
 	g_engineContext.m_physics->RemoveAll();
 	g_networkEntityMap.clear();
 	RootForce::Network::NetworkComponent::ResetSequenceForUser(0);
+	m_treenityMain->ProcessWorldMessages();
 
 	// Restore the old world state.
 	std::map<ECS::Entity*, std::string> entityNames;
@@ -273,6 +286,8 @@ void EngineActions::ParallelPlayModeEnter()
 {
 	// Save the current world state.
 	m_editorLevelState = m_world->GetEntityExporter()->Export(&m_treenityMain->GetProjectManager()->GetEntityNames());
+	m_world->GetEntityExporter()->Export("test.world", &m_treenityMain->GetProjectManager()->GetEntityNames());
+
 
 	// Remove the test spawnpoint, the editor camera and the editor spawnpoint.
 	m_world->GetEntityManager()->RemoveEntity(m_cameraEntity);
