@@ -118,6 +118,7 @@ Treenity::Treenity(QWidget *parent)
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
 
+	ui.widget_canvas3D->SetEditorInterface(this);
 }
 
 Treenity::~Treenity()
