@@ -48,8 +48,8 @@
     - Type: 1
       Data:
         - Entity: 0
-          Position: [-184.801, 139.358, -190.86]
-          Rotation: [0.221731, 0.364328, -0.0897563, 0.900025]
+          Position: [-184.8, 139.36, -190.86]
+          Rotation: [0.221731, 0.364359, -0.0897655, 0.900011]
           Scale: [1, 1, 1]
         - Entity: 1
           Position: [0, 22, 0]
@@ -82,7 +82,6 @@
         []
     - Type: 6
       Data:
-        - Entity: 3
         - Entity: 4
         - Entity: 5
     - Type: 7
@@ -102,9 +101,8 @@
       Data:
         - Entity: 3
           PhysicsType: 0
-          PhysicsShape: 2
-          ShapeRadius: 14
-          ShapeHeight: 1
+          PhysicsShape: 3
+          MeshHandle: Primitives/box0
         - Entity: 4
           PhysicsType: 2
           ShapeMass: 1
@@ -121,7 +119,7 @@
           CollideWithWorld: true
           CollideWithStatic: true
           ShapeRadius: 6
-          ShapeHeight: 1
+          ShapeHeight: 0.5
     - Type: 12
       Data:
         - Entity: 4

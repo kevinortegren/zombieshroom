@@ -444,7 +444,7 @@ void TreenityMain::ProcessWorldMessages()
 
 void TreenityMain::Update(float dt)
 {
-	if (dt > 4.0f)
+	if (dt > 1.0f)
 	{
 		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "Frame time dt == %f. Setting dt = 0 to avoid calamity.", dt);
 		dt = 0.0f;
@@ -503,8 +503,12 @@ void TreenityMain::Update(float dt)
 		//Update water
 		m_waterSystem->Process();
 
-		// Update on player controls.
-		m_playerControlSystem->Process();
+		// Update on player controls (only if 3D canvas has focus).
+		if (m_treenityEditor.GetUi().widget_canvas3D->hasFocus())
+		{
+			m_playerControlSystem->Process();
+		}
+
 		m_actionSystem->Process();
 
 	

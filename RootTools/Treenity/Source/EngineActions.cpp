@@ -471,13 +471,13 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 						newMeshHandle = g_engineContext.m_resourceManager->ResolveStringFromModel(rend->m_model);
 
 						if(newMeshHandle == "")
-							newMeshHandle = "Primitives/box0";
-						else
-							newMeshHandle += "0";
+							newMeshHandle = "Primitives/box";
+						//else
+							//newMeshHandle += "0";
 					}
 					else
 					{
-						newMeshHandle = "Primitives/box0";
+						newMeshHandle = "Primitives/box";
 					}					
 				}
 				else

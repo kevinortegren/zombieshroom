@@ -637,7 +637,7 @@ namespace Physics
 			PhysicsMeshInterface* tempMesh = g_resourceManager->GetPhysicsMesh(p_shapeStruct.m_modelHandle);
 			if(tempMesh == NULL)
 			{
-				g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Mesh for %s not found", p_shapeStruct.m_modelHandle);
+				g_context.m_logger->LogText(LogTag::PHYSICS, LogLevel::WARNING, "Mesh for %s not found", p_shapeStruct.m_modelHandle.c_str());
 				return nullptr;
 			}
 			btTriangleIndexVertexArray* indexVertexArray = new btTriangleIndexVertexArray(tempMesh->GetNrOfFaces(), tempMesh->GetIndices(), 3* sizeof(int), tempMesh->GetNrOfPoints() , (btScalar*) tempMesh->GetMeshPoints(), 3*sizeof(btScalar));
