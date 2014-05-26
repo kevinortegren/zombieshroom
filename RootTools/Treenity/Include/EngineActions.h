@@ -35,6 +35,7 @@ public:
 	void DeleteEntity(ECS::Entity* p_entity);
 	void TargetEntity(ECS::Entity* p_entity);
 	ECS::Entity* GetEntityByTag(const std::string& p_tag);
+	void DuplicateEntity(ECS::Entity* p_entity);
 
 	// World
 	const ECS::World* GetWorld();

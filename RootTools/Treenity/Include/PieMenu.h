@@ -9,7 +9,7 @@ class PiePiece : public QGraphicsObject
 {
 	Q_OBJECT
 public:
-	PiePiece(int index, int radius, QPoint position, PieMenu* parent, const QString& p_imageName);
+	PiePiece(int index, int radius, QPoint position, PieMenu* parent, const QString& p_imageName, const QString& p_toolTip);
 	QPainterPath shape() const;
 	QRectF boundingRect() const;
 	void updatePosition();
@@ -37,6 +37,8 @@ private:
 	QPixmap m_pixmap;
 	PieMenu* m_parent;
 	bool m_hovered;
+	QString m_toolTip;
+	QSize m_imageSize;
 };
 
 class PieMenu : public QWidget
@@ -47,7 +49,7 @@ public:
 	~PieMenu();
 
 	bool canSee() const;
-	PiePiece* addPiece(const QString& p_imageName);
+	PiePiece* addPiece(const QString& p_imageName, const QString& p_toolTip);
 public slots:
 	void showMenu();
 	void closeMenu();

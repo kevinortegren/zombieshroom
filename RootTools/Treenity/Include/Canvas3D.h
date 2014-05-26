@@ -48,6 +48,12 @@ private:
 	ECS::World* m_world;
 	
 private slots:
-	void pieMenuClickTest();
-	void PieMenuAddComponent();
+	void PieButton1();
+	void PieButton2();
+	void PieButton3();
+	void PieButton4();
+	void PieButton5();
+	void PieButton6();
+	void PieButton7();
+	void PieButton8();
 };

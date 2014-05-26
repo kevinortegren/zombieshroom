@@ -339,6 +339,69 @@ ECS::Entity* EngineActions::GetEntityByTag( const std::string& p_tag )
 	return m_world->GetTagManager()->GetEntityByTag(p_tag);
 }
 
+void EngineActions::DuplicateEntity( ECS::Entity* p_entity )
+{
+	//Create new entity
+	ECS::Entity* newEntity = CreateEntity();
+	//Set position, scale and rotation of new entity to same as old entity + a little offset in X (to avoid clipping and confusion)
+	SetPosition(newEntity, GetPosition(p_entity) + glm::vec3(10, 0, 0));
+	SetOrientation(newEntity, GetOrientation(p_entity));
+	SetScale(newEntity, GetScale(p_entity));
+
+	//Get all components
+	RootForce::Renderable*		renderable		= m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
+	RootForce::Physics*			physics			= m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
+	RootForce::Collision*		collision		= m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	RootForce::Script*			script			= m_world->GetEntityManager()->GetComponent<RootForce::Script>(p_entity);
+	RootForce::WaterCollider*	watercollider	= m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity);
+
+	//Check if there's a renderable and copy data
+	if(renderable != nullptr)
+	{
+		AddRenderable(newEntity);
+		SetRenderableModelName(newEntity, GetRenderableModelName(p_entity));
+		SetRenderableMaterialName(newEntity, GetRenderableMaterialName(p_entity));
+	}
+
+	//Check if there's a renderable and copy data
+	if(collision != nullptr)
+	{
+		if(physics != nullptr)
+		{
+			AddPhysics(newEntity, true);
+			SetMass(newEntity, GetMass(p_entity));
+		}
+		else
+			AddPhysics(newEntity, false);
+
+		SetPhysicsType(newEntity, GetPhysicsType(p_entity));
+		SetPhysicsShape(newEntity, GetPhysicsShape(p_entity));
+		SetShapeHeight(newEntity, GetShapeHeight(p_entity));
+		SetShapeRadius(newEntity, GetShapeRadius(p_entity));
+		SetPhysicsMesh(newEntity, GetPhysicsMesh(p_entity));
+		SetCollideWithStatic(newEntity, GetCollideWithStatic(p_entity));
+		SetCollideWithWorld(newEntity, GetCollideWithWorld(p_entity));
+		SetGravity(newEntity, GetGravity(p_entity));	
+	}
+
+	//Check if there's a script and copy data
+	if(script != nullptr)
+	{
+		AddScript(newEntity);
+		SetScript(newEntity, GetScript(p_entity));
+	}
+
+	//Check if there's a water collider and copy data
+	if(watercollider != nullptr)
+	{
+		AddWaterCollider(newEntity);
+		SetWaterColliderInterval(newEntity, GetWaterColliderInterval(p_entity));
+		SetWaterColliderPower(newEntity, GetWaterColliderPower(p_entity));
+		SetWaterColliderRadius(newEntity, GetWaterColliderRadius(p_entity));
+	}
+}
+
+//Other
 const ECS::World* EngineActions::GetWorld()
 {
 	return m_world;

@@ -325,6 +325,33 @@ TreenityMain::TreenityMain(const std::string& p_path)
 
 	m_globalKeys.RegisterModifier(Qt::AltModifier);
 	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
+
+	//Load sounds, yep this happened
+
+	//Water sounds
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-1.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-2.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-3.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-1.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-2.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-3.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-4.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-5.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-6.wav");
+
+	//Movement
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-1.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-2.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-3.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-4.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump1-1.wav");
+
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-1.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-2.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-3.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-4.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-5.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-6.wav");
 }
 
 TreenityMain::~TreenityMain()
@@ -453,6 +480,7 @@ void TreenityMain::Update(float dt)
 		dt = 0.0f;
 	}
 
+	g_engineContext.m_sound->Update();
 	if (m_engineActions.GetMode() == EditorMode::EDITOR)
 	{
 		m_world.SetDelta(dt);
@@ -468,7 +496,7 @@ void TreenityMain::Update(float dt)
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
-
+		m_soundSystem->Process();
 		m_physicsTransformCorrectionSystem->Process();
 		g_engineContext.m_physics->DrawDebug();
 		
@@ -511,6 +539,7 @@ void TreenityMain::Update(float dt)
 		{
 			m_playerControlSystem->Process();
 		}
+		m_soundSystem->Process();
 
 		m_actionSystem->Process();
 

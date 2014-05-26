@@ -8,8 +8,8 @@
 #include <qmath.h>
 #include <iostream>
 
-PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent, const QString& p_imageName)
-	: m_startAngle((360 / 8) * index), m_radius(radius), m_center(position), m_parent(parent), m_hovered(false)
+PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent, const QString& p_imageName, const QString& p_toolTip)
+	: m_startAngle((360 / 8) * index), m_radius(radius), m_center(position), m_parent(parent), m_hovered(false), m_toolTip(p_toolTip), m_imageSize(QSize(48,48))
 {
 	setParent((QObject*)m_parent);
 
@@ -24,7 +24,7 @@ PiePiece::PiePiece(int index, int radius, QPoint position, PieMenu* parent, cons
 	m_shapePath.arcTo(smallRect, m_startAngle + 45, -360 / 8);
 	m_shapePath.closeSubpath();
 
-	m_pixmap = QPixmap(p_imageName).scaled(QSize(32, 32), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	m_pixmap = QPixmap(p_imageName).scaled(m_imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 QPainterPath PiePiece::shape() const 
@@ -50,34 +50,36 @@ void PiePiece::updatePosition()
 void PiePiece::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget*)
 {
 	QBrush brush(QColor(60, 60, 60));
+	
 
 	if (m_hovered) 
 	{
+		//Draw tooltip
+		QRect rect(-65, -12, 130, 24);
+		painter->setPen(QColor(255, 255, 255));
+		painter->setBrush(brush);
+		painter->drawRect(rect);
+		painter->setFont(QFont("Arial", 12));
+		painter->drawText(rect, Qt::AlignCenter, m_toolTip);
+
+		//Set hover color
 		brush.setColor(QColor(90, 90, 90));
 	}
 	
+	//Set border color
 	painter->setPen(QColor(20, 20, 20));
 	painter->setBrush(brush);
-	//painter->drawEllipse(boundingRect());
+
 	painter->drawPath(m_shapePath);
 	painter->fillPath(m_shapePath, painter->brush());
 
-	QPointF pixpoint = (0.75 * m_radius) * angleToVector(2 * M_PI * (m_startAngle + 22.5) / 360.0) + QPointF(-16, -16);
-	/*
-	grad.setColorAt(down ? 1 : 0, Qt::darkGray);
-	grad.setColorAt(down ? 0 : 1, Qt::lightGray);
-	painter->setPen(Qt::NoPen);
-	painter->setBrush(grad);
-	if (down)
-	{
-		painter->translate(1, 1);
-	}*/
-	//painter->drawEllipse(boundingRect().adjusted(3, 3, -3, -3));
-//	if (m_startAngle < 45)
+	//calculate draw position of image withing pie piece
+	QPointF pixpoint = (0.75 * m_radius) * angleToVector(2 * M_PI * (m_startAngle + 22.5) / 360.0) + QPointF(-(m_imageSize.width() * 0.5f), -(m_imageSize.height() * 0.5f));
 	
 	{
 		painter->drawPixmap(pixpoint, m_pixmap);
 	}
+
 }
 
 void PiePiece::hide()
@@ -281,9 +283,9 @@ void PieMenu::setHovered( int index, bool state )
 		m_hoveredIndex = -1;
 }
 
-PiePiece* PieMenu::addPiece( const QString& p_imageName )
+PiePiece* PieMenu::addPiece( const QString& p_imageName, const QString& p_toolTip )
 {
-	PiePiece* piece = new PiePiece(m_pieces.size(), m_radius, QCursor::pos(), this, p_imageName);
+	PiePiece* piece = new PiePiece(m_pieces.size(), m_radius, QCursor::pos(), this, p_imageName, p_toolTip);
 	piece->setAcceptedMouseButtons(Qt::NoButton);
 	m_pieces.push_back(piece);
 	m_scene->addItem(piece);
