@@ -182,8 +182,9 @@ namespace Render
 		if(m_showPointlights)
 		{
 #ifndef COMPILE_LEVEL_EDITOR
-			PointLightStencil();
-			PointLightRender();
+			//PointLightStencil();
+			//PointLightRender();
+			PointLightFSQ();
 #else
 			PointLightFSQ();
 #endif

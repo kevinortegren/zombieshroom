@@ -30,6 +30,13 @@ void TextureDrop::SetTexture(Render::TextureInterface* p_texture)
 	ui.label_2->setPixmap(pm.scaled(ui.label_2->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
+void TextureDrop::Clear()
+{
+	ui.label_2->setPixmap(QPixmap());
+	ui.label_2->setText("No Texture");
+
+}
+
 QPixmap TextureDrop::GetPixmap(Render::TextureInterface* p_texture)
 {
 	std::string fullTexturePath = m_engineInterface->GetContentPath() + "Assets\\Textures\\" +  m_engineInterface->GetTextureName(p_texture) + ".dds";

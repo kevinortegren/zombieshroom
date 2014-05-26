@@ -160,6 +160,7 @@ namespace RootEngine
 			virtual float GetHeight(int p_objectHandle) = 0;
 			virtual bool GetCollideWithStatic(int p_objectHandle) = 0;
 			virtual bool GetCollideWithWorld(int p_objectHandle)  = 0;
+			virtual bool IsVisualizeEnabled(int p_objectHandle) = 0;
 
 			//Setters
 			virtual void SetOrientation(int p_objectHandle, glm::quat p_objectOrientation) = 0;
@@ -245,6 +246,7 @@ namespace RootEngine
 			float GetHeight(int p_objectHandle);
 			bool GetCollideWithStatic(int p_objectHandle);
 			bool GetCollideWithWorld(int p_objectHandle); 
+			bool IsVisualizeEnabled(int p_objectHandle);
 
 			//Setters
 			void SetGravity(int p_objectHandle, glm::vec3 p_gravity);

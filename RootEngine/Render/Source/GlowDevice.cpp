@@ -31,7 +31,7 @@ namespace Render
 			float halfWidth;
 			float halfHeight;
 			float blurRadius;
-			float gauss[11];
+			//float gauss[11];
 		} data;
 
 		data.halfWidth = (float)p_width / 2.0f;
@@ -41,11 +41,11 @@ namespace Render
 		float blurFactor = 9.0f;
 		float blurStrength = 0.3f;
 
-		data.gauss[0] = Gaussian(blurFactor * (1.0f - blurStrength), (float)pow(blurFactor * 0.35, 2));
+		/*data.gauss[0] = Gaussian(blurFactor * (1.0f - blurStrength), (float)pow(blurFactor * 0.35, 2));
 		for(int i = 0; i < 10; i++)
 		{
 			data.gauss[i+1] = Gaussian(i * (1.0f - blurStrength), (float)pow(blurFactor * 0.35, 2));
-		}
+		}*/
 
 		m_glowEffect->GetTechniques()[0]->m_perTechniqueBuffer->BufferData(1, sizeof(data), &data, GL_DYNAMIC_DRAW);
 

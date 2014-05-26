@@ -5,12 +5,12 @@
 in vec2 vert_texCoord;
 
 // Uniforms
-uniform PerTech
+layout(std140) uniform PerTech
 {
     float g_Width;
 	float g_Height;
 	float g_BlurRadius;
-    float g_Gauss[11];
+    //float g_Gauss[11];
 };
 
 // Textures
@@ -22,7 +22,7 @@ uniform sampler2D g_Input;
 const float PixelOffset[10] =
     float[10]( 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 );
 
-/*const float g_Gauss[11] = float[11] 
+const float g_Gauss[11] = float[11] 
 (
 0.009292,
 0.126648,
@@ -35,7 +35,7 @@ const float PixelOffset[10] =
 0.026080,
 0.016077,
 0.009292
-);*/
+);
     
 out vec4 frag_color;
 

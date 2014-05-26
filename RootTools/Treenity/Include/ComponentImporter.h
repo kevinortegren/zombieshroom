@@ -290,7 +290,11 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
 				{
 					//Set physics mass
-					p_node["ShapeMass"] >> physics->m_mass;
+					std::string masss;
+					p_node["ShapeMass"] >> masss;
+					physics->m_mass = 0.0f;
+					if(masss != "1.#INF")
+						p_node["ShapeMass"] >> physics->m_mass;
 					if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 						physics->m_mass = 0;
 				}

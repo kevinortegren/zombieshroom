@@ -6,14 +6,22 @@ layout(std140) uniform PerFrame
 {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
-};  
+	mat4 invView;
+	mat4 invProj;
+	mat4 invViewProj;
+};    
 
 layout(std140) uniform PerObject
 {
 	mat4 modelMatrix;
 	mat4 normalMatrix;
 	vec3 gEyeWorldPos;
-};                  
+	float gTime;
+	vec4 gOptions;
+	vec4 SunColor;
+	vec3 SunDirection;
+	float dx2; //Length between height values
+};                   
                                                                                                                                 
 in vec3 WorldPos_ES_in[];                                                                    
 in vec2 TexCoord_ES_in[];

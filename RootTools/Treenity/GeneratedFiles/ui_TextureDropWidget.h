@@ -34,15 +34,39 @@ public:
             Form->setObjectName(QStringLiteral("Form"));
         Form->resize(400, 71);
         gridLayout = new QGridLayout(Form);
+        gridLayout->setSpacing(0);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(Form);
         label->setObjectName(QStringLiteral("label"));
+        label->setMaximumSize(QSize(16777215, 16777215));
+        QFont font;
+        font.setBold(true);
+        font.setWeight(75);
+        label->setFont(font);
+        label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        label->setMargin(13);
 
         gridLayout->addWidget(label, 0, 0, 1, 1);
 
         label_2 = new DropLabel(Form);
         label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
+        label_2->setSizePolicy(sizePolicy);
+        label_2->setMinimumSize(QSize(0, 0));
+        label_2->setMaximumSize(QSize(70, 70));
+        QFont font1;
+        font1.setBold(false);
+        font1.setItalic(true);
+        font1.setWeight(50);
+        label_2->setFont(font1);
+        label_2->setFrameShape(QFrame::StyledPanel);
+        label_2->setFrameShadow(QFrame::Plain);
+        label_2->setLineWidth(1);
+        label_2->setAlignment(Qt::AlignCenter);
 
         gridLayout->addWidget(label_2, 0, 1, 1, 1);
 
