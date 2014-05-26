@@ -81,8 +81,7 @@
         []
     - Type: 10
       Data:
-        - Entity: 4
-          ScriptName: DefaultScript
+        []
     - Type: 11
       Data:
         - Entity: 3

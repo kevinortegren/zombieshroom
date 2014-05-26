@@ -154,14 +154,13 @@ void EngineActions::CreateTestSpawnpoint()
 		m_testSpawnpoint = m_world->GetEntityManager()->CreateEntity();
 
 		transform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_testSpawnpoint);
-		renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_testSpawnpoint);
 	}
 	else
 	{
 		transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_testSpawnpoint);
-		renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_testSpawnpoint);
 	}
 
+	renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_testSpawnpoint);
 	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("TestSpawnpoint");
 	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
 	renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TextureType::TEXTURE_2D);
@@ -304,12 +303,15 @@ ECS::Entity* EngineActions::CreateEntity()
 
 void EngineActions::TargetEntity(ECS::Entity* p_entity)
 {
-	ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
-	RootForce::Script* script = m_world->GetEntityManager()->GetComponent<RootForce::Script>(cameraEntity);
+	if (GetMode() == EditorMode::EDITOR)
+	{
+		ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
+		RootForce::Script* script = m_world->GetEntityManager()->GetComponent<RootForce::Script>(cameraEntity);
 
-	g_engineContext.m_script->SetFunction(script->Name, "Target");
-	g_engineContext.m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+		g_engineContext.m_script->SetFunction(script->Name, "Target");
+		g_engineContext.m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
+		g_engineContext.m_script->ExecuteScript();
+	}
 }
 
 void EngineActions::DeleteEntity(ECS::Entity* p_entity)
