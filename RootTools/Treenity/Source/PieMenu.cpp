@@ -242,6 +242,7 @@ void PieMenu::mouseMoveEvent( QMouseEvent * event )
 void PieMenu::mouseReleaseEvent( QMouseEvent * event )
 {
 	releaseMouse();
+
 	closeMenu();
 
 	
