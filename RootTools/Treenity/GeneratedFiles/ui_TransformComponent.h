@@ -51,6 +51,7 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(Transform->sizePolicy().hasHeightForWidth());
         Transform->setSizePolicy(sizePolicy);
+        Transform->setMinimumSize(QSize(232, 0));
         Transform->setMaximumSize(QSize(16777215, 150));
         gridLayout = new QGridLayout(Transform);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));

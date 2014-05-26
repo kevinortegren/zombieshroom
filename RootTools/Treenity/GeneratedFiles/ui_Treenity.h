@@ -271,6 +271,7 @@ public:
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockWidget_4);
         dockWidget_6 = new QDockWidget(TreenityClass);
         dockWidget_6->setObjectName(QStringLiteral("dockWidget_6"));
+        dockWidget_6->setMinimumSize(QSize(200, 75));
         dockWidget_6->setAcceptDrops(true);
         dockWidget_6->setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
         dockWidgetContents_6 = new QWidget();
