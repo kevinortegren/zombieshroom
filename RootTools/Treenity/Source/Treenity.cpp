@@ -167,6 +167,8 @@ void Treenity::EntityCreated(ECS::Entity* p_entity)
 	ui.treeView_entityOutliner->EntityCreated(p_entity, m_projectManager->GetEntityName(p_entity));
 
 	Utils::Write("Entity added: " + QString::number(p_entity->GetId()));
+
+	Select(p_entity);
 }
 
 void Treenity::EntityRemoved(ECS::Entity* p_entity)
@@ -182,11 +184,11 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 		if(p_componentType == RootForce::ComponentType::PHYSICS)
 			return;
 
-		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
-		m_componentViews[p_componentType]->DisplayEntity(p_entity);
-		//QWidget* widget = new QWidget();
-		//SetupUIForComponent(widget, p_componentType);
-		//m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
+		if (m_componentViews.find(p_componentType) != m_componentViews.end())
+		{
+			m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+			m_componentViews[p_componentType]->DisplayEntity(p_entity);
+		}
 	}
 }
 
@@ -353,7 +355,7 @@ void Treenity::RenameEntity(ECS::Entity* p_entity, const QString& p_name)
 void Treenity::CreateEntity()
 {
 	ECS::Entity* e = m_engineInterface->CreateEntity();
-	Select(e);
+	//Select(e);
 }
 
 void Treenity::DestroyEntity()

@@ -255,7 +255,7 @@ void PhysicsView::CylinderHeightChanged( double p_value )
 void PhysicsView::PhysicsMeshChanged()
 {
 	ECS::Entity* selection = *m_editorInterface->GetSelection().begin();
-	m_engineInterface->SetPhysicsMesh(selection, (ui.lineEdit_physicsMesh->text() + "0").toStdString());
+	m_engineInterface->SetPhysicsMesh(selection, ui.lineEdit_physicsMesh->text().toStdString());
 }
 
 void PhysicsView::PhysicsMeshBrowse()

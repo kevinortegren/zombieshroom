@@ -480,7 +480,13 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 						newMeshHandle = "Primitives/box0";
 					}					
 				}
-				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle, transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
+				else
+				{
+					// Load the model if necessary
+					g_engineContext.m_resourceManager->LoadCollada(newMeshHandle);
+				}
+
+				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle + "0", transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
 
 			}
 		break;
@@ -573,7 +579,8 @@ float EngineActions::GetShapeHeight(ECS::Entity* p_entity)
 std::string EngineActions::GetPhysicsMesh(ECS::Entity* p_entity)
 {
 	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
-	return g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
+	std::string mesh = g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
+	return mesh.substr(0, mesh.size() - 1);
 }
 
 bool EngineActions::GetCollisionVisualized(ECS::Entity* p_entity)
