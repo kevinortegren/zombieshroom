@@ -10,7 +10,10 @@
 
 #include <memory>
 #include <SDL2/SDL.h>
+#include <PieMenu.h>
 #include <RootTools/Treenity/Include/EngineInterface.h>
+#include <RootTools/Treenity/Include/EditorInterface.h>
+#include <Utility/ECS/Include/World.h>
 
 class Canvas3D : public QWidget
 {
@@ -22,6 +25,7 @@ public:
 
 	void CreateOpenGLContext();
 	void SetEngineInterface(EngineInterface* p_engineInterface);
+	void SetEditorInterface(EditorInterface* p_editorInterface);
 
 protected:
 	void wheelEvent(QWheelEvent* event);
@@ -29,12 +33,21 @@ protected:
 	void keyReleaseEvent( QKeyEvent *k );
 	void resizeEvent( QResizeEvent * event );
 	//void enterEvent( QEvent * event );
+
+	void mousePressEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent *event);
 	void dragEnterEvent(QDragEnterEvent* event);
 	void dropEvent(QDropEvent* event);
 	void focusInEvent(QFocusEvent* event);
 	void focusOutEvent(QFocusEvent* event);
-	
 private:
 	std::shared_ptr<SDL_Window> m_window;
+	std::shared_ptr<PieMenu> m_pieMenu;
 	EngineInterface* m_engineInterface;
+	EditorInterface* m_editorInterface;
+	ECS::World* m_world;
+	
+private slots:
+	void pieMenuClickTest();
+	void PieMenuAddComponent();
 };
