@@ -135,9 +135,10 @@ Section "Uninstall"
   SetShellVarContext all
   SetOutPath "$TEMP"
   
-  MessageBox MB_OK "The install directory is: $INSTDIR"
+  ;MessageBox MB_OK "The install directory is: $INSTDIR"
   ;Delete "$INSTDIR\*.*"
   ;Delete "$INSTDIR\Uninstall.exe"
+  Delete "$INSTDIR\*.*"
   RMDir /r "$INSTDIR"
   
   DeleteRegKey /ifempty HKCU "Software\ZombieShroom\RootForce"
