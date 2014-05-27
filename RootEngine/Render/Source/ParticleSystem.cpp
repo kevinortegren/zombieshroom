@@ -66,16 +66,24 @@ namespace Render
 		m_currentTFB = 1;
 		m_first = true;
 
+		m_uniforms = p_renderer->CreateBuffer(GL_UNIFORM_BUFFER);
+		char data[RENDER_PARTICLES_UNIFORM_SIZE];
+		memset(&data, 0, RENDER_PARTICLES_UNIFORM_SIZE);
+
+		m_uniforms->BufferData(1, RENDER_PARTICLES_UNIFORM_SIZE, &data, GL_DYNAMIC_DRAW);
 	}
 
 	void ParticleSystem::Update()
 	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId());
+
 		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[m_currentVB]->GetVertexBuffer()->GetBufferId());
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[m_currentTFB]->GetTransformFeedback()); 
 
-		 m_meshes[m_currentVB]->Bind();
+		m_meshes[m_currentVB]->Bind();
 
-		 glBeginTransformFeedback(GL_POINTS);
+		glBeginTransformFeedback(GL_POINTS);
+		
 
 		if (m_first) {
 			glDrawArrays(GL_POINTS, 0, 1);
@@ -85,16 +93,24 @@ namespace Render
 			glDrawTransformFeedback(GL_POINTS, m_meshes[m_currentVB]->GetTransformFeedback());
 		}
 
-		 glEndTransformFeedback();
+		glEndTransformFeedback();
 
-		 m_meshes[m_currentVB]->Unbind();
+		//AMD fix
+		glFlush();
 
-		 std::swap(m_currentVB, m_currentTFB);
+		m_meshes[m_currentVB]->Unbind();
+
+		std::swap(m_currentVB, m_currentTFB);
 	}
 
 	Render::MeshInterface* ParticleSystem::GetMesh()
 	{
 		return m_meshes[m_currentVB];
+	}
+
+	Render::BufferInterface* ParticleSystem::GetUniformBuffer()
+	{
+		return m_uniforms;
 	}
 
 	ParticleSystem::ParticleSystem()
@@ -159,14 +175,14 @@ namespace Render
 		return &m_particleSystems[slot++];
 	}
 
-	void ParticleSystemHandler::SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params)
+	void ParticleSystemHandler::SetParticleUniforms(ParticleSystemInterface* p_system, Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params)
 	{
 		for(auto itr = p_params.begin(); itr != p_params.end(); ++itr)
 		{
 			int offset = p_technique->m_uniformsParams[(*itr).first];
 			unsigned size = Render::GLRenderer::s_sizes[(*itr).first];
 
-			m_perObjectBuffer->BufferSubData(offset, size, (*itr).second);
+			p_system->GetUniformBuffer()->BufferSubData(offset, size, (*itr).second);
 		}
 	}
 
@@ -195,11 +211,15 @@ namespace Render
 		m_perFrameBuffer->BufferSubData(0, sizeof(m_perFrameVars), &m_perFrameVars);
 
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PERFRAME, m_perFrameBuffer->GetBufferId());
-		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_perObjectBuffer->GetBufferId());
+		
+
+		
 	}
 
 	void ParticleSystemHandler::EndTransform()
 	{
+		 
+
 		 glDisable(GL_RASTERIZER_DISCARD);
 	}
 

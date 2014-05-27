@@ -3,7 +3,9 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QMenu>
 #include <RootTools/Treenity/Include/Components/AbstractComponentView.h>
+#include <RootTools/Treenity/Include/ComponentViewHeader.h>
 
 class ComponentViewItem : public QWidget
 {
@@ -18,7 +20,10 @@ private:
 	AbstractComponentView*		m_item;
 	QPushButton*				m_headerButton;
 	QVBoxLayout*				m_layout;
+	ComponentViewHeader*		m_header;
 
 private slots:
-	void HeaderClicked();
+	void ShowComponentView();
+	void HideComponentView();
+	void RemoveComponent();
 };

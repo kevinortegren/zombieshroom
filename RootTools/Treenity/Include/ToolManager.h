@@ -18,6 +18,7 @@ class ToolManager
 {
 public:
 	ToolManager();
+	void SetEditorInterface(EditorInterface* p_editorInterface);
 	void Initialize(ECS::World* p_world);
 	Tool* GetSelectedTool(); 
 	void SetTool(ToolBox::ToolBox p_tool);
@@ -25,4 +26,5 @@ public:
 private:
 	std::map<ToolBox::ToolBox, Tool*> m_tools; 
 	Tool* m_selectedTool;
+	EditorInterface* m_editorInterface;
 };

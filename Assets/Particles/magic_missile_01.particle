@@ -17,7 +17,7 @@
   BLENDING: 0
   RELATIVE: 0
   TEXTURE: Particles/smocke
-  EFFECT: Particle/ParticleAdditive
+  EFFECT: Particle/ParticleAdditiveRelative
   NAME: tits
   ROTATIONSPEEDMIN: -3.1
   ROTATIONSPEEDMAX: 3.1
@@ -41,7 +41,7 @@
   BLENDING: 0
   RELATIVE: 0
   TEXTURE: Particles/smoke
-  EFFECT: Particle/ParticleAdditive
+  EFFECT: Particle/ParticleAdditiveRelative
   NAME: balls
   ROTATIONSPEEDMIN: -3.1
   ROTATIONSPEEDMAX: 3.1

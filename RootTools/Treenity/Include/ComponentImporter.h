@@ -19,6 +19,11 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 	{
 		case RootForce::ComponentType::RENDERABLE:
 			{
+				// Do not create a renderable without a model (useful for detecting empty renderables on ignored exports).
+				// TODO: This is not the best solution, the renderable should not have been exported at all for these entities. However, the export is done in ECS and cannot be overridden.
+				if (p_node.FindValue("Model") == nullptr)
+					return;
+
 				RootForce::Renderable* renderable = p_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
 				
 				const YAML::Node* modelNode = p_node.FindValue("Model");
@@ -290,7 +295,11 @@ static void Importer(ECS::World* p_world, int p_type, ECS::Entity* p_entity, con
 				if (type == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
 				{
 					//Set physics mass
-					p_node["ShapeMass"] >> physics->m_mass;
+					std::string masss;
+					p_node["ShapeMass"] >> masss;
+					physics->m_mass = 0.0f;
+					if(masss != "1.#INF")
+						p_node["ShapeMass"] >> physics->m_mass;
 					if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_STATIC)
 						physics->m_mass = 0;
 				}

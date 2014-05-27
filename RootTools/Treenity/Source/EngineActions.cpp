@@ -52,19 +52,16 @@ void EngineActions::ClearScene()
 
 void EngineActions::AddDefaultEntities()
 {
-	// Process entities from world import.
-	m_treenityMain->ProcessWorldMessages();
- 
 	// Add non-editable entities.
+	m_treenityMain->GetEditor()->InitializeTools(m_world);
 	ECS::Entity* skybox = m_treenityMain->GetWorldSystem()->CreateSkyBox();
 	CreateFreeFlyingCamera();
-	m_treenityMain->GetEditor()->InitializeTools(m_world);
-	m_world->GetEntityManager()->CleanUp();
 
 	// Add editable entities.
 	ECS::Entity* sun = m_treenityMain->GetWorldSystem()->CreateSun();
 	CreateTestSpawnpoint();
 	CreateWater();
+
 	m_treenityMain->ProcessWorldMessages();
 	m_world->GetEntityManager()->CleanUp();
 	
@@ -133,6 +130,8 @@ void EngineActions::CreateFreeFlyingCamera()
 
 	m_world->GetTagManager()->RegisterEntity("Camera", m_cameraEntity);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_cameraEntity);	
+	m_world->GetGroupManager()->RegisterEntity("NonSelectable", m_cameraEntity);	
+
 
 	// Setup aiming device.
 	m_aimingDevice = m_world->GetEntityManager()->CreateEntity();
@@ -141,33 +140,38 @@ void EngineActions::CreateFreeFlyingCamera()
 
 	m_world->GetTagManager()->RegisterEntity("AimingDevice", m_aimingDevice);
 	m_world->GetGroupManager()->RegisterEntity("NonExport", m_aimingDevice);
+	m_world->GetGroupManager()->RegisterEntity("NonSelectable", m_aimingDevice);	
 }
 
 void EngineActions::CreateTestSpawnpoint()
 {
 	m_testSpawnpoint = m_world->GetTagManager()->GetEntityByTag("TestSpawnpoint");
+	RootForce::Transform* transform;
+	RootForce::Renderable* renderable;
+
 	if (m_testSpawnpoint == nullptr)
 	{
 		m_testSpawnpoint = m_world->GetEntityManager()->CreateEntity();
 
-		RootForce::Transform* transform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_testSpawnpoint);
-		RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_testSpawnpoint);
-
-		renderable->m_material = g_engineContext.m_renderer->CreateMaterial("TestSpawnpoint");
-		renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
-		renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TextureType::TEXTURE_2D);
-		renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture("WSGlowRed", Render::TextureType::TextureType::TEXTURE_2D);
-		renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TextureType::TEXTURE_2D);
-		renderable->m_material->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TextureType::TEXTURE_2D);
-		renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
-
-		//m_world->GetGroupManager()->RegisterEntity("NonExport", m_testSpawnpoint);
-		m_world->GetTagManager()->RegisterEntity("TestSpawnpoint", m_testSpawnpoint);
+		transform = m_world->GetEntityManager()->CreateComponent<RootForce::Transform>(m_testSpawnpoint);
+	}
+	else
+	{
+		transform = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_testSpawnpoint);
 	}
 
-	// Add a shadow technique to the spawn point (which is not exported).
-	RootForce::Renderable* renderable = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(m_testSpawnpoint);
+	renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(m_testSpawnpoint);
+	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("TestSpawnpoint");
+	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("testchar");
+	renderable->m_material->m_textures[Render::TextureSemantic::DIFFUSE] = g_engineContext.m_resourceManager->LoadTexture("WStexture", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::GLOW] = g_engineContext.m_resourceManager->LoadTexture("WSGlowRed", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::SPECULAR] = g_engineContext.m_resourceManager->LoadTexture("WSSpecular", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_textures[Render::TextureSemantic::NORMAL] = g_engineContext.m_resourceManager->LoadTexture("WSNormal", Render::TextureType::TextureType::TEXTURE_2D);
+	renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_NormalMap");
 	renderable->m_shadowTech = Render::ShadowTechnique::SHADOW_DYNAMIC;
+
+	//m_world->GetGroupManager()->RegisterEntity("NonExport", m_testSpawnpoint);
+	m_world->GetTagManager()->RegisterEntity("TestSpawnpoint", m_testSpawnpoint);
 }
 
 void EngineActions::CreateWater()
@@ -184,6 +188,18 @@ void EngineActions::CreateWater()
 // Mode switching
 void EngineActions::EnterPlayMode()
 {
+	ECS::GroupManager::GroupRange range = m_world->GetGroupManager()->GetEntitiesInGroup("Tools");
+	std::vector<ECS::Entity*> m_entitiesToRemove;
+	for(std::multimap<std::string, ECS::Entity*>::iterator itr = range.first; itr != range.second; ++itr)
+	{
+		m_entitiesToRemove.push_back((*itr).second);
+	}
+	for(ECS::Entity* e : m_entitiesToRemove)
+	{
+		m_world->GetEntityManager()->RemoveEntity(e);
+	}
+	m_world->GetEntityManager()->CleanUp();
+
 	QCursor::setPos(QApplication::primaryScreen(), m_treenityMain->GetEditor()->GetUi().widget_canvas3D->geometry().center());
 	m_editorMode = EditorMode::GAME;
 	g_engineContext.m_inputSys->LockMouseToCenter(true);
@@ -248,6 +264,7 @@ void EngineActions::ExitPlayMode()
 	g_engineContext.m_physics->RemoveAll();
 	g_networkEntityMap.clear();
 	RootForce::Network::NetworkComponent::ResetSequenceForUser(0);
+	m_treenityMain->ProcessWorldMessages();
 
 	// Restore the old world state.
 	std::map<ECS::Entity*, std::string> entityNames;
@@ -299,12 +316,15 @@ ECS::Entity* EngineActions::CreateEntity()
 
 void EngineActions::TargetEntity(ECS::Entity* p_entity)
 {
-	ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
-	RootForce::Script* script = m_world->GetEntityManager()->GetComponent<RootForce::Script>(cameraEntity);
+	if (GetMode() == EditorMode::EDITOR)
+	{
+		ECS::Entity* cameraEntity = m_world->GetTagManager()->GetEntityByTag("Camera");
+		RootForce::Script* script = m_world->GetEntityManager()->GetComponent<RootForce::Script>(cameraEntity);
 
-	g_engineContext.m_script->SetFunction(script->Name, "Target");
-	g_engineContext.m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
-	g_engineContext.m_script->ExecuteScript();
+		g_engineContext.m_script->SetFunction(script->Name, "Target");
+		g_engineContext.m_script->AddParameterUserData(p_entity, sizeof(ECS::Entity*), "Entity");
+		g_engineContext.m_script->ExecuteScript();
+	}
 }
 
 void EngineActions::DeleteEntity(ECS::Entity* p_entity)
@@ -312,6 +332,81 @@ void EngineActions::DeleteEntity(ECS::Entity* p_entity)
 	m_world->GetEntityManager()->RemoveEntity(p_entity);
 }
 
+ECS::Entity* EngineActions::GetEntityByTag( const std::string& p_tag )
+{
+	return m_world->GetTagManager()->GetEntityByTag(p_tag);
+}
+
+void EngineActions::DuplicateEntity( ECS::Entity* p_entity )
+{
+	//Create new entity
+	ECS::Entity* newEntity = CreateEntity();
+	//Set position, scale and rotation of new entity to same as old entity + a little offset in X (to avoid clipping and confusion)
+	SetPosition(newEntity, GetPosition(p_entity) + glm::vec3(10, 0, 0));
+	SetOrientation(newEntity, GetOrientation(p_entity));
+	SetScale(newEntity, GetScale(p_entity));
+
+	//Get all components
+	RootForce::Renderable*		renderable		= m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(p_entity);
+	RootForce::Physics*			physics			= m_world->GetEntityManager()->GetComponent<RootForce::Physics>(p_entity);
+	RootForce::Collision*		collision		= m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	RootForce::Script*			script			= m_world->GetEntityManager()->GetComponent<RootForce::Script>(p_entity);
+	RootForce::WaterCollider*	watercollider	= m_world->GetEntityManager()->GetComponent<RootForce::WaterCollider>(p_entity);
+	RootForce::ParticleEmitter* particleEmitter = m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(p_entity);
+
+	//Check if there's a renderable and copy data
+	if(renderable != nullptr)
+	{
+		AddRenderable(newEntity);
+		SetRenderableModelName(newEntity, GetRenderableModelName(p_entity));
+		SetRenderableMaterialName(newEntity, GetRenderableMaterialName(p_entity));
+	}
+
+	//Check if there's a renderable and copy data
+	if(collision != nullptr)
+	{
+		if(physics != nullptr)
+		{
+			AddPhysics(newEntity, true);
+			SetMass(newEntity, GetMass(p_entity));
+		}
+		else
+			AddPhysics(newEntity, false);
+
+		SetPhysicsType(newEntity, GetPhysicsType(p_entity));
+		SetPhysicsShape(newEntity, GetPhysicsShape(p_entity));
+		SetShapeHeight(newEntity, GetShapeHeight(p_entity));
+		SetShapeRadius(newEntity, GetShapeRadius(p_entity));
+		SetPhysicsMesh(newEntity, GetPhysicsMesh(p_entity));
+		SetCollideWithStatic(newEntity, GetCollideWithStatic(p_entity));
+		SetCollideWithWorld(newEntity, GetCollideWithWorld(p_entity));
+		SetGravity(newEntity, GetGravity(p_entity));	
+	}
+
+	//Check if there's a script and copy data
+	if(script != nullptr)
+	{
+		AddScript(newEntity);
+		SetScript(newEntity, GetScript(p_entity));
+	}
+
+	//Check if there's a water collider and copy data
+	if(watercollider != nullptr)
+	{
+		AddWaterCollider(newEntity);
+		SetWaterColliderInterval(newEntity, GetWaterColliderInterval(p_entity));
+		SetWaterColliderPower(newEntity, GetWaterColliderPower(p_entity));
+		SetWaterColliderRadius(newEntity, GetWaterColliderRadius(p_entity));
+	}
+
+	if(particleEmitter != nullptr)
+	{
+		AddParticle(newEntity);
+		SetParticleEmitter(newEntity, GetParticleEmitter(p_entity));
+	}
+}
+
+//Other
 const ECS::World* EngineActions::GetWorld()
 {
 	return m_world;
@@ -361,7 +456,7 @@ const glm::vec3& EngineActions::GetScale(ECS::Entity* p_entity)
 void EngineActions::AddRenderable(ECS::Entity* p_entity)
 {
 	RootForce::Renderable* renderable = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(p_entity);
-	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/box");
+	renderable->m_model = g_engineContext.m_resourceManager->LoadCollada("Primitives/sphere");
 	renderable->m_material = g_engineContext.m_renderer->CreateMaterial("DefaultMaterial");
 	renderable->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh");
 }
@@ -471,16 +566,22 @@ void EngineActions::ReconstructPhysicsObject(ECS::Entity* p_entity, bool p_dynam
 						newMeshHandle = g_engineContext.m_resourceManager->ResolveStringFromModel(rend->m_model);
 
 						if(newMeshHandle == "")
-							newMeshHandle = "Primitives/box0";
-						else
-							newMeshHandle += "0";
+							newMeshHandle = "Primitives/box";
+						//else
+							//newMeshHandle += "0";
 					}
 					else
 					{
-						newMeshHandle = "Primitives/box0";
+						newMeshHandle = "Primitives/box";
 					}					
 				}
-				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle, transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
+				else
+				{
+					// Load the model if necessary
+					g_engineContext.m_resourceManager->LoadCollada(newMeshHandle);
+				}
+
+				g_engineContext.m_physics->BindMeshShape(*collision->m_handle, newMeshHandle + "0", transform->m_position, transform->m_orientation.GetQuaternion(), transform->m_scale, p_mass, p_collideWithWorld, p_collideWithStatic, p_visualize);
 
 			}
 		break;
@@ -573,7 +674,8 @@ float EngineActions::GetShapeHeight(ECS::Entity* p_entity)
 std::string EngineActions::GetPhysicsMesh(ECS::Entity* p_entity)
 {
 	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
-	return g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
+	std::string mesh = g_engineContext.m_physics->GetPhysicsModelHandle(*collision->m_handle);
+	return mesh.substr(0, mesh.size() - 1);
 }
 
 bool EngineActions::GetCollisionVisualized(ECS::Entity* p_entity)
@@ -641,7 +743,12 @@ void EngineActions::SetPhysicsMesh(ECS::Entity* p_entity, const std::string& p_m
 
 void EngineActions::SetCollisionVisualized(ECS::Entity* p_entity, bool p_visualize)
 {
-	ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), p_visualize);
+	RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(p_entity);
+	if (g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_STATIC ||
+		g_engineContext.m_physics->GetType(*collision->m_handle) == RootEngine::Physics::PhysicsType::TYPE_DYNAMIC)
+	{
+		ReconstructPhysicsObject(p_entity, GetPhysicsType(p_entity), GetCollideWithWorld(p_entity), GetCollideWithStatic(p_entity), GetMass(p_entity), GetPhysicsShape(p_entity), GetShapeRadius(p_entity), GetShapeHeight(p_entity), GetPhysicsMesh(p_entity), p_visualize);
+	}
 }
 
 

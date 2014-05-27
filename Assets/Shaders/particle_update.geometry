@@ -1,5 +1,4 @@
-#version 400
-#extension GL_EXT_geometry_shader4 : enable  
+#version 430 core
 
 layout(points) in;
 layout(points, max_vertices = 51) out;

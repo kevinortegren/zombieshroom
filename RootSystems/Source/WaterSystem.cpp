@@ -1,6 +1,7 @@
 #include <RootSystems/Include/WaterSystem.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootEngine/Include/Logging/Logging.h>
+#include <RootEngine/Sound/Include/SoundAudio.h>
 #include <iostream>
 #include <fstream>
 
@@ -90,12 +91,18 @@ namespace RootForce
 		else //if by the edge of the water, start disturbing at given interval
 			
 		if(waterCollider->m_edgeWaterTime <= 0.0f && glm::distance(glm::vec2(waterCollider->m_prevPos.x, waterCollider->m_prevPos.z) , glm::vec2(transform->m_position.x, transform->m_position.z)) > 5.0f )
-		{					
+		{			
 			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
+			{
+				PlayWaterSound(waterCollider->m_radius, transform->m_position);
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
+			}
 			else if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::UNDER_WATER)
+			{
+				PlayWaterSound(waterCollider->m_radius, transform->m_position);
 				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower, waterCollider->m_radius);
+			}
 			else//if previous water state was EDGE_WATER we disturb 1/3 of the power
 				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower/3.0f, waterCollider->m_radius);
 			waterCollider->m_prevPos = transform->m_position;
@@ -697,6 +704,56 @@ namespace RootForce
 		waterTrans->m_scale = glm::vec3(m_scale, 1, m_scale);
 
 		return water;
+	}
+
+	void WaterSystem::PlayWaterSound( int p_radius, glm::vec3 p_pos )
+	{
+		//If radius is less than 4, play small hit water sounds
+		if(p_radius < 4)
+		{
+			int random = rand() % 6;
+			switch (random)
+			{
+			case 0:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-1.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			case 1:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-2.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			case 2:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-3.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			case 3:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-4.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			case 4:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-5.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			case 5:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-6.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			default:
+				break;
+			}
+		}
+		else // Play medium size sound
+		{
+			int random = rand() % 3;
+			switch (random)
+			{
+			case 0:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-1.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			case 1:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-2.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			case 2:
+				g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-3.wav")->PlayOnce(1.0f, 0x00400011, p_pos, 10.0f, 100.0f);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 }

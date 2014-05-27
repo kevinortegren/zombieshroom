@@ -1,6 +1,7 @@
 #ifndef COMPILE_LEVEL_EDITOR
 #include <AnimationSystem.h>
 #include <RootSystems/Include/StatChangeSystem.h>
+#include <RootEngine/Include/ResourceManager/ResourceManager.h>
 
 namespace RootForce
 {
@@ -16,7 +17,8 @@ namespace RootForce
 
 	void AnimationSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
-		
+		m_temptity = p_entity; //Nice hax to feed entity to animation sounds
+
 		if(m_logger)
 		{
 			Renderable* renderable = m_renderables.Get(p_entity);
@@ -134,6 +136,35 @@ namespace RootForce
 
 		float TimeInTicks		= p_animation->LowerBodyAnim.m_animTime * p_ticksPerSecond;
 		m_lowerAnimTime			= ((float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_startTime) + fmod(TimeInTicks, (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_duration);
+		
+		//Footstep sound properties
+		m_animSeedTime			= p_animation->LowerBodyAnim.m_animTime;
+		float animTime			= m_lowerAnimTime - (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_startTime * p_ticksPerSecond;
+
+
+		//Animation sounds
+		if(p_animation->LowerBodyAnim.m_animClip == AnimationClip::WALKING 
+			|| p_animation->LowerBodyAnim.m_animClip == AnimationClip::LEFTFORWARD 
+			|| p_animation->LowerBodyAnim.m_animClip == AnimationClip::RIGHTFORWARD
+			|| p_animation->LowerBodyAnim.m_animClip == AnimationClip::STRAFE_LEFT 
+			|| p_animation->LowerBodyAnim.m_animClip == AnimationClip::STRAFE_RIGHT
+			|| p_animation->LowerBodyAnim.m_animClip == AnimationClip::BACKWARDS
+			|| p_animation->LowerBodyAnim.m_animClip == AnimationClip::LEFTBACK 
+			|| p_animation->LowerBodyAnim.m_animClip == AnimationClip::RIGHTBACK)
+		{
+			if((animTime >= 0.65f && animTime <= 0.75f) || (animTime >= 0.25f && animTime <= 0.35f))
+			{
+				if(!p_animation->m_stepTaken)
+				{
+					PlayAnimSound();
+					p_animation->m_stepTaken = true;
+				}
+			}
+			else
+			{
+				p_animation->m_stepTaken = false;
+			}
+		}
 	}
 
 	
@@ -417,6 +448,42 @@ namespace RootForce
 		Out = Out.Normalize();
 	}
 
+	void AnimationSystem::PlayAnimSound()
+	{
+		glm::vec3 pos = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_temptity)->m_position;
 
+		std::srand((int)(m_animSeedTime * 10000.0f));
+		int random = std::rand() % 6;
+
+		unsigned flags;
+		if(m_temptity == m_world->GetTagManager()->GetEntityByTag("Player"))
+			flags = SOUND_2D | SOUND_LOOP_OFF;
+		else
+			flags = SOUND_3D | SOUND_3D_LINEARSQUAREROLLOFF | SOUND_LOOP_OFF;
+		
+		switch (random)
+		{
+		case 0:
+			m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-1.wav")->PlayOnce(0.2f, flags, pos, 10.0f, 100.0f);
+			break;
+		case 1:
+			m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-2.wav")->PlayOnce(0.2f, flags, pos, 10.0f, 100.0f);
+			break;
+		case 2:
+			m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-3.wav")->PlayOnce(0.2f, flags, pos, 10.0f, 100.0f);
+			break;
+		case 3:
+			m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-4.wav")->PlayOnce(0.2f, flags, pos, 10.0f, 100.0f);
+			break;
+		case 4:
+			m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-5.wav")->PlayOnce(0.2f, flags, pos, 10.0f, 100.0f);
+			break;
+		case 5:
+			m_context->m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-6.wav")->PlayOnce(0.2f, flags, pos, 10.0f, 100.0f);
+			break;
+		default:
+			break;
+		}
+	}
 }
 #endif

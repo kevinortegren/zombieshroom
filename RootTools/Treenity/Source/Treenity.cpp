@@ -14,6 +14,7 @@
 
 #include <QPushButton>
 #include <QScrollArea>
+#include <QShortcut>
 
 #include <RootTools/Treenity/Include/Components/ParticleView.h>
 
@@ -88,7 +89,6 @@ Treenity::Treenity(QWidget *parent)
 	m_componentViews[RootForce::ComponentType::PARTICLE]			= new ParticleView();
 
 	// Block component views from updates while in game mode.
-
 	m_componentViews[RootForce::ComponentType::RENDERABLE]->SetReceiveUpdates(false);
 
 	for (auto it : m_componentViews)
@@ -118,10 +118,21 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.pushButton_translateMode,			SIGNAL(clicked()),			this,					SLOT(SetTranslateTool()));
 	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
 	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
+	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
 	
+
+	connect(m_componentViews[RootForce::ComponentType::RENDERABLE],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveRenderable(ECS::Entity*)));
+	connect(m_componentViews[RootForce::ComponentType::COLLISION],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemovePhysics(ECS::Entity*))); 
+	connect(m_componentViews[RootForce::ComponentType::WATERCOLLIDER],		SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveWaterCollider(ECS::Entity*))); 
+	connect(m_componentViews[RootForce::ComponentType::SCRIPT],				SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveScriptComponent(ECS::Entity*))); 
+	connect(m_componentViews[RootForce::ComponentType::COLLISIONRESPONDER], SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveCollisionResponder(ECS::Entity*))); 
+
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
 
+	ui.widget_canvas3D->SetEditorInterface(this);
+	// Set tool mode.
+	m_toolMode = ToolMode::LOCAL;
 }
 
 Treenity::~Treenity()
@@ -171,6 +182,8 @@ void Treenity::EntityCreated(ECS::Entity* p_entity)
 	ui.treeView_entityOutliner->EntityCreated(p_entity, m_projectManager->GetEntityName(p_entity));
 
 	Utils::Write("Entity added: " + QString::number(p_entity->GetId()));
+
+	//Select(p_entity);
 }
 
 void Treenity::EntityRemoved(ECS::Entity* p_entity)
@@ -186,11 +199,11 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 		if(p_componentType == RootForce::ComponentType::PHYSICS)
 			return;
 
-		m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
-		m_componentViews[p_componentType]->DisplayEntity(p_entity);
-		//QWidget* widget = new QWidget();
-		//SetupUIForComponent(widget, p_componentType);
-		//m_compView->AddItem(new ComponentViewItem(m_componentNames[p_componentType], widget));
+		if (m_componentViews.find(p_componentType) != m_componentViews.end())
+		{
+			m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+			m_componentViews[p_componentType]->DisplayEntity(p_entity);
+		}
 	}
 }
 
@@ -229,7 +242,7 @@ void Treenity::EntityRemovedFromGroup(ECS::Entity* p_entity, const std::string& 
 void Treenity::InitializeTools(ECS::World* p_world)
 {
 	m_toolManager.Initialize(p_world);
-	
+	m_toolManager.SetEditorInterface(this);
 	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
 }
 
@@ -270,12 +283,8 @@ void Treenity::OpenProject()
 		m_currentProjectFile = fileName;
 
 		UpdateWindowTitle();
-
 		m_engineInterface->ClearScene();
-	
 		m_projectManager->Import(fileName);
-
-
 		m_engineInterface->AddDefaultEntities();
 		m_engineInterface->InitializeScene();
 	}
@@ -310,13 +319,16 @@ void Treenity::Play()
 
 void Treenity::Select(ECS::Entity* p_entity)
 {
-	m_previouslySelectedEntities = m_selectedEntities;
-	m_selectedEntities.clear();
+	if(!m_engineInterface->GetWorld()->GetGroupManager()->IsEntityInGroup(p_entity, "NonSelectable"))
+	{
+		m_previouslySelectedEntities = m_selectedEntities;
+		m_selectedEntities.clear();
 
-	if(p_entity != nullptr)
-		m_selectedEntities.insert(p_entity);
+		if(p_entity != nullptr)
+			m_selectedEntities.insert(p_entity);
 
-	UpdateOnSelection();
+		UpdateOnSelection();
+	}
 }
 
 void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
@@ -324,15 +336,30 @@ void Treenity::Select(const std::set<ECS::Entity*>& p_entities)
 	m_previouslySelectedEntities = m_selectedEntities;
 	m_selectedEntities = p_entities;
 
+	for(auto itr = m_selectedEntities.begin(); itr != m_selectedEntities.end();)
+	{
+		if(m_engineInterface->GetWorld()->GetGroupManager()->IsEntityInGroup((*itr), "NonSelectable"))
+		{
+			itr = m_selectedEntities.erase(itr);
+		}
+		else
+		{
+			itr++;
+		}
+	}
+
 	UpdateOnSelection();
 }
 
 void Treenity::AddToSelection(ECS::Entity* p_entity)
 {
-	m_previouslySelectedEntities = m_selectedEntities;
-	m_selectedEntities.insert(p_entity);
+	if(!m_engineInterface->GetWorld()->GetGroupManager()->IsEntityInGroup(p_entity, "NonSelectable"))
+	{
+		m_previouslySelectedEntities = m_selectedEntities;
+		m_selectedEntities.insert(p_entity);
 
-	UpdateOnSelection();
+		UpdateOnSelection();
+	}
 }
 
 void Treenity::ClearSelection()
@@ -352,6 +379,11 @@ void Treenity::RenameEntity(ECS::Entity* p_entity, const QString& p_name)
 {
 	ui.treeView_entityOutliner->EntityRenamed(p_entity, p_name);
 	m_projectManager->SetEntityName(p_entity, p_name);
+}
+
+ToolMode::ToolMode Treenity::GetToolMode()
+{
+	return m_toolMode;
 }
 
 void Treenity::CreateEntity()
@@ -439,9 +471,6 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list.
 		m_compView->RemoveItems();
-
-		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
-
 	}
 	else if (m_selectedEntities.size() == 1)
 	{
@@ -473,7 +502,6 @@ void Treenity::UpdateOnSelection()
 	}
 	else if (m_selectedEntities.size() > 1)
 	{
-
 		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 
 		// Enable name, allow all names to be changed.
@@ -482,9 +510,6 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list (potential change in future, show transforms).
 		m_compView->RemoveItems();
-
-		// Update rotation tool selection.
-		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 	}
 
 	// For all selected entities that has a collision component, visualize their shape.
@@ -517,20 +542,68 @@ void Treenity::DisplayEntity(ECS::Entity* p_selectedEntity)
 
 void Treenity::keyPressEvent( QKeyEvent* event )
 {
-	if(event->key() == 70)
+	if(m_engineInterface->GetMode() == EditorMode::EDITOR)
 	{
-		if(m_selectedEntities.size() > 0)
-		m_engineInterface->TargetEntity(*m_selectedEntities.begin());
-	}
-	if (event->key() == Qt::Key_Escape)
-	{
-		if (m_engineInterface->GetMode() == EditorMode::GAME)
+		if(event->key() == Qt::Key_F)
 		{
-			Utils::Write("Stopping game session. Restoring world.");
-			m_engineInterface->ExitPlayMode();
+			if(m_selectedEntities.size() > 0)
+			m_engineInterface->TargetEntity(*m_selectedEntities.begin());
+		}
+		else if(event->key() == Qt::Key_Delete)
+		{
+			if(m_selectedEntities.size() > 0)
+			{
+				for(auto e : m_selectedEntities)
+				{
+					m_engineInterface->DeleteEntity(e);
+				}
+			}
+		}
+		else if(event->key() == Qt::Key_A)
+		{
+			ClearSelection();
+		}
+		else if( event->key() == Qt::Key_Q)
+		{
+			ui.pushButton_translateMode->click();
+		}
+		else if( event->key() == Qt::Key_W)
+		{
+			ui.pushButton_rotateMode->click();
+		}
+		else if( event->key() == Qt::Key_E)
+		{
+			ui.pushButton_scaleMode->click();
+		}
+		else if( event->key() == Qt::Key_S)
+		{
+			int index = (m_toolMode == ToolMode::GLOBAL) ? 0 : 1;
+			ui.comboBox_mode->setCurrentIndex(index);
 		}
 	}
-	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
+	else if(m_engineInterface->GetMode() == EditorMode::GAME)
+	{
+		if (event->key() == Qt::Key_Escape)
+		{
+			if (m_engineInterface->GetMode() == EditorMode::GAME)
+			{
+				Utils::Write("Stopping game session. Restoring world.");
+				m_engineInterface->ExitPlayMode();
+			}
+		}
+		else if(event->key() == Qt::Key_Delete)
+		{
+			if(m_selectedEntities.size() > 0)
+			{
+				for(auto e : m_selectedEntities)
+				{
+					m_engineInterface->DeleteEntity(e);
+				}
+			}
+		}
+	}
+
+	g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
 }
 
 void Treenity::keyReleaseEvent( QKeyEvent* event )
@@ -585,4 +658,34 @@ void Treenity::SetRotateTool()
 void Treenity::SetResizeTool()
 {
 	//Set resize tool
+}
+
+void Treenity::ChangeToolMode(int index)
+{
+	m_toolMode = (ToolMode::ToolMode)index;
+}
+
+void Treenity::RemoveRenderable(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemoveRenderable(p_entity);
+}
+
+void Treenity::RemovePhysics(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemovePhysics(p_entity);
+}
+
+void Treenity::RemoveWaterCollider(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemoveWaterCollider(p_entity);
+}
+
+void Treenity::RemoveScriptComponent(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemoveScript(p_entity);
+}
+
+void Treenity::RemoveCollisionResponder(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemoveCollisionResponder(p_entity);
 }

@@ -61,7 +61,7 @@ public:
     QPushButton *pushButton_translateMode;
     QPushButton *pushButton_rotateMode;
     QPushButton *pushButton_scaleMode;
-    QComboBox *comboBox;
+    QComboBox *comboBox_mode;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -153,9 +153,8 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
         verticalLayout_2->setSpacing(0);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         widget_canvas3D = new Canvas3D(centralWidget);
         widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -197,11 +196,11 @@ public:
         pushButton_scaleMode->setIcon(icon1);
         pushButton_scaleMode->setCheckable(true);
         pushButton_scaleMode->setAutoExclusive(true);
-        comboBox = new QComboBox(treedeetoolbar);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
-        comboBox->setGeometry(QRect(96, 0, 70, 32));
-        comboBox->setMinimumSize(QSize(70, 32));
-        comboBox->setStyleSheet(QStringLiteral(""));
+        comboBox_mode = new QComboBox(treedeetoolbar);
+        comboBox_mode->setObjectName(QStringLiteral("comboBox_mode"));
+        comboBox_mode->setGeometry(QRect(96, 0, 70, 32));
+        comboBox_mode->setMinimumSize(QSize(70, 32));
+        comboBox_mode->setStyleSheet(QStringLiteral(""));
 
         verticalLayout_2->addWidget(treedeetoolbar);
 
@@ -236,9 +235,8 @@ public:
         dockWidgetContents_4->setObjectName(QStringLiteral("dockWidgetContents_4"));
         verticalLayout_3 = new QVBoxLayout(dockWidgetContents_4);
         verticalLayout_3->setSpacing(0);
-        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
         treeView_entityOutliner = new EntityOutliner(dockWidgetContents_4);
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
         __qtreewidgetitem->setText(0, QStringLiteral("1"));
@@ -274,6 +272,7 @@ public:
         TreenityClass->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockWidget_4);
         dockWidget_6 = new QDockWidget(TreenityClass);
         dockWidget_6->setObjectName(QStringLiteral("dockWidget_6"));
+        dockWidget_6->setMinimumSize(QSize(200, 75));
         dockWidget_6->setAcceptDrops(true);
         dockWidget_6->setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
         dockWidgetContents_6 = new QWidget();
@@ -281,9 +280,8 @@ public:
         dockWidgetContents_6->setAcceptDrops(true);
         verticalLayout = new QVBoxLayout(dockWidgetContents_6);
         verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         groupBox = new QGroupBox(dockWidgetContents_6);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setMaximumSize(QSize(16777215, 120));
@@ -316,9 +314,8 @@ public:
         dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
         verticalLayout_5 = new QVBoxLayout(dockWidgetContents);
         verticalLayout_5->setSpacing(0);
-        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
         verticalLayout_5->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
         verticalLayout_assetManager = new QVBoxLayout();
         verticalLayout_assetManager->setSpacing(0);
         verticalLayout_assetManager->setObjectName(QStringLiteral("verticalLayout_assetManager"));
@@ -398,10 +395,10 @@ public:
         pushButton_translateMode->setText(QString());
         pushButton_rotateMode->setText(QString());
         pushButton_scaleMode->setText(QString());
-        comboBox->clear();
-        comboBox->insertItems(0, QStringList()
-         << QApplication::translate("TreenityClass", "Global", 0)
+        comboBox_mode->clear();
+        comboBox_mode->insertItems(0, QStringList()
          << QApplication::translate("TreenityClass", "Local", 0)
+         << QApplication::translate("TreenityClass", "Global", 0)
         );
         menuFile->setTitle(QApplication::translate("TreenityClass", "File", 0));
         menuEdit->setTitle(QApplication::translate("TreenityClass", "Edit", 0));

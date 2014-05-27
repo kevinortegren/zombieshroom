@@ -16,6 +16,10 @@ ECS::GroupManager* ECS::World::GetGroupManager()
 {
 	return &m_groupManager;
 }
+const ECS::GroupManager* ECS::World::GetGroupManager() const
+{
+	return &m_groupManager;
+}
 void ECS::World::SetDelta(float p_dt)
 {
 	m_dt = p_dt;

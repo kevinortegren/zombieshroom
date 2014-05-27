@@ -35,6 +35,8 @@ struct EngineInterface
 	virtual ECS::Entity* CreateEntity() = 0;
 	virtual void DeleteEntity(ECS::Entity* p_entity) = 0;
 	virtual void TargetEntity(ECS::Entity* p_entity) = 0;
+	virtual ECS::Entity* GetEntityByTag(const std::string& p_tag) = 0;
+	virtual void DuplicateEntity(ECS::Entity* p_entity) = 0;
 
 	// World
 	virtual const ECS::World* GetWorld() = 0;

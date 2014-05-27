@@ -47,11 +47,9 @@ namespace RootEngine
 		class SoundAudioInterface
 		{
 		public:
-			virtual bool LoadSound(std::string p_name, unsigned p_flags) = 0;
+			virtual bool LoadSound(std::string p_name) = 0;
 			virtual FMOD::Sound* GetFmodSound() = 0;
-			virtual bool Is3D() = 0;
-			virtual void PlayOnce3D(float p_volume, glm::vec3 p_position, float p_minRange, float p_maxRange) = 0;
-			//virtual void PlayOnce2D(float p_volume) = 0;
+			virtual void PlayOnce(float p_volume, unsigned p_flags, glm::vec3 p_position = glm::vec3(0.0f), float p_minRange = 0.0f, float p_maxRange = 0.0f) = 0;
 
 			virtual ~SoundAudioInterface(){};
 
@@ -62,15 +60,12 @@ namespace RootEngine
 		public:
 			SoundAudio(FMOD::System* p_system);
 			~SoundAudio();
-			bool LoadSound(std::string p_name, unsigned p_flags);
+			bool LoadSound(std::string p_name);
 			FMOD::Sound* GetFmodSound();
-			bool Is3D();
-			void PlayOnce3D(float p_volume, glm::vec3 p_position, float p_minRange, float p_maxRange);
-			//void PlayOnce2D(float p_volume);
+			void PlayOnce(float p_volume, unsigned p_flags, glm::vec3 p_position = glm::vec3(0.0f), float p_minRange = 0.0f, float p_maxRange = 0.0f);
 		private:
 			FMOD::System*		m_system;
 			FMOD::Sound*		m_sound;
-			bool m_is3D;
 		};
 	}
 }

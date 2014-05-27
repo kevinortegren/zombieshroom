@@ -29,7 +29,7 @@ namespace RootForce
 	void TransformInterpolationSystem::ProcessEntity(ECS::Entity* p_entity)
 	{
 		Transform* transform = m_transforms.Get(p_entity);
-		
+
 		// Do not interpolate the local player.
 		if (p_entity == m_world->GetTagManager()->GetEntityByTag("Player"))
 		{

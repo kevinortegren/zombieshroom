@@ -65,6 +65,7 @@ namespace ECS
 		EntitySystemManager* GetSystemManager();
 		TagManager* GetTagManager();
 		GroupManager* GetGroupManager();
+		const GroupManager* GetGroupManager() const;
 		EntityImporter* GetEntityImporter();
 		EntityExporter* GetEntityExporter();
 		Storage* GetStorage();

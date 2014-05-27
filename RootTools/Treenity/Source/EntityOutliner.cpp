@@ -1,5 +1,8 @@
 #include <RootTools/Treenity/Include/EntityOutliner.h>
+#include <RootEngine/Include/Logging/Logging.h>
 #include <algorithm>
+
+extern RootEngine::GameSharedContext g_engineContext;
 
 EntityOutlinerItem::EntityOutlinerItem(QTreeWidget* p_parent, ECS::Entity* p_entity, const QString& p_name)
 	: QTreeWidgetItem(p_parent, 0), m_entity(p_entity)
@@ -113,7 +116,10 @@ void EntityOutliner::SetEditorInterface(EditorInterface* p_editorInterface)
 
 void EntityOutliner::EntityCreated(ECS::Entity* p_entity, const QString& p_name)
 {
-	addTopLevelItem(new EntityOutlinerItem(this, p_entity, p_name));
+	if(!m_engineInterface->GetWorld()->GetGroupManager()->IsEntityInGroup(p_entity, "NonSelectable"))
+	{
+		addTopLevelItem(new EntityOutlinerItem(this, p_entity, p_name));
+	}
 }
 
 void EntityOutliner::EntityRemoved(ECS::Entity* p_entity)
@@ -198,7 +204,15 @@ void EntityOutliner::SetCurrentItems(const std::set<ECS::Entity*> p_selected)
 
 	for(ECS::Entity* entity : p_selected)
 	{
-		FindItemWithEntity(entity)->setSelected(true);
+		EntityOutlinerItem* item = FindItemWithEntity(entity);
+		if(item)
+		{
+			item->setSelected(true);
+		}
+		else
+		{
+			g_engineContext.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Trying to select entity but outliner item does not exist");
+		}
 	}
 
 	blockSignals(false);

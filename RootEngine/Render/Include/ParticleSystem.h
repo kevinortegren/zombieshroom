@@ -38,6 +38,7 @@ namespace Render
 		virtual void Init(GLRenderer* p_renderer, unsigned p_slot) = 0;
 		virtual void Update() = 0;
 		virtual Render::MeshInterface* GetMesh() = 0;
+		virtual Render::BufferInterface* GetUniformBuffer() = 0;
 		virtual ~ParticleSystemInterface(){};
 	};
 
@@ -52,6 +53,7 @@ namespace Render
 		void Init(GLRenderer* p_renderer, unsigned p_slot);
 		void Update();
 		Render::MeshInterface* GetMesh();
+		Render::BufferInterface* GetUniformBuffer();
 
 	private:
 		unsigned m_slot;
@@ -59,6 +61,7 @@ namespace Render
 		int m_currentVB;
 		int m_currentTFB;
 		Render::MeshInterface* m_meshes[2];
+		Render::BufferInterface* m_uniforms;
 	};
 
 	class ParticleSystemHandler
@@ -68,7 +71,7 @@ namespace Render
 		ParticleSystemHandler();
 		void Init(GLRenderer* p_renderer);
 		ParticleSystem* Create(GLRenderer* p_renderer);
-		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
+		void SetParticleUniforms(ParticleSystemInterface* p_system, Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void Free(ParticleSystem* p_system);
 		void BeginTransform(float dt);
 		void EndTransform();

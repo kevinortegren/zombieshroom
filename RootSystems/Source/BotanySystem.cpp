@@ -126,7 +126,8 @@ namespace RootForce
 			glBeginTransformFeedback(GL_POINTS);
 			renderable->m_model->m_meshes[0]->Draw();
 			glEndTransformFeedback();
-
+			//AMD fix
+			glFlush();
 			renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_TRIANGLES);
 			renderable->m_model->m_meshes[0]->Unbind();
 
@@ -168,7 +169,7 @@ namespace RootForce
 			glBeginTransformFeedback(GL_POINTS);
 			renderable->m_model->m_meshes[0]->Draw();
 			glEndTransformFeedback();
-
+	
 			renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_TRIANGLES);
 			renderable->m_model->m_meshes[0]->Unbind();
 

@@ -156,6 +156,7 @@ if (NOT COMPILE_LEVEL_EDITOR)
 	else()
 		add_custom_target(_Dependencies ALL
 			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x86/Release ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
+			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/RootForceInstallerScript.nsi ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 		)
 	endif()
 else()
@@ -166,6 +167,7 @@ else()
 	else()
 		add_custom_target(_Dependencies ALL
 			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/External/Bin/x64 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release
+			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/RootForceInstallerScript.nsi ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 		)
 	endif()
 endif()

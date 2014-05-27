@@ -88,17 +88,17 @@ namespace RootEngine
 		ModelImporter(GameSharedContext* p_context);
 		~ModelImporter();
 
-		Model* LoadModel(const std::string p_fileName, bool p_noRender);
+		Model* LoadModel(const std::string p_fileName, const std::string& p_handle, bool p_noRender);
 		
 	private:
 
-		void TraverseSceneHierarchy(const aiScene* p_scene, const std::string p_filename );
-		void Traverse(const aiNode* p_node, const aiScene* p_scene, const std::string p_filename );
+		void TraverseSceneHierarchy(const aiScene* p_scene, const std::string p_handle );
+		void Traverse(const aiNode* p_node, const aiScene* p_scene, const std::string p_handle );
 
-		void InitFromScene(const aiScene* p_scene, const std::string p_filename);
-		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename );
-		void InitPhysicsMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_filename );
-		void InitMaterials(const aiScene* p_scene, const std::string p_filename);
+		void InitFromScene(const aiScene* p_scene, const std::string p_handle);
+		void InitMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_handle );
+		void InitPhysicsMesh(unsigned int p_index, const aiMesh* p_aiMesh, const std::string p_handle );
+		void InitMaterials(const aiScene* p_scene, const std::string p_handle);
 		void LoadBones(const aiMesh* p_aiMesh);
 		void LoadAnimation(unsigned int p_index, const aiScene* p_scene);
 		std::string GetNameFromPath(std::string p_path);

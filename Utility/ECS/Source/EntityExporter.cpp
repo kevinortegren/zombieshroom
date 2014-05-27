@@ -43,8 +43,9 @@ std::string ECS::EntityExporter::Export(std::map<ECS::Entity*, std::string>* p_e
 
 	for(int i = 0; i < m_world->GetEntityManager()->m_nextID; i++)
 	{
-		if(m_world->GetEntityManager()->m_entities[i].m_id == -1)
+		if(m_world->GetEntityManager()->IsEntityActive(&m_world->GetEntityManager()->m_entities[i]))
 			continue;
+
 		int id = m_world->GetEntityManager()->m_entities[i].m_id;
 		if(nonExportIds[id])
 			continue;
@@ -155,7 +156,7 @@ std::string ECS::EntityExporter::Export(std::map<ECS::Entity*, std::string>* p_e
 		//for(int i = 0; i < m_world->GetEntityManager()->m_nextID; i++)
 		for(auto itr = p_entityNames->begin(); itr != p_entityNames->end(); ++itr)
 		{
-			if(itr->first->GetId() == -1)
+			if(m_world->GetEntityManager()->IsEntityActive(itr->first))
 				continue;
 
 			if(nonExportIds[itr->first->GetId()])

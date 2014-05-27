@@ -13,7 +13,7 @@ namespace RootEngine
 		class SoundChannelInterface
 		{
 		public:
-			virtual void PlaySound(Sound::SoundAudioInterface* p_audio, float p_volume) = 0;
+			virtual void PlaySound(Sound::SoundAudioInterface* p_audio, float p_volume, unsigned p_flags ) = 0;
 			virtual void SetVolume(float p_volume) = 0;
 			virtual void SetPaused(bool p_paused) = 0;
 			virtual void SetMinMaxDistance(float p_min, float p_max) = 0;
@@ -26,7 +26,7 @@ namespace RootEngine
 		public:
 			SoundChannel(FMOD::System* p_system);
 			~SoundChannel();
-			void PlaySound(Sound::SoundAudioInterface* p_audio, float p_volume);
+			void PlaySound(Sound::SoundAudioInterface* p_audio, float p_volume, unsigned p_flags );
 			void SetVolume(float p_volume);
 			void SetPaused(bool p_paused);
 			void SetMinMaxDistance(float p_min, float p_max);

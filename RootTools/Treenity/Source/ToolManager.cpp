@@ -10,6 +10,16 @@ ToolManager::ToolManager()
 	m_selectedTool = m_tools[ToolBox::TRANSLATION_TOOL];
 }
 
+void ToolManager::SetEditorInterface(EditorInterface* p_editorInterface)
+{
+	m_editorInterface = p_editorInterface;
+
+	for(auto tool = m_tools.begin(); tool != m_tools.end(); tool++)
+	{
+		tool->second->SetEditorInterface(p_editorInterface);
+	}
+}
+
 void ToolManager::Initialize(ECS::World* p_world)
 {
 	//Load all the tools by looping through and running LoadResources
@@ -26,21 +36,15 @@ Tool* ToolManager::GetSelectedTool()
 
 void ToolManager::SetTool(ToolBox::ToolBox p_tool)
 {
-	//Disregard tool change if setting same tool as currently selected
+	// If changing tool.
 	if(m_tools[p_tool] != m_selectedTool)
 	{
-		//Hide the current tool
-		m_selectedTool->Hide();
-
-		//Transfer the selected entity from the previous tool
-		m_tools[p_tool]->SetSelectedEntity(m_selectedTool->GetSelectedEntity());
-
-		//Check if the new tool is visible and show it if its not
-		if(!m_tools[p_tool]->IsVisible())
-			m_tools[p_tool]->Show();
-
-		//Set new selected tool
+		m_selectedTool->SetSelectedEntity(nullptr);
 		m_selectedTool = m_tools[p_tool];
 	}
-		
+
+	if(m_editorInterface->GetSelection().size() != 0)
+	{
+		m_selectedTool->SetSelectedEntity(*m_editorInterface->GetSelection().begin());
+	}
 }

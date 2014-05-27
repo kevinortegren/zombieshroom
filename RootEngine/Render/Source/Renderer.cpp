@@ -1047,9 +1047,9 @@ namespace Render
 		return m_particles.Create(this);
 	}
 
-	void GLRenderer::SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params)
+	void GLRenderer::SetParticleUniforms(ParticleSystemInterface* p_system, Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params)
 	{
-		m_particles.SetParticleUniforms(p_technique, p_params);
+		m_particles.SetParticleUniforms(p_system, p_technique, p_params);
 	}
 
 	void GLRenderer::BeginTransform(float dt)
@@ -1189,6 +1189,9 @@ namespace Render
 
 		glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &out);
 		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TRANSFORM_FEEDBACK_BUFFERS: %d", out);
+
+		glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS, &out);
+		g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS: %d", out);
 
 		//Tessellaions
 

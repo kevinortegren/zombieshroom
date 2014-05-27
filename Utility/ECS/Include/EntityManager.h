@@ -40,6 +40,14 @@ namespace ECS
 			if(p_entity == nullptr)
 				return nullptr;
 
+			// Slow but usefull!
+			auto itr = std::find(m_componentsToBeRemoved.begin(), m_componentsToBeRemoved.end(),
+				std::pair<unsigned int, unsigned int>(Component<T>::GetTypeId(), p_entity->GetId()));
+			if(itr != m_componentsToBeRemoved.end())
+			{
+				m_componentsToBeRemoved.erase(itr);
+			}
+
 			assert(Component<T>::GetTypeId() != UINT_MAX);
 
 			// Allocate component.
@@ -105,6 +113,7 @@ namespace ECS
 			}
 		}
 
+		bool IsEntityActive(ECS::Entity* p_entity);
 		void CleanUp();
 
 		template<class T>
@@ -154,7 +163,7 @@ namespace ECS
 
 		int m_nextID;
 		std::vector<Entity> m_entities;
-		std::stack<int> m_recycledIds;
+		std::vector<int> m_recycledIds;
 		std::vector<std::vector<ComponentInterface*>> m_components; // CompID, EntityId, CompType.
 
 		ComponentAllocator m_allocator;

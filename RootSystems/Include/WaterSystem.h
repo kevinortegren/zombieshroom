@@ -98,5 +98,6 @@ namespace RootForce
 		void SaveWater();
 		void LoadWater();
 
+		void PlayWaterSound(int p_radius, glm::vec3 p_pos);
 	};
 }

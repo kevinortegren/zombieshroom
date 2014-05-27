@@ -310,21 +310,41 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_selectedEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Selected");
 	m_selectedEntityMaterial->m_textures[Render::TextureSemantic::DEPTH] = g_engineContext.m_resourceManager->LoadTexture("blowDartDiffuse", Render::TextureType::TEXTURE_2D);
 
-	MaterialExporter e;
-	e.Export(m_selectedEntityMaterial, "test.material");
-
-
-	Render::Material* test;
-
-	MaterialImporter i;
-	test = i.Import("test.material");
-
-
 	// Register listeners for global modifer keys.
 	GlobalKeys::InitializeKeyMap();
 
 	m_globalKeys.RegisterModifier(Qt::AltModifier);
 	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
+
+	//Load sounds, yep this happened
+	/*
+
+	//Water sounds
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-1.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-2.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-3.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-1.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-2.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-3.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-4.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-5.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/small-hitwater1-6.wav");
+
+	//Movement
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-1.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-2.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-3.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jumpland1-4.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump1-1.wav");
+
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-1.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-2.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-3.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-4.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-5.wav");
+	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-6.wav");
+
+	*/
 }
 
 TreenityMain::~TreenityMain()
@@ -393,6 +413,9 @@ void TreenityMain::ProcessWorldMessages()
 	auto msgs = m_world.GetMessages();
 	for(auto itr = msgs.begin(); itr != msgs.end(); ++itr) 
 	{
+		ECS::Entity* water = m_world.GetTagManager()->GetEntityByTag("Water");
+		RootForce::Transform* transform = m_world.GetEntityManager()->GetComponent<RootForce::Transform>(water);
+
 		switch (itr->m_type)
 		{
 			case ECS::MessageType::ENTITY_ADDED:
@@ -444,12 +467,13 @@ void TreenityMain::ProcessWorldMessages()
 
 void TreenityMain::Update(float dt)
 {
-	if (dt > 4.0f)
+	if (dt > 1.0f)
 	{
 		g_engineContext.m_logger->LogText(LogTag::GENERAL, LogLevel::WARNING, "Frame time dt == %f. Setting dt = 0 to avoid calamity.", dt);
 		dt = 0.0f;
 	}
 
+	g_engineContext.m_sound->Update();
 	if (m_engineActions.GetMode() == EditorMode::EDITOR)
 	{
 		m_world.SetDelta(dt);
@@ -465,7 +489,7 @@ void TreenityMain::Update(float dt)
 		m_worldSystem->Process();
 		m_controllerActionSystem->Process();
 		m_scriptSystem->Process();
-
+		m_soundSystem->Process();
 		m_physicsTransformCorrectionSystem->Process();
 		g_engineContext.m_physics->DrawDebug();
 		
@@ -504,8 +528,13 @@ void TreenityMain::Update(float dt)
 		//Update water
 		m_waterSystem->Process();
 
-		// Update on player controls.
-		m_playerControlSystem->Process();
+		// Update on player controls (only if 3D canvas has focus).
+		if (m_treenityEditor.GetUi().widget_canvas3D->hasFocus())
+		{
+			m_playerControlSystem->Process();
+		}
+		m_soundSystem->Process();
+
 		m_actionSystem->Process();
 
 	
@@ -530,15 +559,16 @@ void TreenityMain::Update(float dt)
 
 		// Update the rendering.
 		m_worldSystem->Process();
-		m_transformInterpolationSystem->Process();
 		m_actionSystem->UpdateAimingDevice(false);
 		m_thirdPersonBehaviorSystem->Process();
 		m_lookAtSystem->Process();
-		m_cameraSystem->Process();
 		m_particleSystem->Process();
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
+
+		m_cameraSystem->Process();
+		m_transformInterpolationSystem->Process();
 		m_renderingSystem->Process();
 
 		m_animationSystem->Synch();
@@ -657,6 +687,9 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 			if(m_world.GetTagManager()->GetEntityByTag("Water") == (*itr))
 				continue;
 
+			if(m_world.GetGroupManager()->IsEntityInGroup((*itr), "Tools"))
+				continue; 
+
 			glm::mat4x4 transform = m_renderingSystem->m_matrices[(*itr)].m_model;
 			glm::vec3 entityPos = m_world.GetEntityManager()->GetComponent<RootForce::Transform>((*itr))->m_position;
 			RootForce::Renderable* renderable = m_world.GetEntityManager()->GetComponent<RootForce::Renderable>((*itr));
@@ -672,7 +705,7 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 						{
 							closestEntity = (*itr);
 							closestDist = newt;
-							g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
+							//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "OBB hit on %d", (*itr)->GetId());
 						}
 					}
 				}
@@ -688,7 +721,7 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 				{
 					closestEntity = (*itr);
 					closestDist = t;
-					g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
+					//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Sphere hit on %d", (*itr)->GetId());
 
 				}
 			}
@@ -696,7 +729,7 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 
 		if(closestEntity != nullptr)
 		{
-			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
+			//g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Ray Hit Entity %d", closestEntity->GetId());
 
 			if (g_engineContext.m_inputSys->GetKeyState(SDL_SCANCODE_LSHIFT))
 			{
@@ -849,9 +882,6 @@ bool TreenityMain::RayVsTriangle(const glm::vec3& cameraPos, const glm::vec3& ra
 	if(model->m_faceIndexCount == 2)
 		return false;
 
-	std::cout << model->m_indices.size() << std::endl;
-	std::cout << model->m_positions.size() << std::endl;
- 
 	glm::mat4x4 inverseWorld = glm::inverse(transform);
  
 	glm::vec4 rayLocal = inverseWorld * glm::vec4(ray.x, ray.y, ray.z, 0.0f);
