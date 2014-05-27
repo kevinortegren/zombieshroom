@@ -290,8 +290,6 @@ void EngineActions::ParallelPlayModeEnter()
 {
 	// Save the current world state.
 	m_editorLevelState = m_world->GetEntityExporter()->Export(&m_treenityMain->GetProjectManager()->GetEntityNames());
-	m_world->GetEntityExporter()->Export("test.world", &m_treenityMain->GetProjectManager()->GetEntityNames());
-
 
 	// Remove the test spawnpoint, the editor camera and the editor spawnpoint.
 	m_world->GetEntityManager()->RemoveEntity(m_cameraEntity);
