@@ -76,7 +76,15 @@ public:
 
         toolButton_remove = new QToolButton(Form_componentHeader);
         toolButton_remove->setObjectName(QStringLiteral("toolButton_remove"));
-        toolButton_remove->setStyleSheet(QStringLiteral("QToolButton::menu-indicator { image: none; }"));
+        toolButton_remove->setStyleSheet(QLatin1String("QToolButton::menu-indicator { image: none; }\n"
+"\n"
+"QToolButton:pressed {\n"
+"	background-color: #666;\n"
+"}\n"
+"\n"
+"QToolButton:hover {\n"
+"	background-color: #666;\n"
+"}"));
         toolButton_remove->setPopupMode(QToolButton::InstantPopup);
         toolButton_remove->setToolButtonStyle(Qt::ToolButtonIconOnly);
         toolButton_remove->setAutoRaise(true);

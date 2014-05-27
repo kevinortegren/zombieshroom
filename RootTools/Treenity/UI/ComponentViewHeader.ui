@@ -82,7 +82,15 @@ QToolButton:selected {
    <item>
     <widget class="QToolButton" name="toolButton_remove">
      <property name="styleSheet">
-      <string notr="true">QToolButton::menu-indicator { image: none; }</string>
+      <string notr="true">QToolButton::menu-indicator { image: none; }
+
+QToolButton:pressed {
+	background-color: #666;
+}
+
+QToolButton:hover {
+	background-color: #666;
+}</string>
      </property>
      <property name="text">
       <string>...</string>
