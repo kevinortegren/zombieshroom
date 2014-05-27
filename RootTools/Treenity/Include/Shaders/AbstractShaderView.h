@@ -14,7 +14,6 @@ public:
 	virtual void SetMaterial(Render::Material* p_material);
 	virtual void Save();
 	virtual void SetEngineInterface(EngineInterface* p_engineInterface);
-
 	virtual void Display() = 0;
 
 protected:

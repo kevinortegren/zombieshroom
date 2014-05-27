@@ -6,8 +6,6 @@ ComponentViewHeader::ComponentViewHeader(const QString& p_name, QWidget* p_paren
 	ui.setupUi(this);
 	ui.label_componentName->setText(p_name);
 
-	ui.toolButton_collapse->setArrowType(Qt::ArrowType::UpArrow);
-
 	m_contextMenu = new QMenu(this);
 	QAction* remove = new QAction("Remove Component", this);
 	connect(remove, SIGNAL(triggered()), this, SLOT(MenuActionRemove()));
@@ -23,14 +21,14 @@ ComponentViewHeader::ComponentViewHeader(const QString& p_name, QWidget* p_paren
 
 void ComponentViewHeader::CollapseButtonPress()
 {
-	if(ui.toolButton_collapse->arrowType() == Qt::ArrowType::DownArrow)
-	{
-		ui.toolButton_collapse->setArrowType(Qt::ArrowType::UpArrow);
-		emit showView();
-	}
-	else if(ui.toolButton_collapse->arrowType() == Qt::ArrowType::UpArrow)
+	if(ui.toolButton_collapse->arrowType() == Qt::ArrowType::RightArrow)
 	{
 		ui.toolButton_collapse->setArrowType(Qt::ArrowType::DownArrow);
+		emit showView();
+	}
+	else if(ui.toolButton_collapse->arrowType() == Qt::ArrowType::DownArrow)
+	{
+		ui.toolButton_collapse->setArrowType(Qt::ArrowType::RightArrow);
 		emit hideView();
 	}	
 }
@@ -43,4 +41,9 @@ void ComponentViewHeader::RemoveButtonPress()
 void ComponentViewHeader::MenuActionRemove()
 {
 	emit remove();
+}
+
+void ComponentViewHeader::SetArrowShape(Qt::ArrowType p_type)
+{
+	ui.toolButton_collapse->setArrowType(p_type);
 }

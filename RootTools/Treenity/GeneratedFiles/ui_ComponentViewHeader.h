@@ -47,7 +47,7 @@ public:
         toolButton_collapse = new QToolButton(Form_componentHeader);
         toolButton_collapse->setObjectName(QStringLiteral("toolButton_collapse"));
         toolButton_collapse->setAutoRaise(true);
-        toolButton_collapse->setArrowType(Qt::DownArrow);
+        toolButton_collapse->setArrowType(Qt::RightArrow);
 
         horizontalLayout->addWidget(toolButton_collapse);
 

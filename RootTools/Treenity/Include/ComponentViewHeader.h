@@ -11,6 +11,8 @@ public:
 	ComponentViewHeader(const QString& p_name, QWidget* p_parent);
 	virtual ~ComponentViewHeader() {}
 
+	void SetArrowShape(Qt::ArrowType p_type);
+
 private:
 	Ui::Form_componentHeader ui;
 	QMenu* m_contextMenu;
