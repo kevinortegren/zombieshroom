@@ -310,16 +310,6 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_selectedEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Selected");
 	m_selectedEntityMaterial->m_textures[Render::TextureSemantic::DEPTH] = g_engineContext.m_resourceManager->LoadTexture("blowDartDiffuse", Render::TextureType::TEXTURE_2D);
 
-	MaterialExporter e;
-	e.Export(m_selectedEntityMaterial, "test.material");
-
-
-	Render::Material* test;
-
-	MaterialImporter i;
-	test = i.Import("test.material");
-
-
 	// Register listeners for global modifer keys.
 	GlobalKeys::InitializeKeyMap();
 

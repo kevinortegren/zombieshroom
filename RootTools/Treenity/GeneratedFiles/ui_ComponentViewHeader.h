@@ -33,7 +33,7 @@ public:
     {
         if (Form_componentHeader->objectName().isEmpty())
             Form_componentHeader->setObjectName(QStringLiteral("Form_componentHeader"));
-        Form_componentHeader->resize(400, 39);
+        Form_componentHeader->resize(400, 22);
         Form_componentHeader->setStyleSheet(QLatin1String("#Form_componentHeader {\n"
 "	border-style: outset;\n"
 "	border-radius: 5px;\n"
@@ -53,12 +53,19 @@ public:
 
         label_componentName = new QLabel(Form_componentHeader);
         label_componentName->setObjectName(QStringLiteral("label_componentName"));
+        QFont font;
+        font.setBold(true);
+        font.setWeight(75);
+        label_componentName->setFont(font);
         label_componentName->setAlignment(Qt::AlignCenter);
 
         horizontalLayout->addWidget(label_componentName);
 
         toolButton_remove = new QToolButton(Form_componentHeader);
         toolButton_remove->setObjectName(QStringLiteral("toolButton_remove"));
+        toolButton_remove->setStyleSheet(QStringLiteral("QToolButton::menu-indicator { image: none; }"));
+        toolButton_remove->setPopupMode(QToolButton::InstantPopup);
+        toolButton_remove->setToolButtonStyle(Qt::ToolButtonFollowStyle);
         toolButton_remove->setAutoRaise(true);
 
         horizontalLayout->addWidget(toolButton_remove);

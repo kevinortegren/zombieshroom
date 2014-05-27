@@ -3,6 +3,7 @@
 ComponentViewItem::ComponentViewItem(AbstractComponentView* p_item, QWidget* p_parent /*= 0*/ ) : QWidget(p_parent), m_item(p_item)
 {
 	m_header = new ComponentViewHeader(p_item->GetComponentName(), this);
+	p_item->setVisible(true);
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->addWidget(m_header);
@@ -10,9 +11,9 @@ ComponentViewItem::ComponentViewItem(AbstractComponentView* p_item, QWidget* p_p
 	m_layout->setSizeConstraint(QLayout::SetNoConstraint);
 	setLayout(m_layout);
 
-	connect(m_header, SIGNAL(show()), this, SLOT(ShowComponentView()));
-	connect(m_header, SIGNAL(hide()), this, SLOT(HideComponentView()));
-	connect(m_header, SIGNAL(remove()), this, SLOT(RemoveComponent()));
+	connect(m_header, SIGNAL(showView()),	this, SLOT(ShowComponentView()));
+	connect(m_header, SIGNAL(hideView()),	this, SLOT(HideComponentView()));
+	connect(m_header, SIGNAL(remove()),		this, SLOT(RemoveComponent()));
 }
 
 ComponentViewItem::~ComponentViewItem()

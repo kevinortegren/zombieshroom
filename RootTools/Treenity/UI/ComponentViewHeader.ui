@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>39</height>
+    <height>22</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,6 +52,12 @@
    </item>
    <item>
     <widget class="QLabel" name="label_componentName">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>TextLabel</string>
      </property>
@@ -62,8 +68,17 @@
    </item>
    <item>
     <widget class="QToolButton" name="toolButton_remove">
+     <property name="styleSheet">
+      <string notr="true">QToolButton::menu-indicator { image: none; }</string>
+     </property>
      <property name="text">
       <string>...</string>
+     </property>
+     <property name="popupMode">
+      <enum>QToolButton::InstantPopup</enum>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonFollowStyle</enum>
      </property>
      <property name="autoRaise">
       <bool>true</bool>

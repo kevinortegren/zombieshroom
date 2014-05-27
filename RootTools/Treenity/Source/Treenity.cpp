@@ -179,7 +179,7 @@ void Treenity::EntityCreated(ECS::Entity* p_entity)
 
 	Utils::Write("Entity added: " + QString::number(p_entity->GetId()));
 
-	Select(p_entity);
+	//Select(p_entity);
 }
 
 void Treenity::EntityRemoved(ECS::Entity* p_entity)

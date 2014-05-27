@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QMenu>
 #include <RootTools/Treenity/Include/Components/AbstractComponentView.h>
 #include <RootTools/Treenity/Include/ComponentViewHeader.h>
 
