@@ -46,6 +46,8 @@
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
   !insertmacro MUI_PAGE_INSTFILES
+      ;;;;;;;!define MUI_FINISHPAGE_RUN "calc.exe" ;THIS WILL ADD A "RUN ROOT FORCE" CHECKBOX WHICH RUNS calc.exe
+  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
   !insertmacro MUI_PAGE_FINISH
   
   !insertmacro MUI_UNPAGE_WELCOME
