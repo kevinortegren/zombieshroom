@@ -32,7 +32,7 @@ namespace RootForce
 			m_context->m_sound->SetListenerAttributes(playerTrans->m_position, playerTrans->m_orientation.GetUp(), playerTrans->m_orientation.GetFront());
 		else
 		{
-			g_engineContext.m_logger->LogText(LogTag::SOUND, LogLevel::NON_FATAL_ERROR, "Player has no transformation component, setting listener attributes to Vec3(0,0,0)");
+			//g_engineContext.m_logger->LogText(LogTag::SOUND, LogLevel::NON_FATAL_ERROR, "Player has no transformation component, setting listener attributes to Vec3(0,0,0)");
 			m_context->m_sound->SetListenerAttributes(glm::vec3(0,0,0), glm::vec3(0,1,0), glm::vec3(0,0,-1));
 		}
 	}
