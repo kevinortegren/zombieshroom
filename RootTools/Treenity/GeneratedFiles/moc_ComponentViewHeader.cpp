@@ -119,7 +119,7 @@ void ComponentViewHeader::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
 }
 
 const QMetaObject ComponentViewHeader::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_ComponentViewHeader.data,
+    { &QFrame::staticMetaObject, qt_meta_stringdata_ComponentViewHeader.data,
       qt_meta_data_ComponentViewHeader,  qt_static_metacall, 0, 0}
 };
 
@@ -134,12 +134,12 @@ void *ComponentViewHeader::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_ComponentViewHeader.stringdata))
         return static_cast<void*>(const_cast< ComponentViewHeader*>(this));
-    return QWidget::qt_metacast(_clname);
+    return QFrame::qt_metacast(_clname);
 }
 
 int ComponentViewHeader::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QWidget::qt_metacall(_c, _id, _a);
+    _id = QFrame::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {

@@ -35,11 +35,24 @@ public:
             Form_componentHeader->setObjectName(QStringLiteral("Form_componentHeader"));
         Form_componentHeader->resize(400, 22);
         Form_componentHeader->setStyleSheet(QLatin1String("#Form_componentHeader {\n"
-"	border-style: outset;\n"
-"	border-radius: 5px;\n"
-"	border-width: 2px;\n"
-"	border-color: white;\n"
-"}"));
+"	border-radius: 2px;\n"
+"	background-color: #888;\n"
+"}\n"
+"\n"
+"QToolButton:hover {\n"
+"	 background: transparent; \n"
+"}\n"
+"\n"
+"QToolButton:pressed {\n"
+"	 background: transparent; \n"
+"}\n"
+"\n"
+"QToolButton:selected {\n"
+"	 background: transparent; \n"
+"}\n"
+"\n"
+"\n"
+""));
         horizontalLayout = new QHBoxLayout(Form_componentHeader);
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
@@ -65,7 +78,7 @@ public:
         toolButton_remove->setObjectName(QStringLiteral("toolButton_remove"));
         toolButton_remove->setStyleSheet(QStringLiteral("QToolButton::menu-indicator { image: none; }"));
         toolButton_remove->setPopupMode(QToolButton::InstantPopup);
-        toolButton_remove->setToolButtonStyle(Qt::ToolButtonFollowStyle);
+        toolButton_remove->setToolButtonStyle(Qt::ToolButtonIconOnly);
         toolButton_remove->setAutoRaise(true);
 
         horizontalLayout->addWidget(toolButton_remove);

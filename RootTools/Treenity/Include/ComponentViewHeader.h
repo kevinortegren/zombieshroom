@@ -4,7 +4,7 @@
 #include <QMenu>
 #include <RootTools/Treenity/GeneratedFiles/ui_ComponentViewHeader.h>
 
-class ComponentViewHeader : public QWidget
+class ComponentViewHeader : public QFrame
 {
 	Q_OBJECT
 public:

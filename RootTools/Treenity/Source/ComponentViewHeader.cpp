@@ -1,7 +1,7 @@
 #include <RootTools/Treenity/Include/ComponentViewHeader.h>
 
 ComponentViewHeader::ComponentViewHeader(const QString& p_name, QWidget* p_parent)
-	: QWidget(p_parent)
+	: QFrame(p_parent)
 {
 	ui.setupUi(this);
 	ui.label_componentName->setText(p_name);
@@ -14,9 +14,11 @@ ComponentViewHeader::ComponentViewHeader(const QString& p_name, QWidget* p_paren
 	ui.toolButton_remove->setMenu(m_contextMenu);
 	ui.toolButton_remove->setPopupMode(QToolButton::InstantPopup);
 
-	connect(ui.toolButton_collapse, SIGNAL(pressed()), this, SLOT(CollapseButtonPress()));
-	//connect(ui.toolButton_remove,	SIGNAL(pressed()), this, SLOT(RemoveButtonPress()));
-	//connect(m_contextMenu, SIGNAL(QMenu::aboutToShow()), this, SLOT(Poulate()));
+	connect(ui.toolButton_collapse, SIGNAL(pressed()), this, SLOT(CollapseButtonPress()));	
+	//connect(ui.toolButton_remove, SIGNAL(pressed()), this, SLOT(RemoveButtonPress()));
+
+	//setFrameStyle(QFrame::StyledPanel);
+	//setLineWidth(1);
 }
 
 void ComponentViewHeader::CollapseButtonPress()
@@ -35,7 +37,7 @@ void ComponentViewHeader::CollapseButtonPress()
 
 void ComponentViewHeader::RemoveButtonPress()
 {
-	m_contextMenu->exec();
+	m_contextMenu->popup(this->mapToGlobal(ui.toolButton_remove->pos() + QPoint(0, ui.toolButton_remove->geometry().height())));
 }
 
 void ComponentViewHeader::MenuActionRemove()
