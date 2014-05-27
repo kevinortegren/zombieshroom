@@ -86,7 +86,6 @@ Treenity::Treenity(QWidget *parent)
 	m_componentViews[RootForce::ComponentType::COLLISIONRESPONDER]	= new CollisionResponderView();
 
 	// Block component views from updates while in game mode.
-
 	m_componentViews[RootForce::ComponentType::RENDERABLE]->SetReceiveUpdates(false);
 
 	for (auto it : m_componentViews)
@@ -117,6 +116,13 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
 	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
 	
+
+	connect(m_componentViews[RootForce::ComponentType::RENDERABLE],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveRenderable(ECS::Entity*)));
+	connect(m_componentViews[RootForce::ComponentType::COLLISION],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemovePhysics(ECS::Entity*))); 
+	connect(m_componentViews[RootForce::ComponentType::WATERCOLLIDER],		SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveWaterCollider(ECS::Entity*))); 
+	connect(m_componentViews[RootForce::ComponentType::SCRIPT],				SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveScriptComponent(ECS::Entity*))); 
+	connect(m_componentViews[RootForce::ComponentType::COLLISIONRESPONDER], SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveCollisionResponder(ECS::Entity*))); 
+
 	// Setup Qt-to-SDL keymatching.
 	InitialiseKeymap();
 
@@ -454,9 +460,6 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list.
 		m_compView->RemoveItems();
-
-		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
-
 	}
 	else if (m_selectedEntities.size() == 1)
 	{
@@ -488,7 +491,6 @@ void Treenity::UpdateOnSelection()
 	}
 	else if (m_selectedEntities.size() > 1)
 	{
-
 		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 
 		// Enable name, allow all names to be changed.
@@ -497,9 +499,6 @@ void Treenity::UpdateOnSelection()
 
 		// Clear component list (potential change in future, show transforms).
 		m_compView->RemoveItems();
-
-		// Update rotation tool selection.
-		m_toolManager.GetSelectedTool()->SetSelectedEntity(nullptr);
 	}
 
 	// For all selected entities that has a collision component, visualize their shape.
@@ -652,6 +651,30 @@ void Treenity::SetResizeTool()
 
 void Treenity::ChangeToolMode(int index)
 {
-	std::cout << "Change to index: " << index << std::endl;
 	m_toolMode = (ToolMode::ToolMode)index;
+}
+
+void Treenity::RemoveRenderable(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemoveRenderable(p_entity);
+}
+
+void Treenity::RemovePhysics(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemovePhysics(p_entity);
+}
+
+void Treenity::RemoveWaterCollider(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemoveWaterCollider(p_entity);
+}
+
+void Treenity::RemoveScriptComponent(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemoveScript(p_entity);
+}
+
+void Treenity::RemoveCollisionResponder(ECS::Entity* p_entity)
+{
+	m_engineInterface->RemoveCollisionResponder(p_entity);
 }

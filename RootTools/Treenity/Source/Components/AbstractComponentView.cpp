@@ -34,3 +34,19 @@ bool AbstractComponentView::IsReceivingUpdates() const
 {
 	return m_receiveUpdates;
 }
+
+EditorInterface* AbstractComponentView::GetEditorInterface()
+{
+	return m_editorInterface;
+}
+
+EngineInterface* AbstractComponentView::GetEngineInterface()
+{
+	return m_engineInterface;
+}
+
+void AbstractComponentView::Delete(ECS::Entity* p_entity)
+{
+	emit deleted(p_entity);
+}
+

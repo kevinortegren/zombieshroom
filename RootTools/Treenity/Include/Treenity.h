@@ -127,6 +127,13 @@ private slots:
 	void SetRotateTool();
 	void SetResizeTool();
 	void ChangeToolMode(int index);
+
+	void RemoveRenderable(ECS::Entity* p_entity);
+	void RemovePhysics(ECS::Entity* p_entity);
+	void RemoveWaterCollider(ECS::Entity* p_entity);
+	void RemoveScriptComponent(ECS::Entity* p_entity);
+	void RemoveCollisionResponder(ECS::Entity* p_entity);
+
 };
 
 #endif // TREENITY_H

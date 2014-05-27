@@ -327,6 +327,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
 
 	//Load sounds, yep this happened
+	/*
 
 	//Water sounds
 	g_engineContext.m_resourceManager->LoadSoundAudio("Abilities/Hits/Water/medium-hitwater1-1.wav");
@@ -352,6 +353,8 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-4.wav");
 	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-5.wav");
 	g_engineContext.m_resourceManager->LoadSoundAudio("Movement/FootstepOneshots/step1-6.wav");
+
+	*/
 }
 
 TreenityMain::~TreenityMain()
