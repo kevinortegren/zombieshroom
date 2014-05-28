@@ -2118,4 +2118,3 @@ typedef fastdelegate::FastDelegate3<Awesomium::WebView*, std::string, const Awes
 typedef fastdelegate::FastDelegate1<const Awesomium::JSArray&, Awesomium::JSValue> JSDelegate1WithRetval;
 
 #endif // !defined(FASTDELEGATE_H)
-

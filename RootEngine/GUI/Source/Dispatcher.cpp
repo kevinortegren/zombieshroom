@@ -21,7 +21,6 @@ The above copyright notice and this permission notice shall be included in all
 
 #include "Dispatcher.h"
 #include <RootEngine/Include/SubsystemSharedContext.h>
-#include <Awesomium/STLHelpers.h>
 namespace RootEngine
 {
 	namespace GUISystem

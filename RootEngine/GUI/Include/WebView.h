@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Awesomium/WebCore.h>
-#include <mutex>
 #include <queue>
 #include <vector>
 #include "Dispatcher.h"
@@ -68,7 +67,7 @@ namespace RootEngine
 			virtual void Focus() = 0;
 
 			virtual Awesomium::WebView* GetView() = 0;
-
+			virtual void SetView(Awesomium::WebView* p_view) = 0;
 			virtual void SetActive(bool p_active) = 0;
 
 			virtual void InjectKeyboardEvent(Awesomium::WebKeyboardEvent p_event) = 0;
@@ -118,7 +117,7 @@ namespace RootEngine
 			{
 				return m_webView;
 			}
-
+			void SetView(Awesomium::WebView* p_view) {m_webView = p_view;}
 			void SetActive(bool p_active)
 			{
 				m_isActive = p_active;
@@ -141,14 +140,11 @@ namespace RootEngine
 
 			Awesomium::WebView* m_webView;
 			Awesomium::JSObject* m_callbackObject;
-			std::mutex m_jsBufferMutex;
 			std::vector<std::string> m_jsBuffer;
-			std::mutex m_callbackMutex;
 			std::map<std::string, JSDelegate1> m_callback;
 			std::map<std::string, JSDelegate1WithRetval> m_callbackWithRetval;
 			GUISystem::DispatcherInterface* m_dispatcher;
 			std::string m_callbackObjectName;
-			std::mutex m_injectMutex;
 			std::vector<Awesomium::WebKeyboardEvent> m_injectKeyboard;
 			std::vector<Awesomium::MouseButton> m_injectMouseDown;
 			std::vector<Awesomium::MouseButton> m_injectMouseUp;
