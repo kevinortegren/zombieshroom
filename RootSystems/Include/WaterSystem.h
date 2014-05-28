@@ -51,6 +51,16 @@ namespace RootForce
 
 		ECS::Entity* CreateDefaultWater();
 
+		float	GetSpeed();
+		float	GetDepth();
+		bool	GetNormals();
+		bool	GetReflections();
+		bool	GetRefractions();
+		bool	GetPaused();
+
+
+		void SetColor(const glm::vec3& p_color);
+		glm::vec3 GetColor();
 	private:
 
 		ECS::ComponentMapper<RootForce::Transform> m_transform;
@@ -70,6 +80,7 @@ namespace RootForce
 		float		m_timeStep, m_dt, m_dx, m_speed, m_damping, m_mk1, m_mk2, m_mk3, m_scale, m_totalTime;;	
 		float*		m_textureData;
 		glm::vec4	m_waterOptions;
+		glm::vec3	m_color;
 
 		void CalculateWaterConstants();
 		bool ValidValues();
