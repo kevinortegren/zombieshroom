@@ -65,11 +65,11 @@
         - name: g_Diffuse
           slot: 6
         - name: g_Translucency
-          slot: 17
+          slot: 14
         - name: g_Billboard
-          slot: 18
+          slot: 11
         - name: g_TerrainGrass
-          slot: 19
+          slot: 12
       programs:
         - name: Botany_Render
           shaders:

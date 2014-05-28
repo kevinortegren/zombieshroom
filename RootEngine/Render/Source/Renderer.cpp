@@ -384,6 +384,7 @@ namespace Render
 		s_sizes[Semantic::MK3]				= sizeof(float);
 		s_sizes[Semantic::EYEWORLDPOS]		= sizeof(glm::vec3);
 		s_sizes[Semantic::DX]				= sizeof(float);
+		s_sizes[Semantic::XMAX]				= sizeof(int);
 		s_sizes[Semantic::ROTATIONSPEEDMIN] = sizeof(float);
 		s_sizes[Semantic::ROTATIONSPEEDMAX] = sizeof(float);
 		s_sizes[Semantic::MAXPERFRAME]		= sizeof(float);
@@ -420,10 +421,10 @@ namespace Render
 		s_textureSlots[TextureSemantic::TEXTURE_R]		= 14;
 		s_textureSlots[TextureSemantic::TEXTURE_G]		= 15;
 		s_textureSlots[TextureSemantic::TEXTURE_B]		= 16;
-		s_textureSlots[TextureSemantic::TRANSLUCENCY]   = 17;
-		s_textureSlots[TextureSemantic::DIFFUSE1]		= 18;
-		s_textureSlots[TextureSemantic::DIFFUSE2]		= 19;
-		s_textureSlots[TextureSemantic::DIFFUSE3]		= 20;
+		s_textureSlots[TextureSemantic::TRANSLUCENCY]   = 14;
+		s_textureSlots[TextureSemantic::DIFFUSE1]		= 11;
+		s_textureSlots[TextureSemantic::DIFFUSE2]		= 12;
+		s_textureSlots[TextureSemantic::DIFFUSE3]		= 13;
 	}
 
 	void GLRenderer::InitialziePostProcesses()

@@ -45,6 +45,7 @@ namespace Render
 			
 			vertexBuffer[i]->BufferData(RENDER_NUM_PARTCILES, sizeof(ParticleVertex), particles, GL_STATIC_DRAW);
 			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId());
+			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0); //AMD test
 
 			attributes[i] = p_renderer->CreateVertexAttributes();
 			attributes[i]->Init(9);
@@ -75,6 +76,8 @@ namespace Render
 
 	void ParticleSystem::Update()
 	{
+		glEnable(GL_RASTERIZER_DISCARD);//AMD test
+
 		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId());
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[m_currentVB]->GetVertexBuffer()->GetBufferId());
@@ -94,13 +97,15 @@ namespace Render
 		}
 
 		glEndTransformFeedback();
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0); 
 
 		//AMD fix
-		glFlush();
+		glFlush();//AMD test
 
 		m_meshes[m_currentVB]->Unbind();
 
 		std::swap(m_currentVB, m_currentTFB);
+		glDisable(GL_RASTERIZER_DISCARD);//AMD test
 	}
 
 	Render::MeshInterface* ParticleSystem::GetMesh()
