@@ -118,11 +118,14 @@ namespace RootEngine
 
 			WebViewImpl* temp = new WebViewImpl(p_callbackObjectName, m_dispatcher);
 			Awesomium::WebView* view = m_core->CreateWebView(m_width, m_height);
-			view->SetTransparent(true);
-			view->LoadURL(url);
+
 
 			while(!view || view->IsLoading())
 							Sleep(100);
+
+			
+			view->SetTransparent(true);
+			view->LoadURL(url);
 
 			temp->SetView(view);
 			m_viewBuffer.push_back(view);

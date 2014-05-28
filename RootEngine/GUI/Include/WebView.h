@@ -68,6 +68,7 @@ namespace RootEngine
 
 			virtual Awesomium::WebView* GetView() = 0;
 			virtual void SetView(Awesomium::WebView* p_view) = 0;
+			virtual void Update() = 0;
 			virtual void SetActive(bool p_active) = 0;
 
 			virtual void InjectKeyboardEvent(Awesomium::WebKeyboardEvent p_event) = 0;
@@ -125,9 +126,9 @@ namespace RootEngine
 
 			bool GetShouldResize() const { return m_shouldResize; }
 			void SetShouldResize(bool p_shouldResize) { m_shouldResize = p_shouldResize; }
-
-		private:
 			void Update();
+		private:
+
 			//void PushEvent(std::pair<std::string,Awesomium::JSArray> p_event);
 
 			void ProcessEvent(Awesomium::WebView* p_caller, std::string p_event, const Awesomium::JSArray& p_array);

@@ -26,7 +26,7 @@ namespace RootForce
 		m_view->RegisterJSCallback("Return", JSDelegate1(this, &IngameMenu::Return));
 		m_view->RegisterJSCallback("SelectTeam", JSDelegate1(this, &IngameMenu::ChangeTeam));
 		m_view->RegisterJSCallback("ChangeName", JSDelegate1(this, &IngameMenu::ChangeName));
-
+		m_view->Update();
 		m_settingsMenu->BindEvents(m_view);
 		m_view->Focus();
 	}
@@ -113,6 +113,7 @@ namespace RootForce
 		PlayerComponent* playerComponent = g_world->GetEntityManager()->GetComponent<PlayerComponent>(player);
 
 		m_view->BufferJavascript("UpdateScoreScreen(" + std::to_string(playerComponent->TeamID) + ",'" + RootEngine::GUISystem::PreventHTMLInjections(playerComponent->Name) + "'," + p_score + ");");
+		m_view->Update();
 	}
 
 	void IngameMenu::ChangeName( const Awesomium::JSArray& p_array )
