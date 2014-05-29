@@ -11,10 +11,10 @@
   OutFile "RootForceSetup.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\ZombieShroom\RootForce"
+  InstallDir "$PROGRAMFILES\RootForce"
   
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\Root Force" ""
+  InstallDirRegKey HKCU "Software\RootForce" ""
 
   ;Request application privileges for Windows Vista
   RequestExecutionLevel admin
@@ -91,7 +91,7 @@ Section "Root Force" SecRootForce
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
-    
+	
     ;Create shortcuts
     CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
     CreateShortcut "$SMPROGRAMS\$StartMenuFolder\RootForce.lnk" "$INSTDIR\RootForce.exe"
@@ -101,13 +101,13 @@ Section "Root Force" SecRootForce
   !insertmacro MUI_STARTMENU_WRITE_END
   
   ; Install the Visual Studio 11 redistributable.
-  ReadRegDWORD $1 HKLM "SOFTWARE\Microsoft\VisualStudio\11.0_Config\VC\Runtimes\x86" "Installed"
+  ReadRegDWORD $1 HKCU Software\Microsoft\VisualStudio\11.0_Config\VC\Runtimes\x86 Installed
   IntCmp $1 1 redist_already_installed
   ExecWait "$INSTDIR/vcredist_x86.exe"
   redist_already_installed:
   
   ;Store installation folder
-  WriteRegStr HKCU "Software\ZombieShroom\RootForce" "" $INSTDIR
+  WriteRegStr HKCU "Software\RootForce" "" $INSTDIR
 
 SectionEnd
 
@@ -137,11 +137,16 @@ Section "Uninstall"
   SetShellVarContext all
   SetOutPath "$TEMP"
   
-  ;MessageBox MB_OK "The install directory is: $INSTDIR"
-  ;Delete "$INSTDIR\*.*"
-  ;Delete "$INSTDIR\Uninstall.exe"
+  ; Delete the start menu if existing
+  ReadRegStr $1 HKCU "Software\RootForce" "Start Menu Folder"
+  StrCmp $1 "" no_start_menu
+  RMDir /r "$SMPROGRAMS\$StartMenuFolder\$1\"
+  no_start_menu:
+  
+  ; Delete the install folder
   Delete "$INSTDIR\*.*"
   RMDir /r "$INSTDIR"
   
-  DeleteRegKey /ifempty HKCU "Software\ZombieShroom\RootForce"
+  ; Delete registry entries
+  DeleteRegKey /ifempty HKCU "Software\RootForce"
 SectionEnd
