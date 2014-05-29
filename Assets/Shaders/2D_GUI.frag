@@ -1,4 +1,4 @@
-#version 410
+#version 430
 
 in vec2 vert_texCoord;
 in float vert_textureNumber;

@@ -1,4 +1,4 @@
-#version 400
+#version 430
 #extension GL_EXT_geometry_shader4 : enable  
 
 #define USE_TERRAIN_NORMAL;

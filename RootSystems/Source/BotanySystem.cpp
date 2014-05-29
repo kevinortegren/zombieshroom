@@ -127,7 +127,7 @@ namespace RootForce
 			renderable->m_model->m_meshes[0]->Draw();
 			glEndTransformFeedback();
 			//AMD fix
-			glFlush();
+		//	glFlush();
 			renderable->m_model->m_meshes[0]->SetPrimitiveType(GL_TRIANGLES);
 			renderable->m_model->m_meshes[0]->Unbind();
 

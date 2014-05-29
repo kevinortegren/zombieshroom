@@ -1,5 +1,4 @@
-#version 400
-#extension GL_EXT_geometry_shader4 : enable  
+#version 430
 
 layout(triangles) in;
 layout(line_strip, max_vertices = 6) out;

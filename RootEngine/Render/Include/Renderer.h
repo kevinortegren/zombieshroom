@@ -40,8 +40,23 @@
 
 #define RENDER_USE_COMPUTE
 
+#ifdef _DEBUG
+#define GLCheck(F) \
+	F;			   \
+	{   		   \
+		GLenum error = glGetError(); \
+		if (error != GL_NO_ERROR) {  \
+			Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "GLCheck error: %s", gluErrorString(error)); \
+		}		   \
+	}
+#else
+#define GLCheck(F) F
+#endif
+
+
 namespace Render
 {
+	extern RootEngine::SubsystemSharedContext g_context;
 	class RendererInterface : public RootEngine::SubsystemInterface
 	{
 	public:

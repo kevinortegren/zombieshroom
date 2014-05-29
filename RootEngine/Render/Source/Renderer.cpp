@@ -204,12 +204,12 @@ namespace Render
 
 		// Init GLEW.
 		glewExperimental = GL_TRUE; 
-		GLenum err = glewInit();
+		GLenum err = GLCheck(glewInit());
 		if (err != GLEW_OK) {
 			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to initialize glew!");
 			return;
 		}
-
+			
 		GLint major, minor;
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
 		glGetIntegerv(GL_MINOR_VERSION, &minor);

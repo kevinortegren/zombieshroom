@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 in vec2 ex_TexCoord;
 out vec4 out_Color;

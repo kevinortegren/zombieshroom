@@ -41,11 +41,11 @@ namespace Render
 
 		for (unsigned i = 0; i < 2 ; i++) {
 
-			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[i]->GetTransformFeedback());
+			GLCheck(glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[i]->GetTransformFeedback()));
 			
 			vertexBuffer[i]->BufferData(RENDER_NUM_PARTCILES, sizeof(ParticleVertex), particles, GL_STATIC_DRAW);
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId());
-			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0); //AMD test
+			GLCheck(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer[i]->GetBufferId()));
+			GLCheck(glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0)); //AMD test
 
 			attributes[i] = p_renderer->CreateVertexAttributes();
 			attributes[i]->Init(9);
@@ -76,16 +76,16 @@ namespace Render
 
 	void ParticleSystem::Update()
 	{
-		glEnable(GL_RASTERIZER_DISCARD);//AMD test
+		GLCheck(glEnable(GL_RASTERIZER_DISCARD));//AMD test
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId());
+		GLCheck(glBindBufferBase(GL_UNIFORM_BUFFER, RENDER_SLOT_PEROBJECT, m_uniforms->GetBufferId()));
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[m_currentVB]->GetVertexBuffer()->GetBufferId());
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[m_currentTFB]->GetTransformFeedback()); 
+		GLCheck(glBindBuffer(GL_ARRAY_BUFFER, m_meshes[m_currentVB]->GetVertexBuffer()->GetBufferId()));
+		GLCheck(glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, m_meshes[m_currentTFB]->GetTransformFeedback())); 
 
 		m_meshes[m_currentVB]->Bind();
 
-		glBeginTransformFeedback(GL_POINTS);
+		GLCheck(glBeginTransformFeedback(GL_POINTS));
 		
 
 		if (m_first) {
@@ -93,19 +93,19 @@ namespace Render
 			m_first = false;
 		}
 		else {
-			glDrawTransformFeedback(GL_POINTS, m_meshes[m_currentVB]->GetTransformFeedback());
+			GLCheck(glDrawTransformFeedback(GL_POINTS, m_meshes[m_currentVB]->GetTransformFeedback()));
 		}
 
-		glEndTransformFeedback();
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0); 
+		GLCheck(glEndTransformFeedback());
+		GLCheck(glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0)); 
 
 		//AMD fix
-		glFlush();//AMD test
+		//glFlush();//AMD test
 
 		m_meshes[m_currentVB]->Unbind();
 
 		std::swap(m_currentVB, m_currentTFB);
-		glDisable(GL_RASTERIZER_DISCARD);//AMD test
+		GLCheck(glDisable(GL_RASTERIZER_DISCARD));//AMD test
 	}
 
 	Render::MeshInterface* ParticleSystem::GetMesh()
