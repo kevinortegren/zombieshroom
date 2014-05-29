@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 
 			INITIALIZEENGINE libInitializeEngine = (INITIALIZEENGINE)DynamicLoader::LoadProcess(g_engineModule, "InitializeEngine");
 
-			g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, path);
+			g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL);
 
 			if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) 
 			{
