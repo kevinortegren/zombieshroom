@@ -95,6 +95,8 @@ namespace RootForce
 		p_view->RegisterJSCallback("SaveSettings", JSDelegate1(this, &SettingsMenu::SaveSettingsEvent));
 		p_view->RegisterJSCallback("FocusBind", JSDelegate1(this, &SettingsMenu::FocusBindEvent));
 		p_view->RegisterJSCallback("UnfocusBind", JSDelegate1(this, &SettingsMenu::UnfocusBindEvent));
+
+		p_view->Update();
 	}
 
 	void SettingsMenu::Update()

@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 uniform sampler2D g_Diffuse;
 
@@ -8,6 +8,5 @@ in vec2 texCoord;
 
 void main()
 {
-	
-	frag_color = vec4(texture(g_Diffuse, texCoord.st).rgb * 0.1, 1.0);
+	frag_color = vec4(texture(g_Diffuse, texCoord.st).rgb, 1.0);
 }

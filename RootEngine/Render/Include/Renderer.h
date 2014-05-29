@@ -40,8 +40,23 @@
 
 #define RENDER_USE_COMPUTE
 
+#ifdef _DEBUG
+#define GLCheck(F) \
+	F;			   \
+	{   		   \
+		GLenum error = glGetError(); \
+		if (error != GL_NO_ERROR) {  \
+			Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::NON_FATAL_ERROR, "GLCheck error: %s", gluErrorString(error)); \
+		}		   \
+	}
+#else
+#define GLCheck(F) F
+#endif
+
+
 namespace Render
 {
+	extern RootEngine::SubsystemSharedContext g_context;
 	class RendererInterface : public RootEngine::SubsystemInterface
 	{
 	public:
@@ -89,7 +104,7 @@ namespace Render
 		// Particle systems.
 		virtual ParticleSystem* CreateParticleSystem() = 0;
 		virtual void FreeParticleSystem(ParticleSystemInterface* p_particleSys) = 0;
-		virtual void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params) = 0;
+		virtual void SetParticleUniforms(ParticleSystemInterface* p_system, Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params) = 0;
 		virtual void BeginTransform(float dt) = 0;
 		virtual void EndTransform() = 0;
 
@@ -161,7 +176,7 @@ namespace Render
 		// Particle systems.
 		ParticleSystem* CreateParticleSystem();
 		void FreeParticleSystem(ParticleSystemInterface* p_particleSys);
-		void SetParticleUniforms(Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
+		void SetParticleUniforms(ParticleSystemInterface* p_system, Technique* p_technique, std::map<Render::Semantic::Semantic, void*> p_params);
 		void BeginTransform(float dt);
 		void EndTransform();
 
@@ -185,6 +200,8 @@ namespace Render
 		void CleanResources(unsigned p_flag);
 		void RemoveMesh(MeshInterface* p_mesh);
 		void RemoveVAO(VertexAttributesInterface* p_vao);
+
+		void PrintOpenGLMaxValues();
 
 		glm::vec3 m_camPos;
 

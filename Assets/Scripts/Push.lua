@@ -8,7 +8,8 @@ Push.channelingTime = 0;
 Push.duration = 0.5;
 
 function Push.OnLoad()
-	ResourceManager.LoadParticle("fireball");
+	ResourceManager.LoadParticle("PushMeMaybe");
+	ResourceManager.LoadTexture("Particles/Leaf")
 	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-6.wav");
 	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-7.wav");
 	ResourceManager.LoadSound("Movement/JumpingOneshots/jump2-8.wav");

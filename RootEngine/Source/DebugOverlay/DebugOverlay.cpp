@@ -72,6 +72,7 @@ namespace RootEngine
 		command += "\",false);";
 		m_view->BufferJavascript(command);
 
+		m_view->Update();
 		m_leftOverlay = "";
 		m_rightOverlay = "";
 	}

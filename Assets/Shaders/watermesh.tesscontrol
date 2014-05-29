@@ -1,4 +1,4 @@
-#version 410 core                                                                               
+#version 430                                                                               
                                                                                                 
 // define the number of CPs in the output patch                                              
 layout (vertices = 3) out;   
@@ -27,11 +27,11 @@ float GetTessLevel(float Distance0, float Distance1)
 {                                                                                               
     float AvgDistance = (Distance0 + Distance1) / 2.0;  
 	                                       
-	if (AvgDistance <= 120.0f)
+	if (AvgDistance <= 120.0)
 	{  
-		return 6.0f;
+		return 6.0;
 	}
-	if (AvgDistance <= 500.0f) 
+	if (AvgDistance <= 500.0) 
 	{                                                              
         return 6.0;                                                                             
     }                                                                                            
@@ -45,7 +45,7 @@ float GetDynamicTessFactor(float distance0, float distance1)
 {
 	//return 1;
 	float AvgDistance = (distance0 + distance1) / 2.0; 
-	float factor = 16.0f*(1/(0.016*AvgDistance));
+	float factor = 16.0*(1/(0.016*AvgDistance));
 
 	if(factor > 16.0)
 		factor = 16.0;

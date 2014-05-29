@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 layout(location = 0) in vec3	in_initialPos;
 layout(location = 1) in vec3	in_initialVel;
@@ -20,7 +20,7 @@ layout(std140) uniform PerObject
 };
 
 void main(void) {
-    gl_Position = vec4(vec3(in_initialPos+g_transPos), 1.0f);
+    gl_Position = vec4(vec3(in_initialPos+g_transPos), 1.0);
 	vert_scale = in_scale;
 	vert_color = in_color;
 	vert_rotation = in_rot;

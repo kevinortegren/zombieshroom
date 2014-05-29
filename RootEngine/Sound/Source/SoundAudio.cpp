@@ -51,13 +51,15 @@ namespace RootEngine
 		{
 			FMOD::Channel* channel;
 			m_system->playSound(FMOD_CHANNEL_FREE, m_sound, true, &channel);
-
+			channel->setMode(p_flags);
 			channel->setVolume(p_volume);
 			FMOD_VECTOR position = {p_position.x, p_position.y, p_position.z};
-			channel->set3DAttributes(&position, 0);
-			channel->set3DDopplerLevel(0.0f);
-			channel->set3DMinMaxDistance(p_minRange, p_maxRange);
-			channel->setMode(p_flags);
+			if((p_flags & SOUND_3D) == SOUND_3D)
+			{
+				channel->set3DAttributes(&position, 0);
+				channel->set3DDopplerLevel(0.0f);
+				channel->set3DMinMaxDistance(p_minRange, p_maxRange);
+			}
 			channel->setPaused(false);
 		}
 	}

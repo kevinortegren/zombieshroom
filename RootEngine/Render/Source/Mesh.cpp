@@ -1,5 +1,6 @@
 #include <RootEngine/Render/Include/Mesh.h>
 #include <RootEngine/Render/Include/RenderResourceManager.h>
+#include <RootEngine/Render/Include/Renderer.h>
 
 namespace Render
 {
@@ -122,12 +123,12 @@ namespace Render
 			}
 			else
 			{
-				glDrawElements(m_primitive, m_elementBuffer->GetNumElements(), GL_UNSIGNED_INT, 0);
+				GLCheck(glDrawElements(m_primitive, m_elementBuffer->GetNumElements(), GL_UNSIGNED_INT, 0));
 			}
 		}
 		else if(m_transformFeedback != 0)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId());
+			GLCheck(glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer->GetBufferId()));
 			if(m_wireFrame)
 			{
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -142,12 +143,12 @@ namespace Render
 			}
 			else
 			{
-				glDrawTransformFeedback(m_primitive, m_transformFeedback);
+				GLCheck(glDrawTransformFeedback(m_primitive, m_transformFeedback));
 			}	
 		}
 		else
 		{
-			glDrawArrays(m_primitive, 0, m_vertexBuffer->GetNumElements());
+			GLCheck(glDrawArrays(m_primitive, 0, m_vertexBuffer->GetNumElements()));
 		}
 	}
 

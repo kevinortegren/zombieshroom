@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 in vec3 vert_normal;
 in vec2 vert_texcoord;
@@ -25,7 +25,7 @@ void main()
 	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
     
 
-    float value = 1.0f / (weight.r + weight.g + weight.b);
+    float value = 1.0 / (weight.r + weight.g + weight.b);
     
     diffuseR *= weight.r * value;
     diffuseG *= weight.g * value;
@@ -39,5 +39,5 @@ void main()
 	diffuse = vec4(blendedColor.xyz, specTerm);
     float p = sqrt(normal.z*8+8);
     normals = normal.xy/p + 0.5;
-	glow = vec4(vec3(glow_color.xyz), 0.0f);
+	glow = vec4(vec3(glow_color.xyz), 0.0);
 }

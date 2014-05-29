@@ -26,8 +26,11 @@ void TextureDrop::SetName(const QString& p_textureName)
 
 void TextureDrop::SetTexture(Render::TextureInterface* p_texture)
 {
-	QPixmap pm = GetPixmap(p_texture);			
-	ui.label_2->setPixmap(pm.scaled(ui.label_2->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+	if(p_texture != nullptr)
+	{
+		QPixmap pm = GetPixmap(p_texture);			
+		ui.label_2->setPixmap(pm.scaled(ui.label_2->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+	}
 }
 
 void TextureDrop::Clear()

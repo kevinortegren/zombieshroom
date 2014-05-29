@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 layout(location = 0) in vec3	in_initialPos;
 layout(location = 1) in vec3	in_initialVel;
@@ -15,7 +15,7 @@ out vec4 vert_color;
 out float vert_rotation;
 
 void main(void) {
-    gl_Position = vec4(vec3(in_initialPos), 1.0f);
+    gl_Position = vec4(vec3(in_initialPos), 1.0);
 	vert_scale = in_scale;
 	vert_color = in_color;
 	vert_rotation = in_rot;

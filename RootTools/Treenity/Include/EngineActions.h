@@ -123,7 +123,14 @@ public:
 
 	//Collision responder
 	void		AddCollisionResponder(ECS::Entity* p_entity); 
-	void		RemoveCollisionResponder(ECS::Entity* p_entity);
+	void		RemoveCollisionResponder(ECS::Entity* p_sentity);
+
+	//Particle
+	void		AddParticle(ECS::Entity* p_entity);
+	void		RemoveParticle(ECS::Entity* p_entity);
+	void		SetParticleEmitter(ECS::Entity* p_entity, const std::string& p_name);
+	std::string	GetParticleEmitter(ECS::Entity* p_entity);
+
 
 private:
 

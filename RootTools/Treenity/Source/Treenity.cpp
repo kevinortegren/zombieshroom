@@ -16,6 +16,8 @@
 #include <QScrollArea>
 #include <QShortcut>
 
+#include <RootTools/Treenity/Include/Components/ParticleView.h>
+
 extern RootEngine::GameSharedContext g_engineContext;
 
 Treenity::Treenity(QWidget *parent)
@@ -84,6 +86,7 @@ Treenity::Treenity(QWidget *parent)
 	m_componentViews[RootForce::ComponentType::WATERCOLLIDER]		= new WaterColliderView();
 	m_componentViews[RootForce::ComponentType::SCRIPT]				= new ScriptView();
 	m_componentViews[RootForce::ComponentType::COLLISIONRESPONDER]	= new CollisionResponderView();
+	m_componentViews[RootForce::ComponentType::PARTICLE]			= new ParticleView();
 
 	// Block component views from updates while in game mode.
 	m_componentViews[RootForce::ComponentType::RENDERABLE]->SetReceiveUpdates(false);
@@ -113,6 +116,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addWaterCollider,				SIGNAL(triggered()),		this,					SLOT(AddWaterCollider()));
 	connect(ui.action_addScript,					SIGNAL(triggered()),		this,					SLOT(AddScriptComponent()));
 	connect(ui.action_collisionResponder,			SIGNAL(triggered()),		this,					SLOT(AddCollisionResponder()));
+	connect(ui.action_addParticle,					SIGNAL(triggered()),		this,					SLOT(AddParticleComponent()));
 	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
 	connect(ui.pushButton_translateMode,			SIGNAL(clicked()),			this,					SLOT(SetTranslateTool()));
 	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
@@ -450,6 +454,13 @@ void Treenity::AddCollisionResponder()
 	}
 }
 
+void Treenity::AddParticleComponent()
+{
+	if(m_selectedEntities.size() == 1)
+	{
+		m_engineInterface->AddParticle(*m_selectedEntities.begin());
+	}
+}
 
 void Treenity::UpdateOnSelection()
 {

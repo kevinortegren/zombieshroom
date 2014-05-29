@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 in vec3 vert_normal;
 in vec2 vert_texcoord;
@@ -32,7 +32,7 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	vec2 screenTexCoord		= gl_FragCoord.xy / textureSize(g_LA, 0);
 	ivec2 screenAbsCoord	= ivec2(gl_FragCoord.xy);
-	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(vec2(vert_normal.x, vert_normal.y) * 30.0f), ivec2(0), textureSize(g_LA, 0));
+	ivec2 refractedUV		= clamp(screenAbsCoord + ivec2(vec2(vert_normal.x, vert_normal.y) * 30.0), ivec2(0), textureSize(g_LA, 0));
 	float refractionDepth	= texelFetch(g_Depth, refractedUV, 0).r;
 
 	vec3 refractionColor;

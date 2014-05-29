@@ -39,7 +39,7 @@
           - name: g_NormalMap
             slot: 16
           - name: g_Diffuse
-            slot: 18
+            slot: 11
       flags:
           - name: Forward
           - name: Refractive

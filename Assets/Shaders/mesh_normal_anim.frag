@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 in vec3 vert_normal;
 in vec2 vert_texcoord;
@@ -23,7 +23,7 @@ void main()
 	
 
 	vec3 normalT = texture(g_Normal, vert_texcoord).xyz;
-	normalT = normalT * 2.0f - 1.0f;
+	normalT = normalT * 2.0 - 1.0;
 
 	mat3 TBNmatrix = mat3(vert_tangent, vert_bitangent, vert_normal);
 
@@ -32,5 +32,5 @@ void main()
 	diffuse = vec4(frag_color, specTerm);
     float p = sqrt(bumpNormal.z*8+8);
     normals = bumpNormal.xy/p + 0.5;
-	glow = vec4(vec3(glow_color.xyz), 0.0f);
+	glow = vec4(vec3(glow_color.xyz), 0.0);
 }

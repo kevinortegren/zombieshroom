@@ -37,7 +37,7 @@ namespace RootForce
 
 			auto updateTechnique = emitter->m_particleSystems[i]->m_material->m_effect->GetTechniques()[0];
 
-			g_engineContext.m_renderer->SetParticleUniforms(updateTechnique.get(), emitter->m_particleSystems[i]->m_params);
+			g_engineContext.m_renderer->SetParticleUniforms(emitter->m_systems[i], updateTechnique.get(), emitter->m_particleSystems[i]->m_params);
 
 			updateTechnique->Apply();
 

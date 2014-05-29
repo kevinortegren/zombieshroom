@@ -1,5 +1,4 @@
-#version 400
-#extension GL_EXT_geometry_shader4 : enable  
+#version 430
 
 //#define SHOW_LOD
 //#define SHOW_NORMALS
@@ -505,10 +504,10 @@ void CreateQuad(vec3 position, vec3 cameraPosition)
     
     // Local vertices.
 	vec4 vertices[4];  
-	vertices[0] = vec4(-scale.x, scale.y, 0, 1.0f);  
-	vertices[1] = vec4(scale.x, scale.y, 0, 1.0f);   
-	vertices[2] = vec4(-scale.x, -scale.y, 0, 1.0f);  
-	vertices[3] = vec4(scale.x, -scale.y, 0, 1.0f);
+	vertices[0] = vec4(-scale.x, scale.y, 0, 1.0);  
+	vertices[1] = vec4(scale.x, scale.y, 0, 1.0);   
+	vertices[2] = vec4(-scale.x, -scale.y, 0, 1.0);  
+	vertices[3] = vec4(scale.x, -scale.y, 0, 1.0);
 
     // Billboard basis.
     vec3 up = vec3(0.0, 1.0, 0.0);

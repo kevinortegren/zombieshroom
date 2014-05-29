@@ -34,6 +34,21 @@ end
 function FireBall.Interrupted (time, userId, actionId)
 end
 
+function FireBall.Explode(self)
+	FireBallExplosion.OnCreate(self:GetNetwork():GetUserId(), self:GetNetwork():GetActionId(),FireBall.damageIncrease);
+	if Global.IsClient then
+		self:RemovePointLight();
+	end
+	self:RemovePhysics();
+	self:RemoveCollision();
+	self:RemoveCollisionResponder();
+	self:GetParticleEmitter():SetAlive(-1.0);
+
+	self:RemoveSoundable();
+	local network = self:GetNetwork();
+	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 2.0, "FireBall", "OnDestroy", self);
+end
+
 function FireBall.OnCreate (userId, actionId)
 	--Entities
 	local self = Entity.New();
@@ -77,21 +92,18 @@ function FireBall.OnCollide (self, entity)
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
 		local type = hitCol:GetType();
+		local abilityOwnerNetwork = self:GetNetwork();
+		local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 		if type == PhysicsType.TYPE_PLAYER then
 			local targetPlayerComponent = entity:GetPlayerComponent();
-			local abilityOwnerNetwork = self:GetNetwork();
-			local abilityOwnerId = abilityOwnerNetwork:GetUserId();
 			local abilityOwnerEntity = Entity.GetEntityByNetworkID(abilityOwnerId, ReservedActionID.CONNECT, 0);
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 			local health = entity:GetHealth();
 			if abilityOwnerNetwork:GetUserId() ~= entity:GetNetwork():GetUserId() then
-				FireBallExplosion.OnCreate(abilityOwnerNetwork:GetUserId(), abilityOwnerNetwork:GetActionId(),FireBall.damageIncrease);
-				FireBall.OnDestroy(self);
 			end
 		else
-			FireBallExplosion.OnCreate(self:GetNetwork():GetUserId(), self:GetNetwork():GetActionId(),FireBall.damageIncrease);
-			FireBall.OnDestroy(self);
 		end
+		FireBall.Explode(self);
 	end
 end
 

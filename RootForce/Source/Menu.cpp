@@ -14,14 +14,14 @@ namespace RootForce
 		m_view = p_view;
 		m_context = p_context;
 		m_settingsMenu = new SettingsMenu(p_context, p_keymapper);
-		m_view->WaitLoading();
+		//m_view->WaitLoading();
 		p_keymapper->SetMenu(m_view);
 
 		m_view->RegisterJSCallback("Exit", JSDelegate1(this, &Menu::ExitEvent));
 		m_view->RegisterJSCallback("Host", JSDelegate1(this, &Menu::HostEvent));
 		m_view->RegisterJSCallback("Connect", JSDelegate1(this, &Menu::ConnectEvent));
 		m_view->RegisterJSCallback("Refresh", JSDelegate1(this, &Menu::RefreshEvent));
-		
+		m_view->Update();
 		m_settingsMenu->BindEvents(p_view);
 
 		m_view->Focus();
@@ -48,6 +48,7 @@ namespace RootForce
 		command = command + "'" + (p_serverInfo.second.Information.PasswordProtected ? "Yes" : "No") + "');";
 
 		m_view->BufferJavascript(command);
+		m_view->Update();
 	}
 
 	void RootForce::Menu::LoadDefaults(RootEngine::ConfigManagerInterface* p_configMan, std::string p_workingDir)
@@ -69,6 +70,7 @@ namespace RootForce
 		command += ");";
 
 		m_view->BufferJavascript(command);
+		m_view->Update();
 	}
 	
     void Menu::ShowError(std::string p_errorMessage, std::string p_errorTitle)
@@ -79,6 +81,7 @@ namespace RootForce
 		command += ");";
 
 		m_view->BufferJavascript(command);
+		m_view->Update();
 	}
 
 	MenuEvent::MenuEvent RootForce::Menu::PollEvent()
@@ -178,6 +181,7 @@ namespace RootForce
 	void Menu::Update()
 	{
 		m_settingsMenu->Update();
+		m_view->Update();
 	}
 
 }

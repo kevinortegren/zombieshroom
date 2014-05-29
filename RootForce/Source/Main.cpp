@@ -97,7 +97,6 @@ namespace RootForce
 		g_engineContext.m_renderer->SetResolution(g_engineContext.m_configManager->GetConfigValueAsBool("settings-fullscreen"), width, height);
 
 		SDL_GLContext mainContext = SDL_GL_GetCurrentContext();
-		SDL_GLContext guiContext = SDL_GL_CreateContext(m_window.get());
 		SDL_GL_MakeCurrent(m_window.get(), mainContext);
 
 		// Setup the importer and exporter
@@ -105,7 +104,7 @@ namespace RootForce
 		m_world.GetEntityExporter()->SetExporter(Exporter);
 
 		// Initialize GUI
-		g_engineContext.m_gui->Initialize(g_engineContext.m_renderer->GetWidth(), g_engineContext.m_renderer->GetHeight(), m_window.get(), guiContext);
+		g_engineContext.m_gui->Initialize(g_engineContext.m_renderer->GetWidth(), g_engineContext.m_renderer->GetHeight());
 
 		// Initialize shared systems
 		m_sharedSystems.m_matchStateSystem = std::shared_ptr<RootForce::MatchStateSystem>(new RootForce::MatchStateSystem(g_world, &g_engineContext));

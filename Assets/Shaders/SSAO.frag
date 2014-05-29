@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 in vec2 ex_TexCoord;
 out vec4 out_Color;
@@ -34,7 +34,7 @@ vec3 GetVSPositionFromDepth(vec2 sampleCoord)
 	float x = sampleCoord.x * 2 - 1;
 	float y = sampleCoord.y * 2 - 1;
 
-	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+	vec4 vProjectedPos = vec4(x, y, z, 1.0);
 	vec4 sPos = invProj * vProjectedPos;
 
 	return (sPos.xyz / sPos.w);

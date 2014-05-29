@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 in vec4 vert_color;
 
@@ -11,6 +11,6 @@ void main()
 {
 	diffuse = vec4(0);
 	normals = vec3(0);
-	glow = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	glow = vec4(0.0, 0.0, 0.0, 0.0);
 	background = vert_color;
 }

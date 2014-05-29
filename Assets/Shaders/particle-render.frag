@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 layout(std140) uniform PerFrame
 {
@@ -28,7 +28,7 @@ vec3 GetVSPositionFromDepth(vec2 texcoord)
 	float x = texcoord.x * 2 - 1;
 	float y = texcoord.y * 2 - 1;
 
-	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+	vec4 vProjectedPos = vec4(x, y, z, 1.0);
 	vec4 sPos = invProj * vProjectedPos;
 
 	return (sPos.xyz / sPos.w);
@@ -40,12 +40,12 @@ void main(void) {
 
 	vec4 frag_color = texture(g_Diffuse, gs_TexCoord);
 
-    float depth = gs_Depth * -1.0f;   
-    float depthViewSample = GetVSPositionFromDepth(TexCoord).z * -1.0f;
+    float depth = gs_Depth * -1.0;   
+    float depthViewSample = GetVSPositionFromDepth(TexCoord).z * -1.0;
 
     float depthDiff = depthViewSample - depth;
     
-	depthDiff = clamp(depthDiff * 0.1f, 0.0f, 1.0f);
+	depthDiff = clamp(depthDiff * 0.1f, 0.0, 1.0);
 
 	out_color = vec4(frag_color.xyz, frag_color.a * depthDiff) * gs_color;
 }

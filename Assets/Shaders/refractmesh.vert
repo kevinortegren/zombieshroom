@@ -1,4 +1,4 @@
-#version 410 core 
+#version 430 
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
@@ -25,11 +25,11 @@ out vec3 vert_bitangent;
 
 void main()
 {  
-	vert_normal = normalize(viewMatrix * normalMatrix * vec4(in_normal, 0.0f)).xyz;
-	vert_tangent = normalize( viewMatrix * normalMatrix * vec4(in_tangent, 0.0f)).xyz;
-	vert_bitangent = normalize( viewMatrix * normalMatrix * vec4(in_bitangent, 0.0f)).xyz;
+	vert_normal = normalize(viewMatrix * normalMatrix * vec4(in_normal, 0.0)).xyz;
+	vert_tangent = normalize( viewMatrix * normalMatrix * vec4(in_tangent, 0.0)).xyz;
+	vert_bitangent = normalize( viewMatrix * normalMatrix * vec4(in_bitangent, 0.0)).xyz;
 
 	vert_texcoord = in_texcoord;
 
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0 );
 }

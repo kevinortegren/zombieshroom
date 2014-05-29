@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 layout(location = 0) in vec3 in_position;
 
@@ -22,7 +22,7 @@ out float viewZ;
 
 void main()
 {
-	viewZ = (viewMatrix * modelMatrix * vec4( in_position, 1.0f )).z;
+	viewZ = (viewMatrix * modelMatrix * vec4( in_position, 1.0 )).z;
 
 
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(in_position, 1.0);

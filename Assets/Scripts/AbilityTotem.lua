@@ -75,7 +75,7 @@ function AbilityTotem.OnCreate (userId, actionId)
 		soundable:SetSound("Abilities/Turret/turretactive1-1.wav");
 		soundable:SetFlags(bit32.bor(SoundMode.SOUND_LOOP_NORMAL, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 		soundable:SetRange(10.0, 100.0);
-		soundable:SetVolume(0.5);
+		soundable:SetVolume(0.3);
 		soundable:Play();
 
 		local renderComp = Renderable.New(self);

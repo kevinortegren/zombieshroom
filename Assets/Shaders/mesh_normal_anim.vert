@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
@@ -34,17 +34,17 @@ void main()
     boneTransform     += bones[in_boneID.z] * in_weights.z;
     boneTransform     += bones[in_boneID.w] * in_weights.w;
 
-	vec4 norm = boneTransform * vec4(in_normal, 0.0f);
+	vec4 norm = boneTransform * vec4(in_normal, 0.0);
 
 	vert_normal = normalize( viewMatrix * normalMatrix * norm).xyz;
-	vert_tangent = normalize( viewMatrix * normalMatrix * vec4(in_tangent, 0.0f)).xyz;
-	vert_bitangent = normalize( viewMatrix * normalMatrix * vec4(in_bitangent, 0.0f)).xyz;
+	vert_tangent = normalize( viewMatrix * normalMatrix * vec4(in_tangent, 0.0)).xyz;
+	vert_bitangent = normalize( viewMatrix * normalMatrix * vec4(in_bitangent, 0.0)).xyz;
 
 	vert_texcoord = in_texcoord;
 
-	view = viewMatrix * modelMatrix * vec4( in_position, 1.0f );
+	view = viewMatrix * modelMatrix * vec4( in_position, 1.0 );
 
-	vec4 pos = boneTransform * vec4( in_position, 1.0f );
+	vec4 pos = boneTransform * vec4( in_position, 1.0 );
 
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * pos;
 

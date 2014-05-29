@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 struct PointLight
 {
@@ -40,7 +40,7 @@ vec3 GetVSPositionFromDepth(vec2 texcoord)
 	float x = texcoord.x * 2 - 1;
 	float y = texcoord.y * 2 - 1;
 
-	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+	vec4 vProjectedPos = vec4(x, y, z, 1.0);
 	vec4 sPos = invProj * vProjectedPos;
 
 	return (sPos.xyz / sPos.w);
@@ -91,11 +91,11 @@ void main() {
     float transFactor = clamp(EdotL * LdotN, 0.0, 1.0) * translucency;
     float diffuseFactor = max(0.0, dot( normalize( vert_lightVec ), normal ));
     
-	vec3 spec_color = ex_Light.Color.xyz * specTerm * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0f);
+	vec3 spec_color = ex_Light.Color.xyz * specTerm * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0);
 	vec3 diffuse_color = clamp(diffuseFactor + transFactor, 0.0, 1.0) * diffuse * ex_Light.Color.xyz;
 
 	light = diffuse_color + spec_color;
 	light = light / dot(ex_Light.Attenuation, vec3(1, dist, dist*dist));     
 	
-    out_Color = vec4(light, 1.0f);
+    out_Color = vec4(light, 1.0);
 }

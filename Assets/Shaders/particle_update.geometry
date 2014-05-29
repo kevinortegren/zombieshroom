@@ -1,5 +1,4 @@
-#version 400
-#extension GL_EXT_geometry_shader4 : enable  
+#version 430
 
 layout(points) in;
 layout(points, max_vertices = 51) out;
@@ -81,7 +80,7 @@ void main()
 
 	if(vert_type[0] == 0)
 	{
-		if(lifeTime <= 0.0f)
+		if(lifeTime <= 0.0)
 		{
 			float step = 1.0 / g_maxPerFrame;
 
@@ -120,11 +119,11 @@ void main()
 
 					vert_scale1 		= vec2(GetRandomNumber(g_time + i*step + 0.059, g_sizeMin.x, g_sizeMax.x), GetRandomNumber(g_time + i*step + 0.075, g_sizeMin.y, g_sizeMax.y));
 					vert_age1 			= GetRandomNumber(g_time + i*step + 0.14, g_lifeTimeMin, g_lifeTimeMax);
-					vert_type1 			= 1.0f;
+					vert_type1 			= 1.0;
 		 			vert_color1 		= g_color;
 		 			vert_accel1			= g_gravity;
 					lifeTime			= g_spawnTime;
-					vert_rotation1		= GetRandomNumber(g_time + i*step + 0.011f , 0.0f, 6.29f);
+					vert_rotation1		= GetRandomNumber(g_time + i*step + 0.011f , 0.0, 6.29);
 					vert_rotationSpeed1 = GetRandomNumber(g_time + i*step + 0.087, g_rotationSpeedMin, g_rotationSpeedMax);
 					EmitVertex();
 					EndPrimitive();
@@ -135,9 +134,9 @@ void main()
 		// Always output the emitter particle with initial values.
 		vert_initialPos1	= g_Position;
 		vert_initialVel1	= vert_initialVel[0];
-		vert_scale1			= vec2(0.0f, 0.0f);
+		vert_scale1			= vec2(0.0, 0.0);
 		vert_age1			= lifeTime;
-		vert_type1			= 0.0f;
+		vert_type1			= 0.0;
 		vert_color1			= vert_color[0];  
 		vert_accel1			= vert_accel[0];
 		vert_rotation1		= vert_rotation[0];
@@ -153,14 +152,14 @@ void main()
 		//Pos
 		vec3 DeltaP = g_dt * vert_initialVel[0];
 
-		if(lifeTime > 0.0f)
+		if(lifeTime > 0.0)
 		{	
-			float linearFac = 1.0f - lifeTime / vert_age[0];
+			float linearFac = 1.0 - lifeTime / vert_age[0];
 			vert_initialPos1	= gl_in[0].gl_Position.xyz + DeltaP;		
 			vert_initialVel1	= vert_initialVel[0] + DeltaV;
 			vert_scale1			= mix(vert_scale[0], g_sizeEnd, linearFac);
 			vert_age1			= lifeTime;		
-			vert_type1			= 1.0f;
+			vert_type1			= 1.0;
 			vert_color1			= mix(vert_color[0], g_colorEnd, linearFac);  
 			vert_accel1			= vert_accel[0];
 			vert_rotation1		= vert_rotation[0] + vert_rotationSpeed[0] * g_dt;

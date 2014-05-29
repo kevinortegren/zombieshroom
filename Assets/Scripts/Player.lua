@@ -32,6 +32,8 @@ function Player.OnCreate(userId, actionId)
 		Entity.RegisterTag("Player", player);
 		Entity.RegisterTag("AimingDevice", aimingEntity);
 	end
+	
+	Push.OnLoad();
 end
 
 function Player.OnTeamSelect(self, teamId)

@@ -282,9 +282,12 @@ void Canvas3D::PieButton5()
 
 void Canvas3D::PieButton6()
 {
-	if(m_editorInterface->GetSelection().size() == 1)
+	if(m_editorInterface->GetSelection().size() > 0)
 	{
-		m_engineInterface->DuplicateEntity(*m_editorInterface->GetSelection().begin());
+		for(ECS::Entity* ent : m_editorInterface->GetSelection())
+		{
+			m_engineInterface->DuplicateEntity(ent);
+		}
 	}
 }
 

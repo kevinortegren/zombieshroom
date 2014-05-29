@@ -1,4 +1,4 @@
-#version 400
+#version 430
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec4 in_color;
@@ -19,5 +19,5 @@ out vec4 vert_color;
 void main()
 {
 	vert_color = in_color;
-	gl_Position = projectionMatrix * viewMatrix * vec4( in_position, 1.0f );
+	gl_Position = projectionMatrix * viewMatrix * vec4( in_position, 1.0 );
 }

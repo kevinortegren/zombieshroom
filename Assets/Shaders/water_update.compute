@@ -17,7 +17,7 @@ layout(std140) uniform MK
 void main() 
 {   
 	ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
-	if(storePos.x == 0 || storePos.y == 0 || storePos.x == xMax || storePos.y == xMax)
+	if(storePos.x == 0 || storePos.y == 0 || storePos.x == xMax-1 || storePos.y == xMax-1)
 		return;
 	
 	float prev = imageLoad(prevTex, storePos).r;
@@ -35,7 +35,7 @@ void main()
 	n.z = d-c; //dz
 	n.y = dx*2;
 	n = normalize(n);
-	imageStore(normalTex, storePos, vec4(n * 0.5 + 0.5, 0.0f));
+	imageStore(normalTex, storePos, vec4(n * 0.5 + 0.5, 0.0));
 	*/
 	vec4 storeVar = vec4(b-a, d-c, 0.0, 0.0);
 	imageStore(normalTex, storePos, storeVar);

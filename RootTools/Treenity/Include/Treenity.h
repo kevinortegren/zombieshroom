@@ -125,6 +125,7 @@ private slots:
 	void AddWaterCollider();
 	void AddScriptComponent();
 	void AddCollisionResponder();
+	void AddParticleComponent();
 	void SetTranslateTool();
 	void SetRotateTool();
 	void SetResizeTool();

@@ -38,7 +38,7 @@ void DiffuseShaderView::Display()
 		else
 		{
 			ui.textureDrop_diffuse->SetTexture(itr->second);
-		}
+        }
 	}
 	else
 	{

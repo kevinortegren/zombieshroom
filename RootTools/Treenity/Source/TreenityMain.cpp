@@ -492,6 +492,7 @@ void TreenityMain::Update(float dt)
 		
 		m_lookAtSystem->Process();
 		
+		m_particleSystem->Process();
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
@@ -558,6 +559,7 @@ void TreenityMain::Update(float dt)
 		m_actionSystem->UpdateAimingDevice(false);
 		m_thirdPersonBehaviorSystem->Process();
 		m_lookAtSystem->Process();
+		m_particleSystem->Process();
 		m_shadowSystem->Process();
 		m_directionalLightSystem->Process();
 		m_pointLightSystem->Process();
