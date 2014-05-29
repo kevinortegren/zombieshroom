@@ -11,9 +11,8 @@
 #include <RootEngine/Include/SubsystemSharedContext.h>
 #include <RootEngine/Include/GameSharedContext.h>
 #include <RootEngine/GUI/Include/guiInstance.h>
-
-
 #include <memory>
+#include <string>
 
 namespace RootEngine
 {
@@ -38,7 +37,7 @@ namespace RootEngine
 		EngineMain();
 		~EngineMain();
 
-		void Initialize(int p_flags, std::string p_workingDirectory);
+		void Initialize(int p_flags);
 		GameSharedContext GetGameSharedContext();
 		SubsystemSharedContext GetSubsystemSharedContext();
 	private:
@@ -88,6 +87,6 @@ namespace RootEngine
 
 extern "C"
 {
-	typedef RootEngine::GameSharedContext ( *INITIALIZEENGINE )(int, std::string);
-	ROOTENGINE_DLL_EXPORT RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workingDirectory);
+	typedef RootEngine::GameSharedContext ( *INITIALIZEENGINE )(int);
+	ROOTENGINE_DLL_EXPORT RootEngine::GameSharedContext InitializeEngine(int p_flags);
 }

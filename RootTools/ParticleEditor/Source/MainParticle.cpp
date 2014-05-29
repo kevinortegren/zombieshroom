@@ -12,17 +12,12 @@
 #undef main
 int main(int argc, char *argv[])
 {
-	std::string path(argv[0]);
 	std::string loadFile;
 
 	if(argv[1] == 0)
 		loadFile = "";
 	else
 		loadFile = argv[1];//If a .particle file was opened with application
-	
-	
-	std::string rootforcename = "ParticleEditor.exe";
-	path = path.substr(0, path.size() - rootforcename.size());
 	
 	try 
 	{
@@ -59,7 +54,7 @@ int main(int argc, char *argv[])
 			throw std::runtime_error("Failed to load RootEngine - please check your installation");
 		}
 
-		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_INPUT | RootEngine::SubsystemInit::INIT_RENDER, path);
+		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_INPUT | RootEngine::SubsystemInit::INIT_RENDER);
 
 		if (SDL_Init(SDL_INIT_TIMER) != 0) 
 		{
@@ -71,7 +66,7 @@ int main(int argc, char *argv[])
 		w.setStyle(QStyleFactory::create("Fusion"));
 		w.setPalette(palette);
 
-		MainParticle m(path, &w, loadFile);
+		MainParticle m(&w, loadFile);
 
 		w.show();
 		uint64_t old = SDL_GetPerformanceCounter();
@@ -106,10 +101,10 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-MainParticle::MainParticle( std::string p_workingDirectory, ParticleEditor* p_particleEditorQt, std::string p_loadFile )
+MainParticle::MainParticle(ParticleEditor* p_particleEditorQt, std::string p_loadFile )
 {
 	m_particleEditorQt = p_particleEditorQt;
-	m_workingDirectory = p_workingDirectory;
+	m_workingDirectory = g_engineContext.m_workingDirectory;
 	g_world = &m_world;
 
 	RootForce::Renderable::SetTypeId(RootForce::ComponentType::RENDERABLE);

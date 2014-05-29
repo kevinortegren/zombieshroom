@@ -24,7 +24,6 @@ namespace RootEngine
 	}
 	EngineMain::~EngineMain()
 	{
-		
 #ifndef COMPILING_LEVEL_EDITOR
 
 		/*
@@ -67,12 +66,19 @@ namespace RootEngine
 		}
 	}
 
-	void EngineMain::Initialize(int p_flags, std::string p_workingDirectory)
+	void EngineMain::Initialize(int p_flags)
 	{
-		g_logger.OpenLogStream(p_workingDirectory);
+		const char* workingDirectory = SDL_GetBasePath();
+		const char* preferenceDirectory = SDL_GetPrefPath("Zombieshroom", "Root Force");
+		m_subsystemSharedContext.m_workingDirectory = workingDirectory;
+		m_subsystemSharedContext.m_preferenceDirectory = preferenceDirectory;
+		m_gameSharedContext.m_workingDirectory = workingDirectory;
+		m_gameSharedContext.m_preferenceDirectory = preferenceDirectory;
+
+		g_logger.OpenLogStream(preferenceDirectory);
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Started initializing engine context!");
 
-		m_configManager.LoadConfig(p_workingDirectory + "config.yaml");
+		m_configManager.LoadConfig(std::string(preferenceDirectory) + "config.yaml");
 
 #ifndef COMPILING_LEVEL_EDITOR
 		//m_network = nullptr;
@@ -114,7 +120,7 @@ namespace RootEngine
 		if((p_flags & SubsystemInit::INIT_GUI) == SubsystemInit::INIT_GUI)
 		{
 			LoadGUI();
-			m_gui->SetWorkingDir(p_workingDirectory);
+			m_gui->SetWorkingDir(workingDirectory);
 		}
 		if((p_flags & SubsystemInit::INIT_PHYSICS) == SubsystemInit::INIT_PHYSICS)
 		{
@@ -124,13 +130,13 @@ namespace RootEngine
 		if((p_flags & SubsystemInit::INIT_SCRIPTING) == SubsystemInit::INIT_SCRIPTING)
 		{
 			LoadScriptEngine();
-			m_scriptEngine->SetWorkingDir(p_workingDirectory);
+			m_scriptEngine->SetWorkingDir(workingDirectory);
 		}
 
 		if((p_flags & SubsystemInit::INIT_SOUND) == SubsystemInit::INIT_SOUND)
 		{
 			LoadSoundEngine();
-			m_soundEngine->SetWorkingDir(p_workingDirectory);
+			m_soundEngine->SetWorkingDir(workingDirectory);
 		}
 #endif
 		// TODO: Load the rest of the submodules
@@ -162,7 +168,7 @@ namespace RootEngine
 
 #endif
 
-		m_resourceManager.Init(p_workingDirectory, &m_gameSharedContext);
+		m_resourceManager.Init(workingDirectory, &m_gameSharedContext);
 
 		g_logger.LogText(LogTag::GENERAL, LogLevel::INIT_PRINT, "Engine Context initialized!");
 	}
@@ -355,8 +361,8 @@ namespace RootEngine
 	extern RootEngine::EngineMain* g_engineMain;
 }
 
-RootEngine::GameSharedContext InitializeEngine(int p_flags, std::string p_workingDirectory)
+RootEngine::GameSharedContext InitializeEngine(int p_flags)
 {
-	RootEngine::g_engineMain->Initialize(p_flags, p_workingDirectory);
+	RootEngine::g_engineMain->Initialize(p_flags);
 	return RootEngine::g_engineMain->GetGameSharedContext();
 }

@@ -40,9 +40,6 @@ int main(int argc, char *argv[])
 #ifndef _DEBUG
 	FreeConsole();
 #endif
-	std::string path(argv[0]);
-	std::string rootforcename = "Treenity.exe";
-	path = path.substr(0, path.size() - rootforcename.size());
 
 	QApplication a(argc, argv);
 	
@@ -72,7 +69,7 @@ int main(int argc, char *argv[])
 
 
 
-	TreenityMain m(path);
+	TreenityMain m;
 
 	uint64_t old = SDL_GetPerformanceCounter();
 	while(m.IsRunning())
@@ -89,7 +86,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-TreenityMain::TreenityMain(const std::string& p_path)
+TreenityMain::TreenityMain()
 	: m_engineActions(&m_world, this)
 	, m_projectManager(&m_world)
 {
@@ -111,7 +108,7 @@ TreenityMain::TreenityMain(const std::string& p_path)
 	}
 
 	g_engineContext = libInitializeEngine(
-		RootEngine::SubsystemInit::INIT_ALL, p_path);
+		RootEngine::SubsystemInit::INIT_ALL);
 
 	// Initialize SDL.
 	if (SDL_Init(SDL_INIT_TIMER) != 0) 

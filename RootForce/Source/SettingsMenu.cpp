@@ -6,6 +6,7 @@
 #include <RootSystems/Include/Network/NetworkComponents.h>
 #include <RootEngine/Include/ResourceManager/ResourceManager.h>
 #include <RootSystems/Include/PlayerSystem.h>
+//#include <Shlobj.h>
 
 extern ECS::World* g_world;
 namespace RootForce
@@ -17,7 +18,6 @@ namespace RootForce
 		, m_chatSystem(p_chatSystem)
 	{
 		m_context = p_context;
-		m_workingDir = m_context.m_resourceManager->GetWorkingDirectory();
 		m_fullscreen = m_context.m_configManager->GetConfigValueAsBool("settings-fullscreen");
 		std::string resolutionString = m_context.m_configManager->GetConfigValueAsString("settings-resolution");
 		int splitPos = resolutionString.find('x');
@@ -34,7 +34,7 @@ namespace RootForce
 	Awesomium::JSValue SettingsMenu::RequestSettingsEvent( const Awesomium::JSArray& p_array )
 	{
 		// Reload config
-		m_context.m_configManager->LoadConfig( m_workingDir + "config.yaml");
+		m_context.m_configManager->LoadConfig( std::string(g_engineContext.m_preferenceDirectory) + "config.yaml");
 		// Update keybinding manager
 		auto map = m_context.m_configManager->GetConfigValuePairs();
 		for(auto pair : map)
@@ -76,7 +76,7 @@ namespace RootForce
 			SetValue(Awesomium::ToString(keys[i].ToString()), Awesomium::ToString(map.GetProperty(keys[i].ToString()).ToString()));
 		}
 
-		m_context.m_configManager->StoreConfig(m_workingDir + "config.yaml"); // Hardcoding config file is not nice
+		m_context.m_configManager->StoreConfig(std::string(g_engineContext.m_preferenceDirectory) + "config.yaml"); // Hardcoding config file is not nice
 	}
 
 	void SettingsMenu::FocusBindEvent(const Awesomium::JSArray& p_array)

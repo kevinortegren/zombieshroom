@@ -41,7 +41,7 @@
 class TreenityMain
 {
 public:
-	TreenityMain(const std::string& p_path);
+	TreenityMain();
 	~TreenityMain();
 
 	void HandleEditorEvents();
