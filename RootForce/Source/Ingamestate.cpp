@@ -75,7 +75,6 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("XplodingMushroomPlanted");
 		g_engineContext.m_resourceManager->LoadScript("ShroomExplosion");
 		g_engineContext.m_resourceManager->LoadScript("TotemProjectile");
-
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -216,6 +215,7 @@ namespace RootForce
 	void IngameState::Enter()
 	{
 		g_world->GetEntityManager()->CleanUp();
+		g_engineContext.m_physics->CreatePlane(glm::vec3(0,1,0), glm::vec3(0,-500,0));
 
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
