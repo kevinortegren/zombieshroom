@@ -100,7 +100,7 @@ namespace Render
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0); 
 
 		//AMD fix
-		glFlush();//AMD test
+		//glFlush();//AMD test
 
 		m_meshes[m_currentVB]->Unbind();
 
