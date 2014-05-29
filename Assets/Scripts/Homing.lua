@@ -7,7 +7,7 @@ Homing.cooldown = 1;
 Homing.charges = 3;
 Homing.chargeTime = 0;
 Homing.channelingTime = 0;
-Homing.duration = 60;
+Homing.duration = 15;
 Homing.crosshair = "crosshairPrecision";
 
 function Homing.OnLoad()
@@ -31,6 +31,17 @@ function Homing.ChannelingDone (time, userId, actionId)
 end
 
 function Homing.Interrupted (time, userId, actionId)
+end
+
+function Homing.Stop(self)
+	if Global.IsClient then
+		self:RemovePointLight();
+	end
+	local network = self:GetNetwork();
+	self:RemovePhysics();
+	self:RemoveCollision();
+	self:RemoveCollisionResponder();
+	self:GetParticleEmitter():SetAlive(-1.0);
 end
 
 function Homing.OnCreate (userId, actionId)
@@ -76,19 +87,17 @@ function Homing.OnCreate (userId, actionId)
 			local abilityOwnerPlayerComponent = abilityOwnerEntity:GetPlayerComponent();
 			if abilityOwnerPlayerComponent:GetTeamId() ~= entityAtAim:GetPlayerComponent():GetTeamId() then
 				homingComp:SetTargetEntity(entityAtAim);
-				TimerEntity.StartTimer(userId, actionId, Homing.duration, "Homing", "OnDestroy", self);
 			else
 				homingComp:SetTargetPosition(rayComp:GetHitPos());
-				TimerEntity.StartTimer(userId, actionId, 15, "Homing", "OnDestroy", self);
 			end
 		else
 			homingComp:SetTargetPosition(rayComp:GetHitPos());
-			TimerEntity.StartTimer(userId, actionId, 15, "Homing", "OnDestroy", self);
 		end
 	else
 		homingComp:SetTargetPosition(rayComp:GetHitPos());
-		TimerEntity.StartTimer(userId, actionId, 15, "Homing", "OnDestroy", self);
 	end
+	TimerEntity.StartTimer(userId, actionId, Homing.duration, "Homing", "Stop", self);
+	TimerEntity.StartTimer(userId, actionId, Homing.duration + 1, "Homing", "OnDestroy", self);
 	physicsComp:BindSphereShape(collisionComp, startPos, rotQuat, 1, 1, true, true);
 	physicsComp:SetVelocity(collisionComp, Vec3.New(dirVec.x * 50, dirVec.y * 50, dirVec.z * 50));
 	physicsComp:SetGravity(collisionComp, Vec3.New(0, 0, 0));

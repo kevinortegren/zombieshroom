@@ -296,6 +296,7 @@ namespace RootEngine
 			std::vector<KinematicController*> m_playerObjects;
 			std::vector<Ragdoll::Ragdoll*> m_ragdolls;
 			std::vector<btTriangleIndexVertexArray*> m_btTriangleIndexVertexArrays;
+			
 			float m_dt;
 			bool m_debugDrawEnabled;
 			float m_removeMeLater;

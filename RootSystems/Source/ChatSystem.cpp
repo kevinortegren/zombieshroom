@@ -18,11 +18,12 @@ namespace RootForce
 		m_hasFocus = false;
 		m_engineContext = p_engineContext;
 		
-		m_view->WaitLoading();
+		//m_view->WaitLoading();
 		m_view->Focus(); // Give the view the focus, necessary for JavaScript to catch the input events
 
 		m_view->RegisterJSCallback("Send", JSDelegate1(this, &ChatSystem::ProcessMessage));
 		m_view->RegisterJSCallback("SetFocus", JSDelegate1(this, &ChatSystem::SetFocus));
+		m_view->Update();
 	}
 
 	void RootForce::ChatSystem::JSAddMessage( std::string p_message )
@@ -37,6 +38,7 @@ namespace RootForce
 		command += p_message;
 		command += "\");";
 		m_view->BufferJavascript(command.c_str());
+		m_view->Update();
 	}
 
 	void RootForce::ChatSystem::SetFocus( const Awesomium::JSArray& p_array )
@@ -51,9 +53,7 @@ namespace RootForce
 		if(temp[0] == '/')
 		{
 			RootServer::EventData ev = RootServer::EventFromString(temp.substr(1));
-			m_eventBufferMutex.lock();
 				m_eventBuffer.push_back(ev);
-			m_eventBufferMutex.unlock();
 		}
 		else
 			m_messageBuffer.push_back(RootEngine::GUISystem::PreventHTMLInjections(Awesomium::ToString(p_array[0].ToString())));
@@ -72,18 +72,14 @@ namespace RootForce
 	{
 		if(m_eventBuffer.size() < 1)
 			return RootServer::EventData();
-		m_eventBufferMutex.lock();
 			RootServer::EventData temp = m_eventBuffer.at(0); 
 			m_eventBuffer.erase(m_eventBuffer.begin());
-		m_eventBufferMutex.unlock();
 		return temp;
 	}
 
 	void ChatSystem::InjectEvent(std::string& p_event)
 	{
-		m_eventBufferMutex.lock();
 			m_eventBuffer.push_back(RootServer::EventFromString(p_event));
-		m_eventBufferMutex.unlock();
 	}
 }
 

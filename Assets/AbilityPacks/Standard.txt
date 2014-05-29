@@ -1,14 +1,14 @@
-AbilityDash
-AbilityBall
-FireBall
-PowerRay
-RefractiveBall
-IceCube
-Homing
-SlowNova
-Boost
-MachineGun
-HealCharges
-ExplodingShroom
-AbilityTotem
-Cannonball
+AbilityDash 0.5
+AbilityBall 0.8
+FireBall 0.5
+PowerRay 0.6
+RefractiveBall 0.1
+IceCube 0.8
+Homing 0.5
+SlowNova 0.7
+Boost 0.5
+MachineGun 0.3
+HealCharges 0.3
+ExplodingShroom 0.4
+AbilityTotem 0.5
+Cannonball 0.3

@@ -42,7 +42,7 @@ namespace RootForce
 		m_loadingScreen->WaitLoading();
 		m_loadingScreen->SetActive(true);
 		g_engineContext.m_renderer->Clear();
-		g_engineContext.m_gui->Render(m_loadingScreen);
+		g_engineContext.m_gui->Render(m_loadingScreen->GetView());
 		g_engineContext.m_renderer->Swap();
 		
 		// Create a server information entity. Used for local information on a local server and used to store server info response on a remote client.

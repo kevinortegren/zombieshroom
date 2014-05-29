@@ -96,6 +96,7 @@ if entity:DoesExist() then
 			local health = entity:GetHealth();
 			if not health:IsDead() then
 				health:Damage(abilityOwnerId, dakComp:GetDamage() * entity:GetStatChange():GetDamageResistance(), "PowerRay");
+				Static.PlaySound("Abilities/SniperRay/sniperrayhit1-1.wav", 0.3, entity:GetTransformation():GetPos(), 10.0, 50.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 			end
 
 			local hitPos = entity:GetTransformation():GetPos();
@@ -103,7 +104,7 @@ if entity:DoesExist() then
 			Static.KnockBack(hitCol:GetHandle(), Vec3.New(hitPos.x-selfPos.x,2,hitPos.z-selfPos.z), dakComp:GetKnockback() * entity:GetStatChange():GetKnockbackResistance(), health:GetHealth());
 		end
 	end
-	Static.PlaySound("Abilities/SniperRay/sniperrayhit1-1.wav", 0.6, entity:GetTransformation():GetPos(), 10.0, 50.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	
 end
 end
 

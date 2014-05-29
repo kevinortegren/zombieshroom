@@ -41,6 +41,17 @@ struct EngineInterface
 	// World
 	virtual const ECS::World* GetWorld() = 0;
 
+	//Water settings
+	virtual void SetWaterParam(std::stringstream* p_ss) = 0;
+	virtual void SetWaterColor(const glm::vec3& p_color) = 0;
+	virtual float GetWaterSpeed() = 0;
+	virtual float GetWaterDepth() = 0;
+	virtual bool GetWaterNormals() = 0;
+	virtual bool GetWaterReflections() = 0;
+	virtual bool GetWaterRefractions() = 0;
+	virtual bool GetWaterPaused() = 0;
+	virtual glm::vec3 GetWaterColor() = 0;
+
 	// Transform
 	virtual void SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position) = 0;
 	virtual void TranslateEntity(ECS::Entity* p_entity, const glm::vec3& p_translation) = 0;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Awesomium/WebCore.h>
-#include <mutex>
 #include <queue>
 #include <vector>
 #include "Dispatcher.h"
@@ -68,7 +67,8 @@ namespace RootEngine
 			virtual void Focus() = 0;
 
 			virtual Awesomium::WebView* GetView() = 0;
-
+			virtual void SetView(Awesomium::WebView* p_view) = 0;
+			virtual void Update() = 0;
 			virtual void SetActive(bool p_active) = 0;
 
 			virtual void InjectKeyboardEvent(Awesomium::WebKeyboardEvent p_event) = 0;
@@ -109,7 +109,7 @@ namespace RootEngine
 			void RegisterJSCallback(std::string p_event, JSDelegate1 callback);
 			void RegisterJSCallback(std::string p_event, JSDelegate1WithRetval callback);
 
-			// Wait until the view has finished loading
+			// Wait until the view has finished loading - NOT WORKING ATM AS SUCH LEFT EMPTY
 			void WaitLoading();
 			// Give the view the focus
 			void Focus();
@@ -118,7 +118,7 @@ namespace RootEngine
 			{
 				return m_webView;
 			}
-
+			void SetView(Awesomium::WebView* p_view) {m_webView = p_view;}
 			void SetActive(bool p_active)
 			{
 				m_isActive = p_active;
@@ -126,9 +126,9 @@ namespace RootEngine
 
 			bool GetShouldResize() const { return m_shouldResize; }
 			void SetShouldResize(bool p_shouldResize) { m_shouldResize = p_shouldResize; }
-
+			void Update(); //Ugly fix, now needs to be called after each inject or callback binding
 		private:
-			void Update();
+
 			//void PushEvent(std::pair<std::string,Awesomium::JSArray> p_event);
 
 			void ProcessEvent(Awesomium::WebView* p_caller, std::string p_event, const Awesomium::JSArray& p_array);
@@ -141,14 +141,11 @@ namespace RootEngine
 
 			Awesomium::WebView* m_webView;
 			Awesomium::JSObject* m_callbackObject;
-			std::mutex m_jsBufferMutex;
 			std::vector<std::string> m_jsBuffer;
-			std::mutex m_callbackMutex;
 			std::map<std::string, JSDelegate1> m_callback;
 			std::map<std::string, JSDelegate1WithRetval> m_callbackWithRetval;
 			GUISystem::DispatcherInterface* m_dispatcher;
 			std::string m_callbackObjectName;
-			std::mutex m_injectMutex;
 			std::vector<Awesomium::WebKeyboardEvent> m_injectKeyboard;
 			std::vector<Awesomium::MouseButton> m_injectMouseDown;
 			std::vector<Awesomium::MouseButton> m_injectMouseUp;

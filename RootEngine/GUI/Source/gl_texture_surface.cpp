@@ -1,176 +1,117 @@
-#include <GL/glew.h>
+// Author: princeofcode
+// URL: https://gist.github.com/princeofcode/5133370 (02-12-2013)
 #include "gl_texture_surface.h"
 #include <iostream>
 
-//GLuint GLTextureSurface::m_bufferTexture = 0;
+GLRAMTextureSurface::GLRAMTextureSurface(int width, int height) : texture_id_(0),
+  buffer_(0), bpp_(4), rowspan_(0), width_(width), height_(height) {
+  rowspan_ = width_ * bpp_;
+  buffer_ = new unsigned char[rowspan_ * height_];
+  needs_update_ = false;
 
-GLTextureSurface::GLTextureSurface(int p_width, int p_height) : 
-	m_width(p_width), m_height(p_height)
-{
-	// Use the int-division to round downwards
-	int tilesX = (p_width-1)/TILE_SIZE+1;
-	int tilesY = (p_height-1)/TILE_SIZE+1;
-
-	m_tiles.resize(tilesX);
-	for(int x = 0; x < tilesX; x++)
-	{
-		m_tiles[x].resize(tilesY);
-	}
+  glGenTextures(1, &texture_id_);
+  glBindTexture(GL_TEXTURE_2D, texture_id_);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
+               bpp_ == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE, buffer_);
 }
 
-GLTextureSurface::~GLTextureSurface()
-{
+GLRAMTextureSurface::~GLRAMTextureSurface() {
+  glDeleteTextures(1, &texture_id_);
+  delete[] buffer_;
 }
 
-std::vector<std::vector<SurfaceTile>>* GLTextureSurface::GetTiles() const
-{
-	return const_cast<std::vector<std::vector<SurfaceTile>>*>(&m_tiles);
+GLuint GLRAMTextureSurface::GetTexture() const {
+  const_cast<GLRAMTextureSurface*>(this)->UpdateTexture();
+
+  return texture_id_;
 }
 
-void GLTextureSurface::Paint(unsigned char* p_buffer, int p_row_span, const Awesomium::Rect& p_src_rect, const Awesomium::Rect& p_dest_rect)
-{
-	for (int row = 0; row < p_dest_rect.height; ++row)
-	{
-		int tileY = (p_dest_rect.y + row)/TILE_SIZE;
-		int tileRow = p_dest_rect.y + row - tileY*TILE_SIZE;
-		int startX = p_dest_rect.x/TILE_SIZE;
-		int endX = (p_dest_rect.x + p_dest_rect.width -1)/TILE_SIZE;
+void GLRAMTextureSurface::Paint(unsigned char* src_buffer,
+                    int src_row_span,
+                    const Awesomium::Rect& src_rect,
+                    const Awesomium::Rect& dest_rect) {
+  for (int row = 0; row < dest_rect.height; row++)
+    memcpy(buffer_ + (row + dest_rect.y) * rowspan_ + (dest_rect.x * 4),
+      src_buffer + (row + src_rect.y) * src_row_span + (src_rect.x * 4),
+      dest_rect.width * 4);
 
-		for (int tileX = startX; tileX <= endX; ++tileX)
-		{
-			int tileRowStart = max(p_dest_rect.x - tileX*TILE_SIZE, 0);
-			int tileRowEnd = max(min(p_dest_rect.x + p_dest_rect.width - tileX*TILE_SIZE, TILE_SIZE), 0);
-			int srcStart = tileRowStart + tileX*TILE_SIZE - p_dest_rect.x + p_src_rect.x;
-			SurfaceTile& tile = m_tiles[tileX][tileY];
-
-			memcpy(tile.Buffer.data() + tileRow * tile.Rowspan + tileRowStart * tile.Bpp,
-				p_buffer + (row + p_src_rect.y) * p_row_span + srcStart * tile.Bpp,
-				(tileRowEnd - tileRowStart) * tile.Bpp);
-
-			tile.NeedsUpdate = true;
-		}
-	}
+  needs_update_ = true;
 }
 
-void GLTextureSurface::Scroll(int dx, int dy, const Awesomium::Rect& clip_rect)
-{
-	if (abs(dx) >= clip_rect.width || abs(dy) >= clip_rect.height)
-		return;
+void GLRAMTextureSurface::Scroll(int dx,
+                    int dy,
+                    const Awesomium::Rect& clip_rect) {
+  if (abs(dx) >= clip_rect.width || abs(dy) >= clip_rect.height)
+    return;
 
-	//m_needsUpdateMutex.lock();
+  if (dx < 0 && dy == 0) {
+    // Area shifted left by dx
+    unsigned char* tempBuffer = new unsigned char[(clip_rect.width + dx) * 4];
 
-	//if (dx < 0 && dy == 0)
-	//{
-	//	// Area shifted left by dx
-	//	unsigned char* tempBuffer = new unsigned char[(clip_rect.width + dx) * 4];
+    for (int i = 0; i < clip_rect.height; i++) {
+      memcpy(tempBuffer, buffer_ + (i + clip_rect.y) * rowspan_ +
+        (clip_rect.x - dx) * 4, (clip_rect.width + dx) * 4);
+      memcpy(buffer_ + (i + clip_rect.y) * rowspan_ + (clip_rect.x) * 4,
+        tempBuffer, (clip_rect.width + dx) * 4);
+    }
 
-	//	for (int i = 0; i < clip_rect.height; i++)
-	//	{
-	//		memcpy(tempBuffer, buffer_ + (i + clip_rect.y) * rowspan_ +
-	//		(clip_rect.x - dx) * 4, (clip_rect.width + dx) * 4);
-	//		memcpy(buffer_ + (i + clip_rect.y) * rowspan_ + (clip_rect.x) * 4,
-	//		tempBuffer, (clip_rect.width + dx) * 4);
-	//	}
+    delete[] tempBuffer;
+  } else if (dx > 0 && dy == 0) {
+    // Area shifted right by dx
+    unsigned char* tempBuffer = new unsigned char[(clip_rect.width - dx) * 4];
 
-	//	delete[] tempBuffer;
-	//}
-	//else if (dx > 0 && dy == 0)
-	//{
-	//	// Area shifted right by dx
-	//	unsigned char* tempBuffer = new unsigned char[(clip_rect.width - dx) * 4];
+    for (int i = 0; i < clip_rect.height; i++) {
+      memcpy(tempBuffer, buffer_ + (i + clip_rect.y) * rowspan_ +
+        (clip_rect.x) * 4, (clip_rect.width - dx) * 4);
+      memcpy(buffer_ + (i + clip_rect.y) * rowspan_ + (clip_rect.x + dx) * 4,
+        tempBuffer, (clip_rect.width - dx) * 4);
+    }
 
-	//	for (int i = 0; i < clip_rect.height; i++)
-	//	{
-	//		memcpy(tempBuffer, buffer_ + (i + clip_rect.y) * rowspan_ +
-	//		(clip_rect.x) * 4, (clip_rect.width - dx) * 4);
-	//		memcpy(buffer_ + (i + clip_rect.y) * rowspan_ + (clip_rect.x + dx) * 4,
-	//		tempBuffer, (clip_rect.width - dx) * 4);
-	//	}
+    delete[] tempBuffer;
+  } else if (dy < 0 && dx == 0) {
+    // Area shifted down by dy
+    for (int i = 0; i < clip_rect.height + dy ; i++)
+      memcpy(buffer_ + (i + clip_rect.y) * rowspan_ + (clip_rect.x * 4),
+      buffer_ + (i + clip_rect.y - dy) * rowspan_ + (clip_rect.x * 4),
+      clip_rect.width * 4);
+  } else if (dy > 0 && dx == 0) {
+    // Area shifted up by dy
+    for (int i = clip_rect.height - 1; i >= dy; i--)
+      memcpy(buffer_ + (i + clip_rect.y) * rowspan_ + (clip_rect.x * 4),
+      buffer_ + (i + clip_rect.y - dy) * rowspan_ + (clip_rect.x * 4),
+      clip_rect.width * 4);
+  }
 
-	//	delete[] tempBuffer;
-	//}
-	//else if (dy < 0 && dx == 0)
-	//{
-	//	// Area shifted down by dy
-	//	for (int i = 0; i < clip_rect.height + dy ; i++)
-	//		memcpy(buffer_ + (i + clip_rect.y) * rowspan_ + (clip_rect.x * 4),
-	//		buffer_ + (i + clip_rect.y - dy) * rowspan_ + (clip_rect.x * 4),
-	//		clip_rect.width * 4);
-	//}
-	//else if (dy > 0 && dx == 0)
-	//{
-	//	// Area shifted up by dy
-	//	for (int i = clip_rect.height - 1; i >= dy; i--)
-	//		memcpy(buffer_ + (i + clip_rect.y) * rowspan_ + (clip_rect.x * 4),
-	//		buffer_ + (i + clip_rect.y - dy) * rowspan_ + (clip_rect.x * 4),
-	//		clip_rect.width * 4);
-	//}
-
-	//needs_update_ = true;
-	//m_needsUpdateMutex.unlock();
+  needs_update_ = true;
 }
 
-void GLTextureSurface::UpdateTexture()
-{
-	for(auto& row : m_tiles)
-	{
-		for(SurfaceTile& tile : row)
-		{
-			if(tile.FenceID > 0 && glClientWaitSync(tile.FenceID, GL_SYNC_FLUSH_COMMANDS_BIT, 0) != GL_TIMEOUT_EXPIRED)
-			{
-				glDeleteSync(tile.FenceID);
-				tile.FenceID = 0;
-				
-				glBindTexture(GL_TEXTURE_2D, tile.Texture);
-				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, tile.PBO[!tile.ActiveBuffer]);
-
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TILE_SIZE, TILE_SIZE,
-					tile.Bpp == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE, 0);
-		
-				glBindTexture(GL_TEXTURE_2D, 0);
-				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
-				tile.ActiveBuffer = !tile.ActiveBuffer;
-			}
-			if (tile.NeedsUpdate)
-			{
-				glBindTexture(GL_TEXTURE_2D, tile.Texture);
-				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, tile.PBO[!tile.ActiveBuffer]);
-				glBufferDataARB(GL_PIXEL_UNPACK_BUFFER, tile.Buffer.size(), 0, GL_STREAM_DRAW_ARB);
-
-				GLubyte* dataPtr = (GLubyte*)glMapBufferARB(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY_ARB);
-				if(dataPtr)
-				{
-					memcpy(dataPtr, tile.Buffer.data(), tile.Buffer.size());
-				}
-				glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER);
-		
-				glBindTexture(GL_TEXTURE_2D, 0);
-				glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
-				tile.NeedsUpdate = false;
-				if(tile.FenceID > 0)
-					glDeleteSync(tile.FenceID);
-				tile.FenceID = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
-			}
-		}
-		Sleep(1);
-	}
+void GLRAMTextureSurface::UpdateTexture() {
+  if (needs_update_) {
+    glBindTexture(GL_TEXTURE_2D, texture_id_);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width_, height_,
+                      bpp_ == 3 ? GL_RGB : GL_BGRA, GL_UNSIGNED_BYTE,
+                      buffer_);
+    needs_update_ = false;
+  }
 }
 
 
-GLTextureSurfaceFactory::GLTextureSurfaceFactory()
-{
+GLTextureSurfaceFactory::GLTextureSurfaceFactory() {
 }
 
-GLTextureSurfaceFactory::~GLTextureSurfaceFactory()
-{
+GLTextureSurfaceFactory::~GLTextureSurfaceFactory() {
 }
 
-Awesomium::Surface* GLTextureSurfaceFactory::CreateSurface(Awesomium::WebView* view, int width, int height)
-{
-  return new GLTextureSurface(width, height);
+Awesomium::Surface* GLTextureSurfaceFactory::CreateSurface(Awesomium::WebView* view,
+                                          int width,
+                                          int height) {
+  return new GLRAMTextureSurface(width, height);
 }
 
-void GLTextureSurfaceFactory::DestroySurface(Awesomium::Surface* surface)
-{
-  delete static_cast<GLTextureSurface*>(surface);
+void GLTextureSurfaceFactory::DestroySurface(Awesomium::Surface* surface) {
+  delete static_cast<GLRAMTextureSurface*>(surface);
 }

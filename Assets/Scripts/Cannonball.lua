@@ -51,7 +51,7 @@ function Cannonball.Explode(self)
 	self:RemoveCollisionResponder();
 	self:GetParticleEmitter():SetAlive(-1.0);
 
-	Static.PlaySound("Abilities/Cannonball/cannonballhit1-1.wav", 1.0, self:GetTransformation():GetPos(), 10.0, 200.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
+	Static.PlaySound("Abilities/Cannonball/cannonballhit1-1.wav", 0.7, self:GetTransformation():GetPos(), 10.0, 200.0, bit32.bor(SoundMode.SOUND_LOOP_OFF, SoundMode.SOUND_3D, SoundMode.SOUND_3D_LINEARSQUAREROLLOFF));
 
 	TimerEntity.StartTimer(network:GetUserId(), network:GetActionId(), 4, "Cannonball", "OnDestroy", self);
 end

@@ -39,6 +39,17 @@ public:
 	// World
 	const ECS::World* GetWorld();
 
+	//Water settings
+	void SetWaterParam(std::stringstream* p_ss);
+	void SetWaterColor(const glm::vec3& p_color);
+	float GetWaterSpeed();
+	float GetWaterDepth();
+	bool GetWaterNormals();
+	bool GetWaterReflections();
+	bool GetWaterRefractions();
+	bool GetWaterPaused();
+	glm::vec3 GetWaterColor();
+
 	// Transform
 	void SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position);
 	void TranslateEntity(ECS::Entity* p_entity, const glm::vec3& p_translation);

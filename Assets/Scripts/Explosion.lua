@@ -7,6 +7,7 @@ Explosion.channelingTime = 0.0;
 Explosion.duration = 1.0;
 
 function Explosion.OnLoad()
+	ResourceManager.LoadTexture("Particles/smoke");
 	ResourceManager.LoadParticle("Explosion_G-stuf");
 end
 
@@ -46,7 +47,7 @@ function Explosion.OnCreate (userId, actionId)
 end
 
 function Explosion.OnCollide (self, entity)
-	--Logging.Log(LogLevel.DEBUG_PRINT, "OnCollide");
+	--Logging.Log(LogLevel.PINK_PRINT, "OnCollide");
 	if entity:DoesExist() then
 		local hitCol = entity:GetCollision();
 		local type = hitCol:GetType();

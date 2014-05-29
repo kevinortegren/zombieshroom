@@ -397,7 +397,7 @@ void Initialize(RootEngine::GameSharedContext g_engineContext)
 	m_world.GetSystemManager()->AddSystem<RootForce::ShadowSystem>(shadowSystem);
 
 	worldSystem = new RootForce::WorldSystem(&m_world, &g_engineContext);
-	worldSystem->CreateSun();
+	//worldSystem->CreateSun();
 	worldSystem->CreateSkyBox();
 	waterSystem = new RootForce::WaterSystem(&m_world, &g_engineContext);
 	waterSystem->Init();
@@ -1306,6 +1306,7 @@ void UpdateLight(int index, bool remove, bool firstTimeLoad, string type)
 
 	if(type == "DirectionalLight")
 	{
+		worldSystem->CreateSun();
 		m_world.GetEntityManager()->GetComponent<RootForce::Transform>(m_world.GetTagManager()->GetEntityByTag("Sun"))->m_position = RM.worldData->DirectionalSun.transformation.position;
 		glm::quat rot;
 		rot.x = RM.worldData->DirectionalSun.transformation.rotation.x;

@@ -80,7 +80,7 @@ namespace RootForce
 		m_networkContext.m_clientMessageHandler->SetLanList(nullptr);
 
 		// Free menu resources
-		g_engineContext.m_gui->DestroyView(m_menu->GetView());
+		g_engineContext.m_gui->DestroyView(m_menu->GetView()->GetView());
 		m_menu.reset();
 	}
 
@@ -157,7 +157,7 @@ namespace RootForce
 
 		// Render the GUI
 		g_engineContext.m_renderer->Clear();
-		g_engineContext.m_gui->Render(m_menu->GetView());
+		g_engineContext.m_gui->Render(m_menu->GetView()->GetView());
 		g_engineContext.m_renderer->Swap();
 
 		return result;

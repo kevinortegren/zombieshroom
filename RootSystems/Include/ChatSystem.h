@@ -6,7 +6,6 @@
 #include <RootEngine/GUI/Include/Dispatcher.h>
 #include <RootSystems/Include/Network/ServerEvents.h>
 #include <vector>
-#include <mutex>
 namespace RootForce
 {
 	class ChatSystem
@@ -31,7 +30,6 @@ namespace RootForce
 		RootEngine::GUISystem::WebView* m_view;
 		std::vector<std::string> m_messageBuffer;
 		std::vector<RootServer::EventData> m_eventBuffer;
-		std::mutex m_eventBufferMutex;
 		bool m_hasFocus;
 		RootEngine::GameSharedContext* m_engineContext;
 	};

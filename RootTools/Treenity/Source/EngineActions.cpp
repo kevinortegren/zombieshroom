@@ -412,6 +412,51 @@ const ECS::World* EngineActions::GetWorld()
 	return m_world;
 }
 
+//Water settings
+void EngineActions::SetWaterParam( std::stringstream* p_ss )
+{
+	m_treenityMain->GetWaterSystem()->ParseCommands(p_ss);
+}
+
+void EngineActions::SetWaterColor( const glm::vec3& p_color )
+{
+	m_treenityMain->GetWaterSystem()->SetColor(p_color);
+}
+
+float EngineActions::GetWaterSpeed()
+{
+	return m_treenityMain->GetWaterSystem()->GetSpeed();
+}
+
+float EngineActions::GetWaterDepth()
+{
+	return m_treenityMain->GetWaterSystem()->GetDepth();
+}
+
+bool EngineActions::GetWaterNormals()
+{
+	return m_treenityMain->GetWaterSystem()->GetNormals();
+}
+
+bool EngineActions::GetWaterReflections()
+{
+	return m_treenityMain->GetWaterSystem()->GetReflections();
+}
+
+bool EngineActions::GetWaterRefractions()
+{
+	return m_treenityMain->GetWaterSystem()->GetRefractions();
+}
+
+bool EngineActions::GetWaterPaused()
+{
+	return m_treenityMain->GetWaterSystem()->GetPaused();
+}
+
+glm::vec3 EngineActions::GetWaterColor()
+{
+	return m_treenityMain->GetWaterSystem()->GetColor();
+}
 // Transform
 void EngineActions::SetPosition(ECS::Entity* p_entity, const glm::vec3& p_position)
 {
@@ -864,3 +909,4 @@ std::string	EngineActions::GetParticleEmitter(ECS::Entity* p_entity)
 {
 	return m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(p_entity)->m_name;
 }
+

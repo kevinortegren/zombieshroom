@@ -19,6 +19,7 @@ function AbilityBall.OnLoad()
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("SmockeochElden");
 	ResourceManager.LoadScript("Explosion");
+	Explosion.OnLoad();
 	ResourceManager.LoadSound("Abilities/Fireball/fireballhit1-1.wav");
 	ResourceManager.LoadSound("Abilities/Fireball/fireballfly1-2.wav");
 
@@ -109,9 +110,9 @@ function AbilityBall.OnCreate (userId, actionId)
 		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
 
 		local waterCollider = WaterCollider.New(self);
-      	waterCollider:SetDisturbPower(0.8);
-      	waterCollider:SetDisturbInterval(1.5);
-      	waterCollider:SetRadius(3);
+		waterCollider:SetDisturbPower(0.8);
+		waterCollider:SetDisturbInterval(1.5);
+		waterCollider:SetRadius(3);
 	end
 end
 
