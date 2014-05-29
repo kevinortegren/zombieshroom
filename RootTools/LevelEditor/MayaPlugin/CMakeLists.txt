@@ -29,4 +29,4 @@ set(OUTPUT_FILE "C:/Program Files/Autodesk/Maya2014/bin/plug-ins/MayaPlugin.mll"
 #		MAIN_DEPENDENCY INPUT_FILE VERBATIM)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy ARGS "${CMAKE_BINARY_DIR}/Debug/MayaPlugin.dll" "C:/Program Files/Autodesk/Maya2014/bin/plug-ins/MayaPlugin.mll")
+	COMMAND ${CMAKE_COMMAND} -E copy ARGS "${CMAKE_BINARY_DIR}/Debug/MayaPlugin.dll" "E:/Program/Autodesk/Maya2014/bin/plug-ins/MayaPlugin.mll")
