@@ -64,7 +64,7 @@ namespace RootForce
 		ECS::ComponentMapper<RootForce::Network::NetworkComponent> m_network;
 		ECS::ComponentMapper<RootForce::Script> m_script;
 		ECS::ComponentMapper<RootForce::ParticleEmitter> m_particle;
-		std::vector<std::string> m_levelAbilities;
+		std::vector<std::pair<std::string,float>> m_levelAbilities;
 		std::string m_workingDir;
 
 		RakNet::RakPeerInterface* m_serverPeer;
