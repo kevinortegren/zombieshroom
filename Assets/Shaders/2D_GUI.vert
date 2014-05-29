@@ -11,5 +11,5 @@ void main()
 {
 	vert_texCoord = in_texCoord;
   vert_textureNumber = in_textureNumber;
-	gl_Position = vec4( in_position, 0.0f, 1.0f);
+	gl_Position = vec4( in_position, 0.0, 1.0);
 }

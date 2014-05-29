@@ -10,5 +10,5 @@ layout(std140) uniform PerFrame
 
 void main()
 {
-	gl_Position = projectionMatrix * viewMatrix * vec4( in_position, 1.0f );
+	gl_Position = projectionMatrix * viewMatrix * vec4( in_position, 1.0 );
 }

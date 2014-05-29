@@ -49,7 +49,7 @@ void main()
     vec2 TexelCoord = gl_FragCoord.xy / vec2(g_Width * 2, g_Height * 2);	
 
     // Inverse size of Blur Sampler.
-    float dy = 1.0f / textureSize(g_Glow, 0).y;
+    float dy = 1.0 / textureSize(g_Glow, 0).y;
 
     vec4 glow = texture(g_Glow, TexelCoord);
     vec4 scene = texture(g_Scene, TexelCoord);

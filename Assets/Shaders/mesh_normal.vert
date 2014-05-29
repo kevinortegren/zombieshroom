@@ -26,14 +26,14 @@ out vec4 view;
 
 void main()
 {
-	vert_normal = normalize( viewMatrix * normalMatrix * vec4(in_normal, 0.0f)).xyz;
-	vert_tangent = normalize( viewMatrix * normalMatrix * vec4(in_tangent, 0.0f)).xyz;
-	vert_bitangent = normalize( viewMatrix * normalMatrix * vec4(in_bitangent, 0.0f)).xyz;
+	vert_normal = normalize( viewMatrix * normalMatrix * vec4(in_normal, 0.0)).xyz;
+	vert_tangent = normalize( viewMatrix * normalMatrix * vec4(in_tangent, 0.0)).xyz;
+	vert_bitangent = normalize( viewMatrix * normalMatrix * vec4(in_bitangent, 0.0)).xyz;
 
 	vert_texcoord = in_texcoord;
 
-	view = viewMatrix * modelMatrix * vec4( in_position, 1.0f );
+	view = viewMatrix * modelMatrix * vec4( in_position, 1.0 );
 
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0 );
 
 }

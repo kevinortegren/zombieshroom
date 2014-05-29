@@ -33,5 +33,5 @@ out vec2 TexCoord_CS_in;
 void main()
 {  
 	TexCoord_CS_in	= in_texcoord;
-	WorldPos_CS_in	= (modelMatrix * vec4( in_position, 1.0f )).xyz;
+	WorldPos_CS_in	= (modelMatrix * vec4( in_position, 1.0 )).xyz;
 }

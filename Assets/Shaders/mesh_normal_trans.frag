@@ -28,7 +28,7 @@ void main()
 	vec3 glow_color = texture(g_Glow, vert_texcoord).xyz;
 
 	vec3 normalT = texture(g_Normal, vert_texcoord).xyz;
-	normalT = normalT * 2.0f - 1.0f;
+	normalT = normalT * 2.0 - 1.0;
 
 	mat3 TBNmatrix = mat3(vert_tangent, vert_bitangent, vert_normal);
 

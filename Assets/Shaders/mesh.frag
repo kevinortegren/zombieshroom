@@ -23,5 +23,5 @@ void main()
 	diffuse = vec4(diffuse_color, specTerm);
     float p = sqrt(normal.z*8+8);
     normals = normal.xy/p + 0.5;
-	glow = vec4(vec3(glow_color.xyz), 0.0f);
+	glow = vec4(vec3(glow_color.xyz), 0.0);
 }

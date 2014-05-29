@@ -26,5 +26,5 @@ void main() {
  
 	result = result / float(blurSize * blurSize);
 
-	out_Color = vec4(g_Ambient.rgb * result * texture(g_Diffuse, ex_TexCoord.st).rgb, 1.0f);
+	out_Color = vec4(g_Ambient.rgb * result * texture(g_Diffuse, ex_TexCoord.st).rgb, 1.0);
 }

@@ -43,7 +43,7 @@ vec3 GetVSPositionFromDepth(float z, vec2 screenCoord)
 	float x = screenCoord.x * 2 - 1;
 	float y = screenCoord.y * 2 - 1;
 
-	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+	vec4 vProjectedPos = vec4(x, y, z, 1.0);
 	vec4 sPos = invProj * vProjectedPos;
 
 	return (sPos.xyz / sPos.w);
@@ -51,8 +51,8 @@ vec3 GetVSPositionFromDepth(float z, vec2 screenCoord)
 
 float Fresnel(float p_dot, float p_fresnelBias, float p_fresnelPow)
 {
-	float facing = (1.0f - p_dot);
-	return max(p_fresnelBias + (1.0f - p_fresnelBias) * pow(facing, p_fresnelPow), 0.0f);
+	float facing = (1.0 - p_dot);
+	return max(p_fresnelBias + (1.0 - p_fresnelBias) * pow(facing, p_fresnelPow), 0.0);
 }
 
 vec3 convertCameraSpaceToScreenSpace(in vec3 p_cameraSpace)
@@ -87,7 +87,7 @@ void main()
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
 		normalMap 				= mix(TBN * normalT, normalMap, 0.85); //Smooth the normal from the normal map
 	}
-	vec3 viewNormal			= normalize(viewMatrix * vec4(normalMap,0.0f)).rgb;
+	vec3 viewNormal			= normalize(viewMatrix * vec4(normalMap,0.0)).rgb;
 	////////////////////////////////////////////////////////////////////////////
 	//Calculate transparent color and refraction
 	////////////////////////////////////////////////////////////////////////////
@@ -224,28 +224,28 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	//Calculate fresnel factor
 	////////////////////////////////////////////////////////////////////////////
-	float ndotl		= max(dot(normalize(gEyeWorldPos - WorldPos_FS_in), normalMap), 0.0f);
-	float fresnel	= Fresnel(ndotl, 0.2f, 6.0f);
+	float ndotl		= max(dot(normalize(gEyeWorldPos - WorldPos_FS_in), normalMap), 0.0);
+	float fresnel	= Fresnel(ndotl, 0.2, 6.0);
 
 	////////////////////////////////////////////////////////////////////////////
 	//Lerp water color and refraction color
 	////////////////////////////////////////////////////////////////////////////
 	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - viewSpacePosition.z);
-	float distFac = clamp(gOptions.z*vdist, 0.0f, 1.0f);
+	float distFac = clamp(gOptions.z*vdist, 0.0, 1.0);
 	
 	vec3 waterColor	= mix(refractionColor, vec3(0, 0.15f, 0.115f), distFac);
 
 	////////////////////////////////////////////////////////////////////////////
 	//Water foam
 	////////////////////////////////////////////////////////////////////////////
-	//vec3 foamWaterColor  = texture(g_Specular, TexCoord_FS_in*256.0f).rgb;  calculations
-	//float foamDistFac = clamp(0.05f*vdist, 0.0f, 1.0f);
+	//vec3 foamWaterColor  = texture(g_Specular, TexCoord_FS_in*256.0).rgb;  calculations
+	//float foamDistFac = clamp(0.05f*vdist, 0.0, 1.0);
 	//waterColor = mix(foamWaterColor, waterColor, foamDistFac);
 
 	////////////////////////////////////////////////////////////////////////////
 	//Calculate result diffuse color
 	////////////////////////////////////////////////////////////////////////////
-	vec4 result = vec4(mix(waterColor, reflectionColor, fresnel), 1.0f);
+	vec4 result = vec4(mix(waterColor, reflectionColor, fresnel), 1.0);
 
 	////////////////////////////////////////////////////////////////////////////
 	//Lighting

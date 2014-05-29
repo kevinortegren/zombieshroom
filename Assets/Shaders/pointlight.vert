@@ -43,8 +43,8 @@ out PointLight ex_Light;
 void main() {
 
 	ex_Light = plights[gl_InstanceID];
-	ex_Light.LightPosition = (viewMatrix * vec4(ex_Light.LightPosition, 1.0f)).xyz; 
+	ex_Light.LightPosition = (viewMatrix * vec4(ex_Light.LightPosition, 1.0)).xyz; 
     ex_TexCoord = in_TexCoord;
     
-    gl_Position = projectionMatrix * viewMatrix * ex_Light.Transform * vec4(in_PositionM, 1.0f);
+    gl_Position = projectionMatrix * viewMatrix * ex_Light.Transform * vec4(in_PositionM, 1.0);
 }
