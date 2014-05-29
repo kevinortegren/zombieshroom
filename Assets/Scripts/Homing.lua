@@ -37,7 +37,6 @@ function Homing.Stop(self)
 	if Global.IsClient then
 		self:RemovePointLight();
 	end
-	local network = self:GetNetwork();
 	self:RemovePhysics();
 	self:RemoveCollision();
 	self:RemoveCollisionResponder();
