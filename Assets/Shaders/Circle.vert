@@ -22,7 +22,7 @@ out float viewZ;
 
 void main()
 {
-	viewZ = (viewMatrix * modelMatrix * vec4( in_position, 1.0f )).z;
+	viewZ = (viewMatrix * modelMatrix * vec4( in_position, 1.0 )).z;
 
 
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(in_position, 1.0);

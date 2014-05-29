@@ -35,7 +35,7 @@ void main()
 	n.z = d-c; //dz
 	n.y = dx*2;
 	n = normalize(n);
-	imageStore(normalTex, storePos, vec4(n * 0.5 + 0.5, 0.0f));
+	imageStore(normalTex, storePos, vec4(n * 0.5 + 0.5, 0.0));
 	*/
 	vec4 storeVar = vec4(b-a, d-c, 0.0, 0.0);
 	imageStore(normalTex, storePos, storeVar);

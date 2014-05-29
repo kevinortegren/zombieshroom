@@ -53,5 +53,5 @@ void main()
 	//Calc new vertex position                             
     WorldPos_FS_in = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]) + vec3(0, height, 0);    
                                
-    gl_Position = projectionMatrix * viewMatrix * vec4(WorldPos_FS_in, 1.0f);                                              
+    gl_Position = projectionMatrix * viewMatrix * vec4(WorldPos_FS_in, 1.0);                                              
 }                                       

@@ -25,11 +25,11 @@ void main()
 {
 	for(int i = 0; i < gl_VerticesIn; ++i)
 	{
-		gl_Position = projectionMatrix * viewMatrix * vec4(WorldPos_FS_in[i], 1.0f);
+		gl_Position = projectionMatrix * viewMatrix * vec4(WorldPos_FS_in[i], 1.0);
 		vert_color = vec4(0,0,1,1);
 		EmitVertex();
 
-		gl_Position = projectionMatrix * viewMatrix * (vec4(WorldPos_FS_in[i], 1.0f) + vec4(Normal_FS_in[i], 0.0f) * 0.4f);
+		gl_Position = projectionMatrix * viewMatrix * (vec4(WorldPos_FS_in[i], 1.0) + vec4(Normal_FS_in[i], 0.0) * 0.4f);
 		vert_color = vec4(1,0,0,1);
 		EmitVertex();
 

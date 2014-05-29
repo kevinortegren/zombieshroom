@@ -57,7 +57,7 @@ void main()
         vec2 TexelCoord = gl_FragCoord.xy / vec2(g_Width, g_Height);	
 
         // Inverse size of Glow Sampler.
-        float dx = 1.0f / textureSize(g_Glow, 0).x;
+        float dx = 1.0 / textureSize(g_Glow, 0).x;
 
         vec4 blur = texture(g_Glow, TexelCoord) * g_Gauss[0];
 

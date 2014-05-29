@@ -31,5 +31,5 @@ void main()
 	vert_rotation = in_rot;
 	vert_rotationSpeed = in_rotSpeed;
 
-	gl_Position = vec4( in_initialPos, 1.0f );
+	gl_Position = vec4( in_initialPos, 1.0 );
 }

@@ -12,5 +12,5 @@ void main()
 	cs_normal_in = in_normal;
 	cs_texcoord_in = in_texcoord;
     
-	gl_Position = vec4(in_position, 1.0f);
+	gl_Position = vec4(in_position, 1.0);
 }

@@ -17,5 +17,5 @@ out vec4 vert_color;
 
 void main()
 {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f );
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0 );
 }

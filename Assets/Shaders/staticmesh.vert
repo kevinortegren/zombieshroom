@@ -16,11 +16,11 @@ out vec4 view;
 
 void main()
 {
-	vert_normal = normalize( viewMatrix * vec4(in_normal, 0.0f)).xyz;
+	vert_normal = normalize( viewMatrix * vec4(in_normal, 0.0)).xyz;
 	vert_texcoord = in_texcoord;
 
-	view = viewMatrix * vec4( in_position, 1.0f );
+	view = viewMatrix * vec4( in_position, 1.0 );
 
-	gl_Position = projectionMatrix * viewMatrix * vec4( in_position, 1.0f );
+	gl_Position = projectionMatrix * viewMatrix * vec4( in_position, 1.0 );
 
 }

@@ -16,5 +16,5 @@ layout(std140) uniform PerObject
 
 void main()
 {
-	gl_Position = viewMatrix * modelMatrix * vec4( in_position, 1.0f );
+	gl_Position = viewMatrix * modelMatrix * vec4( in_position, 1.0 );
 }

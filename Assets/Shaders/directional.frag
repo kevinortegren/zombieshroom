@@ -69,7 +69,7 @@ vec3 GetVSPositionFromDepth()
 	float x = ex_TexCoord.x * 2 - 1;
 	float y = ex_TexCoord.y * 2 - 1;
 
-	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+	vec4 vProjectedPos = vec4(x, y, z, 1.0);
 	vec4 sPos = invProj * vProjectedPos;
 
 	return (sPos.xyz / sPos.w);
@@ -166,7 +166,7 @@ void main() {
 	colors[3] = vec3(0.0, 1.0, 1.0);
 	float offsets[CASCADES];
 	int cascade = 0;
-	float visibility = 0.0f;
+	float visibility = 0.0;
 	int useCascade;
 
 	for(cascade = 0; cascade < CASCADES; cascade++)
@@ -209,7 +209,7 @@ void main() {
     float transFactor = clamp(EdotL * LdotN, 0.0, 1.0) * translucency;
     float diffuseFactor = max(0.0, dot( normalize( vert_lightVec ), normal ));
     
-	vec3 spec_color = ex_Light.Color.xyz * specTerm * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0f);
+	vec3 spec_color = ex_Light.Color.xyz * specTerm * pow(clamp(dot(normal, halfVector), 0.0, 1.0), 128.0);
 	vec3 diffuse_color = clamp(diffuseFactor + transFactor, 0.0, 1.0) * diffuse * ex_Light.Color.xyz;
 
 	out_Color = vec4(diffuse_color + spec_color, 1.0);

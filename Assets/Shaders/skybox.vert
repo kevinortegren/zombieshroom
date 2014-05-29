@@ -17,9 +17,9 @@ out vec3 vert_texcoord;
 
 void main()
 {
-	vec3 pos = (projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0f )).xyz;
+	vec3 pos = (projectionMatrix * viewMatrix * modelMatrix * vec4( in_position, 1.0 )).xyz;
 
-	gl_Position = vec4(pos.xyz, pos.z + 0.001f);
+	gl_Position = vec4(pos.xyz, pos.z + 0.001);
 
 	vert_texcoord = in_position.xyz;	
 }

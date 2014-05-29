@@ -36,5 +36,5 @@ void main()
         gs_lod_in = 2.0;
     }
     
-	gl_Position = vec4(in_position, 1.0f);
+	gl_Position = vec4(in_position, 1.0);
 }
