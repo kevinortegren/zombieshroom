@@ -109,9 +109,9 @@ function AbilityBall.OnCreate (userId, actionId)
 		pointlightComp:SetAttenuation(Vec3.New(0.5, 0.15, 0.005));
 
 		local waterCollider = WaterCollider.New(self);
-      	waterCollider:SetDisturbPower(0.8);
-      	waterCollider:SetDisturbInterval(1.5);
-      	waterCollider:SetRadius(3);
+		waterCollider:SetDisturbPower(0.8);
+		waterCollider:SetDisturbInterval(1.5);
+		waterCollider:SetRadius(3);
 	end
 end
 
