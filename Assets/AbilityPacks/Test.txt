@@ -1,2 +1,2 @@
-AbilityBall
-RefractiveBall
+AbilityBall 0.9
+RefractiveBall 0.01

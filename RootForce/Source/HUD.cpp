@@ -59,6 +59,7 @@ namespace RootForce
 	void HUD::Update()
 	{
 		m_view->BufferJavascript(m_commandBuffer);
+		m_view->Update();
 		m_commandBuffer = "";
 	}
 

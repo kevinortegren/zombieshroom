@@ -91,12 +91,18 @@ namespace RootForce
 		std::ifstream file(m_workingDir + "Assets/AbilityPacks/" + p_abilityPack + ".txt");
 		if(file.is_open())
 		{
-			std::string temp;
-			while(std::getline(file, temp))
+			std::string line;
+			while(std::getline(file, line))
 			{
-				m_levelAbilities.push_back(temp);
-				m_engineContext->m_resourceManager->LoadScript(temp);
-				m_engineContext->m_script->SetFunction(temp, "OnLoad");
+				std::istringstream buffer(line);
+				std::istream_iterator<std::string> beg(buffer), end;
+				std::vector<std::string> token(beg, end);
+				if(token.size() < 2) //Make sure the line is not empty
+					break;
+
+				m_levelAbilities.push_back(std::pair<std::string,float>(token[0], (float)std::atof(token[1].c_str())));
+				m_engineContext->m_resourceManager->LoadScript(token[0]);
+				m_engineContext->m_script->SetFunction(token[0], "OnLoad");
 				m_engineContext->m_script->ExecuteScript();
 			}
 			m_engineContext->m_logger->LogText(LogTag::GAME, LogLevel::DEBUG_PRINT, "Succesfully loaded the ability pack");
@@ -170,11 +176,19 @@ namespace RootForce
 			Network::NetworkComponent* network = m_network.Get(p_entity);
 
 			//Get a new random ability from the pack
+			
+			float spawnRate = (float)(rand()%100)/100.0f;
 			unsigned chosenSpawn = rand()%m_levelAbilities.size();
+			int counter = 0;
+			while(m_levelAbilities.at(chosenSpawn).second < spawnRate && counter < 100)
+			{
+				chosenSpawn = rand()%m_levelAbilities.size();
+				counter++;
+			}
 
 			RootForce::NetworkMessage::AbilitySpawn m;
 			m.ID = network->ID;
-			m.AbilityName = RakNet::RakString(m_levelAbilities.at(chosenSpawn).c_str());
+			m.AbilityName = RakNet::RakString(m_levelAbilities.at(chosenSpawn).first.c_str());
 
 			RakNet::BitStream bs;
 			bs.Write((RakNet::MessageID) ID_TIMESTAMP);

@@ -19,6 +19,7 @@ function AbilityBall.OnLoad()
 	ResourceManager.LoadEffect("Mesh_NormalMap");
 	ResourceManager.LoadParticle("SmockeochElden");
 	ResourceManager.LoadScript("Explosion");
+	Explosion.OnLoad();
 	ResourceManager.LoadSound("Abilities/Fireball/fireballhit1-1.wav");
 	ResourceManager.LoadSound("Abilities/Fireball/fireballfly1-2.wav");
 

@@ -557,7 +557,7 @@ namespace Physics
 		userPointer->m_entity = nullptr;
 		*(userPointer->m_id) = m_userPointer.size()-1;
 		planeBody->setUserPointer((void*)userPointer);
-
+		m_dynamicObjects.push_back(planeBody);
 	}
 
 

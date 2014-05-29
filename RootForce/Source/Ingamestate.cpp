@@ -75,7 +75,6 @@ namespace RootForce
 		g_engineContext.m_resourceManager->LoadScript("XplodingMushroomPlanted");
 		g_engineContext.m_resourceManager->LoadScript("ShroomExplosion");
 		g_engineContext.m_resourceManager->LoadScript("TotemProjectile");
-
 		// Initialize the player control system.
 		m_playerControlSystem = std::shared_ptr<RootForce::PlayerControlSystem>(new RootForce::PlayerControlSystem(g_world));
 		m_playerControlSystem->SetInputInterface(g_engineContext.m_inputSys);
@@ -216,6 +215,7 @@ namespace RootForce
 	void IngameState::Enter()
 	{
 		g_world->GetEntityManager()->CleanUp();
+		g_engineContext.m_physics->CreatePlane(glm::vec3(0,1,0), glm::vec3(0,-500,0));
 
 		m_shadowSystem->SetQuadTree(m_sharedSystems.m_worldSystem->GetQuadTree());
 
@@ -339,11 +339,11 @@ namespace RootForce
 		Network::NetworkComponent::s_sequenceIDMap.clear();
 
 		// Destroy the ingame GUI views.
-		g_engineContext.m_gui->DestroyView(m_hud->GetView());
+		g_engineContext.m_gui->DestroyView(m_hud->GetView()->GetView());
 #ifdef _DEBUG
-		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView());
+		g_engineContext.m_gui->DestroyView(g_engineContext.m_debugOverlay->GetView()->GetView());
 #endif
-		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView());
+		g_engineContext.m_gui->DestroyView(m_ingameMenu->GetView()->GetView());
 
 		// Unset the variables stored by the HUD manager.
 		m_hudManager->SetHUD(nullptr);
@@ -397,7 +397,7 @@ namespace RootForce
 			m_ingameMenu->Update();
 			if (m_displayIngameMenu)
 			{
-				g_engineContext.m_gui->Render(m_ingameMenu->GetView());
+				g_engineContext.m_gui->Render(m_ingameMenu->GetView()->GetView());
 				m_ingameMenu->GetView()->Focus();
 
 				
@@ -410,7 +410,7 @@ namespace RootForce
 					m_hud->GetView()->SetActive(m_displayGuiHUD);
 					m_hud->GetView()->Focus();
 					if(m_displayGuiHUD)
-						g_engineContext.m_gui->Render(m_hud->GetView());
+						g_engineContext.m_gui->Render(m_hud->GetView()->GetView());
 				}
 #ifdef _DEBUG
 				{
@@ -418,7 +418,7 @@ namespace RootForce
 
 					g_engineContext.m_debugOverlay->GetView()->SetActive(m_displayDebugHUD);
 					if(m_displayDebugHUD)
-						g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView());
+						g_engineContext.m_gui->Render(g_engineContext.m_debugOverlay->GetView()->GetView());
 				}
 #endif
 			}
