@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <string>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/Memory/MemoryTracker.h>
 #include <RootEngine/Include/ConfigManager.h>
@@ -14,6 +14,8 @@ namespace RootEngine
 
 	struct SubsystemSharedContext
 	{
+		const char* m_workingDirectory;
+		const char* m_preferenceDirectory;
 		Logging* m_logger;
 
 		MemoryTracker* m_memTracker;

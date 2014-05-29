@@ -15,15 +15,10 @@ int main(int argc, char* argv[])
 {
 #ifndef _DEBUG
 	FreeConsole();
-#endif
-	std::string path(argv[0]);
-	std::string rootforcename = "Rootforce.exe";
-	path = path.substr(0, path.size() - rootforcename.size());
-#ifndef _DEBUG
 	try 
 #endif
 	{
-		RootForce::Main m(path);
+		RootForce::Main m;
 		m.Start();
 	}
 #ifndef _DEBUG
@@ -46,10 +41,9 @@ int main(int argc, char* argv[])
 
 namespace RootForce
 {
-	Main::Main(std::string p_workingDirectory) 
+	Main::Main() 
 		: m_running(true)
 	{
-		m_workingDirectory = p_workingDirectory;
 		g_world = &m_world;
 
 		srand((unsigned)time(NULL));
@@ -69,7 +63,7 @@ namespace RootForce
 			throw std::runtime_error("Failed to load RootEngine - please check your installation");
 		}
 
-		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL, p_workingDirectory);
+		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL);
 
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
 		{
@@ -121,7 +115,7 @@ namespace RootForce
 		m_connectingState = std::shared_ptr<ConnectingState>(new ConnectingState(m_networkContext, m_sharedSystems));
 		m_ingameState = std::shared_ptr<IngameState>(new IngameState(m_networkContext, m_sharedSystems, m_keymapper));
 
-		m_menuState->Initialize(m_workingDirectory);
+		m_menuState->Initialize(g_engineContext.m_workingDirectory);
 		m_connectingState->Initialize();
 		m_ingameState->Initialize();
 

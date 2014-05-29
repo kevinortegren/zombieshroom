@@ -49,6 +49,8 @@ namespace RootEngine
 
 	struct GameSharedContext
 	{
+		const char* m_workingDirectory;
+		const char* m_preferenceDirectory;
 		Logging* m_logger;
 		MemoryTracker* m_memTracker;
 		ConfigManagerInterface* m_configManager;

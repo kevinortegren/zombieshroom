@@ -28,13 +28,12 @@ namespace RootForce
 	class Main 
 	{
 	public:
-		Main(std::string p_workingDirectory);
+		Main();
 		~Main();
 
 		void Start();
 	private:
         bool m_running;
-		std::string m_workingDirectory;
         void* m_engineModule;
         std::shared_ptr<SDL_Window> m_window;
 
