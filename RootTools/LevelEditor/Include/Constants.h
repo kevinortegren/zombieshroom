@@ -15,8 +15,8 @@ const int g_shortMaxNameLength = 15;
 const int g_maxPathLength = 150;
 const int g_maxNrOfFlags = 2;
 const int g_maxLocators = 50;
-const string g_savepath = "C:/Users/BTH/Documents/Output/Assets/"; 
-const string g_textureLookPath = "C:/ZombieShroom/LevelEditor/Assets/Textures/";
+const string g_savepath = "E:/Users/Putte/Documents/zombieshroomTreenity/Assets/";
+const string g_textureLookPath = "E:/Users/Putte/Documents/zombieshroomTreenity/Assets/Textures/";
 
 const string g_levelName = "CaveTestV1";
 

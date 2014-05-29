@@ -23,6 +23,7 @@
 #include <RootTools/Treenity/Include/AssetManagerWidget.h>
 #include <RootTools/Treenity/Include/ToolManager.h>
 #include <RootTools/Treenity/Include/VerticalScrollArea.h>
+#include <RootTools/Treenity/Include/WaterTool.h>
 
 class Treenity : public QMainWindow, public EditorInterface
 {
@@ -105,6 +106,7 @@ private:
 
 	ToolMode::ToolMode m_toolMode;
 
+	WaterTool* m_waterToolDockable;
 protected:
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);

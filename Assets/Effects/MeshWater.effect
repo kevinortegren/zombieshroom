@@ -23,6 +23,8 @@
             offset: 176
           - sem: LIFETIMEMAX
             offset: 188
+          - sem: GRAVITY
+            offset: 192
       textures:
           - name: g_SceneNormals
             slot: 1
