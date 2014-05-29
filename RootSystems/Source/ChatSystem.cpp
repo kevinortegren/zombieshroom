@@ -53,9 +53,7 @@ namespace RootForce
 		if(temp[0] == '/')
 		{
 			RootServer::EventData ev = RootServer::EventFromString(temp.substr(1));
-			m_eventBufferMutex.lock();
 				m_eventBuffer.push_back(ev);
-			m_eventBufferMutex.unlock();
 		}
 		else
 			m_messageBuffer.push_back(RootEngine::GUISystem::PreventHTMLInjections(Awesomium::ToString(p_array[0].ToString())));
@@ -74,18 +72,14 @@ namespace RootForce
 	{
 		if(m_eventBuffer.size() < 1)
 			return RootServer::EventData();
-		m_eventBufferMutex.lock();
 			RootServer::EventData temp = m_eventBuffer.at(0); 
 			m_eventBuffer.erase(m_eventBuffer.begin());
-		m_eventBufferMutex.unlock();
 		return temp;
 	}
 
 	void ChatSystem::InjectEvent(std::string& p_event)
 	{
-		m_eventBufferMutex.lock();
 			m_eventBuffer.push_back(RootServer::EventFromString(p_event));
-		m_eventBufferMutex.unlock();
 	}
 }
 

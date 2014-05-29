@@ -29,10 +29,7 @@ namespace RootEngine
 		}
 		void WebViewImpl::WaitLoading()
 		{
-			while(!m_webView || m_webView->IsLoading())
-			{
-				Sleep(100);
-			}
+
 		}
 		void WebViewImpl::Focus()
 		{

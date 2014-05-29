@@ -109,7 +109,7 @@ namespace RootEngine
 			void RegisterJSCallback(std::string p_event, JSDelegate1 callback);
 			void RegisterJSCallback(std::string p_event, JSDelegate1WithRetval callback);
 
-			// Wait until the view has finished loading
+			// Wait until the view has finished loading - NOT WORKING ATM AS SUCH LEFT EMPTY
 			void WaitLoading();
 			// Give the view the focus
 			void Focus();
@@ -126,7 +126,7 @@ namespace RootEngine
 
 			bool GetShouldResize() const { return m_shouldResize; }
 			void SetShouldResize(bool p_shouldResize) { m_shouldResize = p_shouldResize; }
-			void Update();
+			void Update(); //Ugly fix, now needs to be called after each inject or callback binding
 		private:
 
 			//void PushEvent(std::pair<std::string,Awesomium::JSArray> p_event);
