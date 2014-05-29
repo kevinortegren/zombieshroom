@@ -10,7 +10,18 @@ namespace RootForce
 {
 
 	WaterSystem::WaterSystem( ECS::World* p_world, RootEngine::GameSharedContext* p_context ) 
-		: ECS::EntitySystem(p_world), m_context(p_context), m_world(p_world), m_wireFrame(false), m_scale(1.0f), m_renderable(nullptr), m_pause(true), m_totalTime(0.0f), m_waterOptions(glm::vec4(0.0f, 0.0f, 0.06f, 0.0f)), m_playerWaterDeath(true), m_showDebugDraw(false)
+		: ECS::EntitySystem(p_world),
+		m_context(p_context),
+		m_world(p_world),
+		m_wireFrame(false),
+		m_scale(1.0f),
+		m_renderable(nullptr), 
+		m_pause(true),
+		m_totalTime(0.0f),
+		m_waterOptions(glm::vec4(0.0f, 0.0f, 0.06f, 0.0f)),
+		m_playerWaterDeath(true),
+		m_showDebugDraw(false),
+		m_color(glm::vec3(0.0f, 0.15f, 0.115f))
 	{
 		SetUsage<RootForce::Transform>();
 		SetUsage<RootForce::WaterCollider>();
@@ -204,6 +215,8 @@ namespace RootForce
 		m_renderable->m_params[Render::Semantic::COLOREND] = &m_context->m_renderer->GetDirectionalLight()->m_color;
 		m_renderable->m_params[Render::Semantic::DIRECTION] = &m_context->m_renderer->GetDirectionalLight()->m_direction;
 
+		//Water surface color 
+		m_renderable->m_params[Render::Semantic::GRAVITY] = &m_color;
 		//Camera position in world space
 		m_renderable->m_params[Render::Semantic::EYEWORLDPOS]					= &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position; 
 		m_renderable->m_material->m_effect										= m_context->m_resourceManager->LoadEffect("MeshWater");
@@ -760,5 +773,49 @@ namespace RootForce
 		}
 	}
 	#endif
+
+	float WaterSystem::GetSpeed()
+	{
+		return m_speed;
+	}
+
+	float WaterSystem::GetDepth()
+	{
+		return m_waterOptions.z;
+	}
+
+	bool WaterSystem::GetNormals()
+	{
+		return (m_waterOptions.y == 0.0f);
+	}
+
+	bool WaterSystem::GetReflections()
+	{
+		return (m_waterOptions.x == 0.0f);
+	}
+
+	bool WaterSystem::GetRefractions()
+	{
+		return (m_waterOptions.w == 0.0f);
+	}
+
+	bool WaterSystem::GetPaused()
+	{
+		return m_pause;
+	}
+
+	glm::vec3 WaterSystem::GetColor()
+	{
+		return m_color;
+	}
+
+	void WaterSystem::SetColor( const glm::vec3& p_color )
+	{
+		ECS::Entity* waterEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+		if(waterEnt == nullptr)
+			return;
+
+		m_color = p_color;
+	}
 
 }

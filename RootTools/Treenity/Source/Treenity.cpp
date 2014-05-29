@@ -95,6 +95,9 @@ Treenity::Treenity(QWidget *parent)
 	
 	ui.treeView_entityOutliner->SetEditorInterface(this);
 
+	//Set up water tool
+	m_waterToolDockable = new WaterTool(this);
+
 	// Match signals with slots.
 	connect(ui.actionNew,							SIGNAL(triggered()),		this,					SLOT(New()));
 	connect(ui.actionOpen_Project,					SIGNAL(triggered()),		this,					SLOT(OpenProject()));
@@ -115,7 +118,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
 	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
 	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
-	
+	connect(ui.actionWaterSetting,					SIGNAL(triggered()),		m_waterToolDockable,	SLOT(Show()));
 
 	connect(m_componentViews[RootForce::ComponentType::RENDERABLE],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveRenderable(ECS::Entity*)));
 	connect(m_componentViews[RootForce::ComponentType::COLLISION],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemovePhysics(ECS::Entity*))); 
@@ -130,6 +133,7 @@ Treenity::Treenity(QWidget *parent)
 	// Set tool mode.
 	m_toolMode = ToolMode::LOCAL;
 }
+
 
 Treenity::~Treenity()
 {
@@ -146,6 +150,7 @@ void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 		it.second->SetEngineInterface(p_engineInterface);
 	}
 	ui.widget_canvas3D->SetEngineInterface(p_engineInterface);
+	m_waterToolDockable->SetEngineInterface(p_engineInterface);
 }
 
 void Treenity::SetProjectManager(ProjectManager* p_projectManager)

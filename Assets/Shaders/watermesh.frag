@@ -32,6 +32,7 @@ layout(std140) uniform PerObject
 	vec4 SunColor;
 	vec3 SunDirection;
 	float dx2; //Length between height values
+	vec3 g_waterColor;
 };    
 
 //vec4 LightColor;
@@ -233,7 +234,7 @@ void main()
 	float vdist = abs(GetVSPositionFromDepth(refractionDepth, screenTexCoord).z - viewSpacePosition.z);
 	float distFac = clamp(gOptions.z*vdist, 0.0f, 1.0f);
 	
-	vec3 waterColor	= mix(refractionColor, vec3(0, 0.15f, 0.115f), distFac);
+	vec3 waterColor	= mix(refractionColor, g_waterColor, distFac);
 
 	////////////////////////////////////////////////////////////////////////////
 	//Water foam

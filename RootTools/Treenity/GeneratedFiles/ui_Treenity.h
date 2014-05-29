@@ -53,6 +53,7 @@ public:
     QAction *action_addWaterCollider;
     QAction *action_addScript;
     QAction *action_collisionResponder;
+    QAction *actionWaterSetting;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     Canvas3D *widget_canvas3D;
@@ -146,12 +147,15 @@ public:
         action_addScript->setObjectName(QStringLiteral("action_addScript"));
         action_collisionResponder = new QAction(TreenityClass);
         action_collisionResponder->setObjectName(QStringLiteral("action_collisionResponder"));
+        actionWaterSetting = new QAction(TreenityClass);
+        actionWaterSetting->setObjectName(QStringLiteral("actionWaterSetting"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
         verticalLayout_2->setSpacing(0);
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         widget_canvas3D = new Canvas3D(centralWidget);
         widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -232,8 +236,9 @@ public:
         dockWidgetContents_4->setObjectName(QStringLiteral("dockWidgetContents_4"));
         verticalLayout_3 = new QVBoxLayout(dockWidgetContents_4);
         verticalLayout_3->setSpacing(0);
-        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         treeView_entityOutliner = new EntityOutliner(dockWidgetContents_4);
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
         __qtreewidgetitem->setText(0, QStringLiteral("1"));
@@ -277,8 +282,9 @@ public:
         dockWidgetContents_6->setAcceptDrops(true);
         verticalLayout = new QVBoxLayout(dockWidgetContents_6);
         verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
         groupBox = new QGroupBox(dockWidgetContents_6);
         groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setMaximumSize(QSize(16777215, 120));
@@ -311,8 +317,9 @@ public:
         dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
         verticalLayout_5 = new QVBoxLayout(dockWidgetContents);
         verticalLayout_5->setSpacing(0);
-        verticalLayout_5->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        verticalLayout_5->setContentsMargins(0, 0, 0, 0);
         verticalLayout_assetManager = new QVBoxLayout();
         verticalLayout_assetManager->setSpacing(0);
         verticalLayout_assetManager->setObjectName(QStringLiteral("verticalLayout_assetManager"));
@@ -341,6 +348,7 @@ public:
         menu_addComponent->addAction(action_addScript);
         menu_addComponent->addAction(action_collisionResponder);
         menuView->addAction(actionLog);
+        menuView->addAction(actionWaterSetting);
         mainToolBar->addAction(actionPlay);
 
         retranslateUi(TreenityClass);
@@ -387,6 +395,7 @@ public:
         action_addWaterCollider->setText(QApplication::translate("TreenityClass", "Water Collider", 0));
         action_addScript->setText(QApplication::translate("TreenityClass", "Script", 0));
         action_collisionResponder->setText(QApplication::translate("TreenityClass", "Collision responder", 0));
+        actionWaterSetting->setText(QApplication::translate("TreenityClass", "Water settings", 0));
         pushButton_translateMode->setText(QString());
         pushButton_rotateMode->setText(QString());
         pushButton_scaleMode->setText(QString());
