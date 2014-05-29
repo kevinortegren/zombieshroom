@@ -663,6 +663,11 @@
     <string>Particle</string>
    </property>
   </action>
+  <action name="actionWaterSetting">
+   <property name="text">
+    <string>Water settings</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
