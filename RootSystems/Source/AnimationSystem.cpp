@@ -35,7 +35,9 @@ namespace RootForce
 				animSpeed = statComp->SpeedChange;
 
 			UpdateUpperBodyAnimation(renderable, animation, TicksPerSecond, animSpeed);
-			UpdateLowerBodyAnimation(renderable, animation, TicksPerSecond, animSpeed);
+			
+			if(!UpdateLowerBodyAnimation(renderable, animation, TicksPerSecond, animSpeed))
+				return;
 
 			if(animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL || animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 				return;
@@ -47,13 +49,13 @@ namespace RootForce
 	}
 
 	//UPPER
-	void AnimationSystem::UpdateUpperBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
+	bool AnimationSystem::UpdateUpperBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
 	{
 		if(p_animation->UpperBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 		{
 			p_animation->UpperBodyAnim.m_locked = false;
 			p_animation->UpperBodyAnim.m_blending = false;
-			return;
+			return false;
 		}
 
 		//If animation switched, start new clip
@@ -74,9 +76,8 @@ namespace RootForce
 			if(p_animation->UpperBodyAnim.m_locked && p_animation->UpperBodyAnim.m_animTime * p_ticksPerSecond >= (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_duration)
 			{
 				//m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::IDENTIFY_PRINT, "Unlocked");
-
 				p_animation->UpperBodyAnim.m_locked = false;
-				return;
+				return false;
 			}
 		}
 		else
@@ -91,22 +92,23 @@ namespace RootForce
 
 		float TimeInTicks		= p_animation->UpperBodyAnim.m_animTime * p_ticksPerSecond;
 		m_upperAnimTime			= ((float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_startTime) + fmod(TimeInTicks, (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->UpperBodyAnim.m_animClip)->m_duration);
+
+		return true;
 	}
 
 	//LOWER
-	void AnimationSystem::UpdateLowerBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
+	bool AnimationSystem::UpdateLowerBodyAnimation( Renderable* p_renderable, Animation* p_animation, float p_ticksPerSecond, float p_animationSpeed )
 	{
 		if(p_animation->LowerBodyAnim.m_animClip == AnimationClip::RAGDOLL)
 		{
 			p_animation->LowerBodyAnim.m_locked = false;
 			p_animation->LowerBodyAnim.m_blending = false;
-			return;
+			return false;
 		}
 
 		//If animation switched, start new clip
 		if(p_animation->LowerBodyAnim.m_animClip != p_animation->LowerBodyAnim.m_prevAnimClip)
 		{
-			//m_context->m_logger->LogText(LogTag::ANIMATION, LogLevel::IDENTIFY_PRINT, "Lower animation changed from %d to %d", p_animation->LowerBodyAnim.m_prevAnimClip, p_animation->LowerBodyAnim.m_animClip);
 			p_animation->LowerBodyAnim.m_animTime = 0.0f;
 			p_animation->LowerBodyAnim.m_prevAnimClip = p_animation->LowerBodyAnim.m_animClip;
 			p_animation->LowerBodyAnim.m_blending = true;
@@ -121,7 +123,7 @@ namespace RootForce
 			if(p_animation->LowerBodyAnim.m_locked && p_animation->LowerBodyAnim.m_animTime * p_ticksPerSecond >= (float)p_renderable->m_model->m_animation->GetAnimClip(p_animation->LowerBodyAnim.m_animClip)->m_duration)
 			{
 				p_animation->LowerBodyAnim.m_locked = false;
-				return;
+				return false;
 			}
 		}
 		else
@@ -165,6 +167,7 @@ namespace RootForce
 				p_animation->m_stepTaken = false;
 			}
 		}
+		return true;
 	}
 
 	

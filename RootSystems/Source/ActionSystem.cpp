@@ -118,7 +118,6 @@ namespace RootSystems
 							//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 							
 							g_engineContext.m_resourceManager->LoadSoundAudio("Movement/JumpingOneshots/jump1-1.wav")->PlayOnce(0.2f, 0x00400011, transform->m_position, 10.0f, 100.0f );
-
 							animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 							state->CurrentState = RootForce::EntityState::ASCENDING;
 						}
@@ -186,8 +185,8 @@ namespace RootSystems
 			}
 			else if(state->CurrentState == RootForce::EntityState::LANDING)
 			{
-				animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
-				//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
+				//animation->LowerBodyAnim.SetAnimationClip(RootForce::AnimationClip::LANDING, true);
+				//animation->UpperBodyAnim.SetAnimationClip(RootForce::AnimationClip::JUMP_START, true);
 
 				//std::srand((int)time(NULL));
 				//int random = std::rand() % 4;
