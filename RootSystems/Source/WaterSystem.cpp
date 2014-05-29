@@ -95,12 +95,16 @@ namespace RootForce
 			//Disturb
 			if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::OVER_WATER)
 			{
+#ifndef COMPILE_LEVEL_EDITOR
 				PlayWaterSound(waterCollider->m_radius, transform->m_position);
+#endif
 				Disturb(transform->m_position.x, transform->m_position.z, -waterCollider->m_disturbPower, waterCollider->m_radius);
 			}
 			else if(waterCollider->m_waterState ==  RootForce::WaterState::WaterState::UNDER_WATER)
 			{
+#ifndef COMPILE_LEVEL_EDITOR
 				PlayWaterSound(waterCollider->m_radius, transform->m_position);
+#endif
 				Disturb(transform->m_position.x, transform->m_position.z, waterCollider->m_disturbPower, waterCollider->m_radius);
 			}
 			else//if previous water state was EDGE_WATER we disturb 1/3 of the power
@@ -705,7 +709,7 @@ namespace RootForce
 
 		return water;
 	}
-
+#ifndef COMPILE_LEVEL_EDITOR
 	void WaterSystem::PlayWaterSound( int p_radius, glm::vec3 p_pos )
 	{
 		//If radius is less than 4, play small hit water sounds
@@ -755,5 +759,6 @@ namespace RootForce
 			}
 		}
 	}
+	#endif
 
 }
