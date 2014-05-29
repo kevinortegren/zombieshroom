@@ -7,6 +7,7 @@ Explosion.channelingTime = 0.0;
 Explosion.duration = 1.0;
 
 function Explosion.OnLoad()
+	ResourceManager.LoadTexture("Particles/smoke");
 	ResourceManager.LoadParticle("Explosion_G-stuf");
 end
 
