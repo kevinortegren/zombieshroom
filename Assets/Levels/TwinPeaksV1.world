@@ -1,4 +1,5 @@
 - Entities:
+    - 1
     - 3
     - 4
     - 5
@@ -129,6 +130,7 @@
 - Components:
     - Type: 0
       Data:
+        - Entity: 1
         - Entity: 45
           Model: StoneBridgeShape
           Material:
@@ -723,6 +725,10 @@
             Normal: BigLeafPlantNormal
     - Type: 1
       Data:
+        - Entity: 1
+          Position: [0, -241.207, 0]
+          Rotation: [0, 0, 0, 1]
+          Scale: [40, 1, 40]
         - Entity: 3
           Position: [-134.918, -63.6567, 420.021]
           Rotation: [0, 0, 0, 1]
@@ -1953,8 +1959,6 @@
       Value: GrassStraw
     - Key: GrassTranslucency
       Value: grass_translucency
-    - Key: Water
-      Value: -241.207
 - EntityNames:
     - ID: 0
       Name: Sun
