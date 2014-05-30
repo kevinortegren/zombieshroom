@@ -65,7 +65,7 @@ namespace RootForce
 
 		g_engineContext = libInitializeEngine(RootEngine::SubsystemInit::INIT_ALL);
 
-		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
+		if (SDL_Init(SDL_INIT_TIMER) != 0) 
 		{
 			throw std::runtime_error("Failed to initialize SDL");
 		}

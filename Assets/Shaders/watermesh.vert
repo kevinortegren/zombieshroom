@@ -25,7 +25,8 @@ layout(std140) uniform PerObject
 	vec4 SunColor;
 	vec3 SunDirection;
 	float dx2; //Length between height values
-}; 
+	vec3 g_waterColor;
+};    
 
 out vec3 WorldPos_CS_in;
 out vec2 TexCoord_CS_in;
