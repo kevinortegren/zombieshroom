@@ -14,6 +14,19 @@ ComponentView::~ComponentView()
 
 void ComponentView::AddItem( ComponentViewItem* p_item )
 {
+	//Don't add duplicate views
+	for (int i = 0; i < m_layout->count(); ++i)
+	{
+		ComponentViewItem* temp = (ComponentViewItem*)m_layout->itemAt(i)->widget();
+		if(temp)
+		{
+			if (temp->GetItem()->GetComponentName() == p_item->GetItem()->GetComponentName())
+			{
+				return;
+			}
+		}
+	}
+
 	// Remove last spacer item if present.
 	int count = m_layout->count();
 	if (count > 1) {
