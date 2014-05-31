@@ -190,8 +190,9 @@ namespace Render
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, flags);
 
 		m_glContext = SDL_GL_CreateContext(p_window);
-		if(!m_glContext) {
-			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "%s", SDL_GetError());
+		if(!m_glContext) { 
+			g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Make sure your graphics card and drivers support OpenGL 4.3! Playing on a laptop with switchable graphics? Don't forget to turn on your discrete graphics card!");
+			return;
 		}
 
 		SDL_GL_SetSwapInterval(0);
@@ -206,14 +207,14 @@ namespace Render
 		glewExperimental = GL_TRUE; 
 		GLenum err = GLCheck(glewInit());
 		if (err != GLEW_OK) {
-			Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::FATAL_ERROR, "Failed to initialize glew!");
+			Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::FATAL_ERROR, "Failed to initialize glew!");
 			return;
 		}
 			
 		GLint major, minor;
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
 		glGetIntegerv(GL_MINOR_VERSION, &minor);
-		Render::g_context.m_logger->LogText(LogTag::RENDER,  LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
+		Render::g_context.m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "OpenGL context version: %d.%d", major, minor);
 
 		glClearColor(0,0,0,0);
 		

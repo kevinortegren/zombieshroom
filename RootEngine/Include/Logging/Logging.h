@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <map>
+#include <memory>
 
 namespace LogTag
 {
@@ -116,7 +117,7 @@ class Logging : public LoggingInterface
 
 		void ClearLog();
 
-
+		std::string StringFormat(const std::string p_fmt, va_list p_args) ;
 
 };
 //(LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ...)

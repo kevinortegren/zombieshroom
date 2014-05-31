@@ -1,6 +1,9 @@
 #include "Logging/Logging.h"
 #include <ctime>
 #include <RootEngine/Include/Logging/CMDColor.h>
+#include <SDL2/SDL.h>
+
+#pragma warning( disable : 4996)
 
 Logging::Logging() : m_enableLogging(true)
 {
@@ -93,17 +96,24 @@ std::string Logging::GetTimeString( int p_time )
 //////////////////////////////////////////////////////////////////////////
 void Logging::LT( std::string p_func, int p_line, LogTag::LogTag p_tag, LogLevel::LogLevel p_vLevel, const char* p_format, ... )
 {
-
-#ifdef _DEBUG
 	va_list args;
 	va_start (args, p_format);
+#ifdef _DEBUG
 	if(CheckLevel(p_vLevel) && CheckTag(p_tag))
 	{
 		WriteToConsole(p_func, p_line, p_tag, p_vLevel, p_format, args);
 		WriteToFile(p_func, p_line, p_tag, p_vLevel, p_format, args);
 	}
-	va_end (args);
+#else
+	if(p_vLevel == LogLevel::FATAL_ERROR)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, 
+			"FATAL ERROR!",
+			StringFormat(p_format, args).c_str(),
+			NULL);
+	}
 #endif
+	va_end (args);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -398,4 +408,22 @@ void Logging::ClearLog()
 #ifdef _DEBUG
 	system("cls");
 #endif
+}
+
+//StackOverflow magic
+std::string Logging::StringFormat(const std::string p_fmt, va_list p_args) 
+{
+	int final_n, n = ((int)p_fmt.size()) * 2; /* reserve 2 times as much as the length of the fmt_str */
+	std::string str;
+	std::unique_ptr<char[]> formatted;
+	while(1) {
+		formatted.reset(new char[n]); /* wrap the plain char array into the unique_ptr */
+		strcpy(&formatted[0], p_fmt.c_str());
+		final_n = vsnprintf(&formatted[0], n, p_fmt.c_str(), p_args);
+		if (final_n < 0 || final_n >= n)
+			n += abs(final_n - n + 1);
+		else
+			break;
+	}
+	return std::string(formatted.get());
 }

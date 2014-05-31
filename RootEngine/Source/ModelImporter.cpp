@@ -27,7 +27,7 @@ namespace RootEngine
 		const aiScene* aiscene = m_importer->ReadFile(p_fileName.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 		if(!aiscene)
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Error parsing scene %s: %s", p_fileName, m_importer->GetErrorString());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing scene %s/%s: %s", p_fileName, p_handle, m_importer->GetErrorString());
 		}
 
 		/*
@@ -35,14 +35,7 @@ namespace RootEngine
 		_splitpath_s(p_fileName.c_str(), NULL, 0, NULL, 0, fileName, p_fileName.size(), NULL, 0);
 		*/
 
-		if (aiscene) 
-		{
-			TraverseSceneHierarchy(aiscene, p_handle);
-		}
-		else 
-		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::FATAL_ERROR, "Error parsing '%s': '%s'", p_handle.c_str(), m_importer->GetErrorString());
-		}
+		TraverseSceneHierarchy(aiscene, p_handle);
 
 		if(aiscene->HasAnimations() && m_model->m_animation )
 		{
