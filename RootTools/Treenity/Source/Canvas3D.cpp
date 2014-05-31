@@ -77,11 +77,11 @@ Canvas3D::Canvas3D( QWidget* p_parent /*= 0*/ ) : QWidget(p_parent)
 	connect(tempPiece, SIGNAL(clicked()), this, SLOT(PieButton4()));
 	tempPiece = m_pieMenu->addPiece("Resources/watercollider.png", "Add water collider");
 	connect(tempPiece, SIGNAL(clicked()), this, SLOT(PieButton5()));
-	tempPiece = m_pieMenu->addPiece("Resources/duplicate.png", "Duplicate");
+	tempPiece = m_pieMenu->addPiece("Resources/particleicon.png", "Add Particle");
 	connect(tempPiece, SIGNAL(clicked()), this, SLOT(PieButton6()));
-	tempPiece = m_pieMenu->addPiece("Resources/genericicon.png", "");
+	tempPiece = m_pieMenu->addPiece("Resources/redminus.png", "Delete Entity");
 	connect(tempPiece, SIGNAL(clicked()), this, SLOT(PieButton7()));
-	tempPiece = m_pieMenu->addPiece("Resources/genericicon.png", "");
+	tempPiece = m_pieMenu->addPiece("Resources/duplicate.png", "Duplicate");
 	connect(tempPiece, SIGNAL(clicked()), this, SLOT(PieButton8()));
 }
 
@@ -243,40 +243,51 @@ void Canvas3D::SetEditorInterface( EditorInterface* p_editorInterface )
 
 void Canvas3D::PieButton1()
 {
-	Utils::Write("We clicked PieMenu :)");
 	ECS::Entity* entity = m_engineInterface->CreateEntity();
 	m_engineInterface->SetPosition(entity, m_engineInterface->GetPosition(m_engineInterface->GetEntityByTag("AimingDevice")));
 }
 
 void Canvas3D::PieButton2()
 {
-	if(m_editorInterface->GetSelection().size() == 1)
+	if(m_editorInterface->GetSelection().size() > 0)
 	{
-		m_engineInterface->AddRenderable(*m_editorInterface->GetSelection().begin());
+		for(ECS::Entity* ent : m_editorInterface->GetSelection())
+		{
+			m_engineInterface->AddRenderable(ent);
+		}
 	}
 }
 
 void Canvas3D::PieButton3()
 {
-	if(m_editorInterface->GetSelection().size() == 1)
+	if(m_editorInterface->GetSelection().size() > 0)
 	{
-		m_engineInterface->AddPhysics(*m_editorInterface->GetSelection().begin(), true);
+		for(ECS::Entity* ent : m_editorInterface->GetSelection())
+		{
+			m_engineInterface->AddPhysics(ent, true);
+		}
 	}
 }
 
 void Canvas3D::PieButton4()
 {
-	if(m_editorInterface->GetSelection().size() == 1)
+	if(m_editorInterface->GetSelection().size() > 0)
 	{
-		m_engineInterface->AddScript(*m_editorInterface->GetSelection().begin());
+		for(ECS::Entity* ent : m_editorInterface->GetSelection())
+		{
+			m_engineInterface->AddScript(ent);
+		}
 	}
 }
 
 void Canvas3D::PieButton5()
 {
-	if(m_editorInterface->GetSelection().size() == 1)
+	if(m_editorInterface->GetSelection().size() > 0)
 	{
-		m_engineInterface->AddWaterCollider(*m_editorInterface->GetSelection().begin());
+		for(ECS::Entity* ent : m_editorInterface->GetSelection())
+		{
+			m_engineInterface->AddWaterCollider(ent);
+		}
 	}
 }
 
@@ -286,18 +297,30 @@ void Canvas3D::PieButton6()
 	{
 		for(ECS::Entity* ent : m_editorInterface->GetSelection())
 		{
-			m_engineInterface->DuplicateEntity(ent);
+			m_engineInterface->AddParticle(ent);
 		}
 	}
 }
 
 void Canvas3D::PieButton7()
 {
-
+	if(m_editorInterface->GetSelection().size() > 0)
+	{
+		for(ECS::Entity* ent : m_editorInterface->GetSelection())
+		{
+			m_engineInterface->DeleteEntity(ent);
+		}
+	}
 }
 
 void Canvas3D::PieButton8()
 {
-
+	if(m_editorInterface->GetSelection().size() > 0)
+	{
+		for(ECS::Entity* ent : m_editorInterface->GetSelection())
+		{
+			m_engineInterface->DuplicateEntity(ent);
+		}
+	}
 }
 
