@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <RootTools/Treenity/Include/ComponentViewItem.h>
+#include <RootTools/Treenity/Include/Components/AbstractComponentView.h>
 
 class ComponentView : public QWidget
 {
@@ -11,7 +12,7 @@ public:
 	~ComponentView();
 
 	//Add
-	void AddItem(ComponentViewItem* p_item);
+	void AddItem(AbstractComponentView* p_item);
 
 	//Remove
 	void RemoveItems();

@@ -12,7 +12,7 @@ ComponentView::~ComponentView()
 
 }
 
-void ComponentView::AddItem( ComponentViewItem* p_item )
+void ComponentView::AddItem( AbstractComponentView* p_item )
 {
 	//Don't add duplicate views
 	for (int i = 0; i < m_layout->count(); ++i)
@@ -20,7 +20,7 @@ void ComponentView::AddItem( ComponentViewItem* p_item )
 		ComponentViewItem* temp = (ComponentViewItem*)m_layout->itemAt(i)->widget();
 		if(temp)
 		{
-			if (temp->GetItem()->GetComponentName() == p_item->GetItem()->GetComponentName())
+			if (temp->GetItem() == p_item)
 			{
 				return;
 			}
@@ -34,7 +34,7 @@ void ComponentView::AddItem( ComponentViewItem* p_item )
 	}
 
 	// Add item and make sure it stretches the remaining space.
-	m_layout->addWidget(p_item);    
+	m_layout->addWidget(new ComponentViewItem(p_item));    
 	m_layout->addStretch();
 }
 

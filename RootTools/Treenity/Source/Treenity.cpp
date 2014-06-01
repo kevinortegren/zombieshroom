@@ -206,7 +206,7 @@ void Treenity::ComponentCreated(ECS::Entity* p_entity, int p_componentType)
 
 		if (m_componentViews.find(p_componentType) != m_componentViews.end())
 		{
-			m_compView->AddItem(new ComponentViewItem(m_componentViews[p_componentType]));
+			m_compView->AddItem(m_componentViews[p_componentType]);
 			m_componentViews[p_componentType]->DisplayEntity(p_entity);
 		}
 	}
@@ -499,7 +499,7 @@ void Treenity::UpdateOnSelection()
 			{
 				if (m_componentViews.find(i) != m_componentViews.end())
 				{
-					m_compView->AddItem(new ComponentViewItem(m_componentViews[i]));
+					m_compView->AddItem(m_componentViews[i]);
 					m_componentViews[i]->DisplayEntity(selectedEntity);
 				}
 			}
