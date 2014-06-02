@@ -86,6 +86,9 @@ Section "Root Force" SecRootForce
   SetOutPath "$INSTDIR\Assets\"
   File /r "Release\Assets\*.*"
 
+  SetOutPath "$INSTDIR\Resources\"
+  File /r "Release\Resources\*.*"
+
   ;Create uninstaller
   SetOutPath "$INSTDIR"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
