@@ -42,6 +42,7 @@
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
 
   !insertmacro MUI_PAGE_WELCOME
+  !insertmacro MUI_PAGE_LICENSE "LICENSE.rtf"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder

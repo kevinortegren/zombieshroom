@@ -1,9 +1,0 @@
-Qt5Core.dll
-Qt5Gui.dll
-Qt5Widgets.dll
-libGLESv2.dll
-icuin51.dll
-icuuc51.dll
-icudt51.dll
-libEGL.dll
-platforms/qwindows.dll

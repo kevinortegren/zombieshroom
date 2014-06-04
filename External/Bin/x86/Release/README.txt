@@ -7,9 +7,10 @@
 | ) \ \__| (___) || (___) |   | |     | )      | (___) || ) \ \__| (____/\| (____/\
 |/   \__/(_______)(_______)   )_(     |/       (_______)|/   \__/(_______/(_______/
 
+VERSION: 0.9b
+
 KNOWN ISSUES
--No AMD support
--GUI delay on Nvidia Kepler cards
+-Bad AMD support, only works on some AMD cards
 
 CONTROLS
 -WASD: Move character
@@ -23,6 +24,28 @@ CONTROLS
 -LMB: Activate selected ability
 -Enter: Chat
 -F12: Toggle GUI
+-TAB: Show score screen
 
 OTHER INFO
 -Map and Ability pack must be selected before hosting a level
+-Root Force may have to be added to Windows Firewall as an exception for it to work over network
+
+DISCLAIMER
+This is not a finished product and is provided as is. This product is licensed under CC-BY-NC 4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+
+DEVELOPED BY
+Joel Begnert
+Daniel Carlsson
+Martins Cebers
+Kim Hansson
+Erik Hörlin
+Mattias Nässén
+Gustav Pihl
+Thomas Sievert
+Patrik Skog
+Lars Woxberg
+Kevin Örtegren
+
+SPECIAL THANKS TO
+Kristoffer "Malmen" Malmgren for the sound track
+Karl Karlsson & Michael Moström for the sound effects
