@@ -463,7 +463,7 @@ namespace RootForce
 		m_computeJob.m_textures[0]->Bind(0);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_texSize, m_texSize, GL_RED, GL_FLOAT, nada);
 		m_computeJob.m_textures[0]->Unbind(0);
-		delete nada;
+		delete[] nada;
 		g_engineContext.m_logger->LogText(LogTag::WATER, LogLevel::DEBUG_PRINT, "Water has been reset!");
 	}
 

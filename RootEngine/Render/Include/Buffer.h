@@ -14,6 +14,8 @@ namespace Render
 		virtual size_t GetBufferSize() const = 0;
 		virtual size_t GetElementSize() const  = 0;
 		virtual size_t GetNumElements() const = 0;
+		virtual void* MapBuffer(GLenum p_access) = 0;
+		virtual bool UnmapBuffer() = 0;
 		virtual ~BufferInterface(){};
 	};
 
@@ -30,6 +32,8 @@ namespace Render
 		size_t GetBufferSize() const { return m_size; }
 		size_t GetElementSize() const { return m_elementSize; }
 		size_t GetNumElements() const { return m_numElements; }
+		void* MapBuffer(GLenum p_access);
+		bool UnmapBuffer();
 
 	private:
 		Buffer(GLenum p_type);

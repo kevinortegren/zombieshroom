@@ -129,6 +129,7 @@ private slots:
 	void SetTranslateTool();
 	void SetRotateTool();
 	void SetResizeTool();
+	void SetTerrainGeometryTool();
 	void ChangeToolMode(int index);
 
 	void RemoveRenderable(ECS::Entity* p_entity);

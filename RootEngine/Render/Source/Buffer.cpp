@@ -30,3 +30,20 @@ void Render::Buffer::BufferSubData(size_t p_offset, size_t p_length, void* p_dat
 	glBindBuffer(m_type, m_id);
 	glBufferSubData(m_type, p_offset, p_length, p_data);
 }
+
+void* Render::Buffer::MapBuffer( GLenum p_access )
+{
+	glBindBuffer(m_type, m_id);
+	return glMapBuffer(m_type, p_access);
+}
+
+bool Render::Buffer::UnmapBuffer()
+{
+	GLboolean errCheck = glUnmapBuffer(m_type);
+	glBindBuffer(m_type, 0);
+
+	if(errCheck == GL_TRUE)
+		return true;
+	else 
+		return false;
+}

@@ -123,16 +123,8 @@ void Canvas3D::wheelEvent(QWheelEvent* event)
 void Canvas3D::mousePressEvent( QMouseEvent* event )
 {
 
-	if (event->button() == Qt::RightButton && !(event->modifiers() & Qt::AltModifier)) {
-		/*paj->setIconSize(QSize(40,40));
-		paj->addAction("", QIcon("Resources/resizeButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);
-		paj->addAction("", QIcon("Resources/playButton.png"), nullptr, nullptr);*/
+	if (event->button() == Qt::RightButton && !(event->modifiers() & Qt::AltModifier)) 
+	{
 		m_pieMenu->showMenu();
 	}
 

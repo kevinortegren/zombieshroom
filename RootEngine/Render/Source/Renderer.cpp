@@ -490,7 +490,6 @@ namespace Render
 
 		if((job->m_material->m_effect->GetTechniques().at(0)->m_flags & TechniqueFlags::RENDER_DEFERRED1) == TechniqueFlags::RENDER_DEFERRED1 || job->m_forward)
 		{
-			
 			m_forwardJobs.push_back(job);
 		}
 		else

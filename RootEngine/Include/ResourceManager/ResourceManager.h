@@ -4,6 +4,7 @@
 #include <vector>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/ModelImporter.h>
+#include <RootEngine/Include/ModelExporter.h>
 #include <RootEngine/Include/EffectImporter.h>
 #include <RootEngine/Include/TextureImporter.h>
 #include <RootEngine/Render/Include/Mesh.h>
@@ -35,7 +36,7 @@ namespace RootEngine
 			virtual std::string LoadScript(std::string p_scriptName) = 0;
 			virtual std::string GetScript(std::string p_scriptName) = 0;
 			virtual void		ReloadAllScripts() = 0;
-			
+			virtual void		ExportCollada(const std::string& p_modelName) = 0;
 		#endif
 
 		virtual Model* CreateModel(const std::string& p_path) = 0;
@@ -87,6 +88,7 @@ namespace RootEngine
 			std::string LoadScript(std::string p_scriptName);
 			std::string GetScript(std::string p_scriptName);
 			void		ReloadAllScripts();
+			void		ExportCollada(const std::string& p_modelName);
 		#endif
 
 		Model* CreateModel(const std::string& p_path);
@@ -136,6 +138,7 @@ namespace RootEngine
 		//Importers
 #ifndef COMPILE_LEVEL_EDITOR
 		std::shared_ptr<ModelImporter>		m_modelImporter;
+		std::shared_ptr<ModelExporter>		m_modelExporter;
 #endif
 		std::shared_ptr<EffectImporter>		m_effectImporter;
 		std::shared_ptr<TextureImporter>	m_textureImporter;

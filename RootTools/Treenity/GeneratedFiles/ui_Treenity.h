@@ -63,6 +63,8 @@ public:
     QPushButton *pushButton_rotateMode;
     QPushButton *pushButton_scaleMode;
     QComboBox *comboBox_mode;
+    QPushButton *pushButton_terrainGeometryMode;
+    QPushButton *pushButton_terrainPaintMode;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -205,6 +207,29 @@ public:
         comboBox_mode->setGeometry(QRect(96, 0, 70, 32));
         comboBox_mode->setMinimumSize(QSize(70, 32));
         comboBox_mode->setStyleSheet(QStringLiteral(""));
+        pushButton_terrainGeometryMode = new QPushButton(treedeetoolbar);
+        pushButton_terrainGeometryMode->setObjectName(QStringLiteral("pushButton_terrainGeometryMode"));
+        pushButton_terrainGeometryMode->setGeometry(QRect(166, 0, 32, 32));
+        pushButton_terrainGeometryMode->setMinimumSize(QSize(32, 32));
+        pushButton_terrainGeometryMode->setMaximumSize(QSize(32, 32));
+        QIcon icon4;
+        icon4.addFile(QStringLiteral("Resources/terrainGeometryTool.png"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_terrainGeometryMode->setIcon(icon4);
+        pushButton_terrainGeometryMode->setIconSize(QSize(16, 16));
+        pushButton_terrainGeometryMode->setCheckable(true);
+        pushButton_terrainGeometryMode->setChecked(false);
+        pushButton_terrainGeometryMode->setAutoExclusive(true);
+        pushButton_terrainPaintMode = new QPushButton(treedeetoolbar);
+        pushButton_terrainPaintMode->setObjectName(QStringLiteral("pushButton_terrainPaintMode"));
+        pushButton_terrainPaintMode->setGeometry(QRect(198, 0, 32, 32));
+        pushButton_terrainPaintMode->setMinimumSize(QSize(32, 32));
+        pushButton_terrainPaintMode->setMaximumSize(QSize(32, 32));
+        QIcon icon5;
+        icon5.addFile(QStringLiteral("Resources/terrainPaintTool.png"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_terrainPaintMode->setIcon(icon5);
+        pushButton_terrainPaintMode->setCheckable(true);
+        pushButton_terrainPaintMode->setChecked(false);
+        pushButton_terrainPaintMode->setAutoExclusive(true);
 
         verticalLayout_2->addWidget(treedeetoolbar);
 
@@ -409,6 +434,14 @@ public:
          << QApplication::translate("TreenityClass", "Local", 0)
          << QApplication::translate("TreenityClass", "Global", 0)
         );
+#ifndef QT_NO_TOOLTIP
+        pushButton_terrainGeometryMode->setToolTip(QApplication::translate("TreenityClass", "Edit terrain geometry", 0));
+#endif // QT_NO_TOOLTIP
+        pushButton_terrainGeometryMode->setText(QString());
+#ifndef QT_NO_TOOLTIP
+        pushButton_terrainPaintMode->setToolTip(QApplication::translate("TreenityClass", "Paint terrain", 0));
+#endif // QT_NO_TOOLTIP
+        pushButton_terrainPaintMode->setText(QString());
         menuFile->setTitle(QApplication::translate("TreenityClass", "File", 0));
         menuEdit->setTitle(QApplication::translate("TreenityClass", "Edit", 0));
         menuEntity->setTitle(QApplication::translate("TreenityClass", "Entity", 0));

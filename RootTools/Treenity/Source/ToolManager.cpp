@@ -1,10 +1,14 @@
 #include <RootTools/Treenity/Include/ToolManager.h>
+#include <RootTools/Treenity/Include/RotationTool.h>
+#include <RootTools/Treenity/Include/TranslationTool.h>
+#include <RootTools/Treenity/Include/TerrainTool.h>
 
 ToolManager::ToolManager()
 {
 	//Add tools to the toolbox here
 	m_tools[ToolBox::ROTATION_TOOL] = new RotationTool();
 	m_tools[ToolBox::TRANSLATION_TOOL] = new TranslationTool();
+	m_tools[ToolBox::TERRAIN_TOOL] = new TerrainTool();
 
 	//This is the default tool, must correspond to what is selected by the GUI by default (Currently translation tool)
 	m_selectedTool = m_tools[ToolBox::TRANSLATION_TOOL];

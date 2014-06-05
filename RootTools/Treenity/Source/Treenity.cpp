@@ -121,6 +121,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.pushButton_translateMode,			SIGNAL(clicked()),			this,					SLOT(SetTranslateTool()));
 	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
 	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
+	connect(ui.pushButton_terrainGeometryMode,		SIGNAL(clicked()),			this,					SLOT(SetTerrainGeometryTool()));
 	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
 	connect(ui.actionWaterSetting,					SIGNAL(triggered()),		m_waterToolDockable,	SLOT(Show()));
 
@@ -585,6 +586,14 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 			int index = (m_toolMode == ToolMode::GLOBAL) ? 0 : 1;
 			ui.comboBox_mode->setCurrentIndex(index);
 		}
+		else if( event->key() == Qt::Key_R)
+		{
+			ui.pushButton_terrainGeometryMode->click();
+		}
+		else if( event->key() == Qt::Key_T)
+		{
+			ui.pushButton_terrainPaintMode->click();
+		}
 	}
 	else if(m_engineInterface->GetMode() == EditorMode::GAME)
 	{
@@ -663,6 +672,11 @@ void Treenity::SetRotateTool()
 void Treenity::SetResizeTool()
 {
 	//Set resize tool
+}
+
+void Treenity::SetTerrainGeometryTool()
+{
+	m_toolManager.SetTool(ToolBox::TERRAIN_TOOL);
 }
 
 void Treenity::ChangeToolMode(int index)

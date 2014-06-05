@@ -1,7 +1,6 @@
 #pragma once
 
-#include <RootTools/Treenity/Include/RotationTool.h>
-#include <RootTools/Treenity/Include/TranslationTool.h>
+
 #include <RootTools/Treenity/Include/Tool.h>
 #include <map>
 
@@ -11,6 +10,7 @@ namespace ToolBox
 	{
 		ROTATION_TOOL,
 		TRANSLATION_TOOL,
+		TERRAIN_TOOL,
 	};
 }
 

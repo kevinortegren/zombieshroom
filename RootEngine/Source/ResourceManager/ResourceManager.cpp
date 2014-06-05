@@ -49,6 +49,7 @@ namespace RootEngine
 		m_effectImporter = std::shared_ptr<EffectImporter>(new EffectImporter(m_context->m_renderer));
 #ifndef COMPILE_LEVEL_EDITOR
 		m_modelImporter = std::shared_ptr<ModelImporter>(new ModelImporter(p_context));
+		m_modelExporter = std::shared_ptr<ModelExporter>(new ModelExporter(p_context));
 #endif
 		m_textureImporter = std::shared_ptr<TextureImporter>(new TextureImporter(m_context->m_logger, m_context->m_renderer));
 		
@@ -534,4 +535,26 @@ namespace RootEngine
 		m_context->m_renderer->RemoveMesh(p_model->m_meshes[0]);
 		m_context->m_renderer->RemoveMesh(p_model->m_meshes[1]);
 	}
+
+#ifndef COMPILE_LEVEL_EDITOR
+	//Export
+	void ResourceManager::ExportCollada( const std::string& p_modelName )
+	{
+		if(m_models.find(p_modelName) == m_models.end())
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Tried to export an unexisting model: %s", p_modelName.c_str());
+		}
+		else
+		{
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::START_PRINT, "[EXPORT] Started exporting model: %s", p_modelName.c_str());
+
+			bool errCheck = m_modelExporter->ExportMesh(m_models[p_modelName]->m_meshes[0]);
+
+			if(errCheck)
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[EXPORT] Successfully exported model: %s", p_modelName.c_str());
+			else
+				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "[EXPORT] Failed to export model: %s", p_modelName.c_str());
+		}
+	}
+#endif
 }

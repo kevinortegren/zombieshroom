@@ -12,6 +12,7 @@ namespace Render
 		virtual void Init(size_t p_numAttribs) = 0;
 		virtual void SetVertexAttribPointer(GLuint p_bufferId, GLuint p_location, GLint p_size,
 			GLenum p_type, GLboolean p_normalized, GLsizei p_stride, GLvoid* p_pointer) = 0;
+		virtual size_t GetNumAttributes() const = 0;
 
 		virtual ~VertexAttributesInterface(){};
 	};
