@@ -137,6 +137,10 @@ Treenity::Treenity(QWidget *parent)
 	ui.widget_canvas3D->SetEditorInterface(this);
 	// Set tool mode.
 	m_toolMode = ToolMode::LOCAL;
+
+	m_brushManager.GetCurrentBrush()->SetSize(5);
+	m_brushManager.GetCurrentBrush()->SetStrength(3);
+
 }
 
 
@@ -707,4 +711,9 @@ void Treenity::RemoveScriptComponent(ECS::Entity* p_entity)
 void Treenity::RemoveCollisionResponder(ECS::Entity* p_entity)
 {
 	m_engineInterface->RemoveCollisionResponder(p_entity);
+}
+
+BrushManager* Treenity::GetBrushManager()
+{
+	return &m_brushManager;
 }

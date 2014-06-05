@@ -2,6 +2,7 @@
 
 #include <set>
 #include <Utility/ECS/Include/Entity.h>
+#include <RootTools/Treenity/Include/BrushManager.h>
 #include <qstring.h>
 
 namespace ToolMode
@@ -23,4 +24,5 @@ public:
 	virtual const std::set<ECS::Entity*>& GetSelection() const = 0;
 	virtual void RenameEntity(ECS::Entity* p_entity, const QString& p_name) = 0;
 	virtual ToolMode::ToolMode GetToolMode() = 0;
+	virtual BrushManager* GetBrushManager() = 0;
 };

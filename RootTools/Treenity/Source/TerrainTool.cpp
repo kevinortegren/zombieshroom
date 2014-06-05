@@ -1,5 +1,4 @@
 #include <RootTools/Treenity/Include/TerrainTool.h>
-#include <RootSystems/Include/Transform.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/GameSharedContext.h>
@@ -10,8 +9,6 @@ extern RootEngine::GameSharedContext g_engineContext;
 TerrainTool::TerrainTool()
 	: Tool()
 {
-	m_brushManager.GetCurrentBrush()->SetSize(10);
-	m_brushManager.GetCurrentBrush()->SetStrength(7);
 }
 
 TerrainTool::~TerrainTool()
@@ -34,8 +31,8 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 		return false;
 	}
 
-	RootForce::Transform* terrainTrans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(terrainEnt);
-	if(terrainTrans == nullptr)
+	m_terrainTrans = m_world->GetEntityManager()->GetComponent<RootForce::Transform>(terrainEnt);
+	if(m_terrainTrans == nullptr)
 	{
 		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain entity has no transform!");
 		return false;
@@ -105,10 +102,10 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 		}
 
 		//Buffer is mapped, ready to be read and written to
-		for (unsigned i = 0; i < m_brushManager.GetCurrentBrush()->GetBrush()->size(); ++i)
+		for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->size(); ++i)
 		{
-			glm::ivec2 brushLocalPos	= m_brushManager.GetCurrentBrush()->GetBrush()->at(i).pos;
-			float strength				= m_brushManager.GetCurrentBrush()->GetBrush()->at(i).strength;
+			glm::ivec2 brushLocalPos	= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).pos;
+			float strength				= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).strength;
 
 			glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
 			
@@ -118,9 +115,9 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 				m_vertexData[pos].m_pos.y += strength;
 		}
 
-		for (unsigned i = 0; i < m_brushManager.GetCurrentBrush()->GetBrush()->size(); ++i)
+		for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->size(); ++i)
 		{
-			glm::ivec2 brushLocalPos	= m_brushManager.GetCurrentBrush()->GetBrush()->at(i).pos;
+			glm::ivec2 brushLocalPos	= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).pos;
 
 			glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
 
@@ -162,10 +159,10 @@ int TerrainTool::GetVertexPosition( const glm::ivec2& p_pos )
 {
 	int pos = p_pos.y * m_width + p_pos.x;
 
-	if(pos >= m_numElements || pos < 0)
-		return -1;
-	else
+	if(IsCoordInsideTerrain(p_pos))
 		return pos;
+	else
+		return -1;
 }
 
 float TerrainTool::AverageHeight( const glm::ivec2& p_pos)
@@ -178,7 +175,7 @@ float TerrainTool::AverageHeight( const glm::ivec2& p_pos)
 		for(int n = p_pos.y - 1; n <= p_pos.y + 1; ++n)
 		{
 			//Check if in bounds
-			if( m * n < m_numElements || m * n >= 0)
+			if(IsCoordInsideTerrain(glm::ivec2(m, n)))
 			{
 				avg += m_vertexData[GetVertexPosition(glm::ivec2(m, n))].m_pos.y;
 				num += 1.0f;
@@ -191,23 +188,32 @@ float TerrainTool::AverageHeight( const glm::ivec2& p_pos)
 glm::ivec2 TerrainTool::GetRayMarchCollision( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 {
 	glm::vec3 rayPos = p_cameraPos;
+	glm::vec3 rayDir = glm::normalize(p_ray);
+	glm::ivec2 hitPos;
+
+	float midTransFactorX = (m_terrainTrans->m_scale.x * m_width) / 2.0f;
+	float midTransFactorZ = (m_terrainTrans->m_scale.z * m_width) / 2.0f;
 
 	int rayDistCounter = 0;
-	while(rayDistCounter < 2000)
+	int iterations = 5000;
+	while(rayDistCounter < iterations)
 	{
-		if(IsCoordInsideTerrain(glm::ivec2(rayPos.z/40.0f, rayPos.x/40.0f)))
+		hitPos = glm::ivec2((rayPos.z - m_terrainTrans->m_position.z + midTransFactorZ) / m_terrainTrans->m_scale.z, (rayPos.x - m_terrainTrans->m_position.x + midTransFactorX) / m_terrainTrans->m_scale.x);
+		if(IsCoordInsideTerrain(hitPos))
 		{
-			if(rayPos.y <= m_vertexData[GetVertexPosition(glm::ivec2(rayPos.z/40.0f, rayPos.x/40.0f))].m_pos.y)
+			if(rayPos.y <= m_vertexData[GetVertexPosition(hitPos)].m_pos.y)
 			{
-				g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "HIT TERRAIN");
 				break;
 			}
 		}
-		rayPos += p_ray;
+		rayPos += rayDir;
 		rayDistCounter++;
 	}
 
-	return glm::ivec2(rayPos.z/40.0f, rayPos.x/40.0f);
+	if(rayDistCounter == iterations)
+		return glm::ivec2(9999999, 9999999);
+	else
+		return hitPos;
 }
 
 bool TerrainTool::IsCoordInsideTerrain( glm::ivec2 p_pos)

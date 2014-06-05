@@ -24,6 +24,7 @@
 #include <RootTools/Treenity/Include/ToolManager.h>
 #include <RootTools/Treenity/Include/VerticalScrollArea.h>
 #include <RootTools/Treenity/Include/WaterTool.h>
+#include <RootTools/Treenity/Include/BrushManager.h>
 
 class Treenity : public QMainWindow, public EditorInterface
 {
@@ -66,6 +67,7 @@ public:
 	const std::set<ECS::Entity*>& GetSelection() const;
 	void RenameEntity(ECS::Entity* p_entity, const QString& p_name);
 	ToolMode::ToolMode GetToolMode();
+	BrushManager* GetBrushManager();
 
 	//Called after RootEngine has been loaded from TreenityMain!
 	void Init();
@@ -74,6 +76,7 @@ public:
 	void Update(float p_dt);
 
 	ToolManager m_toolManager;
+	BrushManager m_brushManager;
 
 private:
 
