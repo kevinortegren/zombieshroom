@@ -124,6 +124,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.pushButton_terrainGeometryMode,		SIGNAL(clicked()),			this,					SLOT(SetTerrainGeometryTool()));
 	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
 	connect(ui.actionWaterSetting,					SIGNAL(triggered()),		m_waterToolDockable,	SLOT(Show()));
+	connect(ui.actionAdd_terrain,					SIGNAL(triggered()),		this,					SLOT(AddTerrain()));
 
 	connect(m_componentViews[RootForce::ComponentType::RENDERABLE],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveRenderable(ECS::Entity*)));
 	connect(m_componentViews[RootForce::ComponentType::COLLISION],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemovePhysics(ECS::Entity*))); 
@@ -716,4 +717,9 @@ void Treenity::RemoveCollisionResponder(ECS::Entity* p_entity)
 BrushManager* Treenity::GetBrushManager()
 {
 	return &m_brushManager;
+}
+
+void Treenity::AddTerrain()
+{
+	m_engineInterface->CreateTerrainEntity(128, 128);
 }

@@ -134,6 +134,7 @@ private slots:
 	void SetResizeTool();
 	void SetTerrainGeometryTool();
 	void ChangeToolMode(int index);
+	void AddTerrain();
 
 	void RemoveRenderable(ECS::Entity* p_entity);
 	void RemovePhysics(ECS::Entity* p_entity);

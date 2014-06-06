@@ -36,6 +36,9 @@ public:
 	ECS::Entity* GetEntityByTag(const std::string& p_tag);
 	void DuplicateEntity(ECS::Entity* p_entity);
 
+	//Special entities
+	ECS::Entity* CreateTerrainEntity(int p_width, int p_height);
+
 	// World
 	const ECS::World* GetWorld();
 

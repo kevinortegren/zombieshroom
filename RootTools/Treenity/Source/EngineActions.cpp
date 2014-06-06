@@ -910,3 +910,70 @@ std::string	EngineActions::GetParticleEmitter(ECS::Entity* p_entity)
 	return m_world->GetEntityManager()->GetComponent<RootForce::ParticleEmitter>(p_entity)->m_name;
 }
 
+//Special entities
+ECS::Entity* EngineActions::CreateTerrainEntity( int p_width, int p_height )
+{
+	ECS::Entity* terrainEnt = CreateEntity();
+
+	RootForce::Renderable* terraintRend = m_world->GetEntityManager()->CreateComponent<RootForce::Renderable>(terrainEnt);
+
+	terraintRend->m_material	= g_engineContext.m_renderer->CreateMaterial("supersecretterrainmaterial");
+
+	terraintRend->m_material->m_tileFactor = 12.0f;
+
+	//Set textures to renderable
+	terraintRend->m_material->m_textures[Render::TextureSemantic::DIFFUSE]		= g_engineContext.m_resourceManager->LoadTexture("CaveMountainColor", Render::TextureType::TEXTURE_2D);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]	= g_engineContext.m_resourceManager->LoadTexture("CaveMountainColor", Render::TextureType::TEXTURE_2D);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]	= g_engineContext.m_resourceManager->LoadTexture("DirtAndStones", Render::TextureType::TEXTURE_2D);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]	= g_engineContext.m_resourceManager->LoadTexture("Grass", Render::TextureType::TEXTURE_2D);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]	= g_engineContext.m_resourceManager->LoadTexture("CliffWall", Render::TextureType::TEXTURE_2D);
+
+	terraintRend->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
+
+	if(g_engineContext.m_resourceManager->GetModel("TerrainModelTerrain"))
+	{
+		terraintRend->m_model = g_engineContext.m_resourceManager->GetModel("TerrainModelTerrain");
+		return terrainEnt;
+	}
+
+	std::vector<Render::Vertex1P1N1UV> vertices;
+	std::vector<unsigned int> indices;
+
+	for (float x = 0.0f; x < (float)p_width; ++x)
+	{
+		for (float z = 0.0f; z < (float)p_width; ++z)
+		{
+			Render::Vertex1P1N1UV v;
+			v.m_pos		= glm::vec3(x-(float)p_width/2.0f, 0.0f, z-(float)p_width/2.0f);
+			v.m_normal	= glm::vec3(0.0f, 1.0f, 0.0f);
+			v.m_UV		= glm::vec2(x/(float)p_width, z/(float)p_width);
+			vertices.push_back(v);
+		}
+	}
+
+	for (unsigned int x = 0; x < (unsigned int)(p_width-1); ++x)
+	{
+		for (unsigned int z = 0; z < (unsigned int)(p_width-1); ++z)
+		{
+			unsigned int  start = x * p_width + z;
+			indices.push_back(start);
+			indices.push_back(start + 1);
+			indices.push_back(start + p_width + 1);
+			indices.push_back(start + p_width + 1);
+			indices.push_back(start + p_width);
+			indices.push_back(start);
+		}
+	}
+
+	terraintRend->m_model = g_engineContext.m_resourceManager->CreateModel("TerrainModelTerrain");
+	terraintRend->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
+	terraintRend->m_model->m_meshes[0]->SetElementBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
+	terraintRend->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
+	terraintRend->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
+	terraintRend->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
+
+	m_world->GetTagManager()->RegisterEntity("Terrain", terrainEnt);
+
+	return terrainEnt;
+}
+

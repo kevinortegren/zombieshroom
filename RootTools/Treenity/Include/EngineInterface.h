@@ -38,6 +38,9 @@ struct EngineInterface
 	virtual ECS::Entity* GetEntityByTag(const std::string& p_tag) = 0;
 	virtual void DuplicateEntity(ECS::Entity* p_entity) = 0;
 
+	//Special entities
+	virtual ECS::Entity* CreateTerrainEntity(int p_width, int p_height) = 0; 
+
 	// World
 	virtual const ECS::World* GetWorld() = 0;
 

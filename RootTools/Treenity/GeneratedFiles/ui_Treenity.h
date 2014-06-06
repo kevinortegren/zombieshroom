@@ -55,6 +55,7 @@ public:
     QAction *action_collisionResponder;
     QAction *action_addParticle;
     QAction *actionWaterSetting;
+    QAction *actionAdd_terrain;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout_2;
     Canvas3D *widget_canvas3D;
@@ -154,6 +155,8 @@ public:
         action_addParticle->setObjectName(QStringLiteral("action_addParticle"));
         actionWaterSetting = new QAction(TreenityClass);
         actionWaterSetting->setObjectName(QStringLiteral("actionWaterSetting"));
+        actionAdd_terrain = new QAction(TreenityClass);
+        actionAdd_terrain->setObjectName(QStringLiteral("actionAdd_terrain"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_2 = new QVBoxLayout(centralWidget);
@@ -369,6 +372,7 @@ public:
         menuFile->addAction(actionExit);
         menuEntity->addAction(action_addEntity);
         menuEntity->addAction(action_removeEntity);
+        menuEntity->addAction(actionAdd_terrain);
         menuComponent->addAction(menu_addComponent->menuAction());
         menu_addComponent->addAction(action_addRenderable);
         menu_addComponent->addAction(action_addPhysics);
@@ -426,6 +430,7 @@ public:
         action_collisionResponder->setText(QApplication::translate("TreenityClass", "Collision responder", 0));
         action_addParticle->setText(QApplication::translate("TreenityClass", "Particle", 0));
         actionWaterSetting->setText(QApplication::translate("TreenityClass", "Water settings", 0));
+        actionAdd_terrain->setText(QApplication::translate("TreenityClass", "Add terrain", 0));
         pushButton_translateMode->setText(QString());
         pushButton_rotateMode->setText(QString());
         pushButton_scaleMode->setText(QString());

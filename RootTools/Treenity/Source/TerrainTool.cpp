@@ -24,7 +24,7 @@ void TerrainTool::LoadResources( ECS::World* p_world )
 bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 {
 	//Get entity with tag Terrian
-	ECS::Entity* terrainEnt = m_world->GetTagManager()->GetEntityByTag("Water");
+	ECS::Entity* terrainEnt = m_world->GetTagManager()->GetEntityByTag("Terrain");
 	if(terrainEnt == nullptr)
 	{
 		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "No terrain entity found!");
@@ -81,7 +81,7 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 		}*/
 
 		//Set as memebers for the rest of the methods to use
-		m_vertexData = static_cast<Render::Vertex1P1N1UV1T1BT*>(terrainVBO->MapBuffer(GL_READ_WRITE));
+		m_vertexData = static_cast<Render::Vertex1P1N1UV*>(terrainVBO->MapBuffer(GL_READ_WRITE));
 		m_width = glm::sqrt(m_numElements);
 
 		
@@ -117,7 +117,7 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 
 		for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->size(); ++i)
 		{
-			glm::ivec2 brushLocalPos	= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).pos;
+			glm::ivec2 brushLocalPos = m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).pos;
 
 			glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
 
@@ -131,6 +131,20 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 
 		}
 
+		for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetNormalBrush()->size(); ++i)
+		{
+			glm::ivec2 brushLocalPos	= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetNormalBrush()->at(i).pos;
+
+			glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
+
+			int pos = GetVertexPosition(pos2d);
+
+			if(pos != -1)
+			{
+				m_vertexData[pos].m_normal = CalcNormalOnCoord(pos2d);
+			}
+		}
+		
 		if(terrainVBO->UnmapBuffer() == false)
 			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not unmap buffer!");
 
@@ -201,7 +215,7 @@ glm::ivec2 TerrainTool::GetRayMarchCollision( const glm::vec3& p_cameraPos, cons
 		hitPos = glm::ivec2((rayPos.z - m_terrainTrans->m_position.z + midTransFactorZ) / m_terrainTrans->m_scale.z, (rayPos.x - m_terrainTrans->m_position.x + midTransFactorX) / m_terrainTrans->m_scale.x);
 		if(IsCoordInsideTerrain(hitPos))
 		{
-			if(rayPos.y <= m_vertexData[GetVertexPosition(hitPos)].m_pos.y)
+			if(rayPos.y <= m_vertexData[GetVertexPosition(hitPos)].m_pos.y + m_terrainTrans->m_position.y)
 			{
 				break;
 			}
@@ -222,5 +236,25 @@ bool TerrainTool::IsCoordInsideTerrain( glm::ivec2 p_pos)
 		return true;
 	else 
 		return false;
+}
+
+glm::vec3 TerrainTool::CalcNormalOnCoord( const glm::ivec2& p_pos )
+{
+	// Estimate normals for interior nodes using central difference.
+	float invTwoDX = 1.0f / (2.0f * m_terrainTrans->m_scale.x);
+	float invTwoDZ = 1.0f / (2.0f * m_terrainTrans->m_scale.z);
+
+	float t = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(-1, 0))].m_pos.y;
+	float b = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(1, 0))].m_pos.y;
+	float l = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(0, -1))].m_pos.y;
+	float r = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(0, 1))].m_pos.y;
+
+	glm::vec3 tanZ(0.0f, (t-b)*invTwoDZ, 1.0f);
+	glm::vec3 tanX(1.0f, (r-l)*invTwoDX, 0.0f);
+
+	glm::vec3 normalen = glm::cross(tanZ, tanX);
+	normalen = glm::normalize(normalen);
+
+	return normalen;
 }
 
