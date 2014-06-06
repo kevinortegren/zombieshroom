@@ -31,6 +31,7 @@ namespace RootEngine
 			virtual Model*	LoadCollada(std::string p_path) = 0;
 			virtual Sound::SoundAudioInterface* LoadSoundAudio(std::string p_name) = 0;
 			virtual Physics::PhysicsMeshInterface* GetPhysicsMesh(std::string p_handle) = 0;
+			virtual Physics::PhysicsMeshInterface* CreatePhysicsMesh(RootEngine::Model* p_model) = 0;
 
 			virtual std::string ForceLoadScript(std::string p_scriptName) = 0;
 			virtual std::string LoadScript(std::string p_scriptName) = 0;
@@ -83,12 +84,13 @@ namespace RootEngine
 			Model*	LoadCollada(std::string p_path);
 			Sound::SoundAudioInterface* LoadSoundAudio(std::string p_name);
 			Physics::PhysicsMeshInterface*	GetPhysicsMesh(std::string p_handle);
-
+			Physics::PhysicsMeshInterface* CreatePhysicsMesh(RootEngine::Model* p_model);
 			std::string ForceLoadScript(std::string p_scriptName);
 			std::string LoadScript(std::string p_scriptName);
 			std::string GetScript(std::string p_scriptName);
 			void		ReloadAllScripts();
 			void		ExportCollada(const std::string& p_modelName);
+			std::string ResolveStringFromMesh(Render::MeshInterface* p_mesh);
 		#endif
 
 		Model* CreateModel(const std::string& p_path);

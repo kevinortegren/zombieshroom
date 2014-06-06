@@ -937,7 +937,7 @@ ECS::Entity* EngineActions::CreateTerrainEntity( int p_width, int p_height )
 	}
 
 	std::vector<Render::Vertex1P1N1UV> vertices;
-	std::vector<unsigned int> indices;
+	terraintRend->m_model = g_engineContext.m_resourceManager->CreateModel("TerrainModelTerrain");
 
 	for (float x = 0.0f; x < (float)p_width; ++x)
 	{
@@ -948,6 +948,7 @@ ECS::Entity* EngineActions::CreateTerrainEntity( int p_width, int p_height )
 			v.m_normal	= glm::vec3(0.0f, 1.0f, 0.0f);
 			v.m_UV		= glm::vec2(x/(float)p_width, z/(float)p_width);
 			vertices.push_back(v);
+			terraintRend->m_model->m_positions.push_back(v.m_pos);
 		}
 	}
 
@@ -956,21 +957,22 @@ ECS::Entity* EngineActions::CreateTerrainEntity( int p_width, int p_height )
 		for (unsigned int z = 0; z < (unsigned int)(p_width-1); ++z)
 		{
 			unsigned int  start = x * p_width + z;
-			indices.push_back(start);
-			indices.push_back(start + 1);
-			indices.push_back(start + p_width + 1);
-			indices.push_back(start + p_width + 1);
-			indices.push_back(start + p_width);
-			indices.push_back(start);
+			terraintRend->m_model->m_indices.push_back(start);
+			terraintRend->m_model->m_indices.push_back(start + 1);
+			terraintRend->m_model->m_indices.push_back(start + p_width + 1);
+			terraintRend->m_model->m_indices.push_back(start + p_width + 1);
+			terraintRend->m_model->m_indices.push_back(start + p_width);
+			terraintRend->m_model->m_indices.push_back(start);
 		}
 	}
 
-	terraintRend->m_model = g_engineContext.m_resourceManager->CreateModel("TerrainModelTerrain");
 	terraintRend->m_model->m_meshes[0]->SetVertexBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ARRAY_BUFFER));
 	terraintRend->m_model->m_meshes[0]->SetElementBuffer(g_engineContext.m_renderer->CreateBuffer(GL_ELEMENT_ARRAY_BUFFER));
 	terraintRend->m_model->m_meshes[0]->SetVertexAttribute(g_engineContext.m_renderer->CreateVertexAttributes());
 	terraintRend->m_model->m_meshes[0]->CreateVertexBuffer1P1N1UV(&vertices[0], vertices.size());
-	terraintRend->m_model->m_meshes[0]->CreateIndexBuffer(&indices[0], indices.size());
+	terraintRend->m_model->m_meshes[0]->CreateIndexBuffer(&terraintRend->m_model->m_indices[0], terraintRend->m_model->m_indices.size());
+
+	g_engineContext.m_resourceManager->CreatePhysicsMesh(terraintRend->m_model);
 
 	m_world->GetTagManager()->RegisterEntity("Terrain", terrainEnt);
 

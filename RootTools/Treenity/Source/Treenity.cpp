@@ -98,8 +98,11 @@ Treenity::Treenity(QWidget *parent)
 	
 	ui.treeView_entityOutliner->SetEditorInterface(this);
 
-	//Set up water tool
+	//Set up water dialog
 	m_waterToolDockable = new WaterTool(this);
+	//Set up terrin dialog
+	m_terrainDialog = new TerrainDialog(this);
+	m_terrainDialog->SetEditorInterface(this);
 
 	// Match signals with slots.
 	connect(ui.actionNew,							SIGNAL(triggered()),		this,					SLOT(New()));
@@ -161,6 +164,7 @@ void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 	}
 	ui.widget_canvas3D->SetEngineInterface(p_engineInterface);
 	m_waterToolDockable->SetEngineInterface(p_engineInterface);
+	m_terrainDialog->SetEngineInterface(p_engineInterface);
 }
 
 void Treenity::SetProjectManager(ProjectManager* p_projectManager)
@@ -667,21 +671,26 @@ void Treenity::Update(float p_dt)
 void Treenity::SetTranslateTool()
 {
 	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
+	m_terrainDialog->hide();
 }
 
 void Treenity::SetRotateTool()
 {
 	m_toolManager.SetTool(ToolBox::ROTATION_TOOL);
+	m_terrainDialog->hide();
 }
 
 void Treenity::SetResizeTool()
 {
 	//Set resize tool
+	m_terrainDialog->hide();
 }
 
 void Treenity::SetTerrainGeometryTool()
 {
 	m_toolManager.SetTool(ToolBox::TERRAIN_TOOL);
+	m_terrainDialog->Show();
+
 }
 
 void Treenity::ChangeToolMode(int index)

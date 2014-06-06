@@ -1,7 +1,7 @@
 #include <RootTools/Treenity/Include/Brush.h>
 
 TerrainBrush::TerrainBrush()
-	: m_size(0), m_strength(0.0f), m_flat(false)
+	: m_size(0), m_strength(0.0f), m_flat(false), m_autoSmooth(false), m_smoothOnly(false)
 {
 
 }
@@ -16,6 +16,7 @@ void TerrainBrush::SetSize( int p_size )
 {
 	m_size = p_size;
 	m_brushElements.clear();
+	m_brushNormalElements.clear();
 	CalculateBrush();
 }
 
@@ -23,6 +24,7 @@ void TerrainBrush::SetStrength( float p_strength )
 {
 	m_strength = p_strength;
 	m_brushElements.clear();
+	m_brushNormalElements.clear();
 	CalculateBrush();
 }
 
@@ -30,6 +32,7 @@ void TerrainBrush::SetFlat( bool p_flat )
 {
 	m_flat = p_flat;
 	m_brushElements.clear();
+	m_brushNormalElements.clear();
 	CalculateBrush();
 }
 
@@ -58,4 +61,24 @@ std::vector<BrushElement>* TerrainBrush::GetBrush()
 std::vector<BrushElement>* TerrainBrush::GetNormalBrush()
 {
 	return &m_brushNormalElements;
+}
+
+void TerrainBrush::SetSmoothOnly( bool p_smoothOnly )
+{
+	m_smoothOnly = p_smoothOnly;
+}
+
+void TerrainBrush::SetAutoSmooth( bool p_autoSmooth )
+{
+	m_autoSmooth = p_autoSmooth;
+}
+
+bool TerrainBrush::GetSmoothOnly()
+{
+	return m_smoothOnly;
+}
+
+bool TerrainBrush::GetAutoSmooth()
+{
+	return m_autoSmooth;
 }

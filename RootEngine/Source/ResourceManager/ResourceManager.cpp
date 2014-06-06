@@ -556,5 +556,36 @@ namespace RootEngine
 				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "[EXPORT] Failed to export model: %s", p_modelName.c_str());
 		}
 	}
+
+	Physics::PhysicsMeshInterface* ResourceManager::CreatePhysicsMesh( RootEngine::Model* p_model )
+	{
+		std::string handle = ResolveStringFromMesh(p_model->m_meshes[0]);
+		
+		if(m_physicMeshes.find(handle) != m_physicMeshes.end())
+		{
+			return m_physicMeshes[handle].get();
+		}
+		else
+		{
+			std::shared_ptr<Physics::PhysicsMeshInterface> pmesh = m_context->m_physics->CreatePhysicsMesh();
+
+			pmesh->Init(p_model->m_positions, (int)p_model->m_positions.size(), p_model->m_indices, (int)p_model->m_indices.size(), (int)p_model->m_indices.size() / 3);
+
+			m_context->m_resourceManager->m_physicMeshes[handle] = pmesh;
+			p_model->m_physicsMeshes.push_back(pmesh);
+			return m_physicMeshes[handle].get();
+		}
+	}
+
+	std::string ResourceManager::ResolveStringFromMesh( Render::MeshInterface* p_mesh )
+	{
+		for(auto itr = m_meshes.begin(); itr != m_meshes.end(); ++itr)
+		{
+			if((*itr).second == p_mesh)
+				return (*itr).first;
+		}
+		return "";
+	}
+
 #endif
 }
