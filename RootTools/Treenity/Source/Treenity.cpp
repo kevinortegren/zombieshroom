@@ -120,7 +120,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.action_addScript,					SIGNAL(triggered()),		this,					SLOT(AddScriptComponent()));
 	connect(ui.action_collisionResponder,			SIGNAL(triggered()),		this,					SLOT(AddCollisionResponder()));
 	connect(ui.action_addParticle,					SIGNAL(triggered()),		this,					SLOT(AddParticleComponent()));
-	connect(ui.actionPlay,							SIGNAL(triggered()),		this,					SLOT(Play()));
+	connect(ui.pushButton_playMode,					SIGNAL(clicked()),			this,					SLOT(Play()));
 	connect(ui.pushButton_translateMode,			SIGNAL(clicked()),			this,					SLOT(SetTranslateTool()));
 	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
 	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
@@ -128,6 +128,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
 	connect(ui.actionWaterSetting,					SIGNAL(triggered()),		m_waterToolDockable,	SLOT(Show()));
 	connect(ui.actionAdd_terrain,					SIGNAL(triggered()),		this,					SLOT(AddTerrain()));
+
 
 	connect(m_componentViews[RootForce::ComponentType::RENDERABLE],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveRenderable(ECS::Entity*)));
 	connect(m_componentViews[RootForce::ComponentType::COLLISION],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemovePhysics(ECS::Entity*))); 
@@ -144,6 +145,9 @@ Treenity::Treenity(QWidget *parent)
 
 	m_brushManager.GetCurrentBrush()->SetSize(5);
 	m_brushManager.GetCurrentBrush()->SetStrength(3);
+
+	//Automatically cleaned up at program exi
+	new QShortcut(QKeySequence(Qt::Key_F), this, SLOT(FocusEntity()));
 
 }
 
@@ -327,9 +331,16 @@ void Treenity::SaveAs()
 void Treenity::Play()
 {
 	Utils::Write("Starting game session");
-
+	ui.treedeetoolbar->setEnabled(false);
+	ui.widget_rightSideLeftAligned->setEnabled(false);
 	ClearSelection();
 	m_engineInterface->EnterPlayMode();
+}
+
+void Treenity::ExitPlayMode()
+{
+	ui.treedeetoolbar->setEnabled(true);
+	ui.widget_rightSideLeftAligned->setEnabled(true);
 }
 
 void Treenity::Select(ECS::Entity* p_entity)
@@ -527,9 +538,15 @@ void Treenity::UpdateOnSelection()
 		m_compView->RemoveItems();
 	}
 
+	
+
 	// For all selected entities that has a collision component, visualize their shape.
 	for (auto entity : m_selectedEntities)
 	{
+		//Don't handle terrain in physics debug drawing
+		if(m_engineInterface->GetEntityByTag("Terrain") == entity)
+			continue;
+
 		if ((entity->GetFlag() & (1ULL << RootForce::ComponentType::COLLISION)) != 0)
 		{
 			m_engineInterface->SetCollisionVisualized(entity, true);
@@ -539,6 +556,10 @@ void Treenity::UpdateOnSelection()
 	// Remove collision visualization for deselected entities.
 	for (auto entity : m_previouslySelectedEntities)
 	{
+		//Don't handle terrain in physics debug drawing
+		if(m_engineInterface->GetEntityByTag("Terrain") == entity)
+			continue;
+
 		if ((entity->GetFlag() & (1ULL << RootForce::ComponentType::COLLISION)) != 0)
 		{
 			if (m_selectedEntities.find(entity) == m_selectedEntities.end())
@@ -559,12 +580,7 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 {
 	if(m_engineInterface->GetMode() == EditorMode::EDITOR)
 	{
-		if(event->key() == Qt::Key_F)
-		{
-			if(m_selectedEntities.size() > 0)
-			m_engineInterface->TargetEntity(*m_selectedEntities.begin());
-		}
-		else if(event->key() == Qt::Key_Delete)
+		if(event->key() == Qt::Key_Delete)
 		{
 			if(m_selectedEntities.size() > 0)
 			{
@@ -578,30 +594,10 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 		{
 			ClearSelection();
 		}
-		else if( event->key() == Qt::Key_Q)
-		{
-			ui.pushButton_translateMode->click();
-		}
-		else if( event->key() == Qt::Key_W)
-		{
-			ui.pushButton_rotateMode->click();
-		}
-		else if( event->key() == Qt::Key_E)
-		{
-			ui.pushButton_scaleMode->click();
-		}
 		else if( event->key() == Qt::Key_S)
 		{
 			int index = (m_toolMode == ToolMode::GLOBAL) ? 0 : 1;
 			ui.comboBox_mode->setCurrentIndex(index);
-		}
-		else if( event->key() == Qt::Key_R)
-		{
-			ui.pushButton_terrainGeometryMode->click();
-		}
-		else if( event->key() == Qt::Key_T)
-		{
-			ui.pushButton_terrainPaintMode->click();
 		}
 	}
 	else if(m_engineInterface->GetMode() == EditorMode::GAME)
@@ -626,7 +622,7 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 		}
 	}
 
-	g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
+	//g_engineContext.m_logger->LogText(LogTag::INPUT, LogLevel::PINK_PRINT, "Key pressed: %d", event->key() );
 }
 
 void Treenity::keyReleaseEvent( QKeyEvent* event )
@@ -670,32 +666,47 @@ void Treenity::Update(float p_dt)
 
 void Treenity::SetTranslateTool()
 {
-	m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
-	m_terrainDialog->hide();
+	if(m_engineInterface->GetMode() != EditorMode::GAME)
+	{
+		m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
+		m_terrainDialog->hide();
+	}
+	
 }
 
 void Treenity::SetRotateTool()
 {
-	m_toolManager.SetTool(ToolBox::ROTATION_TOOL);
-	m_terrainDialog->hide();
+	if(m_engineInterface->GetMode() != EditorMode::GAME)
+	{
+		m_toolManager.SetTool(ToolBox::ROTATION_TOOL);
+		m_terrainDialog->hide();
+	}
 }
 
 void Treenity::SetResizeTool()
 {
-	//Set resize tool
-	m_terrainDialog->hide();
+	if(m_engineInterface->GetMode() != EditorMode::GAME)
+	{
+		//Set resize tool
+		m_terrainDialog->hide();
+	}
 }
 
 void Treenity::SetTerrainGeometryTool()
 {
-	m_toolManager.SetTool(ToolBox::TERRAIN_TOOL);
-	m_terrainDialog->Show();
-
+	if(m_engineInterface->GetMode() != EditorMode::GAME)
+	{
+		m_toolManager.SetTool(ToolBox::TERRAIN_TOOL);
+		m_terrainDialog->Show();
+	}
 }
 
 void Treenity::ChangeToolMode(int index)
 {
-	m_toolMode = (ToolMode::ToolMode)index;
+	if(m_engineInterface->GetMode() != EditorMode::GAME)
+	{
+		m_toolMode = (ToolMode::ToolMode)index;
+	}
 }
 
 void Treenity::RemoveRenderable(ECS::Entity* p_entity)
@@ -732,3 +743,13 @@ void Treenity::AddTerrain()
 {
 	m_engineInterface->CreateTerrainEntity(128, 128);
 }
+
+void Treenity::FocusEntity()
+{
+	if(m_engineInterface->GetMode() != EditorMode::GAME)
+	{
+		if(m_selectedEntities.size() > 0)
+			m_engineInterface->TargetEntity(*m_selectedEntities.begin());
+	}
+}
+

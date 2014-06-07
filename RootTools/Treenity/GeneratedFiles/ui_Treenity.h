@@ -16,7 +16,9 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QFormLayout>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
@@ -25,7 +27,6 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
-#include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include <RootTools/Treenity/include/Canvas3D.h>
@@ -40,10 +41,6 @@ public:
     QAction *actionExit;
     QAction *action_saveAs;
     QAction *action_save;
-    QAction *actionRotate;
-    QAction *actionResize;
-    QAction *actionTranslate;
-    QAction *actionPlay;
     QAction *actionLog;
     QAction *action_removeEntity;
     QAction *action_addRenderable;
@@ -57,15 +54,19 @@ public:
     QAction *actionWaterSetting;
     QAction *actionAdd_terrain;
     QWidget *centralWidget;
-    QVBoxLayout *verticalLayout_2;
-    Canvas3D *widget_canvas3D;
+    QGridLayout *gridLayout;
     QWidget *treedeetoolbar;
+    QHBoxLayout *horizontalLayout;
     QPushButton *pushButton_translateMode;
     QPushButton *pushButton_rotateMode;
     QPushButton *pushButton_scaleMode;
     QComboBox *comboBox_mode;
     QPushButton *pushButton_terrainGeometryMode;
     QPushButton *pushButton_terrainPaintMode;
+    Canvas3D *widget_canvas3D;
+    QWidget *widget_rightSideLeftAligned;
+    QGridLayout *gridLayout_2;
+    QPushButton *pushButton_playMode;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -73,7 +74,6 @@ public:
     QMenu *menuComponent;
     QMenu *menu_addComponent;
     QMenu *menuView;
-    QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QDockWidget *dockWidget_4;
     QWidget *dockWidgetContents_4;
@@ -98,7 +98,7 @@ public:
     {
         if (TreenityClass->objectName().isEmpty())
             TreenityClass->setObjectName(QStringLiteral("TreenityClass"));
-        TreenityClass->resize(1292, 878);
+        TreenityClass->resize(1272, 878);
         TreenityClass->setStyleSheet(QStringLiteral(""));
         TreenityClass->setTabShape(QTabWidget::Rounded);
         TreenityClass->setDockOptions(QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
@@ -110,29 +110,6 @@ public:
         action_saveAs->setObjectName(QStringLiteral("action_saveAs"));
         action_save = new QAction(TreenityClass);
         action_save->setObjectName(QStringLiteral("action_save"));
-        actionRotate = new QAction(TreenityClass);
-        actionRotate->setObjectName(QStringLiteral("actionRotate"));
-        actionRotate->setCheckable(true);
-        QIcon icon;
-        icon.addFile(QStringLiteral("Resources/rotateButton.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionRotate->setIcon(icon);
-        actionResize = new QAction(TreenityClass);
-        actionResize->setObjectName(QStringLiteral("actionResize"));
-        actionResize->setCheckable(true);
-        QIcon icon1;
-        icon1.addFile(QStringLiteral("Resources/resizeButton.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionResize->setIcon(icon1);
-        actionTranslate = new QAction(TreenityClass);
-        actionTranslate->setObjectName(QStringLiteral("actionTranslate"));
-        actionTranslate->setCheckable(true);
-        QIcon icon2;
-        icon2.addFile(QStringLiteral("Resources/translateButton.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionTranslate->setIcon(icon2);
-        actionPlay = new QAction(TreenityClass);
-        actionPlay->setObjectName(QStringLiteral("actionPlay"));
-        QIcon icon3;
-        icon3.addFile(QStringLiteral("Resources/playButton.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionPlay->setIcon(icon3);
         actionLog = new QAction(TreenityClass);
         actionLog->setObjectName(QStringLiteral("actionLog"));
         action_removeEntity = new QAction(TreenityClass);
@@ -159,11 +136,106 @@ public:
         actionAdd_terrain->setObjectName(QStringLiteral("actionAdd_terrain"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        verticalLayout_2 = new QVBoxLayout(centralWidget);
-        verticalLayout_2->setSpacing(0);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        gridLayout = new QGridLayout(centralWidget);
+        gridLayout->setSpacing(0);
+        gridLayout->setContentsMargins(11, 11, 11, 11);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setContentsMargins(0, 0, 0, 0);
+        treedeetoolbar = new QWidget(centralWidget);
+        treedeetoolbar->setObjectName(QStringLiteral("treedeetoolbar"));
+        treedeetoolbar->setMinimumSize(QSize(0, 32));
+        treedeetoolbar->setMaximumSize(QSize(16777215, 32));
+        horizontalLayout = new QHBoxLayout(treedeetoolbar);
+        horizontalLayout->setSpacing(0);
+        horizontalLayout->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        pushButton_translateMode = new QPushButton(treedeetoolbar);
+        pushButton_translateMode->setObjectName(QStringLiteral("pushButton_translateMode"));
+        pushButton_translateMode->setMinimumSize(QSize(32, 32));
+        pushButton_translateMode->setMaximumSize(QSize(32, 32));
+        pushButton_translateMode->setFocusPolicy(Qt::NoFocus);
+        QIcon icon;
+        icon.addFile(QStringLiteral("Resources/translateButton.png"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_translateMode->setIcon(icon);
+        pushButton_translateMode->setIconSize(QSize(24, 24));
+        pushButton_translateMode->setCheckable(true);
+        pushButton_translateMode->setChecked(true);
+        pushButton_translateMode->setAutoExclusive(true);
+
+        horizontalLayout->addWidget(pushButton_translateMode);
+
+        pushButton_rotateMode = new QPushButton(treedeetoolbar);
+        pushButton_rotateMode->setObjectName(QStringLiteral("pushButton_rotateMode"));
+        pushButton_rotateMode->setMinimumSize(QSize(32, 32));
+        pushButton_rotateMode->setMaximumSize(QSize(32, 32));
+        pushButton_rotateMode->setFocusPolicy(Qt::NoFocus);
+        QIcon icon1;
+        icon1.addFile(QStringLiteral("Resources/rotateButton.png"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_rotateMode->setIcon(icon1);
+        pushButton_rotateMode->setIconSize(QSize(24, 24));
+        pushButton_rotateMode->setCheckable(true);
+        pushButton_rotateMode->setAutoExclusive(true);
+
+        horizontalLayout->addWidget(pushButton_rotateMode);
+
+        pushButton_scaleMode = new QPushButton(treedeetoolbar);
+        pushButton_scaleMode->setObjectName(QStringLiteral("pushButton_scaleMode"));
+        pushButton_scaleMode->setMinimumSize(QSize(32, 32));
+        pushButton_scaleMode->setMaximumSize(QSize(32, 32));
+        pushButton_scaleMode->setFocusPolicy(Qt::NoFocus);
+        pushButton_scaleMode->setStyleSheet(QStringLiteral(""));
+        QIcon icon2;
+        icon2.addFile(QStringLiteral("Resources/resizeButton.png"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_scaleMode->setIcon(icon2);
+        pushButton_scaleMode->setIconSize(QSize(24, 24));
+        pushButton_scaleMode->setCheckable(true);
+        pushButton_scaleMode->setAutoExclusive(true);
+
+        horizontalLayout->addWidget(pushButton_scaleMode);
+
+        comboBox_mode = new QComboBox(treedeetoolbar);
+        comboBox_mode->setObjectName(QStringLiteral("comboBox_mode"));
+        comboBox_mode->setMinimumSize(QSize(70, 32));
+        comboBox_mode->setMaximumSize(QSize(80, 16777215));
+        comboBox_mode->setFocusPolicy(Qt::NoFocus);
+        comboBox_mode->setStyleSheet(QStringLiteral(""));
+
+        horizontalLayout->addWidget(comboBox_mode);
+
+        pushButton_terrainGeometryMode = new QPushButton(treedeetoolbar);
+        pushButton_terrainGeometryMode->setObjectName(QStringLiteral("pushButton_terrainGeometryMode"));
+        pushButton_terrainGeometryMode->setMinimumSize(QSize(32, 32));
+        pushButton_terrainGeometryMode->setMaximumSize(QSize(32, 32));
+        pushButton_terrainGeometryMode->setFocusPolicy(Qt::NoFocus);
+        QIcon icon3;
+        icon3.addFile(QStringLiteral("Resources/terrainGeometryTool.png"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_terrainGeometryMode->setIcon(icon3);
+        pushButton_terrainGeometryMode->setIconSize(QSize(24, 24));
+        pushButton_terrainGeometryMode->setCheckable(true);
+        pushButton_terrainGeometryMode->setChecked(false);
+        pushButton_terrainGeometryMode->setAutoExclusive(true);
+
+        horizontalLayout->addWidget(pushButton_terrainGeometryMode);
+
+        pushButton_terrainPaintMode = new QPushButton(treedeetoolbar);
+        pushButton_terrainPaintMode->setObjectName(QStringLiteral("pushButton_terrainPaintMode"));
+        pushButton_terrainPaintMode->setMinimumSize(QSize(32, 32));
+        pushButton_terrainPaintMode->setMaximumSize(QSize(32, 32));
+        pushButton_terrainPaintMode->setFocusPolicy(Qt::NoFocus);
+        QIcon icon4;
+        icon4.addFile(QStringLiteral("Resources/terrainPaintTool.png"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_terrainPaintMode->setIcon(icon4);
+        pushButton_terrainPaintMode->setIconSize(QSize(24, 24));
+        pushButton_terrainPaintMode->setCheckable(true);
+        pushButton_terrainPaintMode->setChecked(false);
+        pushButton_terrainPaintMode->setAutoExclusive(true);
+
+        horizontalLayout->addWidget(pushButton_terrainPaintMode);
+
+
+        gridLayout->addWidget(treedeetoolbar, 1, 0, 1, 1, Qt::AlignLeft);
+
         widget_canvas3D = new Canvas3D(centralWidget);
         widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -173,73 +245,37 @@ public:
         widget_canvas3D->setSizePolicy(sizePolicy);
         widget_canvas3D->setStyleSheet(QStringLiteral("background-color: #000000;"));
 
-        verticalLayout_2->addWidget(widget_canvas3D);
+        gridLayout->addWidget(widget_canvas3D, 0, 0, 1, 2);
 
-        treedeetoolbar = new QWidget(centralWidget);
-        treedeetoolbar->setObjectName(QStringLiteral("treedeetoolbar"));
-        treedeetoolbar->setMinimumSize(QSize(480, 32));
-        treedeetoolbar->setMaximumSize(QSize(16777215, 32));
-        pushButton_translateMode = new QPushButton(treedeetoolbar);
-        pushButton_translateMode->setObjectName(QStringLiteral("pushButton_translateMode"));
-        pushButton_translateMode->setGeometry(QRect(0, 0, 32, 32));
-        pushButton_translateMode->setMinimumSize(QSize(32, 32));
-        pushButton_translateMode->setMaximumSize(QSize(32, 32));
-        pushButton_translateMode->setIcon(icon2);
-        pushButton_translateMode->setCheckable(true);
-        pushButton_translateMode->setChecked(true);
-        pushButton_translateMode->setAutoExclusive(true);
-        pushButton_rotateMode = new QPushButton(treedeetoolbar);
-        pushButton_rotateMode->setObjectName(QStringLiteral("pushButton_rotateMode"));
-        pushButton_rotateMode->setGeometry(QRect(32, 0, 32, 32));
-        pushButton_rotateMode->setMinimumSize(QSize(32, 32));
-        pushButton_rotateMode->setMaximumSize(QSize(32, 32));
-        pushButton_rotateMode->setIcon(icon);
-        pushButton_rotateMode->setCheckable(true);
-        pushButton_rotateMode->setAutoExclusive(true);
-        pushButton_scaleMode = new QPushButton(treedeetoolbar);
-        pushButton_scaleMode->setObjectName(QStringLiteral("pushButton_scaleMode"));
-        pushButton_scaleMode->setGeometry(QRect(64, 0, 32, 32));
-        pushButton_scaleMode->setMinimumSize(QSize(32, 32));
-        pushButton_scaleMode->setMaximumSize(QSize(32, 32));
-        pushButton_scaleMode->setStyleSheet(QStringLiteral(""));
-        pushButton_scaleMode->setIcon(icon1);
-        pushButton_scaleMode->setCheckable(true);
-        pushButton_scaleMode->setAutoExclusive(true);
-        comboBox_mode = new QComboBox(treedeetoolbar);
-        comboBox_mode->setObjectName(QStringLiteral("comboBox_mode"));
-        comboBox_mode->setGeometry(QRect(96, 0, 70, 32));
-        comboBox_mode->setMinimumSize(QSize(70, 32));
-        comboBox_mode->setStyleSheet(QStringLiteral(""));
-        pushButton_terrainGeometryMode = new QPushButton(treedeetoolbar);
-        pushButton_terrainGeometryMode->setObjectName(QStringLiteral("pushButton_terrainGeometryMode"));
-        pushButton_terrainGeometryMode->setGeometry(QRect(166, 0, 32, 32));
-        pushButton_terrainGeometryMode->setMinimumSize(QSize(32, 32));
-        pushButton_terrainGeometryMode->setMaximumSize(QSize(32, 32));
-        QIcon icon4;
-        icon4.addFile(QStringLiteral("Resources/terrainGeometryTool.png"), QSize(), QIcon::Normal, QIcon::Off);
-        pushButton_terrainGeometryMode->setIcon(icon4);
-        pushButton_terrainGeometryMode->setIconSize(QSize(16, 16));
-        pushButton_terrainGeometryMode->setCheckable(true);
-        pushButton_terrainGeometryMode->setChecked(false);
-        pushButton_terrainGeometryMode->setAutoExclusive(true);
-        pushButton_terrainPaintMode = new QPushButton(treedeetoolbar);
-        pushButton_terrainPaintMode->setObjectName(QStringLiteral("pushButton_terrainPaintMode"));
-        pushButton_terrainPaintMode->setGeometry(QRect(198, 0, 32, 32));
-        pushButton_terrainPaintMode->setMinimumSize(QSize(32, 32));
-        pushButton_terrainPaintMode->setMaximumSize(QSize(32, 32));
+        widget_rightSideLeftAligned = new QWidget(centralWidget);
+        widget_rightSideLeftAligned->setObjectName(QStringLiteral("widget_rightSideLeftAligned"));
+        gridLayout_2 = new QGridLayout(widget_rightSideLeftAligned);
+        gridLayout_2->setSpacing(0);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setContentsMargins(0, 0, 0, 0);
+        pushButton_playMode = new QPushButton(widget_rightSideLeftAligned);
+        pushButton_playMode->setObjectName(QStringLiteral("pushButton_playMode"));
+        pushButton_playMode->setMinimumSize(QSize(32, 32));
+        pushButton_playMode->setMaximumSize(QSize(32, 32));
+        pushButton_playMode->setFocusPolicy(Qt::NoFocus);
         QIcon icon5;
-        icon5.addFile(QStringLiteral("Resources/terrainPaintTool.png"), QSize(), QIcon::Normal, QIcon::Off);
-        pushButton_terrainPaintMode->setIcon(icon5);
-        pushButton_terrainPaintMode->setCheckable(true);
-        pushButton_terrainPaintMode->setChecked(false);
-        pushButton_terrainPaintMode->setAutoExclusive(true);
+        icon5.addFile(QStringLiteral("Resources/playButton.png"), QSize(), QIcon::Normal, QIcon::Off);
+        pushButton_playMode->setIcon(icon5);
+        pushButton_playMode->setIconSize(QSize(24, 24));
+        pushButton_playMode->setCheckable(false);
+        pushButton_playMode->setChecked(false);
+        pushButton_playMode->setAutoExclusive(false);
 
-        verticalLayout_2->addWidget(treedeetoolbar);
+        gridLayout_2->addWidget(pushButton_playMode, 0, 0, 1, 1);
+
+
+        gridLayout->addWidget(widget_rightSideLeftAligned, 1, 1, 1, 1, Qt::AlignLeft);
 
         TreenityClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(TreenityClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1292, 21));
+        menuBar->setGeometry(QRect(0, 0, 1272, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuEdit = new QMenu(menuBar);
@@ -253,9 +289,6 @@ public:
         menuView = new QMenu(menuBar);
         menuView->setObjectName(QStringLiteral("menuView"));
         TreenityClass->setMenuBar(menuBar);
-        mainToolBar = new QToolBar(TreenityClass);
-        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
-        TreenityClass->addToolBar(Qt::TopToolBarArea, mainToolBar);
         statusBar = new QStatusBar(TreenityClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         statusBar->setSizeGripEnabled(true);
@@ -382,7 +415,6 @@ public:
         menu_addComponent->addAction(action_addParticle);
         menuView->addAction(actionLog);
         menuView->addAction(actionWaterSetting);
-        mainToolBar->addAction(actionPlay);
 
         retranslateUi(TreenityClass);
 
@@ -394,26 +426,13 @@ public:
         TreenityClass->setWindowTitle(QApplication::translate("TreenityClass", "Treenity", 0));
         action_addEntity->setText(QApplication::translate("TreenityClass", "Add entity", 0));
         actionExit->setText(QApplication::translate("TreenityClass", "Exit", 0));
-        actionExit->setShortcut(QApplication::translate("TreenityClass", "Ctrl+D", 0));
+        actionExit->setShortcut(QApplication::translate("TreenityClass", "Ctrl+Q", 0));
         action_saveAs->setText(QApplication::translate("TreenityClass", "Save As...", 0));
+        action_saveAs->setShortcut(QApplication::translate("TreenityClass", "Ctrl+Shift+S", 0));
         action_save->setText(QApplication::translate("TreenityClass", "Save", 0));
-        actionRotate->setText(QApplication::translate("TreenityClass", "Rotate", 0));
-#ifndef QT_NO_TOOLTIP
-        actionRotate->setToolTip(QApplication::translate("TreenityClass", "Rotate things", 0));
-#endif // QT_NO_TOOLTIP
-        actionResize->setText(QApplication::translate("TreenityClass", "Resize", 0));
-#ifndef QT_NO_TOOLTIP
-        actionResize->setToolTip(QApplication::translate("TreenityClass", "Resize things", 0));
-#endif // QT_NO_TOOLTIP
-        actionTranslate->setText(QApplication::translate("TreenityClass", "Translate", 0));
-#ifndef QT_NO_TOOLTIP
-        actionTranslate->setToolTip(QApplication::translate("TreenityClass", "Move things", 0));
-#endif // QT_NO_TOOLTIP
-        actionPlay->setText(QApplication::translate("TreenityClass", "Play", 0));
-#ifndef QT_NO_TOOLTIP
-        actionPlay->setToolTip(QApplication::translate("TreenityClass", "Play the game", 0));
-#endif // QT_NO_TOOLTIP
+        action_save->setShortcut(QApplication::translate("TreenityClass", "Ctrl+S", 0));
         actionLog->setText(QApplication::translate("TreenityClass", "Log", 0));
+        actionLog->setShortcut(QApplication::translate("TreenityClass", "Ctrl+L", 0));
         action_removeEntity->setText(QApplication::translate("TreenityClass", "Remove entity", 0));
         action_addRenderable->setText(QApplication::translate("TreenityClass", "Renderable", 0));
 #ifndef QT_NO_TOOLTIP
@@ -424,36 +443,61 @@ public:
         action_addPhysics->setToolTip(QApplication::translate("TreenityClass", "Add mass and velocity to the selected entity.", 0));
 #endif // QT_NO_TOOLTIP
         actionNew->setText(QApplication::translate("TreenityClass", "New", 0));
+        actionNew->setShortcut(QApplication::translate("TreenityClass", "Ctrl+N", 0));
         actionOpen_Project->setText(QApplication::translate("TreenityClass", "Open Project...", 0));
+        actionOpen_Project->setShortcut(QApplication::translate("TreenityClass", "Ctrl+O", 0));
         action_addWaterCollider->setText(QApplication::translate("TreenityClass", "Water Collider", 0));
         action_addScript->setText(QApplication::translate("TreenityClass", "Script", 0));
         action_collisionResponder->setText(QApplication::translate("TreenityClass", "Collision responder", 0));
         action_addParticle->setText(QApplication::translate("TreenityClass", "Particle", 0));
         actionWaterSetting->setText(QApplication::translate("TreenityClass", "Water settings", 0));
+        actionWaterSetting->setShortcut(QApplication::translate("TreenityClass", "Ctrl+W", 0));
         actionAdd_terrain->setText(QApplication::translate("TreenityClass", "Add terrain", 0));
+        actionAdd_terrain->setShortcut(QApplication::translate("TreenityClass", "Ctrl+T", 0));
+#ifndef QT_NO_TOOLTIP
+        pushButton_translateMode->setToolTip(QApplication::translate("TreenityClass", "Translate tool (Q)", 0));
+#endif // QT_NO_TOOLTIP
         pushButton_translateMode->setText(QString());
+        pushButton_translateMode->setShortcut(QApplication::translate("TreenityClass", "Q", 0));
+#ifndef QT_NO_TOOLTIP
+        pushButton_rotateMode->setToolTip(QApplication::translate("TreenityClass", "Rotate tool (W)", 0));
+#endif // QT_NO_TOOLTIP
         pushButton_rotateMode->setText(QString());
+        pushButton_rotateMode->setShortcut(QApplication::translate("TreenityClass", "W", 0));
+#ifndef QT_NO_TOOLTIP
+        pushButton_scaleMode->setToolTip(QApplication::translate("TreenityClass", "Scale tool (E)", 0));
+#endif // QT_NO_TOOLTIP
         pushButton_scaleMode->setText(QString());
+        pushButton_scaleMode->setShortcut(QApplication::translate("TreenityClass", "E", 0));
         comboBox_mode->clear();
         comboBox_mode->insertItems(0, QStringList()
          << QApplication::translate("TreenityClass", "Local", 0)
          << QApplication::translate("TreenityClass", "Global", 0)
         );
 #ifndef QT_NO_TOOLTIP
-        pushButton_terrainGeometryMode->setToolTip(QApplication::translate("TreenityClass", "Edit terrain geometry", 0));
+        comboBox_mode->setToolTip(QApplication::translate("TreenityClass", "Set coord space for transform tools (S)", 0));
+#endif // QT_NO_TOOLTIP
+#ifndef QT_NO_TOOLTIP
+        pushButton_terrainGeometryMode->setToolTip(QApplication::translate("TreenityClass", "Edit terrain geometry (R)", 0));
 #endif // QT_NO_TOOLTIP
         pushButton_terrainGeometryMode->setText(QString());
+        pushButton_terrainGeometryMode->setShortcut(QApplication::translate("TreenityClass", "R", 0));
 #ifndef QT_NO_TOOLTIP
-        pushButton_terrainPaintMode->setToolTip(QApplication::translate("TreenityClass", "Paint terrain", 0));
+        pushButton_terrainPaintMode->setToolTip(QApplication::translate("TreenityClass", "Paint terrain (T)", 0));
 #endif // QT_NO_TOOLTIP
         pushButton_terrainPaintMode->setText(QString());
+        pushButton_terrainPaintMode->setShortcut(QApplication::translate("TreenityClass", "T", 0));
+#ifndef QT_NO_TOOLTIP
+        pushButton_playMode->setToolTip(QApplication::translate("TreenityClass", "Play mode (F5)", 0));
+#endif // QT_NO_TOOLTIP
+        pushButton_playMode->setText(QString());
+        pushButton_playMode->setShortcut(QApplication::translate("TreenityClass", "F5", 0));
         menuFile->setTitle(QApplication::translate("TreenityClass", "File", 0));
         menuEdit->setTitle(QApplication::translate("TreenityClass", "Edit", 0));
         menuEntity->setTitle(QApplication::translate("TreenityClass", "Entity", 0));
         menuComponent->setTitle(QApplication::translate("TreenityClass", "Component", 0));
         menu_addComponent->setTitle(QApplication::translate("TreenityClass", "Add component", 0));
         menuView->setTitle(QApplication::translate("TreenityClass", "View", 0));
-        mainToolBar->setWindowTitle(QApplication::translate("TreenityClass", "Play toolbar", 0));
         dockWidget_4->setWindowTitle(QApplication::translate("TreenityClass", "Outline", 0));
         pushButton_addEntity->setText(QApplication::translate("TreenityClass", "+", 0));
         pushButton_removeEntity->setText(QApplication::translate("TreenityClass", "-", 0));

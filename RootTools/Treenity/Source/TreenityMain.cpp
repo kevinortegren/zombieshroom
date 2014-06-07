@@ -620,7 +620,7 @@ void TreenityMain::RenderSelectedEntity()
 		RootForce::Collision* collision = g_world->GetEntityManager()->GetComponent<RootForce::Collision>(*itr);
 		if (collision != nullptr)
 		{
-			if (g_engineContext.m_physics->GetShape(*collision->m_handle) == RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH)
+			if (g_engineContext.m_physics->GetShape(*collision->m_handle) == RootEngine::Physics::PhysicsShape::SHAPE_CUSTOM_MESH && m_world.GetTagManager()->GetEntityByTag("Terrain") != entity)
 			{
 				continue;
 			}
@@ -640,6 +640,12 @@ void TreenityMain::RenderSelectedEntity()
 		m_renderingSystem->m_matrices[entity].m_model = glm::rotate(m_renderingSystem->m_matrices[entity].m_model, transform->m_orientation.GetAngle(), transform->m_orientation.GetAxis());
 		m_renderingSystem->m_matrices[entity].m_model = glm::scale(m_renderingSystem->m_matrices[entity].m_model, transform->m_scale);
 		m_renderingSystem->m_matrices[entity].m_normal = glm::mat4(glm::transpose(glm::inverse(glm::mat3(m_renderingSystem->m_matrices[entity].m_model))));
+
+		if(m_world.GetTagManager()->GetEntityByTag("Terrain") == entity)
+		{
+			Debug(&renderable->m_model->m_obb, m_renderingSystem->m_matrices[entity].m_model, glm::vec3(0,1,0));
+			continue;
+		}
 
 		Render::RenderJob job;	
 		job.m_mesh = renderable->m_model->m_meshes[0];
@@ -682,6 +688,9 @@ void TreenityMain::SelectPick(const glm::vec3& cameraPos, const glm::vec3& ray)
 				continue;
 
 			if(m_world.GetTagManager()->GetEntityByTag("Water") == (*itr))
+				continue;
+
+			if(m_world.GetTagManager()->GetEntityByTag("Terrain") == (*itr))
 				continue;
 
 			if(m_world.GetGroupManager()->IsEntityInGroup((*itr), "Tools"))

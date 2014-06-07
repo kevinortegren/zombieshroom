@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Treenity_t {
-    QByteArrayData data[30];
-    char stringdata[408];
+    QByteArrayData data[31];
+    char stringdata[420];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -52,13 +52,14 @@ QT_MOC_LITERAL(19, 232, 22),
 QT_MOC_LITERAL(20, 255, 14),
 QT_MOC_LITERAL(21, 270, 5),
 QT_MOC_LITERAL(22, 276, 10),
-QT_MOC_LITERAL(23, 287, 16),
-QT_MOC_LITERAL(24, 304, 12),
-QT_MOC_LITERAL(25, 317, 8),
-QT_MOC_LITERAL(26, 326, 13),
-QT_MOC_LITERAL(27, 340, 19),
-QT_MOC_LITERAL(28, 360, 21),
-QT_MOC_LITERAL(29, 382, 24)
+QT_MOC_LITERAL(23, 287, 11),
+QT_MOC_LITERAL(24, 299, 16),
+QT_MOC_LITERAL(25, 316, 12),
+QT_MOC_LITERAL(26, 329, 8),
+QT_MOC_LITERAL(27, 338, 13),
+QT_MOC_LITERAL(28, 352, 19),
+QT_MOC_LITERAL(29, 372, 21),
+QT_MOC_LITERAL(30, 394, 24)
     },
     "Treenity\0New\0\0OpenProject\0Save\0SaveAs\0"
     "Play\0CreateEntity\0DestroyEntity\0"
@@ -68,8 +69,8 @@ QT_MOC_LITERAL(29, 382, 24)
     "SetTranslateTool\0SetRotateTool\0"
     "SetResizeTool\0SetTerrainGeometryTool\0"
     "ChangeToolMode\0index\0AddTerrain\0"
-    "RemoveRenderable\0ECS::Entity*\0p_entity\0"
-    "RemovePhysics\0RemoveWaterCollider\0"
+    "FocusEntity\0RemoveRenderable\0ECS::Entity*\0"
+    "p_entity\0RemovePhysics\0RemoveWaterCollider\0"
     "RemoveScriptComponent\0RemoveCollisionResponder\0"
 };
 #undef QT_MOC_LITERAL
@@ -80,7 +81,7 @@ static const uint qt_meta_data_Treenity[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      25,   14, // methods
+      26,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -88,31 +89,32 @@ static const uint qt_meta_data_Treenity[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  139,    2, 0x08,
-       3,    0,  140,    2, 0x08,
-       4,    0,  141,    2, 0x08,
-       5,    0,  142,    2, 0x08,
-       6,    0,  143,    2, 0x08,
-       7,    0,  144,    2, 0x08,
-       8,    0,  145,    2, 0x08,
-       9,    0,  146,    2, 0x08,
-      10,    0,  147,    2, 0x08,
-      11,    0,  148,    2, 0x08,
-      12,    0,  149,    2, 0x08,
-      13,    0,  150,    2, 0x08,
-      14,    0,  151,    2, 0x08,
-      15,    0,  152,    2, 0x08,
-      16,    0,  153,    2, 0x08,
-      17,    0,  154,    2, 0x08,
-      18,    0,  155,    2, 0x08,
-      19,    0,  156,    2, 0x08,
-      20,    1,  157,    2, 0x08,
-      22,    0,  160,    2, 0x08,
-      23,    1,  161,    2, 0x08,
-      26,    1,  164,    2, 0x08,
-      27,    1,  167,    2, 0x08,
-      28,    1,  170,    2, 0x08,
-      29,    1,  173,    2, 0x08,
+       1,    0,  144,    2, 0x08,
+       3,    0,  145,    2, 0x08,
+       4,    0,  146,    2, 0x08,
+       5,    0,  147,    2, 0x08,
+       6,    0,  148,    2, 0x08,
+       7,    0,  149,    2, 0x08,
+       8,    0,  150,    2, 0x08,
+       9,    0,  151,    2, 0x08,
+      10,    0,  152,    2, 0x08,
+      11,    0,  153,    2, 0x08,
+      12,    0,  154,    2, 0x08,
+      13,    0,  155,    2, 0x08,
+      14,    0,  156,    2, 0x08,
+      15,    0,  157,    2, 0x08,
+      16,    0,  158,    2, 0x08,
+      17,    0,  159,    2, 0x08,
+      18,    0,  160,    2, 0x08,
+      19,    0,  161,    2, 0x08,
+      20,    1,  162,    2, 0x08,
+      22,    0,  165,    2, 0x08,
+      23,    0,  166,    2, 0x08,
+      24,    1,  167,    2, 0x08,
+      27,    1,  170,    2, 0x08,
+      28,    1,  173,    2, 0x08,
+      29,    1,  176,    2, 0x08,
+      30,    1,  179,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -135,11 +137,12 @@ static const uint qt_meta_data_Treenity[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,   21,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 24,   25,
-    QMetaType::Void, 0x80000000 | 24,   25,
-    QMetaType::Void, 0x80000000 | 24,   25,
-    QMetaType::Void, 0x80000000 | 24,   25,
-    QMetaType::Void, 0x80000000 | 24,   25,
+    QMetaType::Void,
+    QMetaType::Void, 0x80000000 | 25,   26,
+    QMetaType::Void, 0x80000000 | 25,   26,
+    QMetaType::Void, 0x80000000 | 25,   26,
+    QMetaType::Void, 0x80000000 | 25,   26,
+    QMetaType::Void, 0x80000000 | 25,   26,
 
        0        // eod
 };
@@ -169,11 +172,12 @@ void Treenity::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 17: _t->SetTerrainGeometryTool(); break;
         case 18: _t->ChangeToolMode((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 19: _t->AddTerrain(); break;
-        case 20: _t->RemoveRenderable((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
-        case 21: _t->RemovePhysics((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
-        case 22: _t->RemoveWaterCollider((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
-        case 23: _t->RemoveScriptComponent((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
-        case 24: _t->RemoveCollisionResponder((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
+        case 20: _t->FocusEntity(); break;
+        case 21: _t->RemoveRenderable((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
+        case 22: _t->RemovePhysics((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
+        case 23: _t->RemoveWaterCollider((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
+        case 24: _t->RemoveScriptComponent((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
+        case 25: _t->RemoveCollisionResponder((*reinterpret_cast< ECS::Entity*(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -206,13 +210,13 @@ int Treenity::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 25)
+        if (_id < 26)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 25;
+        _id -= 26;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 25)
+        if (_id < 26)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 25;
+        _id -= 26;
     }
     return _id;
 }

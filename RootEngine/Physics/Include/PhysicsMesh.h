@@ -12,7 +12,7 @@ namespace RootEngine
 			
 			virtual ~PhysicsMeshInterface() {}
 			virtual void Init(std::vector<glm::vec3> p_pointData, int p_nrOfPoints, std::vector<unsigned int> p_indexData, int p_nrOfIndices, int p_faces) = 0;
-			
+
 			virtual float*	GetMeshPoints() = 0;
 			virtual int*	GetIndices() = 0;
 			virtual int		GetNrOfIndices() = 0;

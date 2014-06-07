@@ -278,6 +278,8 @@ void EngineActions::ExitPlayMode()
 	g_engineContext.m_inputSys->LockMouseToCenter(false);
 	m_editorMode = EditorMode::EDITOR;
 
+	m_treenityMain->GetEditor()->ExitPlayMode();
+
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Exited play mode");
 }
 
@@ -973,6 +975,13 @@ ECS::Entity* EngineActions::CreateTerrainEntity( int p_width, int p_height )
 	terraintRend->m_model->m_meshes[0]->CreateIndexBuffer(&terraintRend->m_model->m_indices[0], terraintRend->m_model->m_indices.size());
 
 	g_engineContext.m_resourceManager->CreatePhysicsMesh(terraintRend->m_model);
+
+	terraintRend->m_model->m_obb.m_maxX = (float)p_width/2.0f;
+	terraintRend->m_model->m_obb.m_maxZ = (float)p_width/2.0f;
+	terraintRend->m_model->m_obb.m_maxY = 2.0f;
+	terraintRend->m_model->m_obb.m_minX = -(float)p_width/2.0f;
+	terraintRend->m_model->m_obb.m_minZ = -(float)p_width/2.0f;
+	terraintRend->m_model->m_obb.m_minY = -2.0f;
 
 	m_world->GetTagManager()->RegisterEntity("Terrain", terrainEnt);
 

@@ -112,6 +112,8 @@ void Canvas3D::CreateOpenGLContext() //Horrible name
 	g_engineContext.m_inputSys->SetWindow(m_window.get());
 }
 
+
+
 void Canvas3D::wheelEvent(QWheelEvent* event)
 {
 	SDL_Event scrollEvent;

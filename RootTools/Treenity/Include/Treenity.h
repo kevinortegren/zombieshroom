@@ -70,6 +70,9 @@ public:
 	ToolMode::ToolMode GetToolMode();
 	BrushManager* GetBrushManager();
 
+	//Called as the last thing when exiting playmode
+	void ExitPlayMode();
+
 	//Called after RootEngine has been loaded from TreenityMain!
 	void Init();
 
@@ -116,7 +119,6 @@ private:
 protected:
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);
-	
 private slots:
 	void New();
 	void OpenProject();
@@ -138,6 +140,7 @@ private slots:
 	void SetTerrainGeometryTool();
 	void ChangeToolMode(int index);
 	void AddTerrain();
+	void FocusEntity();
 
 	void RemoveRenderable(ECS::Entity* p_entity);
 	void RemovePhysics(ECS::Entity* p_entity);

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1292</width>
+    <width>1272</width>
     <height>878</height>
    </rect>
   </property>
@@ -23,10 +23,7 @@
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <property name="spacing">
-     <number>0</number>
-    </property>
+   <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -39,7 +36,310 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="1" column="0" alignment="Qt::AlignLeft">
+     <widget class="QWidget" name="treedeetoolbar" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>32</height>
+       </size>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="pushButton_translateMode">
+         <property name="minimumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Translate tool (Q)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>Resources/translateButton.png</normaloff>Resources/translateButton.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>Q</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_rotateMode">
+         <property name="minimumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Rotate tool (W)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>Resources/rotateButton.png</normaloff>Resources/rotateButton.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>W</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_scaleMode">
+         <property name="minimumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Scale tool (E)</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>Resources/resizeButton.png</normaloff>Resources/resizeButton.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>E</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_mode">
+         <property name="minimumSize">
+          <size>
+           <width>70</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>80</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Set coord space for transform tools (S)</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <item>
+          <property name="text">
+           <string>Local</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Global</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_terrainGeometryMode">
+         <property name="minimumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Edit terrain geometry (R)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>Resources/terrainGeometryTool.png</normaloff>Resources/terrainGeometryTool.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>R</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_terrainPaintMode">
+         <property name="minimumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Paint terrain (T)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>Resources/terrainPaintTool.png</normaloff>Resources/terrainPaintTool.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>T</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
      <widget class="Canvas3D" name="widget_canvas3D" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -52,248 +352,72 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QWidget" name="treedeetoolbar" native="true">
-      <property name="minimumSize">
-       <size>
-        <width>480</width>
-        <height>32</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>32</height>
-       </size>
-      </property>
-      <widget class="QPushButton" name="pushButton_translateMode">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>32</width>
-         <height>32</height>
-        </rect>
+    <item row="1" column="1" alignment="Qt::AlignLeft">
+     <widget class="QWidget" name="widget_rightSideLeftAligned" native="true">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
+       <property name="topMargin">
+        <number>0</number>
        </property>
-       <property name="maximumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
+       <property name="rightMargin">
+        <number>0</number>
        </property>
-       <property name="text">
-        <string/>
+       <property name="bottomMargin">
+        <number>0</number>
        </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>Resources/translateButton.png</normaloff>Resources/translateButton.png</iconset>
+       <property name="spacing">
+        <number>0</number>
        </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_rotateMode">
-       <property name="geometry">
-        <rect>
-         <x>32</x>
-         <y>0</y>
-         <width>32</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>Resources/rotateButton.png</normaloff>Resources/rotateButton.png</iconset>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_scaleMode">
-       <property name="geometry">
-        <rect>
-         <x>64</x>
-         <y>0</y>
-         <width>32</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>Resources/resizeButton.png</normaloff>Resources/resizeButton.png</iconset>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_mode">
-       <property name="geometry">
-        <rect>
-         <x>96</x>
-         <y>0</y>
-         <width>70</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>70</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <item>
-        <property name="text">
-         <string>Local</string>
-        </property>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="pushButton_playMode">
+         <property name="minimumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Play mode (F5)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>Resources/playButton.png</normaloff>Resources/playButton.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>F5</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
-       <item>
-        <property name="text">
-         <string>Global</string>
-        </property>
-       </item>
-      </widget>
-      <widget class="QPushButton" name="pushButton_terrainGeometryMode">
-       <property name="geometry">
-        <rect>
-         <x>166</x>
-         <y>0</y>
-         <width>32</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Edit terrain geometry</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>Resources/terrainGeometryTool.png</normaloff>Resources/terrainGeometryTool.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>16</width>
-         <height>16</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_terrainPaintMode">
-       <property name="geometry">
-        <rect>
-         <x>198</x>
-         <y>0</y>
-         <width>32</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Paint terrain</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>Resources/terrainPaintTool.png</normaloff>Resources/terrainPaintTool.png</iconset>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
+      </layout>
      </widget>
     </item>
    </layout>
@@ -303,7 +427,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1292</width>
+     <width>1272</width>
      <height>21</height>
     </rect>
    </property>
@@ -359,18 +483,6 @@
    <addaction name="menuView"/>
    <addaction name="menuEntity"/>
    <addaction name="menuComponent"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <property name="windowTitle">
-    <string>Play toolbar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionPlay"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="sizeGripEnabled">
@@ -626,79 +738,31 @@
     <string>Exit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+D</string>
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="action_saveAs">
    <property name="text">
     <string>Save As...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="action_save">
    <property name="text">
     <string>Save</string>
    </property>
-  </action>
-  <action name="actionRotate">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>Resources/rotateButton.png</normaloff>Resources/rotateButton.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rotate</string>
-   </property>
-   <property name="toolTip">
-    <string>Rotate things</string>
-   </property>
-  </action>
-  <action name="actionResize">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>Resources/resizeButton.png</normaloff>Resources/resizeButton.png</iconset>
-   </property>
-   <property name="text">
-    <string>Resize</string>
-   </property>
-   <property name="toolTip">
-    <string>Resize things</string>
-   </property>
-  </action>
-  <action name="actionTranslate">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>Resources/translateButton.png</normaloff>Resources/translateButton.png</iconset>
-   </property>
-   <property name="text">
-    <string>Translate</string>
-   </property>
-   <property name="toolTip">
-    <string>Move things</string>
-   </property>
-  </action>
-  <action name="actionPlay">
-   <property name="icon">
-    <iconset>
-     <normaloff>Resources/playButton.png</normaloff>Resources/playButton.png</iconset>
-   </property>
-   <property name="text">
-    <string>Play</string>
-   </property>
-   <property name="toolTip">
-    <string>Play the game</string>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionLog">
    <property name="text">
     <string>Log</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="action_removeEntity">
@@ -726,10 +790,16 @@
    <property name="text">
     <string>New</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open Project...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="action_addWaterCollider">
@@ -756,10 +826,16 @@
    <property name="text">
     <string>Water settings</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
   </action>
   <action name="actionAdd_terrain">
    <property name="text">
     <string>Add terrain</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

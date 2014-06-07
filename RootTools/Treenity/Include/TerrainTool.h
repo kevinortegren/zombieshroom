@@ -30,4 +30,6 @@ private:
 	int m_width;
 	int m_numElements;
 
+	float m_timer;
+
 };

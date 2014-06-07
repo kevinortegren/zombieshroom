@@ -7,7 +7,7 @@
 extern RootEngine::GameSharedContext g_engineContext;
 
 TerrainTool::TerrainTool()
-	: Tool()
+	: Tool(), m_timer(0.0f)
 {
 }
 
@@ -68,59 +68,86 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 
 	RootEngine::InputManager::KeyState::KeyState leftMouseButtonState = g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::LEFT);
 	RootEngine::InputManager::KeyState::KeyState rightMouseButtonState = g_engineContext.m_inputSys->GetKeyState(RootEngine::InputManager::MouseButton::RIGHT);
+	if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN_EDGE)
+	{
+		m_timer = 1.0f/32.0f;
+	}
 
 	if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN)
 	{
-		unsigned numberOfAttribs = terrainMesh->GetVertexAttribute()->GetNumAttributes();
-		m_numElements = terrainVBO->GetNumElements();
+		m_timer += m_world->GetDelta();
+
+		float updateFreq = 1.0f/32.0f;
+		if(m_timer >= updateFreq)
+		{
+			m_timer = m_timer - updateFreq;
 		
-		/*if(numberOfAttribs != 3) 
-		{
-			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Number of attribs is %d", numberOfAttribs);
-			return false;
-		}*/
-
-		//Set as memebers for the rest of the methods to use
-		m_vertexData = static_cast<Render::Vertex1P1N1UV*>(terrainVBO->MapBuffer(GL_READ_WRITE));
-		m_width = glm::sqrt(m_numElements);
-
+			unsigned numberOfAttribs = terrainMesh->GetVertexAttribute()->GetNumAttributes();
+			m_numElements = terrainVBO->GetNumElements();
 		
-		if(m_vertexData == nullptr)
-		{
-			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not map buffer!");
-			return false;
-		}
-
-		glm::ivec2 terrainHitPos = GetRayMarchCollision(p_cameraPos, p_ray);
-
-		if(!IsCoordInsideTerrain(terrainHitPos))
-		{
-			if(terrainVBO->UnmapBuffer() == false)
-				g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not unmap buffer!");
-
-			return false;
-		}
-
-		//Buffer is mapped, ready to be read and written to
-		//If not smooth only, run the height calculation algorithm
-		if(!m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetSmoothOnly())
-			for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->size(); ++i)
+			/*if(numberOfAttribs != 3) 
 			{
-				glm::ivec2 brushLocalPos	= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).pos;
-				float strength				= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).strength;
+				g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Number of attribs is %d", numberOfAttribs);
+				return false;
+			}*/
 
-				glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
-			
-				int pos = GetVertexPosition(pos2d);
+			//Set as memebers for the rest of the methods to use
+			m_vertexData = static_cast<Render::Vertex1P1N1UV*>(terrainVBO->MapBuffer(GL_READ_WRITE));
+			m_width = glm::sqrt(m_numElements);
 
-				if(pos != -1)
-					m_vertexData[pos].m_pos.y += strength;
+		
+			if(m_vertexData == nullptr)
+			{
+				g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not map buffer!");
+				return false;
 			}
-		//If autosmooth or smooth only, run the smoothing algorithm
-		if(m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetSmoothOnly() || m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetAutoSmooth())
-			for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->size(); ++i)
+
+			glm::ivec2 terrainHitPos = GetRayMarchCollision(p_cameraPos, p_ray);
+
+			if(!IsCoordInsideTerrain(terrainHitPos))
 			{
-				glm::ivec2 brushLocalPos = m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).pos;
+				if(terrainVBO->UnmapBuffer() == false)
+					g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not unmap buffer!");
+
+				return false;
+			}
+
+			//Buffer is mapped, ready to be read and written to
+			//If not smooth only, run the height calculation algorithm
+			if(!m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetSmoothOnly())
+				for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->size(); ++i)
+				{
+					glm::ivec2 brushLocalPos	= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).pos;
+					float strength				= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).strength;
+
+					glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
+			
+					int pos = GetVertexPosition(pos2d);
+
+					if(pos != -1)
+						m_vertexData[pos].m_pos.y += strength;
+				}
+			//If autosmooth or smooth only, run the smoothing algorithm
+			if(m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetSmoothOnly() || m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetAutoSmooth())
+				for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->size(); ++i)
+				{
+					glm::ivec2 brushLocalPos = m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetBrush()->at(i).pos;
+
+					glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
+
+					int pos = GetVertexPosition(pos2d);
+
+					if(pos != -1)
+					{
+						float smoothHeight = AverageHeight(pos2d);
+						m_vertexData[pos].m_pos.y = smoothHeight;
+					}
+
+				}
+
+			for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetNormalBrush()->size(); ++i)
+			{
+				glm::ivec2 brushLocalPos	= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetNormalBrush()->at(i).pos;
 
 				glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
 
@@ -128,33 +155,17 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 
 				if(pos != -1)
 				{
-					float smoothHeight = AverageHeight(pos2d);
-					m_vertexData[pos].m_pos.y = smoothHeight;
+					m_vertexData[pos].m_normal = CalcNormalOnCoord(pos2d);
 				}
-
 			}
-
-		for (unsigned i = 0; i < m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetNormalBrush()->size(); ++i)
-		{
-			glm::ivec2 brushLocalPos	= m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetNormalBrush()->at(i).pos;
-
-			glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
-
-			int pos = GetVertexPosition(pos2d);
-
-			if(pos != -1)
-			{
-				m_vertexData[pos].m_normal = CalcNormalOnCoord(pos2d);
-			}
-		}
 	
 
-		if(terrainVBO->UnmapBuffer() == false)
-			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not unmap buffer!");
+			if(terrainVBO->UnmapBuffer() == false)
+				g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not unmap buffer!");
 
-		return true;
+			return true;
+		}
 	}
-
 	return false;
 }
 
