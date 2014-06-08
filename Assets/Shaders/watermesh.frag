@@ -86,7 +86,7 @@ void main()
 		vec3 tangent			= normalize(vec3(dx2*2, -calcNorm.x, 0 ));
 		vec3 bitangent			= normalize(vec3(0,  -calcNorm.y, dx2*2));
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
-		normalMap 				= mix(TBN * normalT, normalMap, 0.85); //Smooth the normal from the normal map
+		normalMap 				= mix(TBN * normalT, normalMap, 0.96); //Smooth the normal from the normal map
 	}
 	vec3 viewNormal			= normalize(viewMatrix * vec4(normalMap,0.0)).rgb;
 	////////////////////////////////////////////////////////////////////////////
@@ -259,7 +259,7 @@ void main()
 	vec3 viewDir 		= -normalize(viewSpacePosition);
 	vec3 halfVector 	= normalize(viewDir + lightVec);
     
-	vec3 specularColor 	= SunColor.xyz * 0.5 * pow(clamp(dot(viewNormal, halfVector), 0.0, 1.0), 128.0);
+	vec3 specularColor 	= SunColor.xyz * 2.0 * pow(clamp(dot(viewNormal, halfVector), 0.0, 1.0), 512.0);
 
 
 	////////////////////////////////////////////////////////////////////////////
