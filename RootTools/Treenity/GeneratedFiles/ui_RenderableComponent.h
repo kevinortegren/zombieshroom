@@ -180,6 +180,10 @@ public:
         comboBox_shaderSelect->clear();
         comboBox_shaderSelect->insertItems(0, QStringList()
          << QApplication::translate("Renderable", "Diffuse", 0)
+         << QApplication::translate("Renderable", "DiffuseNormal", 0)
+         << QApplication::translate("Renderable", "Translucent", 0)
+         << QApplication::translate("Renderable", "Refractive", 0)
+         << QApplication::translate("Renderable", "RefractiveClear", 0)
          << QApplication::translate("Renderable", "Blend", 0)
         );
     } // retranslateUi

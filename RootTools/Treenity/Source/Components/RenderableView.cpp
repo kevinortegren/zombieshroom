@@ -12,6 +12,10 @@
 #include <RootSystems/Include/RenderingSystem.h>
 
 #include <RootTools/Treenity/Include/Shaders/BlendShaderView.h>
+#include <RootTools/Treenity/Include/Shaders/DiffuseNormalView.h>
+#include <RootTools/Treenity/Include/Shaders/DiffuseNormalTransView.h>
+#include <RootTools/Treenity/Include/Shaders/RefractiveClearView.h>
+#include <RootTools/Treenity/Include/Shaders/RefractiveView.h>
 
 RenderableView::RenderableView(QWidget* p_parent)
 	: AbstractComponentView(p_parent)
@@ -24,12 +28,20 @@ RenderableView::RenderableView(QWidget* p_parent)
 
 	// Create shader views.
 	m_shaderViews.push_back(new DiffuseShaderView());
+	m_shaderViews.push_back(new DiffuseNormalShaderView());
+	m_shaderViews.push_back(new DiffuseNormalTransShaderView());
+	m_shaderViews.push_back(new RefractiveShaderView());	
+	m_shaderViews.push_back(new RefractiveClearShaderView());
 	m_shaderViews.push_back(new BlendShaderView());
-
+	
 	// Map root engine effect names to shader views.
 	m_effectToShaderIndex["Mesh"] = 0;
-	m_effectToShaderIndex["Mesh_Blend"] = 1;
-
+	m_effectToShaderIndex["Mesh_NormalMap"] = 1;
+	m_effectToShaderIndex["Mesh_Normal_Trans"] = 2;
+	m_effectToShaderIndex["Mesh_Refractive"] = 3;
+	m_effectToShaderIndex["Mesh_Refractive_Clear"] = 4;
+	m_effectToShaderIndex["Mesh_Blend"] = 5;
+	
 	connect(ui.lineEdit_materialName,		SIGNAL(editingFinished()),			this,		SLOT(MaterialNameChanged()));
 	connect(ui.lineEdit_modelName,			SIGNAL(editingFinished()),			this,		SLOT(ModelNameChanged()));
 	connect(ui.pushButton_newMaterial,		SIGNAL(pressed()),					this,		SLOT(NewMaterial()));
@@ -144,6 +156,17 @@ void RenderableView::ShaderChanged(int index)
 
 	if((size_t)index < m_shaderViews.size())
 	{
+		std::string effectName;
+		for(auto name : m_effectToShaderIndex)
+		{
+			if(name.second == index)
+			{
+				effectName = name.first;
+				break;
+			}
+		}
+
+		m_currentMaterial->m_effect = m_engineInterface->GetEffect(effectName);
 		m_shaderViews[index]->SetMaterialName(ui.lineEdit_materialName->text());
 		m_shaderViews[index]->SetMaterial(m_currentMaterial);
 		m_shaderViews[index]->Display();

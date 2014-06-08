@@ -199,6 +199,26 @@
            </item>
            <item>
             <property name="text">
+             <string>DiffuseNormal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Translucent</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Refractive</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>RefractiveClear</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>Blend</string>
             </property>
            </item>
