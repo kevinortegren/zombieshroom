@@ -333,6 +333,9 @@ void Treenity::Play()
 	Utils::Write("Starting game session");
 	ui.treedeetoolbar->setEnabled(false);
 	ui.widget_rightSideLeftAligned->setEnabled(false);
+
+	m_engineInterface->UpdateTerrainPhysicsMesh();
+
 	ClearSelection();
 	m_engineInterface->EnterPlayMode();
 }

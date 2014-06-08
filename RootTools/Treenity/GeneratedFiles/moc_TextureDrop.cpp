@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_TextureDrop_t {
-    QByteArrayData data[7];
-    char stringdata[103];
+    QByteArrayData data[9];
+    char stringdata[157];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -34,12 +34,15 @@ QT_MOC_LITERAL(1, 12, 14),
 QT_MOC_LITERAL(2, 27, 0),
 QT_MOC_LITERAL(3, 28, 25),
 QT_MOC_LITERAL(4, 54, 18),
-QT_MOC_LITERAL(5, 73, 14),
-QT_MOC_LITERAL(6, 88, 13)
+QT_MOC_LITERAL(5, 73, 40),
+QT_MOC_LITERAL(6, 114, 12),
+QT_MOC_LITERAL(7, 127, 14),
+QT_MOC_LITERAL(8, 142, 13)
     },
     "TextureDrop\0textureChanged\0\0"
     "Render::TextureInterface*\0p_textureInterface\0"
-    "TextureDropped\0p_textureName\0"
+    "Render::TextureSemantic::TextureSemantic\0"
+    "p_textureSem\0TextureDropped\0p_textureName\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -57,16 +60,16 @@ static const uint qt_meta_data_TextureDrop[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   24,    2, 0x06,
+       1,    2,   24,    2, 0x06,
 
  // slots: name, argc, parameters, tag, flags
-       5,    1,   27,    2, 0x08,
+       7,    1,   29,    2, 0x08,
 
  // signals: parameters
-    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3, 0x80000000 | 5,    4,    6,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::QString,    6,
+    QMetaType::Void, QMetaType::QString,    8,
 
        0        // eod
 };
@@ -76,7 +79,7 @@ void TextureDrop::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
     if (_c == QMetaObject::InvokeMetaMethod) {
         TextureDrop *_t = static_cast<TextureDrop *>(_o);
         switch (_id) {
-        case 0: _t->textureChanged((*reinterpret_cast< Render::TextureInterface*(*)>(_a[1]))); break;
+        case 0: _t->textureChanged((*reinterpret_cast< Render::TextureInterface*(*)>(_a[1])),(*reinterpret_cast< Render::TextureSemantic::TextureSemantic(*)>(_a[2]))); break;
         case 1: _t->TextureDropped((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         default: ;
         }
@@ -84,7 +87,7 @@ void TextureDrop::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (TextureDrop::*_t)(Render::TextureInterface * );
+            typedef void (TextureDrop::*_t)(Render::TextureInterface * , Render::TextureSemantic::TextureSemantic );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&TextureDrop::textureChanged)) {
                 *result = 0;
             }
@@ -129,9 +132,9 @@ int TextureDrop::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void TextureDrop::textureChanged(Render::TextureInterface * _t1)
+void TextureDrop::textureChanged(Render::TextureInterface * _t1, Render::TextureSemantic::TextureSemantic _t2)
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_END_MOC_NAMESPACE

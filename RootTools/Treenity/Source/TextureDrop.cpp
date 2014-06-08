@@ -19,11 +19,6 @@ void TextureDrop::SetEngineInterface(EngineInterface* p_engineInterface)
 	m_engineInterface = p_engineInterface;
 }
 
-void TextureDrop::SetName(const QString& p_textureName)
-{
-	ui.label->setText(p_textureName);
-}
-
 void TextureDrop::SetTexture(Render::TextureInterface* p_texture)
 {
 	if(p_texture != nullptr)
@@ -76,5 +71,22 @@ void TextureDrop::TextureDropped(const QString& p_textureName)
 
 	SetTexture(texture);
 
-	emit textureChanged(texture);
+	emit textureChanged(texture, m_textureSem);
+}
+
+const QString& TextureDrop::GetName()
+{
+	return m_name;
+}
+
+Render::TextureSemantic::TextureSemantic TextureDrop::GetTextureSemantic()
+{
+	return m_textureSem;
+}
+
+void TextureDrop::Init( Render::TextureSemantic::TextureSemantic p_texSem, const QString& p_textureName )
+{
+	m_textureSem = p_texSem;
+	ui.label->setText(p_textureName);
+	m_name = p_textureName;
 }

@@ -73,45 +73,67 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 		m_timer = 1.0f/32.0f;
 	}
 
+	unsigned numberOfAttribs = terrainMesh->GetVertexAttribute()->GetNumAttributes();
+	m_numElements = terrainVBO->GetNumElements();
+		
+	/*if(numberOfAttribs != 3) 
+	{
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Number of attribs is %d", numberOfAttribs);
+		return false;
+	}*/
+
+	//Set as memebers for the rest of the methods to use
+	m_vertexData = static_cast<Render::Vertex1P1N1UV*>(terrainVBO->MapBuffer(GL_READ_WRITE));
+	m_width = glm::sqrt(m_numElements);
+
+		
+	if(m_vertexData == nullptr)
+	{
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not map buffer!");
+		return false;
+	}
+
+	glm::ivec2 terrainHitPos = GetRayMarchCollision(p_cameraPos, p_ray);
+
+	if(!IsCoordInsideTerrain(terrainHitPos))
+	{
+		if(terrainVBO->UnmapBuffer() == false)
+			g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not unmap buffer!");
+
+		return false;
+	}
+
+	//Testing brush material
+	m_terrainModelMatrix = glm::translate(glm::mat4(1.0f), m_terrainTrans->m_interpolatedPosition);
+	m_terrainModelMatrix = glm::rotate(m_terrainModelMatrix, m_terrainTrans->m_orientation.GetAngle(), m_terrainTrans->m_orientation.GetAxis());
+	m_terrainModelMatrix = glm::scale(m_terrainModelMatrix, m_terrainTrans->m_scale);
+			
+	m_shaderdata.y = 0.0f;
+	m_shaderdata.w = m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetSize() * m_terrainTrans->m_scale.x;
+			
+	Render::RenderJob job;	
+	job.m_mesh = terrainMesh;
+	job.m_material = g_engineContext.m_renderer->CreateMaterial(m_editorInterface->GetBrushManager()->GetActiveMaterial());
+	job.m_forward = terrainRender->m_forward;
+	job.m_refractive = terrainRender->m_refractive;
+	job.m_params[Render::Semantic::MODEL] = &m_terrainModelMatrix;
+	job.m_params[Render::Semantic::COLOR] = &m_shaderdata;
+	job.m_params[Render::Semantic::TRANSPOSITION] = &m_world->GetEntityManager()->GetComponent<RootForce::Transform>(m_world->GetTagManager()->GetEntityByTag("Camera"))->m_position;
+	job.m_renderPass = RootForce::RenderPass::RENDERPASS_EDITOR;
+	job.m_position = m_terrainTrans->m_interpolatedPosition;
+
+	g_engineContext.m_renderer->AddRenderJob(job);
+
 	if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN)
 	{
 		m_timer += m_world->GetDelta();
-
+		m_shaderdata.y = 1.0f;
 		float updateFreq = 1.0f/32.0f;
 		if(m_timer >= updateFreq)
 		{
 			m_timer = m_timer - updateFreq;
 		
-			unsigned numberOfAttribs = terrainMesh->GetVertexAttribute()->GetNumAttributes();
-			m_numElements = terrainVBO->GetNumElements();
-		
-			/*if(numberOfAttribs != 3) 
-			{
-				g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Number of attribs is %d", numberOfAttribs);
-				return false;
-			}*/
-
-			//Set as memebers for the rest of the methods to use
-			m_vertexData = static_cast<Render::Vertex1P1N1UV*>(terrainVBO->MapBuffer(GL_READ_WRITE));
-			m_width = glm::sqrt(m_numElements);
-
-		
-			if(m_vertexData == nullptr)
-			{
-				g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not map buffer!");
-				return false;
-			}
-
-			glm::ivec2 terrainHitPos = GetRayMarchCollision(p_cameraPos, p_ray);
-
-			if(!IsCoordInsideTerrain(terrainHitPos))
-			{
-				if(terrainVBO->UnmapBuffer() == false)
-					g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not unmap buffer!");
-
-				return false;
-			}
-
+			
 			//Buffer is mapped, ready to be read and written to
 			//If not smooth only, run the height calculation algorithm
 			if(!m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetSmoothOnly())
@@ -165,7 +187,12 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 
 			return true;
 		}
+
 	}
+
+	if(terrainVBO->UnmapBuffer() == false)
+		g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::WARNING, "Terrain tool could not unmap buffer!");
+
 	return false;
 }
 
@@ -236,6 +263,8 @@ glm::ivec2 TerrainTool::GetRayMarchCollision( const glm::vec3& p_cameraPos, cons
 			}
 		}
 		rayPos += rayDir;
+		m_shaderdata.x = rayPos.x;
+		m_shaderdata.z = rayPos.z;
 		rayDistCounter++;
 	}
 

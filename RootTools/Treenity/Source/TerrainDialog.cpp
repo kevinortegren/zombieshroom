@@ -21,7 +21,7 @@ TerrainDialog::TerrainDialog( QWidget* p_parent /*= 0*/ ): QDockWidget(p_parent)
 	connect(ui.checkBox_autoSmooth,			SIGNAL(clicked(bool)),				this, SLOT(SetAutoSmooth(bool)));
 	connect(ui.checkBox_smoothOnly,			SIGNAL(clicked(bool)),				this, SLOT(SetSmoothOnly(bool)));
 	connect(ui.checkBox_flat,				SIGNAL(clicked(bool)),				this, SLOT(SetFlat(bool)));
-	//connect(ui.comboBox_shape,				SIGNAL(currentIndexChanged(int)),	this, SLOT(currentIndexChanged(int)));
+	connect(ui.comboBox_brushStyle,			SIGNAL(currentIndexChanged(int)),	this, SLOT(SetStyle(int)));
 	
 
 }
@@ -35,15 +35,18 @@ void TerrainDialog::DisplayData()
 {
 	ui.spinBox_size->blockSignals(true);
 	ui.doubleSpinBox_strength->blockSignals(true);	
+	ui.comboBox_brushStyle->blockSignals(true);
 
 	ui.spinBox_size->setValue(m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetSize());
 	ui.doubleSpinBox_strength->setValue(m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetStrength());		
 	ui.checkBox_autoSmooth->setChecked(m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetAutoSmooth());			
 	ui.checkBox_smoothOnly->setChecked(m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetSmoothOnly());			
 	ui.checkBox_flat->setChecked(m_editorInterface->GetBrushManager()->GetCurrentBrush()->GetFlat());			
+	ui.comboBox_brushStyle->setCurrentIndex(m_editorInterface->GetBrushManager()->GetActiveMaterialIndex());
 
 	ui.spinBox_size->blockSignals(false);
-	ui.doubleSpinBox_strength->blockSignals(false);	
+	ui.doubleSpinBox_strength->blockSignals(false);
+		ui.comboBox_brushStyle->blockSignals(false);
 }
 
 void TerrainDialog::SetEngineInterface( EngineInterface* p_engineInterface )
@@ -90,4 +93,9 @@ void TerrainDialog::SetFlat( bool p_val )
 void TerrainDialog::SmoothAll()
 {
 	//TODO
+}
+
+void TerrainDialog::SetStyle( int p_val )
+{
+	m_editorInterface->GetBrushManager()->SetActiveMaterial(p_val);
 }

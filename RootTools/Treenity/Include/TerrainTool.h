@@ -32,4 +32,8 @@ private:
 
 	float m_timer;
 
+
+	glm::vec4 m_shaderdata;
+	glm::mat4 m_terrainModelMatrix;
+
 };

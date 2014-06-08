@@ -44,10 +44,10 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QPushButton" name="pushButton_smoothAll">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Smooth all</string>
+      <string>Brush size:</string>
      </property>
     </widget>
    </item>
@@ -58,13 +58,6 @@
      </property>
      <property name="value">
       <number>2</number>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Brush size:</string>
      </property>
     </widget>
    </item>
@@ -88,6 +81,13 @@
      </property>
     </widget>
    </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Smooth only:</string>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="1">
     <widget class="QCheckBox" name="checkBox_autoSmooth">
      <property name="text">
@@ -102,18 +102,23 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_4">
+   <item row="6" column="0" colspan="2">
+    <widget class="QPushButton" name="pushButton_smoothAll">
      <property name="text">
-      <string>Smooth only:</string>
+      <string>Smooth all</string>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QComboBox" name="comboBox_shape">
+    <widget class="QComboBox" name="comboBox_brushStyle">
      <item>
       <property name="text">
-       <string>Circle</string>
+       <string>Ring</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Wireframe</string>
       </property>
      </item>
     </widget>
@@ -121,7 +126,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Brush shape:</string>
+      <string>Brush style:</string>
      </property>
     </widget>
    </item>

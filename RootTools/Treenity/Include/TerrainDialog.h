@@ -40,4 +40,5 @@ private slots:
 	void SetSmoothOnly(bool p_val);
 	void SetFlat(bool p_val);
 	void SmoothAll();
+	void SetStyle(int p_val);
 };

@@ -56,7 +56,7 @@ public:
         sizePolicy.setHeightForWidth(Renderable->sizePolicy().hasHeightForWidth());
         Renderable->setSizePolicy(sizePolicy);
         Renderable->setMinimumSize(QSize(0, 0));
-        Renderable->setMaximumSize(QSize(16777215, 500));
+        Renderable->setMaximumSize(QSize(16777215, 16777215));
         Renderable->setAcceptDrops(true);
         verticalLayout_5 = new QVBoxLayout(Renderable);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
@@ -180,7 +180,7 @@ public:
         comboBox_shaderSelect->clear();
         comboBox_shaderSelect->insertItems(0, QStringList()
          << QApplication::translate("Renderable", "Diffuse", 0)
-         << QApplication::translate("Renderable", "Diffuse_Normal", 0)
+         << QApplication::translate("Renderable", "Blend", 0)
         );
     } // retranslateUi
 

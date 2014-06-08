@@ -307,13 +307,18 @@ TreenityMain::TreenityMain()
 	m_selectedEntityMaterial->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Selected");
 	m_selectedEntityMaterial->m_textures[Render::TextureSemantic::DEPTH] = g_engineContext.m_resourceManager->LoadTexture("blowDartDiffuse", Render::TextureType::TEXTURE_2D);
 
+	//Load brush materials
+	g_engineContext.m_renderer->CreateMaterial("terrainBrushMatCircle")->m_effect = g_engineContext.m_resourceManager->LoadEffect("Terrain_Brush");
+	g_engineContext.m_renderer->CreateMaterial("terrainBrushMatWireframe")->m_effect = g_engineContext.m_resourceManager->LoadEffect("Terrain_Brush_Wireframe");
+
 	// Register listeners for global modifer keys.
 	GlobalKeys::InitializeKeyMap();
 
 	m_globalKeys.RegisterModifier(Qt::AltModifier);
 	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
 
-	//Load sounds, yep this happened
+	GetWorldSystem()->SetAmbientLight(glm::vec4(1.0f));
+	//Load sounds
 	/*
 
 	//Water sounds

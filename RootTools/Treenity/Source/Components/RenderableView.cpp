@@ -11,6 +11,8 @@
 
 #include <RootSystems/Include/RenderingSystem.h>
 
+#include <RootTools/Treenity/Include/Shaders/BlendShaderView.h>
+
 RenderableView::RenderableView(QWidget* p_parent)
 	: AbstractComponentView(p_parent)
 	, m_name("Renderable")
@@ -21,12 +23,12 @@ RenderableView::RenderableView(QWidget* p_parent)
 	ui.lineEdit_materialName->AddDropFilter("material");
 
 	// Create shader views.
-	m_shaderViews.resize(1);
-	m_shaderViews[0] = new DiffuseShaderView();
-	
+	m_shaderViews.push_back(new DiffuseShaderView());
+	m_shaderViews.push_back(new BlendShaderView());
+
 	// Map root engine effect names to shader views.
 	m_effectToShaderIndex["Mesh"] = 0;
-	m_effectToShaderIndex["Mesh_NormalMap"] = 1;
+	m_effectToShaderIndex["Mesh_Blend"] = 1;
 
 	connect(ui.lineEdit_materialName,		SIGNAL(editingFinished()),			this,		SLOT(MaterialNameChanged()));
 	connect(ui.lineEdit_modelName,			SIGNAL(editingFinished()),			this,		SLOT(ModelNameChanged()));
@@ -42,7 +44,8 @@ const QString& RenderableView::GetComponentName() const
 void RenderableView::SetEngineInterface(EngineInterface* p_engineInterface)
 {
 	// Set interface in shader views.
-	m_shaderViews[0]->SetEngineInterface(p_engineInterface);
+	for(auto shaderViews : m_shaderViews)
+		shaderViews->SetEngineInterface(p_engineInterface);
 
 	AbstractComponentView::SetEngineInterface(p_engineInterface);
 }
@@ -145,7 +148,17 @@ void RenderableView::ShaderChanged(int index)
 		m_shaderViews[index]->SetMaterial(m_currentMaterial);
 		m_shaderViews[index]->Display();
 
+		//MAgic
+		// Remove last spacer item if present.
+		int count = ui.verticalLayout_2->count();
+		if (count > 1) {
+			ui.verticalLayout_2->removeItem(ui.verticalLayout_2->itemAt(count - 1));
+		}
+
 		ui.verticalLayout_2->addWidget(m_shaderViews[index]);
+
+		//MAgic
+		ui.verticalLayout_2->addStretch();
 
 		m_currentView = m_shaderViews[index];
 	}

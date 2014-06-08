@@ -38,6 +38,7 @@ public:
 
 	//Special entities
 	ECS::Entity* CreateTerrainEntity(int p_width, int p_height);
+	void UpdateTerrainPhysicsMesh();
 
 	// World
 	const ECS::World* GetWorld();

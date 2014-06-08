@@ -280,6 +280,17 @@ void EngineActions::ExitPlayMode()
 
 	m_treenityMain->GetEditor()->ExitPlayMode();
 
+	//Set params in terrain, quick bug fix. The real problem comes from an issue with import not setting tile factor param in renderable.
+	ECS::Entity* terrainEnt = m_world->GetTagManager()->GetEntityByTag("Terrain");
+	if(terrainEnt != nullptr)
+	{
+		RootForce::Renderable* terRend = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(terrainEnt);
+		if(terRend != nullptr)
+		{
+			terRend->m_params[Render::Semantic::SIZEMIN] = &terRend->m_material->m_tileFactor;
+		}
+	}
+
 	g_engineContext.m_logger->LogText(LogTag::TOOLS, LogLevel::DEBUG_PRINT, "Exited play mode");
 }
 
@@ -922,13 +933,20 @@ ECS::Entity* EngineActions::CreateTerrainEntity( int p_width, int p_height )
 	terraintRend->m_material	= g_engineContext.m_renderer->CreateMaterial("supersecretterrainmaterial");
 
 	terraintRend->m_material->m_tileFactor = 12.0f;
+	terraintRend->m_params[Render::Semantic::SIZEMIN] = &terraintRend->m_material->m_tileFactor;
 
 	//Set textures to renderable
-	terraintRend->m_material->m_textures[Render::TextureSemantic::DIFFUSE]		= g_engineContext.m_resourceManager->LoadTexture("CaveMountainColor", Render::TextureType::TEXTURE_2D);
 	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]	= g_engineContext.m_resourceManager->LoadTexture("CaveMountainColor", Render::TextureType::TEXTURE_2D);
 	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]	= g_engineContext.m_resourceManager->LoadTexture("DirtAndStones", Render::TextureType::TEXTURE_2D);
 	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]	= g_engineContext.m_resourceManager->LoadTexture("Grass", Render::TextureType::TEXTURE_2D);
 	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]	= g_engineContext.m_resourceManager->LoadTexture("CliffWall", Render::TextureType::TEXTURE_2D);
+	//Set textures as repeat
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]->SetParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	terraintRend->m_material->m_effect = g_engineContext.m_resourceManager->LoadEffect("Mesh_Blend");
 
@@ -988,3 +1006,56 @@ ECS::Entity* EngineActions::CreateTerrainEntity( int p_width, int p_height )
 	return terrainEnt;
 }
 
+void EngineActions::UpdateTerrainPhysicsMesh()
+{
+	ECS::Entity* terrainEnt = m_world->GetTagManager()->GetEntityByTag("Terrain");
+	if(terrainEnt == nullptr)
+		return;
+
+	RootForce::Renderable* terRend = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(terrainEnt);
+	if(terRend == nullptr)
+		return;
+
+	RootEngine::Model* terrModel = terRend->m_model;
+	if(terrModel == nullptr)
+		return;
+
+	Render::MeshInterface* terrMesh = terrModel->m_meshes[0];
+	if(terrMesh == nullptr)
+		return;
+
+	Render::Vertex1P1N1UV* vertexData = static_cast<Render::Vertex1P1N1UV*>(terrMesh->GetVertexBuffer()->MapBuffer(GL_READ_WRITE));
+		
+		if(vertexData == nullptr)
+		{
+			g_engineContext.m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Could not map buffer!");
+			return;
+		}
+
+		unsigned numElements = terrMesh->GetVertexBuffer()->GetNumElements();
+		
+		terrModel->m_positions.clear();
+		terrModel->m_positions.shrink_to_fit();
+		terrModel->m_positions.reserve(numElements);
+
+		//Copy all the new positions to the model position vector
+		for (unsigned i = 0; i < numElements; ++i)
+		{
+			terrModel->m_positions.push_back(vertexData[i].m_pos);
+			//m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::DEBUG_PRINT, "Model UV: x %f  y %f", vertexData[i].m_UV.x, vertexData[i].m_UV.y); 
+		}
+
+		if(terrMesh->GetVertexBuffer()->UnmapBuffer() == false)
+			g_engineContext.m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "Could not unmap buffer!");
+
+		if(terrModel->m_physicsMeshes[0] == nullptr)
+			return;
+
+		terrModel->m_physicsMeshes[0]->Init(terrModel->m_positions, (int)terrModel->m_positions.size(), terrModel->m_indices, (int)terrModel->m_indices.size(), (int)terrModel->m_indices.size() / 3);
+
+		RootForce::Collision* collision = m_world->GetEntityManager()->GetComponent<RootForce::Collision>(terrainEnt);
+		if(collision == nullptr)
+			return;
+
+		ReconstructPhysicsObject(terrainEnt, GetPhysicsType(terrainEnt), GetCollideWithWorld(terrainEnt), GetCollideWithStatic(terrainEnt), GetMass(terrainEnt), GetPhysicsShape(terrainEnt), GetShapeRadius(terrainEnt), GetShapeHeight(terrainEnt), GetPhysicsMesh(terrainEnt), GetCollisionVisualized(terrainEnt));
+}

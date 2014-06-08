@@ -40,7 +40,7 @@ struct EngineInterface
 
 	//Special entities
 	virtual ECS::Entity* CreateTerrainEntity(int p_width, int p_height) = 0; 
-
+	virtual void UpdateTerrainPhysicsMesh() = 0;
 	// World
 	virtual const ECS::World* GetWorld() = 0;
 

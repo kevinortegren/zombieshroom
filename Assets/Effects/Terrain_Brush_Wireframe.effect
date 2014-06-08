@@ -1,0 +1,27 @@
+- name: Terrain_Brush
+  techniques:
+    - name: Terrain_Brush
+      bindings:
+        - name: PerFrame
+          slot: 0
+        - name: PerObject
+          slot: 1
+      uniforms:
+        - sem: MODEL
+          offset: 0
+        - sem: COLOR
+          offset: 64
+        - sem: TRANSPOSITION
+          offset: 80
+      flags:
+        - name: Forward
+      programs:
+        - name: Brush
+          shaders:
+            - name: Terrain_Brush
+              type: vertex
+            - name: Terrain_Brush_Wireframe
+              type: fragment
+          wireframe: 1
+              
+

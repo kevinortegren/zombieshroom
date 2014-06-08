@@ -32,15 +32,15 @@ public:
     QLabel *label_3;
     QCheckBox *checkBox_flat;
     QDoubleSpinBox *doubleSpinBox_strength;
-    QPushButton *pushButton_smoothAll;
-    QSpinBox *spinBox_size;
     QLabel *label;
+    QSpinBox *spinBox_size;
     QLabel *label_2;
     QLabel *label_5;
+    QLabel *label_4;
     QCheckBox *checkBox_autoSmooth;
     QCheckBox *checkBox_smoothOnly;
-    QLabel *label_4;
-    QComboBox *comboBox_shape;
+    QPushButton *pushButton_smoothAll;
+    QComboBox *comboBox_brushStyle;
     QLabel *label_6;
 
     void setupUi(QWidget *TerrainTool)
@@ -69,10 +69,10 @@ public:
 
         gridLayout->addWidget(doubleSpinBox_strength, 1, 1, 1, 1);
 
-        pushButton_smoothAll = new QPushButton(TerrainTool);
-        pushButton_smoothAll->setObjectName(QStringLiteral("pushButton_smoothAll"));
+        label = new QLabel(TerrainTool);
+        label->setObjectName(QStringLiteral("label"));
 
-        gridLayout->addWidget(pushButton_smoothAll, 6, 0, 1, 2);
+        gridLayout->addWidget(label, 0, 0, 1, 1);
 
         spinBox_size = new QSpinBox(TerrainTool);
         spinBox_size->setObjectName(QStringLiteral("spinBox_size"));
@@ -80,11 +80,6 @@ public:
         spinBox_size->setValue(2);
 
         gridLayout->addWidget(spinBox_size, 0, 1, 1, 1);
-
-        label = new QLabel(TerrainTool);
-        label->setObjectName(QStringLiteral("label"));
-
-        gridLayout->addWidget(label, 0, 0, 1, 1);
 
         label_2 = new QLabel(TerrainTool);
         label_2->setObjectName(QStringLiteral("label_2"));
@@ -97,6 +92,11 @@ public:
 
         gridLayout->addWidget(label_5, 5, 0, 1, 1);
 
+        label_4 = new QLabel(TerrainTool);
+        label_4->setObjectName(QStringLiteral("label_4"));
+
+        gridLayout->addWidget(label_4, 4, 0, 1, 1);
+
         checkBox_autoSmooth = new QCheckBox(TerrainTool);
         checkBox_autoSmooth->setObjectName(QStringLiteral("checkBox_autoSmooth"));
 
@@ -107,15 +107,15 @@ public:
 
         gridLayout->addWidget(checkBox_smoothOnly, 4, 1, 1, 1);
 
-        label_4 = new QLabel(TerrainTool);
-        label_4->setObjectName(QStringLiteral("label_4"));
+        pushButton_smoothAll = new QPushButton(TerrainTool);
+        pushButton_smoothAll->setObjectName(QStringLiteral("pushButton_smoothAll"));
 
-        gridLayout->addWidget(label_4, 4, 0, 1, 1);
+        gridLayout->addWidget(pushButton_smoothAll, 6, 0, 1, 2);
 
-        comboBox_shape = new QComboBox(TerrainTool);
-        comboBox_shape->setObjectName(QStringLiteral("comboBox_shape"));
+        comboBox_brushStyle = new QComboBox(TerrainTool);
+        comboBox_brushStyle->setObjectName(QStringLiteral("comboBox_brushStyle"));
 
-        gridLayout->addWidget(comboBox_shape, 2, 1, 1, 1);
+        gridLayout->addWidget(comboBox_brushStyle, 2, 1, 1, 1);
 
         label_6 = new QLabel(TerrainTool);
         label_6->setObjectName(QStringLiteral("label_6"));
@@ -133,18 +133,19 @@ public:
         TerrainTool->setWindowTitle(QApplication::translate("TerrainTool", "Form", 0));
         label_3->setText(QApplication::translate("TerrainTool", "Auto smooth:", 0));
         checkBox_flat->setText(QString());
-        pushButton_smoothAll->setText(QApplication::translate("TerrainTool", "Smooth all", 0));
         label->setText(QApplication::translate("TerrainTool", "Brush size:", 0));
         label_2->setText(QApplication::translate("TerrainTool", "Brush strength:", 0));
         label_5->setText(QApplication::translate("TerrainTool", "Flat:", 0));
+        label_4->setText(QApplication::translate("TerrainTool", "Smooth only:", 0));
         checkBox_autoSmooth->setText(QString());
         checkBox_smoothOnly->setText(QString());
-        label_4->setText(QApplication::translate("TerrainTool", "Smooth only:", 0));
-        comboBox_shape->clear();
-        comboBox_shape->insertItems(0, QStringList()
-         << QApplication::translate("TerrainTool", "Circle", 0)
+        pushButton_smoothAll->setText(QApplication::translate("TerrainTool", "Smooth all", 0));
+        comboBox_brushStyle->clear();
+        comboBox_brushStyle->insertItems(0, QStringList()
+         << QApplication::translate("TerrainTool", "Ring", 0)
+         << QApplication::translate("TerrainTool", "Wireframe", 0)
         );
-        label_6->setText(QApplication::translate("TerrainTool", "Brush shape:", 0));
+        label_6->setText(QApplication::translate("TerrainTool", "Brush style:", 0));
     } // retranslateUi
 
 };

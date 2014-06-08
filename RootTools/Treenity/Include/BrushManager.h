@@ -20,8 +20,16 @@ public:
 	TerrainBrush* GetCurrentBrush(); 
 	void SetBrushShape(BrushShape::BrushShape p_brush);
 
+	std::string GetActiveMaterial();
+	int GetActiveMaterialIndex();
+	void SetActiveMaterial(int p_index);
+
 private:
 
 	TerrainBrush* m_currentBrush;
 	std::map<BrushShape::BrushShape, TerrainBrush*> m_brushes;
+
+	int m_activeMaterial;
+
+	std::vector<std::string> m_materials;
 };

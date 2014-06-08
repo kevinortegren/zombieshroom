@@ -6,94 +6,60 @@ DiffuseShaderView::DiffuseShaderView(QWidget* p_parent)
 	: AbstractShaderView(p_parent)
 {
 	ui.setupUi(this);
-	ui.textureDrop_diffuse->SetName("Diffuse");
-	ui.textureDrop_specular->SetName("Specular");
-	ui.textureDrop_glow->SetName("Glow");
+	//Init alltexture drops with Texture semantic and a name
+	ui.textureDrop_diffuse->Init(Render::TextureSemantic::DIFFUSE, "Diffuse");
+	ui.textureDrop_specular->Init(Render::TextureSemantic::SPECULAR, "Specular");
+	ui.textureDrop_glow->Init(Render::TextureSemantic::GLOW, "Glow");
 
-	connect(ui.textureDrop_diffuse, SIGNAL(textureChanged(Render::TextureInterface*)), this, SLOT(DiffuseTextureChanged(Render::TextureInterface*)));
-	connect(ui.textureDrop_specular, SIGNAL(textureChanged(Render::TextureInterface*)), this, SLOT(SpecularTextureChanged(Render::TextureInterface*)));
-	connect(ui.textureDrop_glow, SIGNAL(textureChanged(Render::TextureInterface*)), this, SLOT(GlowTextureChanged(Render::TextureInterface*)));
+
+	//Push them to the texture drop list, if they are not in this list they will not work
+	m_textureDropList.push_back(ui.textureDrop_diffuse);
+	m_textureDropList.push_back(ui.textureDrop_specular);
+	m_textureDropList.push_back(ui.textureDrop_glow);
+	
+	//Connect all texture drops to the texture changed slot
+	for(auto texDrop : m_textureDropList)
+		connect(texDrop, SIGNAL(textureChanged(Render::TextureInterface*, Render::TextureSemantic::TextureSemantic)), this, SLOT(TextureChanged(Render::TextureInterface*, Render::TextureSemantic::TextureSemantic)));
 
 }
 
 void DiffuseShaderView::SetEngineInterface(EngineInterface* p_engineInterface)
 {
-	ui.textureDrop_diffuse->SetEngineInterface(p_engineInterface);
-	ui.textureDrop_specular->SetEngineInterface(p_engineInterface);
-	ui.textureDrop_glow->SetEngineInterface(p_engineInterface);
+	//Set Engine interface for all texture drops
+	for(auto tex : m_textureDropList)
+	{
+		tex->SetEngineInterface(p_engineInterface);
+	}
 
 	AbstractShaderView::SetEngineInterface(p_engineInterface);
 }
 
 void DiffuseShaderView::Display()
 {
-	auto itr = m_material->m_textures.find(Render::TextureSemantic::DIFFUSE);
-
-	if(itr != m_material->m_textures.end())
+	//This will loop through all texture drops and display an image if there is one
+	for(auto tex : m_textureDropList)
 	{
-		if(itr->second == nullptr)
+		auto itr = m_material->m_textures.find(tex->GetTextureSemantic());
+		if(itr != m_material->m_textures.end())
 		{
-			g_engineContext.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "DiffuseShaderView received nullptr diffuse texture");
+			if(itr->second == nullptr)
+			{
+				g_engineContext.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "Received nullptr %s texture", tex->GetName().toStdString().c_str());
+			}
+			else
+			{
+				tex->SetTexture(itr->second);
+			}
 		}
 		else
 		{
-			ui.textureDrop_diffuse->SetTexture(itr->second);
-        }
-	}
-	else
-	{
-		ui.textureDrop_diffuse->Clear();
-	}
-
-	itr = m_material->m_textures.find(Render::TextureSemantic::SPECULAR);
-	if(itr != m_material->m_textures.end())
-	{
-		if(itr->second == nullptr)
-		{
-			g_engineContext.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "DiffuseShaderView received nullptr specular texture");
+			tex->Clear();
 		}
-		else
-		{
-			ui.textureDrop_specular->SetTexture(itr->second);
-		}
-	}
-	else
-	{
-		ui.textureDrop_specular->Clear();
-	}
-
-	itr = m_material->m_textures.find(Render::TextureSemantic::GLOW);
-	if(itr != m_material->m_textures.end())
-	{
-		if(itr->second == nullptr)
-		{
-			g_engineContext.m_logger->LogText(LogTag::GUI, LogLevel::NON_FATAL_ERROR, "DiffuseShaderView received nullptr glow texture");
-		}
-		else
-		{
-			ui.textureDrop_glow->SetTexture(itr->second);
-		}
-	}
-	else
-	{
-		ui.textureDrop_glow->Clear();
 	}
 }
 
-void DiffuseShaderView::DiffuseTextureChanged(Render::TextureInterface* p_texture)
+void DiffuseShaderView::TextureChanged( Render::TextureInterface* p_texture, Render::TextureSemantic::TextureSemantic p_sem )
 {
-	m_material->m_textures[Render::TextureSemantic::DIFFUSE] = p_texture;
-	Save();
-}
-
-void DiffuseShaderView::SpecularTextureChanged(Render::TextureInterface* p_texture)
-{
-	m_material->m_textures[Render::TextureSemantic::SPECULAR] = p_texture;
-	Save();
-}
-
-void DiffuseShaderView::GlowTextureChanged(Render::TextureInterface* p_texture)
-{
-	m_material->m_textures[Render::TextureSemantic::GLOW] = p_texture;
+	m_material->m_textures[p_sem] = p_texture;
 	Save();
 }

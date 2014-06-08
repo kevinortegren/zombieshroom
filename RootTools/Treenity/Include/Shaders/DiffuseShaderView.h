@@ -2,7 +2,7 @@
 
 #include <RootTools/Treenity/Include/Shaders/AbstractShaderView.h>
 #include <RootTools/Treenity/GeneratedFiles/ui_DiffuseShaderView.h>
-
+#include <vector>
 class DiffuseShaderView : public AbstractShaderView
 {
 	Q_OBJECT
@@ -14,9 +14,8 @@ class DiffuseShaderView : public AbstractShaderView
 
 	private:
 		Ui::diffuseShaderView ui;
+		std::vector<TextureDrop*> m_textureDropList;
 
 	private slots:
-		void DiffuseTextureChanged(Render::TextureInterface* p_texture);
-		void SpecularTextureChanged(Render::TextureInterface* p_texture);
-		void GlowTextureChanged(Render::TextureInterface* p_texture);
+		void TextureChanged(Render::TextureInterface* p_texture, Render::TextureSemantic::TextureSemantic p_sem);
 };
