@@ -937,6 +937,10 @@ ECS::Entity* EngineActions::CreateTerrainEntity( int p_width, int p_height )
 
 	//Set textures to renderable
 	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]	= g_engineContext.m_resourceManager->LoadTexture("CaveMountainColor", Render::TextureType::TEXTURE_2D);
+
+	//terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]	= g_engineContext.m_resourceManager->CreateTexture("TerrainBlendMap");//g_engineContext.m_resourceManager->LoadTexture("CaveMountainColor", Render::TextureType::TEXTURE_2D);
+	//terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]->CreateEmptyTexture(256, 256, Render::TextureFormat::TextureFormat::TEXTURE_RGBA );
+	//terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTUREMAP]->SetAccess(GL_READ_WRITE);
 	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_R]	= g_engineContext.m_resourceManager->LoadTexture("DirtAndStones", Render::TextureType::TEXTURE_2D);
 	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_G]	= g_engineContext.m_resourceManager->LoadTexture("Grass", Render::TextureType::TEXTURE_2D);
 	terraintRend->m_material->m_textures[Render::TextureSemantic::TEXTURE_B]	= g_engineContext.m_resourceManager->LoadTexture("CliffWall", Render::TextureType::TEXTURE_2D);

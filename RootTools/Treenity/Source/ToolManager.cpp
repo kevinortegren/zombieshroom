@@ -2,6 +2,7 @@
 #include <RootTools/Treenity/Include/RotationTool.h>
 #include <RootTools/Treenity/Include/TranslationTool.h>
 #include <RootTools/Treenity/Include/TerrainTool.h>
+#include <RootTools/Treenity/Include/TerrainTextureTool.h>
 
 ToolManager::ToolManager()
 {
@@ -9,6 +10,7 @@ ToolManager::ToolManager()
 	m_tools[ToolBox::ROTATION_TOOL] = new RotationTool();
 	m_tools[ToolBox::TRANSLATION_TOOL] = new TranslationTool();
 	m_tools[ToolBox::TERRAIN_TOOL] = new TerrainTool();
+	m_tools[ToolBox::TERRAIN_TEXTURE_TOOL] = new TerrainTextureTool();
 
 	//This is the default tool, must correspond to what is selected by the GUI by default (Currently translation tool)
 	m_selectedTool = m_tools[ToolBox::TRANSLATION_TOOL];

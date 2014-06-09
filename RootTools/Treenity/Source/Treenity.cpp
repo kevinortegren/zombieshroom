@@ -125,6 +125,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.pushButton_rotateMode,				SIGNAL(clicked()),			this,					SLOT(SetRotateTool()));
 	connect(ui.pushButton_scaleMode,				SIGNAL(clicked()),			this,					SLOT(SetResizeTool()));
 	connect(ui.pushButton_terrainGeometryMode,		SIGNAL(clicked()),			this,					SLOT(SetTerrainGeometryTool()));
+	connect(ui.pushButton_terrainPaintMode,			SIGNAL(clicked()),			this,					SLOT(SetTerrainTextureTool()));
 	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
 	connect(ui.actionWaterSetting,					SIGNAL(triggered()),		m_waterToolDockable,	SLOT(Show()));
 	connect(ui.actionAdd_terrain,					SIGNAL(triggered()),		this,					SLOT(AddTerrain()));
@@ -143,18 +144,20 @@ Treenity::Treenity(QWidget *parent)
 	// Set tool mode.
 	m_toolMode = ToolMode::LOCAL;
 
-	m_brushManager.GetCurrentBrush()->SetSize(5);
-	m_brushManager.GetCurrentBrush()->SetStrength(3);
-
 	//Automatically cleaned up at program exi
 	new QShortcut(QKeySequence(Qt::Key_F), this, SLOT(FocusEntity()));
+
+	m_terrainTextureBrush = new TerrainTextureBrush();
+	m_terrainTextureBrush->SetSize(10);
+	m_terrainGeometryBrush = new TerrainGeometryBrush();
 
 }
 
 
 Treenity::~Treenity()
 {
-	
+	delete m_terrainTextureBrush;
+	delete m_terrainGeometryBrush;
 }
 
 void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
@@ -704,6 +707,15 @@ void Treenity::SetTerrainGeometryTool()
 	}
 }
 
+void Treenity::SetTerrainTextureTool()
+{
+	if(m_engineInterface->GetMode() != EditorMode::GAME)
+	{
+		m_toolManager.SetTool(ToolBox::TERRAIN_TEXTURE_TOOL);
+		m_terrainDialog->Show();
+	}
+}
+
 void Treenity::ChangeToolMode(int index)
 {
 	if(m_engineInterface->GetMode() != EditorMode::GAME)
@@ -737,11 +749,6 @@ void Treenity::RemoveCollisionResponder(ECS::Entity* p_entity)
 	m_engineInterface->RemoveCollisionResponder(p_entity);
 }
 
-BrushManager* Treenity::GetBrushManager()
-{
-	return &m_brushManager;
-}
-
 void Treenity::AddTerrain()
 {
 	m_engineInterface->CreateTerrainEntity(128, 128);
@@ -754,5 +761,15 @@ void Treenity::FocusEntity()
 		if(m_selectedEntities.size() > 0)
 			m_engineInterface->TargetEntity(*m_selectedEntities.begin());
 	}
+}
+
+TerrainGeometryBrush* Treenity::GetTerrainGeometryBrush()
+{
+	return m_terrainGeometryBrush;
+}
+
+TerrainTextureBrush* Treenity::GetTerrainTextureBrush()
+{
+	return m_terrainTextureBrush;
 }
 

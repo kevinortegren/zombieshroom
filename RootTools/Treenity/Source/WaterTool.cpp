@@ -30,8 +30,6 @@ WaterTool::WaterTool( QWidget* p_parent /*= 0*/ ): QDockWidget(p_parent)
 	connect(ui.pushButton_waterColor,		SIGNAL(clicked()),				this, SLOT(OpenColorDialog()));
 	connect(ui.pushButton_initWater,		SIGNAL(clicked()),				this, SLOT(InitWater()));
 	connect(ui.pushButton_resetWater,		SIGNAL(clicked()),				this, SLOT(ResetWater()));
-
-	
 }
 
 WaterTool::~WaterTool()

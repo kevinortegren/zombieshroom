@@ -12,38 +12,28 @@ struct BrushElement
 	float strength;
 };
 
-class TerrainBrush
+class BrushBaseShape
 {
 public:
-	TerrainBrush();
-	~TerrainBrush();
+	BrushBaseShape();
+	~BrushBaseShape();
 
 	void	SetSize(int p_size);
-	void	SetStrength(float p_strength);
-	void	SetFlat(bool p_flat);
-	void	SetSmoothOnly(bool p_smoothOnly);
-	void	SetAutoSmooth(bool p_autoSmooth);
-
 	int		GetSize();
-	float	GetStrength();
-	bool	GetFlat();
-	bool	GetSmoothOnly();
-	bool	GetAutoSmooth();
 
-	std::vector<BrushElement>* GetBrush();
-	std::vector<BrushElement>* GetNormalBrush();
+	int		GetNormalSize();
+
+	std::vector<BrushElement>* GetBrushShapeData();
+	std::vector<BrushElement>* GetBrushNormalShapeData();
 
 protected:
 	
 	//Implement this with desired brush shape algorithm
 	virtual void CalculateBrush() = 0;
+	virtual void CalculateNormalBrush() = 0;
 
 	std::vector<BrushElement> m_brushElements;
 	std::vector<BrushElement> m_brushNormalElements;
 
 	int m_size;
-	float m_strength;
-	bool m_flat;
-	bool m_smoothOnly;
-	bool m_autoSmooth;
 };

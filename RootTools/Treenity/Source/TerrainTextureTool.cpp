@@ -1,4 +1,4 @@
-#include <RootTools/Treenity/Include/TerrainTool.h>
+#include <RootTools/Treenity/Include/TerrainTextureTool.h>
 #include <RootSystems/Include/RenderingSystem.h>
 #include <RootEngine/Include/Logging/Logging.h>
 #include <RootEngine/Include/GameSharedContext.h>
@@ -6,22 +6,22 @@
 
 extern RootEngine::GameSharedContext g_engineContext;
 
-TerrainTool::TerrainTool()
-	: Tool(), m_timer(0.0f), m_plateauHeight(0.0f), m_downEdge(false)
+TerrainTextureTool::TerrainTextureTool()
+	: Tool(), m_timer(0.0f)
 {
 }
 
-TerrainTool::~TerrainTool()
+TerrainTextureTool::~TerrainTextureTool()
 {
 
 }
 
-void TerrainTool::LoadResources( ECS::World* p_world )
+void TerrainTextureTool::LoadResources( ECS::World* p_world )
 {
 	m_world = p_world;
 }
 
-bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
+bool TerrainTextureTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 {
 	//Get entity with tag Terrian
 	ECS::Entity* terrainEnt = m_world->GetTagManager()->GetEntityByTag("Terrain");
@@ -71,7 +71,6 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 	if(leftMouseButtonState == RootEngine::InputManager::KeyState::DOWN_EDGE)
 	{
 		m_timer = 1.0f/32.0f;
-		m_downEdge = true;
 	}
 
 	unsigned numberOfAttribs = terrainMesh->GetVertexAttribute()->GetNumAttributes();
@@ -108,13 +107,35 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 	m_terrainModelMatrix = glm::translate(glm::mat4(1.0f), m_terrainTrans->m_interpolatedPosition);
 	m_terrainModelMatrix = glm::rotate(m_terrainModelMatrix, m_terrainTrans->m_orientation.GetAngle(), m_terrainTrans->m_orientation.GetAxis());
 	m_terrainModelMatrix = glm::scale(m_terrainModelMatrix, m_terrainTrans->m_scale);
-			
+
+	int texSize = 0;
+	Render::TextureInterface* blendMapTexture = nullptr;
+
+	//Find blendmap
+	auto blendTex = terrainRender->m_material->m_textures.find(Render::TextureSemantic::TEXTUREMAP);
+	if(blendTex != terrainRender->m_material->m_textures.end())
+	{
+		//Found blendmap and it is not null
+		if(blendTex->second != nullptr)
+		{
+			blendMapTexture = blendTex->second;
+
+			texSize = (int)blendTex->second->GetWidth();
+		}
+	}
+
+	//Get texture coords
+	float textureSizeFactor = (float)texSize / (float)m_width;
+
+	//Flip x and z(y)
+	glm::ivec2 textureHitPos = glm::ivec2(textureSizeFactor * glm::vec2(terrainHitPos.y, terrainHitPos.x));
+
 	m_shaderdata.y = 0.0f;
-	m_shaderdata.w = m_editorInterface->GetTerrainGeometryBrush()->GetSize() * m_terrainTrans->m_scale.x;
+	m_shaderdata.w = m_editorInterface->GetTerrainTextureBrush()->GetSize() * m_terrainTrans->m_scale.x / textureSizeFactor; // divide by texture size factor to display a correct brush
 			
 	Render::RenderJob job;	
 	job.m_mesh = terrainMesh;
-	job.m_material = g_engineContext.m_renderer->CreateMaterial(m_editorInterface->GetTerrainGeometryBrush()->GetActiveMaterial());
+	job.m_material = g_engineContext.m_renderer->CreateMaterial(m_editorInterface->GetTerrainTextureBrush()->GetActiveMaterial());
 	job.m_forward = terrainRender->m_forward;
 	job.m_refractive = terrainRender->m_refractive;
 	job.m_params[Render::Semantic::MODEL] = &m_terrainModelMatrix;
@@ -134,59 +155,40 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 		{
 			m_timer = m_timer - updateFreq;
 		
-			
-			//Buffer is mapped, ready to be read and written to
-			//If not smooth only, run the height calculation algorithm
-			if(!m_editorInterface->GetTerrainGeometryBrush()->GetSmoothOnly())
-				for (unsigned i = 0; i < m_editorInterface->GetTerrainGeometryBrush()->GetCurrentBrushShapeData()->size(); ++i)
-				{
-					glm::ivec2 brushLocalPos	= m_editorInterface->GetTerrainGeometryBrush()->GetCurrentBrushShapeData()->at(i).pos;
-					float strength				= m_editorInterface->GetTerrainGeometryBrush()->GetCurrentBrushShapeData()->at(i).strength;
-
-					glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
-			
-					int pos = GetVertexPosition(pos2d);
-
-					if(pos != -1)
-					{
-						if(m_editorInterface->GetTerrainGeometryBrush()->GetFlat())
-							m_vertexData[pos].m_pos.y +=  m_editorInterface->GetTerrainGeometryBrush()->GetStrength();
-						else if(m_editorInterface->GetTerrainGeometryBrush()->GetPlateau())
-							m_vertexData[pos].m_pos.y = m_editorInterface->GetTerrainGeometryBrush()->GetStrength() + m_plateauHeight;
-						else
-							m_vertexData[pos].m_pos.y += strength * m_editorInterface->GetTerrainGeometryBrush()->GetStrength();
-					}
-				}
-			//If autosmooth or smooth only, run the smoothing algorithm
-			if(m_editorInterface->GetTerrainGeometryBrush()->GetSmoothOnly() || m_editorInterface->GetTerrainGeometryBrush()->GetAutoSmooth())
-				for (unsigned i = 0; i < m_editorInterface->GetTerrainGeometryBrush()->GetCurrentBrushShapeData()->size(); ++i)
-				{
-					glm::ivec2 brushLocalPos = m_editorInterface->GetTerrainGeometryBrush()->GetCurrentBrushShapeData()->at(i).pos;
-
-					glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
-
-					int pos = GetVertexPosition(pos2d);
-
-					if(pos != -1)
-					{
-						float smoothHeight = AverageHeight(pos2d);
-						m_vertexData[pos].m_pos.y = smoothHeight;
-					}
-
-				}
-
-			for (unsigned i = 0; i < m_editorInterface->GetTerrainGeometryBrush()->GetCurrentNormalBrushShapeData()->size(); ++i)
+			if(blendMapTexture != nullptr)
 			{
-				glm::ivec2 brushLocalPos	= m_editorInterface->GetTerrainGeometryBrush()->GetCurrentNormalBrushShapeData()->at(i).pos;
+				unsigned char* textureData = new unsigned char[texSize*texSize*4];
 
-				glm::ivec2 pos2d = terrainHitPos + brushLocalPos;
+				blendTex->second->Bind(0);
+				//m_context->m_profiler->BeginGPUTimer();
+				glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+				//double time = m_context->m_profiler->EndGPUTimer();
+				//m_context->m_logger->LogText(LogTag::RENDER, LogLevel::DEBUG_PRINT, "Compute time: %f ms", time);
 
-				int pos = GetVertexPosition(pos2d);
-
-				if(pos != -1)
+				//Buffer is mapped, ready to be read and written to
+				for (unsigned i = 0; i < m_editorInterface->GetTerrainTextureBrush()->GetCurrentBrushShapeData()->size(); ++i)
 				{
-					m_vertexData[pos].m_normal = CalcNormalOnCoord(pos2d);
+					glm::ivec2 brushLocalPos	= m_editorInterface->GetTerrainTextureBrush()->GetCurrentBrushShapeData()->at(i).pos;
+					float strength				= m_editorInterface->GetTerrainTextureBrush()->GetCurrentBrushShapeData()->at(i).strength;
+
+					float colori[]  = {40, 0, 0, 0};
+					
+					glm::ivec2 pos2d = textureHitPos + brushLocalPos;
+
+					//Check out of range
+					if(pos2d.x <= 0 || pos2d.y <= 0 || pos2d.x >= texSize || pos2d.y >= texSize)
+						continue;
+
+					unsigned char color[]  = {0, 0, 0, 0};
+					color[0] = c_clamp(colori[0] += (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y], 0, 255);
+					color[1] = c_clamp(colori[1] += (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 1], 0, 255);
+					color[2] = c_clamp(colori[2] += (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 2], 0, 255);
+					color[3] = c_clamp(colori[3] += (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 3], 0, 255);
+					
+					glTexSubImage2D(GL_TEXTURE_2D, 0, (GLint)pos2d.x, (GLint)pos2d.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &color[0]);
 				}
+				//Clean up
+				delete[] textureData;
 			}
 
 			if(terrainVBO->UnmapBuffer() == false)
@@ -203,22 +205,22 @@ bool TerrainTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 	return false;
 }
 
-void TerrainTool::SetPosition( const glm::vec3& p_position )
+void TerrainTextureTool::SetPosition( const glm::vec3& p_position )
 {
 
 }
 
-void TerrainTool::Hide()
+void TerrainTextureTool::Hide()
 {
 	Tool::Hide();
 }
 
-void TerrainTool::Show()
+void TerrainTextureTool::Show()
 {
 	Tool::Show();
 }
 
-int TerrainTool::GetVertexPosition( const glm::ivec2& p_pos )
+int TerrainTextureTool::GetVertexPosition( const glm::ivec2& p_pos )
 {
 	int pos = p_pos.y * m_width + p_pos.x;
 
@@ -228,27 +230,7 @@ int TerrainTool::GetVertexPosition( const glm::ivec2& p_pos )
 		return -1;
 }
 
-float TerrainTool::AverageHeight( const glm::ivec2& p_pos)
-{
-	float avg = 0.0f;
-	float num = 0.0f;
-
-	for(int m = p_pos.x - 1; m <= p_pos.x + 1; ++m)
-	{ 
-		for(int n = p_pos.y - 1; n <= p_pos.y + 1; ++n)
-		{
-			//Check if in bounds
-			if(IsCoordInsideTerrain(glm::ivec2(m, n)))
-			{
-				avg += m_vertexData[GetVertexPosition(glm::ivec2(m, n))].m_pos.y;
-				num += 1.0f;
-			}
-		}
-	}
-	return avg / num;
-}
-
-glm::ivec2 TerrainTool::GetRayMarchCollision( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
+glm::ivec2 TerrainTextureTool::GetRayMarchCollision( const glm::vec3& p_cameraPos, const glm::vec3& p_ray )
 {
 	glm::vec3 rayPos = p_cameraPos;
 	glm::vec3 rayDir = glm::normalize(p_ray);
@@ -276,26 +258,12 @@ glm::ivec2 TerrainTool::GetRayMarchCollision( const glm::vec3& p_cameraPos, cons
 	}
 
 	if(rayDistCounter == iterations)
-	{
-		if(m_downEdge)
-		{
-			m_plateauHeight = 0.0f;
-			m_downEdge = false;
-		}
 		return glm::ivec2(9999999, 9999999);
-	}
 	else
-	{
-		if(m_downEdge)
-		{
-			m_plateauHeight = m_vertexData[GetVertexPosition(hitPos)].m_pos.y;
-			m_downEdge = false;
-		}
 		return hitPos;
-	}
 }
 
-bool TerrainTool::IsCoordInsideTerrain( glm::ivec2 p_pos)
+bool TerrainTextureTool::IsCoordInsideTerrain( glm::ivec2 p_pos)
 {
 	if((p_pos.x >= 0 && p_pos.x < m_width) && (p_pos.y >= 0 && p_pos.y < m_width))
 		return true;
@@ -303,23 +271,12 @@ bool TerrainTool::IsCoordInsideTerrain( glm::ivec2 p_pos)
 		return false;
 }
 
-glm::vec3 TerrainTool::CalcNormalOnCoord( const glm::ivec2& p_pos )
+unsigned char TerrainTextureTool::c_clamp(float x, float a, float b)
 {
-	// Estimate normals for interior nodes using central difference.
-	float invTwoDX = 1.0f / (2.0f * m_terrainTrans->m_scale.x);
-	float invTwoDZ = 1.0f / (2.0f * m_terrainTrans->m_scale.z);
-
-	float t = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(-1, 0))].m_pos.y;
-	float b = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(1, 0))].m_pos.y;
-	float l = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(0, -1))].m_pos.y;
-	float r = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(0, 1))].m_pos.y;
-
-	glm::vec3 tanZ(0.0f, (t-b)*invTwoDZ, 1.0f);
-	glm::vec3 tanX(1.0f, (r-l)*invTwoDX, 0.0f);
-
-	glm::vec3 normalen = glm::cross(tanZ, tanX);
-	normalen = glm::normalize(normalen);
-
-	return normalen;
+	if (x > b)
+		return (unsigned char)b;
+	else if(x < a)
+		return (unsigned char)a;
+	else 
+		return (unsigned char)x;
 }
-

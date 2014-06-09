@@ -37,8 +37,7 @@ private slots:
 	void SetSize(int p_val);
 	void SetStrength(double p_val);
 	void SetAutoSmooth(bool p_val);
-	void SetSmoothOnly(bool p_val);
-	void SetFlat(bool p_val);
-	void SmoothAll();
 	void SetStyle(int p_val);
+	void SetOptions(int p_val);
+	void SmoothAll();
 };

@@ -24,7 +24,6 @@
 #include <RootTools/Treenity/Include/ToolManager.h>
 #include <RootTools/Treenity/Include/VerticalScrollArea.h>
 #include <RootTools/Treenity/Include/WaterTool.h>
-#include <RootTools/Treenity/Include/BrushManager.h>
 #include <RootTools/Treenity/Include/TerrainDialog.h>
 
 class Treenity : public QMainWindow, public EditorInterface
@@ -68,7 +67,10 @@ public:
 	const std::set<ECS::Entity*>& GetSelection() const;
 	void RenameEntity(ECS::Entity* p_entity, const QString& p_name);
 	ToolMode::ToolMode GetToolMode();
-	BrushManager* GetBrushManager();
+
+	//Brushes
+	TerrainGeometryBrush* GetTerrainGeometryBrush();
+	TerrainTextureBrush* GetTerrainTextureBrush();
 
 	//Called as the last thing when exiting playmode
 	void ExitPlayMode();
@@ -80,8 +82,9 @@ public:
 	void Update(float p_dt);
 
 	ToolManager m_toolManager;
-	BrushManager m_brushManager;
 
+	TerrainGeometryBrush* m_terrainGeometryBrush;
+	TerrainTextureBrush* m_terrainTextureBrush;
 private:
 
 	// Component meta-data.
@@ -138,6 +141,7 @@ private slots:
 	void SetRotateTool();
 	void SetResizeTool();
 	void SetTerrainGeometryTool();
+	void SetTerrainTextureTool();
 	void ChangeToolMode(int index);
 	void AddTerrain();
 	void FocusEntity();
