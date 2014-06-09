@@ -171,21 +171,38 @@ bool TerrainTextureTool::Pick( const glm::vec3& p_cameraPos, const glm::vec3& p_
 					glm::ivec2 brushLocalPos	= m_editorInterface->GetTerrainTextureBrush()->GetCurrentBrushShapeData()->at(i).pos;
 					float strength				= m_editorInterface->GetTerrainTextureBrush()->GetCurrentBrushShapeData()->at(i).strength;
 
-					float colori[]  = {40, 0, 0, 0};
-					
+					float colori[] = {0, 0, 0, 255};
+					if(m_editorInterface->GetTerrainTextureBrush()->GetChannel() == 0)
+						colori[0] = 255;
+					else if(m_editorInterface->GetTerrainTextureBrush()->GetChannel() == 1)
+						colori[1] = 255;
+					else if(m_editorInterface->GetTerrainTextureBrush()->GetChannel() == 2)
+						colori[2] = 255;
+
 					glm::ivec2 pos2d = textureHitPos + brushLocalPos;
 
 					//Check out of range
-					if(pos2d.x <= 0 || pos2d.y <= 0 || pos2d.x >= texSize || pos2d.y >= texSize)
+					if(pos2d.x < 0 || pos2d.y < 0 || pos2d.x >= texSize || pos2d.y >= texSize)
 						continue;
 
-					unsigned char color[]  = {0, 0, 0, 0};
-					color[0] = c_clamp(colori[0] += (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y], 0, 255);
-					color[1] = c_clamp(colori[1] += (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 1], 0, 255);
-					color[2] = c_clamp(colori[2] += (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 2], 0, 255);
-					color[3] = c_clamp(colori[3] += (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 3], 0, 255);
+					float oldColor[]  = {0, 0, 0, 0};
+					oldColor[0] = (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y];
+					oldColor[1] = (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 1];
+					oldColor[2] = (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 2];
+					oldColor[3] = (float)textureData[pos2d.x * 4 + texSize * 4 * pos2d.y + 3];
 					
-					glTexSubImage2D(GL_TEXTURE_2D, 0, (GLint)pos2d.x, (GLint)pos2d.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &color[0]);
+					float opacity = m_editorInterface->GetTerrainTextureBrush()->GetOpacity();
+					oldColor[0] += opacity * (colori[0] - oldColor[0]);
+					oldColor[1] += opacity * (colori[1] - oldColor[1]);
+					oldColor[2] += opacity * (colori[2] - oldColor[2]);
+
+					unsigned char newColor[]  = {0, 0, 0, 0};
+					newColor[0] = c_clamp(oldColor[0], 0, 255);
+					newColor[1] = c_clamp(oldColor[1], 0, 255);
+					newColor[2] = c_clamp(oldColor[2], 0, 255);
+					newColor[3] = c_clamp(oldColor[3], 0, 255);
+
+					glTexSubImage2D(GL_TEXTURE_2D, 0, (GLint)pos2d.x, (GLint)pos2d.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &newColor[0]);
 				}
 				//Clean up
 				delete[] textureData;

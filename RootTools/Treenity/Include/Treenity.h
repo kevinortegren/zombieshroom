@@ -25,6 +25,7 @@
 #include <RootTools/Treenity/Include/VerticalScrollArea.h>
 #include <RootTools/Treenity/Include/WaterTool.h>
 #include <RootTools/Treenity/Include/TerrainDialog.h>
+#include <RootTools/Treenity/Include/TerrainTextureDialog.h>
 
 class Treenity : public QMainWindow, public EditorInterface
 {
@@ -118,6 +119,7 @@ private:
 
 	WaterTool* m_waterToolDockable;
 	TerrainDialog* m_terrainDialog;
+	TerrainTextureDialog* m_terrainTextureDialog;
 
 protected:
 	void keyPressEvent(QKeyEvent* event);

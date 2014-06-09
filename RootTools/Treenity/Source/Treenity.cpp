@@ -100,9 +100,13 @@ Treenity::Treenity(QWidget *parent)
 
 	//Set up water dialog
 	m_waterToolDockable = new WaterTool(this);
-	//Set up terrin dialog
+
+	//Set up terrin dialogs
 	m_terrainDialog = new TerrainDialog(this);
 	m_terrainDialog->SetEditorInterface(this);
+
+	m_terrainTextureDialog = new TerrainTextureDialog(this);
+	m_terrainTextureDialog->SetEditorInterface(this);
 
 	// Match signals with slots.
 	connect(ui.actionNew,							SIGNAL(triggered()),		this,					SLOT(New()));
@@ -172,6 +176,7 @@ void Treenity::SetEngineInterface(EngineInterface* p_engineInterface)
 	ui.widget_canvas3D->SetEngineInterface(p_engineInterface);
 	m_waterToolDockable->SetEngineInterface(p_engineInterface);
 	m_terrainDialog->SetEngineInterface(p_engineInterface);
+	m_terrainTextureDialog->SetEngineInterface(p_engineInterface);
 }
 
 void Treenity::SetProjectManager(ProjectManager* p_projectManager)
@@ -676,6 +681,7 @@ void Treenity::SetTranslateTool()
 	{
 		m_toolManager.SetTool(ToolBox::TRANSLATION_TOOL);
 		m_terrainDialog->hide();
+		m_terrainTextureDialog->hide();
 	}
 	
 }
@@ -686,6 +692,7 @@ void Treenity::SetRotateTool()
 	{
 		m_toolManager.SetTool(ToolBox::ROTATION_TOOL);
 		m_terrainDialog->hide();
+		m_terrainTextureDialog->hide();
 	}
 }
 
@@ -695,6 +702,7 @@ void Treenity::SetResizeTool()
 	{
 		//Set resize tool
 		m_terrainDialog->hide();
+		m_terrainTextureDialog->hide();
 	}
 }
 
@@ -703,6 +711,7 @@ void Treenity::SetTerrainGeometryTool()
 	if(m_engineInterface->GetMode() != EditorMode::GAME)
 	{
 		m_toolManager.SetTool(ToolBox::TERRAIN_TOOL);
+		m_terrainTextureDialog->hide();
 		m_terrainDialog->Show();
 	}
 }
@@ -712,7 +721,8 @@ void Treenity::SetTerrainTextureTool()
 	if(m_engineInterface->GetMode() != EditorMode::GAME)
 	{
 		m_toolManager.SetTool(ToolBox::TERRAIN_TEXTURE_TOOL);
-		m_terrainDialog->Show();
+		m_terrainDialog->hide();
+		m_terrainTextureDialog->Show();
 	}
 }
 
