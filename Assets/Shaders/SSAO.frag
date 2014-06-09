@@ -7,8 +7,8 @@ uniform sampler2D g_Normals;
 uniform sampler2D g_Depth;
 uniform sampler2D g_Noise;
 
-const float uRadius = 1.5;
-const float uPower = 2.0;
+const float uRadius = 1.0;
+const float uPower = 1.0;
 const int uSampleKernelSize = 16;
 
 layout(std140) uniform PerFrame

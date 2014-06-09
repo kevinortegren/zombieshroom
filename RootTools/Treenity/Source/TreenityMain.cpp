@@ -318,6 +318,12 @@ TreenityMain::TreenityMain()
 	m_globalKeys.RegisterModifier(Qt::ShiftModifier);
 
 	GetWorldSystem()->SetAmbientLight(glm::vec4(1.0f));
+
+	//Disable reflections by default
+	std::stringstream ss;
+	ss << "water refl";
+	m_waterSystem->ParseCommands(&ss);
+
 	//Load sounds
 	/*
 

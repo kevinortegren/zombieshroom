@@ -610,6 +610,18 @@ void Treenity::keyPressEvent( QKeyEvent* event )
 			int index = (m_toolMode == ToolMode::GLOBAL) ? 0 : 1;
 			ui.comboBox_mode->setCurrentIndex(index);
 		}
+		else if(event->key() == Qt::Key_G)
+		{
+			std::stringstream ss;
+			ss << "r l ssao 0";
+			g_engineContext.m_renderer->ParseCommands(&ss);
+		}
+		else if(event->key() == Qt::Key_H)
+		{
+			std::stringstream ss;
+			ss << "r l ssao 1";
+			g_engineContext.m_renderer->ParseCommands(&ss);
+		}
 	}
 	else if(m_engineInterface->GetMode() == EditorMode::GAME)
 	{

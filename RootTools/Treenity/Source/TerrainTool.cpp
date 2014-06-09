@@ -309,17 +309,22 @@ glm::vec3 TerrainTool::CalcNormalOnCoord( const glm::ivec2& p_pos )
 	float invTwoDX = 1.0f / (2.0f * m_terrainTrans->m_scale.x);
 	float invTwoDZ = 1.0f / (2.0f * m_terrainTrans->m_scale.z);
 
-	float t = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(-1, 0))].m_pos.y;
-	float b = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(1, 0))].m_pos.y;
-	float l = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(0, -1))].m_pos.y;
-	float r = m_vertexData[GetVertexPosition(p_pos + glm::ivec2(0, 1))].m_pos.y;
+	glm::ivec2 normalPos[] = 
+	{
+		glm::clamp(p_pos + glm::ivec2(-1, 0), glm::ivec2(0, 0), glm::ivec2(m_width-1, m_width-1)),
+		glm::clamp(p_pos + glm::ivec2(1, 0), glm::ivec2(0, 0), glm::ivec2(m_width-1, m_width-1)),
+		glm::clamp(p_pos + glm::ivec2(0, -1), glm::ivec2(0, 0), glm::ivec2(m_width-1, m_width-1)),
+		glm::clamp(p_pos + glm::ivec2(0, 1), glm::ivec2(0, 0), glm::ivec2(m_width-1, m_width-1))
+	};
 
-	glm::vec3 tanZ(0.0f, (t-b)*invTwoDZ, 1.0f);
+	float t = m_vertexData[GetVertexPosition(normalPos[0])].m_pos.y;
+	float b = m_vertexData[GetVertexPosition(normalPos[1])].m_pos.y;
+	float l = m_vertexData[GetVertexPosition(normalPos[2])].m_pos.y;
+	float r = m_vertexData[GetVertexPosition(normalPos[3])].m_pos.y;
+
+	glm::vec3 tanZ(0.0f, (b-t)*invTwoDZ, 1.0f);
 	glm::vec3 tanX(1.0f, (r-l)*invTwoDX, 0.0f);
 
-	glm::vec3 normalen = glm::cross(tanZ, tanX);
-	normalen = glm::normalize(normalen);
-
-	return normalen;
+	return  glm::normalize(glm::cross(tanZ, tanX));
 }
 
