@@ -77,6 +77,7 @@ void main()
 	////////////////////////////////////////////////////////////////////////////
 	vec2 calcNorm		= texture(g_Normal, TexCoord_FS_in).xy; //RG16F from compute shader
 	vec3 normalMap		= normalize(vec3(calcNorm.x, dx2*2, calcNorm.y));
+	vec3 normSpecMap	= normalMap;
 	if(gOptions.y == 0.0)
 	{
 		vec3 normal1 			= normalize(texture(g_NormalMap,  TexCoord_FS_in * 256.0 + 								vec2(sin(time * 0.89) , time * 0.95)) * 2.0 - 1.0).xyz;
@@ -86,9 +87,12 @@ void main()
 		vec3 tangent			= normalize(vec3(dx2*2, -calcNorm.x, 0 ));
 		vec3 bitangent			= normalize(vec3(0,  -calcNorm.y, dx2*2));
 		mat3 TBN				= mat3(tangent, bitangent, normalMap);
-		normalMap 				= mix(TBN * normalT, normalMap, 0.5); //Smooth the normal from the normal map
+		normalMap 				= mix(TBN * normalT, normalMap, 0.86); //Smooth the normal from the normal map
+		normSpecMap 			= mix(TBN * normalT, normalMap, 0.55);
 	}
+
 	vec3 viewNormal			= normalize(viewMatrix * vec4(normalMap,0.0)).rgb;
+	vec3 viewSpecNormal		= normalize(viewMatrix * vec4(normSpecMap,0.0)).rgb;
 	////////////////////////////////////////////////////////////////////////////
 	//Calculate transparent color and refraction
 	////////////////////////////////////////////////////////////////////////////
@@ -259,7 +263,7 @@ void main()
 	vec3 viewDir 		= -normalize(viewSpacePosition);
 	vec3 halfVector 	= normalize(viewDir + lightVec);
     
-	vec3 specularColor 	= SunColor.xyz * 1.0 * pow(clamp(dot(viewNormal, halfVector), 0.0, 1.0), 256.0);
+	vec3 specularColor 	= SunColor.xyz * 2.0 * pow(clamp(dot(viewSpecNormal, halfVector), 0.0, 1.0), 512.0);
 
 
 	////////////////////////////////////////////////////////////////////////////
