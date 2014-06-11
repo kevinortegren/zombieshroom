@@ -29,7 +29,7 @@ namespace RootEngine
 		ModelExporter(GameSharedContext* p_context);
 		~ModelExporter();
 
-		bool ExportMesh(Render::MeshInterface* p_mesh);
+		bool ExportMesh(Render::MeshInterface* p_mesh, const std::string& p_path, const std::string& p_fileName );
 	private:
 
 		GameSharedContext* m_context;

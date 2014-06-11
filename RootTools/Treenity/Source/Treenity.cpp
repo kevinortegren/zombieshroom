@@ -15,7 +15,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QShortcut>
-
+#include <QInputDialog>
 #include <RootTools/Treenity/Include/Components/ParticleView.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
@@ -133,6 +133,7 @@ Treenity::Treenity(QWidget *parent)
 	connect(ui.comboBox_mode,						SIGNAL(currentIndexChanged(int)), this,				SLOT(ChangeToolMode(int)));
 	connect(ui.actionWaterSetting,					SIGNAL(triggered()),		m_waterToolDockable,	SLOT(Show()));
 	connect(ui.actionAdd_terrain,					SIGNAL(triggered()),		this,					SLOT(AddTerrain()));
+	connect(ui.actionTerrain_model,					SIGNAL(triggered()),		this,					SLOT(ExportTerrainModel()));
 
 
 	connect(m_componentViews[RootForce::ComponentType::RENDERABLE],			SIGNAL(deleted(ECS::Entity*)), this, SLOT(RemoveRenderable(ECS::Entity*)));
@@ -793,5 +794,19 @@ TerrainGeometryBrush* Treenity::GetTerrainGeometryBrush()
 TerrainTextureBrush* Treenity::GetTerrainTextureBrush()
 {
 	return m_terrainTextureBrush;
+}
+
+void Treenity::ExportTerrainModel()
+{
+	bool ok;
+	QString name = QInputDialog::getText(this, tr("Enter Terrain Model Name"), tr("Name:"), QLineEdit::Normal, "TerrainModel", &ok);
+
+	if(ok && !name.isEmpty())
+		m_engineInterface->ExportTerrainModel(name.toStdString());
+}
+
+void Treenity::ExportTerrainBlendMap()
+{
+
 }
 

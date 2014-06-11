@@ -147,6 +147,8 @@ private slots:
 	void ChangeToolMode(int index);
 	void AddTerrain();
 	void FocusEntity();
+	void ExportTerrainModel();
+	void ExportTerrainBlendMap();
 
 	void RemoveRenderable(ECS::Entity* p_entity);
 	void RemovePhysics(ECS::Entity* p_entity);

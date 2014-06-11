@@ -435,10 +435,18 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionTerrain_model"/>
+     <addaction name="actionTerrain_blend_map"/>
+    </widget>
     <addaction name="actionNew"/>
     <addaction name="actionOpen_Project"/>
     <addaction name="action_saveAs"/>
     <addaction name="action_save"/>
+    <addaction name="menuExport"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -836,6 +844,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionTerrain_model">
+   <property name="text">
+    <string>Terrain model</string>
+   </property>
+  </action>
+  <action name="actionTerrain_blend_map">
+   <property name="text">
+    <string>Terrain blend map</string>
    </property>
   </action>
  </widget>

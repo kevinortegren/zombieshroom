@@ -53,6 +53,8 @@ public:
     QAction *action_addParticle;
     QAction *actionWaterSetting;
     QAction *actionAdd_terrain;
+    QAction *actionTerrain_model;
+    QAction *actionTerrain_blend_map;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     QWidget *treedeetoolbar;
@@ -69,6 +71,7 @@ public:
     QPushButton *pushButton_playMode;
     QMenuBar *menuBar;
     QMenu *menuFile;
+    QMenu *menuExport;
     QMenu *menuEdit;
     QMenu *menuEntity;
     QMenu *menuComponent;
@@ -134,6 +137,10 @@ public:
         actionWaterSetting->setObjectName(QStringLiteral("actionWaterSetting"));
         actionAdd_terrain = new QAction(TreenityClass);
         actionAdd_terrain->setObjectName(QStringLiteral("actionAdd_terrain"));
+        actionTerrain_model = new QAction(TreenityClass);
+        actionTerrain_model->setObjectName(QStringLiteral("actionTerrain_model"));
+        actionTerrain_blend_map = new QAction(TreenityClass);
+        actionTerrain_blend_map->setObjectName(QStringLiteral("actionTerrain_blend_map"));
         centralWidget = new QWidget(TreenityClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -278,6 +285,8 @@ public:
         menuBar->setGeometry(QRect(0, 0, 1272, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
+        menuExport = new QMenu(menuFile);
+        menuExport->setObjectName(QStringLiteral("menuExport"));
         menuEdit = new QMenu(menuBar);
         menuEdit->setObjectName(QStringLiteral("menuEdit"));
         menuEntity = new QMenu(menuBar);
@@ -402,7 +411,10 @@ public:
         menuFile->addAction(actionOpen_Project);
         menuFile->addAction(action_saveAs);
         menuFile->addAction(action_save);
+        menuFile->addAction(menuExport->menuAction());
         menuFile->addAction(actionExit);
+        menuExport->addAction(actionTerrain_model);
+        menuExport->addAction(actionTerrain_blend_map);
         menuEntity->addAction(action_addEntity);
         menuEntity->addAction(action_removeEntity);
         menuEntity->addAction(actionAdd_terrain);
@@ -454,6 +466,8 @@ public:
         actionWaterSetting->setShortcut(QApplication::translate("TreenityClass", "Ctrl+W", 0));
         actionAdd_terrain->setText(QApplication::translate("TreenityClass", "Add terrain", 0));
         actionAdd_terrain->setShortcut(QApplication::translate("TreenityClass", "Ctrl+T", 0));
+        actionTerrain_model->setText(QApplication::translate("TreenityClass", "Terrain model", 0));
+        actionTerrain_blend_map->setText(QApplication::translate("TreenityClass", "Terrain blend map", 0));
 #ifndef QT_NO_TOOLTIP
         pushButton_translateMode->setToolTip(QApplication::translate("TreenityClass", "Translate tool (Q)", 0));
 #endif // QT_NO_TOOLTIP
@@ -493,6 +507,7 @@ public:
         pushButton_playMode->setText(QString());
         pushButton_playMode->setShortcut(QApplication::translate("TreenityClass", "F5", 0));
         menuFile->setTitle(QApplication::translate("TreenityClass", "File", 0));
+        menuExport->setTitle(QApplication::translate("TreenityClass", "Export", 0));
         menuEdit->setTitle(QApplication::translate("TreenityClass", "Edit", 0));
         menuEntity->setTitle(QApplication::translate("TreenityClass", "Entity", 0));
         menuComponent->setTitle(QApplication::translate("TreenityClass", "Component", 0));

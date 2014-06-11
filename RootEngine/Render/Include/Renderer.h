@@ -292,7 +292,22 @@ namespace Render
 		bool m_displayNormals;
 		bool m_showForward;
 
+		struct InstanceData
+		{
+			InstanceData(glm::mat4 p_mvp, glm::mat4 p_normal) : m_MVP(p_mvp), m_normal(p_normal){}
+			glm::mat4 m_MVP;
+			glm::mat4 m_normal;
+		};
 
+		struct InstanceKeys
+		{
+			InstanceKeys(Render::MeshInterface*	p_mesh, Render::Material* p_mat) : m_mesh(p_mesh), m_mat(p_mat){}
+			Render::MeshInterface*	m_mesh;
+			Render::Material*		m_mat; 
+		};
+
+		std::vector<InstanceKeys> m_instanceKeys;
+		std::vector<std::vector<InstanceData>> m_instanceData;
 	};
 }
 

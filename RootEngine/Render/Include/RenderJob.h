@@ -21,7 +21,7 @@ namespace Render
 	struct RenderJob
 	{
 		RenderJob()
-			: m_forward(0), m_refractive(0), m_renderPass(2) {}
+			: m_forward(0), m_refractive(0), m_renderPass(2), m_instanceIndex(-1) {}
 
 		MeshInterface* m_mesh;
 		MeshInterface* m_shadowMesh;
@@ -31,5 +31,6 @@ namespace Render
 		bool m_refractive;
 		unsigned m_renderPass;
 		glm::vec3 m_position;
+		int m_instanceIndex;
 	};
 }

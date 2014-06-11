@@ -538,23 +538,20 @@ namespace RootEngine
 
 #ifndef COMPILE_LEVEL_EDITOR
 	//Export
-	void ResourceManager::ExportCollada( const std::string& p_modelName )
+	void ResourceManager::ExportCollada( Model* p_model, const std::string& p_fileName )
 	{
-		if(m_models.find(p_modelName) == m_models.end())
+		if(p_model == nullptr)
 		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::WARNING, "Tried to export an unexisting model: %s", p_modelName.c_str());
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[EXPORT] Failed, model is NULL");
+			return;
 		}
+
+		bool errCheck = m_modelExporter->ExportMesh(p_model->m_meshes[0], m_workingDirectory, p_fileName);
+
+		if(errCheck)
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[EXPORT] Successfully exported model");
 		else
-		{
-			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::START_PRINT, "[EXPORT] Started exporting model: %s", p_modelName.c_str());
-
-			bool errCheck = m_modelExporter->ExportMesh(m_models[p_modelName]->m_meshes[0]);
-
-			if(errCheck)
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::SUCCESS, "[EXPORT] Successfully exported model: %s", p_modelName.c_str());
-			else
-				m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "[EXPORT] Failed to export model: %s", p_modelName.c_str());
-		}
+			m_context->m_logger->LogText(LogTag::RESOURCE, LogLevel::NON_FATAL_ERROR, "[EXPORT] Failed to export model");
 	}
 
 	Physics::PhysicsMeshInterface* ResourceManager::CreatePhysicsMesh( RootEngine::Model* p_model )

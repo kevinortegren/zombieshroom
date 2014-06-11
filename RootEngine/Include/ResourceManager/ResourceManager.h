@@ -37,7 +37,7 @@ namespace RootEngine
 			virtual std::string LoadScript(std::string p_scriptName) = 0;
 			virtual std::string GetScript(std::string p_scriptName) = 0;
 			virtual void		ReloadAllScripts() = 0;
-			virtual void		ExportCollada(const std::string& p_modelName) = 0;
+			virtual void		ExportCollada( Model* p_model, const std::string& p_fileName  ) = 0;
 		#endif
 
 		virtual Model* CreateModel(const std::string& p_path) = 0;
@@ -89,7 +89,7 @@ namespace RootEngine
 			std::string LoadScript(std::string p_scriptName);
 			std::string GetScript(std::string p_scriptName);
 			void		ReloadAllScripts();
-			void		ExportCollada(const std::string& p_modelName);
+			void		ExportCollada( Model* p_model, const std::string& p_fileName  );
 			std::string ResolveStringFromMesh(Render::MeshInterface* p_mesh);
 		#endif
 

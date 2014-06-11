@@ -154,6 +154,7 @@ namespace Render
 
 	void Mesh::DrawInstanced(GLsizei p_instances)
 	{
+
 		glDrawElementsInstanced(m_primitive, m_elementBuffer->GetNumElements(), GL_UNSIGNED_INT, 0, p_instances);
 	}
 

@@ -486,6 +486,7 @@ namespace Render
 
 	void GLRenderer::AddRenderJob(RenderJob& p_job)
 	{
+		
 		RenderJob* job = new (m_allocator.Alloc(sizeof(RenderJob))) RenderJob(p_job);
 
 		if((job->m_material->m_effect->GetTechniques().at(0)->m_flags & TechniqueFlags::RENDER_DEFERRED1) == TechniqueFlags::RENDER_DEFERRED1 || job->m_forward)
@@ -725,7 +726,7 @@ namespace Render
 					for(auto program = (*tech)->GetPrograms().begin(); program != (*tech)->GetPrograms().end(); ++program)
 					{
 						(*program)->Apply();
-
+						
 						(*job)->m_mesh->Draw();						
 					}
 				}

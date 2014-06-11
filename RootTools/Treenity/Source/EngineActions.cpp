@@ -1063,3 +1063,16 @@ void EngineActions::UpdateTerrainPhysicsMesh()
 
 		ReconstructPhysicsObject(terrainEnt, GetPhysicsType(terrainEnt), GetCollideWithWorld(terrainEnt), GetCollideWithStatic(terrainEnt), GetMass(terrainEnt), GetPhysicsShape(terrainEnt), GetShapeRadius(terrainEnt), GetShapeHeight(terrainEnt), GetPhysicsMesh(terrainEnt), GetCollisionVisualized(terrainEnt));
 }
+
+void EngineActions::ExportTerrainModel(const std::string& p_fileName)
+{
+	ECS::Entity* terrain = GetEntityByTag("Terrain");
+	if(terrain == nullptr)
+		return;
+
+	RootForce::Renderable* terrainRend = m_world->GetEntityManager()->GetComponent<RootForce::Renderable>(terrain);
+	if(terrainRend == nullptr)
+		return;
+
+	g_engineContext.m_resourceManager->ExportCollada(terrainRend->m_model, p_fileName);
+}
