@@ -102,10 +102,10 @@ Treenity::Treenity(QWidget *parent)
 	m_waterToolDockable = new WaterTool(this);
 
 	//Set up terrin dialogs
-	m_terrainDialog = new TerrainDialog(this);
+	m_terrainDialog = new TerrainDialog(ui.widget_upperToolBar);
 	m_terrainDialog->SetEditorInterface(this);
 
-	m_terrainTextureDialog = new TerrainTextureDialog(this);
+	m_terrainTextureDialog = new TerrainTextureDialog(ui.widget_upperToolBar);
 	m_terrainTextureDialog->SetEditorInterface(this);
 
 	// Match signals with slots.
@@ -808,5 +808,15 @@ void Treenity::ExportTerrainModel()
 void Treenity::ExportTerrainBlendMap()
 {
 
+}
+
+TerrainDialog* Treenity::GetTerrainGeometryDialog()
+{
+	return m_terrainDialog;
+}
+
+TerrainTextureDialog* Treenity::GetTerrainTextureDialog()
+{
+	return m_terrainTextureDialog;
 }
 

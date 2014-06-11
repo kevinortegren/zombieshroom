@@ -6,6 +6,9 @@
 #include <RootTools/Treenity/Include/TerrainTextureBrush.h>
 #include <qstring.h>
 
+class TerrainDialog;
+class TerrainTextureDialog;
+
 namespace ToolMode
 {
 	enum ToolMode
@@ -25,6 +28,10 @@ public:
 	virtual const std::set<ECS::Entity*>& GetSelection() const = 0;
 	virtual void RenameEntity(ECS::Entity* p_entity, const QString& p_name) = 0;
 	virtual ToolMode::ToolMode GetToolMode() = 0;
+
 	virtual TerrainGeometryBrush* GetTerrainGeometryBrush() = 0;
 	virtual TerrainTextureBrush* GetTerrainTextureBrush() = 0;
+
+	virtual TerrainDialog* GetTerrainGeometryDialog() = 0;
+	virtual TerrainTextureDialog* GetTerrainTextureDialog() = 0;
 };

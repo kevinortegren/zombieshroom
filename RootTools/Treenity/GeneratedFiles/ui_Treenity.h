@@ -65,10 +65,11 @@ public:
     QComboBox *comboBox_mode;
     QPushButton *pushButton_terrainGeometryMode;
     QPushButton *pushButton_terrainPaintMode;
-    Canvas3D *widget_canvas3D;
     QWidget *widget_rightSideLeftAligned;
     QGridLayout *gridLayout_2;
     QPushButton *pushButton_playMode;
+    QWidget *widget_upperToolBar;
+    Canvas3D *widget_canvas3D;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuExport;
@@ -241,18 +242,7 @@ public:
         horizontalLayout->addWidget(pushButton_terrainPaintMode);
 
 
-        gridLayout->addWidget(treedeetoolbar, 1, 0, 1, 1, Qt::AlignLeft);
-
-        widget_canvas3D = new Canvas3D(centralWidget);
-        widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
-        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(widget_canvas3D->sizePolicy().hasHeightForWidth());
-        widget_canvas3D->setSizePolicy(sizePolicy);
-        widget_canvas3D->setStyleSheet(QStringLiteral("background-color: #000000;"));
-
-        gridLayout->addWidget(widget_canvas3D, 0, 0, 1, 2);
+        gridLayout->addWidget(treedeetoolbar, 3, 0, 1, 1, Qt::AlignLeft);
 
         widget_rightSideLeftAligned = new QWidget(centralWidget);
         widget_rightSideLeftAligned->setObjectName(QStringLiteral("widget_rightSideLeftAligned"));
@@ -277,7 +267,25 @@ public:
         gridLayout_2->addWidget(pushButton_playMode, 0, 0, 1, 1);
 
 
-        gridLayout->addWidget(widget_rightSideLeftAligned, 1, 1, 1, 1, Qt::AlignLeft);
+        gridLayout->addWidget(widget_rightSideLeftAligned, 3, 1, 1, 1, Qt::AlignLeft);
+
+        widget_upperToolBar = new QWidget(centralWidget);
+        widget_upperToolBar->setObjectName(QStringLiteral("widget_upperToolBar"));
+        widget_upperToolBar->setMinimumSize(QSize(32, 32));
+        widget_upperToolBar->setMaximumSize(QSize(167777, 32));
+
+        gridLayout->addWidget(widget_upperToolBar, 1, 0, 1, 2);
+
+        widget_canvas3D = new Canvas3D(centralWidget);
+        widget_canvas3D->setObjectName(QStringLiteral("widget_canvas3D"));
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(widget_canvas3D->sizePolicy().hasHeightForWidth());
+        widget_canvas3D->setSizePolicy(sizePolicy);
+        widget_canvas3D->setStyleSheet(QStringLiteral("background-color: #000000;"));
+
+        gridLayout->addWidget(widget_canvas3D, 2, 0, 1, 2);
 
         TreenityClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(TreenityClass);

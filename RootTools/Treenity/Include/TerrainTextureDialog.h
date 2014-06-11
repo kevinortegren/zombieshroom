@@ -12,7 +12,9 @@
 //Other includes
 #include <sstream>
 
-class TerrainTextureDialog : public QDockWidget
+#include <RootTools/Treenity/Include/PieMenu.h>
+
+class TerrainTextureDialog : public QWidget
 {
 	Q_OBJECT
 public:
@@ -22,6 +24,10 @@ public:
 	void SetEngineInterface(EngineInterface* p_engineInterface);
 	void SetEditorInterface(EditorInterface* p_editorInterFace);
 
+	bool MouseClick();
+	bool MouseRelease();
+	bool MouseScroll(int p_scrollDelta);
+
 public slots:
 	void Show();
 
@@ -30,6 +36,8 @@ private:
 	EditorInterface* m_editorInterface;
 
 	Ui::TerrainTextureTool ui;
+
+	PieMenu* m_pieMenu;
 
 private slots:
 	

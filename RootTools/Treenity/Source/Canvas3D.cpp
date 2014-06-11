@@ -15,6 +15,8 @@
 
 #include <RootTools/Treenity/Include/Utils.h>
 
+#include <RootTools/Treenity/Include/TerrainTextureDialog.h>
+#include <RootTools/Treenity/Include/TerrainDialog.h>
 
 extern RootEngine::GameSharedContext g_engineContext;
 
@@ -116,10 +118,13 @@ void Canvas3D::CreateOpenGLContext() //Horrible name
 
 void Canvas3D::wheelEvent(QWheelEvent* event)
 {
-	SDL_Event scrollEvent;
-	scrollEvent.type = SDL_MOUSEWHEEL;
-	scrollEvent.wheel.y = event->delta() / 100;
-	SDL_PushEvent(&scrollEvent);
+	if(!m_editorInterface->GetTerrainTextureDialog()->MouseScroll(event->delta()))
+	{
+		SDL_Event scrollEvent;
+		scrollEvent.type = SDL_MOUSEWHEEL;
+		scrollEvent.wheel.y = event->delta() / 100;
+		SDL_PushEvent(&scrollEvent);
+	}
 }
 
 void Canvas3D::mousePressEvent( QMouseEvent* event )
@@ -127,7 +132,8 @@ void Canvas3D::mousePressEvent( QMouseEvent* event )
 
 	if (event->button() == Qt::RightButton && !(event->modifiers() & Qt::AltModifier)) 
 	{
-		m_pieMenu->showMenu();
+		if(!m_editorInterface->GetTerrainTextureDialog()->MouseClick())
+			m_pieMenu->showMenu();
 	}
 
 	QWidget::mousePressEvent(event);
@@ -135,8 +141,9 @@ void Canvas3D::mousePressEvent( QMouseEvent* event )
 
 void Canvas3D::mouseReleaseEvent( QMouseEvent *event )
 {
-	if (m_pieMenu->canSee())
-		m_pieMenu->closeMenu();
+	if(!m_editorInterface->GetTerrainTextureDialog()->MouseRelease())
+		if (m_pieMenu->canSee())
+			m_pieMenu->closeMenu();
 
 	QWidget::mouseReleaseEvent(event);
 }

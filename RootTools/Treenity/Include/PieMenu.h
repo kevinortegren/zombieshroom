@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QWidget>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>

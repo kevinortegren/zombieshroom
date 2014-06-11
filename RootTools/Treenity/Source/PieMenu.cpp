@@ -1,4 +1,4 @@
-#include <PieMenu.h>
+#include <RootTools/Treenity/Include/PieMenu.h>
 #include <QGraphicsSceneHoverEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QGuiApplication>
@@ -275,8 +275,16 @@ int PieMenu::angleToIndex( qreal angle ) const
 
 void PieMenu::setHovered( int index, bool state )
 {
-	if (m_hoveredIndex >= 0 && m_hoveredIndex < 8)
+	if (m_hoveredIndex >= 0 && m_hoveredIndex < m_pieces.size())
 		m_pieces[m_hoveredIndex]->setHovered(false);
+
+	if(index < 0 || index >= m_pieces.size())
+	{
+		if (!state)
+			m_hoveredIndex = -1;
+		return;
+	}
+
 	m_hoveredIndex = index;
 	m_pieces[m_hoveredIndex]->setHovered(state);
 	if (!state)

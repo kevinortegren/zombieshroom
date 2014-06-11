@@ -13,7 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
@@ -26,34 +26,104 @@ QT_BEGIN_NAMESPACE
 class Ui_TerrainTextureTool
 {
 public:
-    QGridLayout *gridLayout;
+    QHBoxLayout *horizontalLayout;
     QLabel *label;
     QSpinBox *spinBox_size;
-    QSlider *horizontalSlider_opacity;
-    QLabel *label_2;
-    QSpinBox *spinBox_opacity;
+    QPushButton *pushButton;
     QPushButton *pushButton_2;
     QPushButton *pushButton_3;
-    QPushButton *pushButton;
+    QLabel *label_2;
+    QSpinBox *spinBox_opacity;
+    QSlider *horizontalSlider_opacity;
 
     void setupUi(QWidget *TerrainTextureTool)
     {
         if (TerrainTextureTool->objectName().isEmpty())
             TerrainTextureTool->setObjectName(QStringLiteral("TerrainTextureTool"));
-        TerrainTextureTool->resize(297, 153);
-        gridLayout = new QGridLayout(TerrainTextureTool);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        TerrainTextureTool->resize(467, 32);
+        TerrainTextureTool->setMinimumSize(QSize(467, 32));
+        TerrainTextureTool->setMaximumSize(QSize(16777215, 32));
+        horizontalLayout = new QHBoxLayout(TerrainTextureTool);
+        horizontalLayout->setSpacing(3);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(TerrainTextureTool);
         label->setObjectName(QStringLiteral("label"));
 
-        gridLayout->addWidget(label, 0, 0, 1, 1);
+        horizontalLayout->addWidget(label);
 
         spinBox_size = new QSpinBox(TerrainTextureTool);
         spinBox_size->setObjectName(QStringLiteral("spinBox_size"));
         spinBox_size->setMinimum(-99);
         spinBox_size->setValue(2);
 
-        gridLayout->addWidget(spinBox_size, 0, 1, 1, 3);
+        horizontalLayout->addWidget(spinBox_size);
+
+        pushButton = new QPushButton(TerrainTextureTool);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setMinimumSize(QSize(32, 32));
+        pushButton->setMaximumSize(QSize(32, 32));
+        pushButton->setStyleSheet(QLatin1String("QPushButton \n"
+"{\n"
+"background-color: red;\n"
+"}\n"
+"\n"
+"QPushButton:checked \n"
+"{ \n"
+"border: 2px solid orange;\n"
+"}"));
+        pushButton->setCheckable(true);
+        pushButton->setChecked(true);
+        pushButton->setAutoExclusive(true);
+
+        horizontalLayout->addWidget(pushButton);
+
+        pushButton_2 = new QPushButton(TerrainTextureTool);
+        pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
+        pushButton_2->setMinimumSize(QSize(32, 32));
+        pushButton_2->setMaximumSize(QSize(32, 32));
+        pushButton_2->setStyleSheet(QLatin1String("QPushButton {\n"
+"background-color: green\n"
+"}\n"
+"QPushButton:checked \n"
+"{ \n"
+"border: 2px solid orange;\n"
+"}"));
+        pushButton_2->setCheckable(true);
+        pushButton_2->setAutoExclusive(true);
+
+        horizontalLayout->addWidget(pushButton_2);
+
+        pushButton_3 = new QPushButton(TerrainTextureTool);
+        pushButton_3->setObjectName(QStringLiteral("pushButton_3"));
+        pushButton_3->setMinimumSize(QSize(32, 32));
+        pushButton_3->setMaximumSize(QSize(32, 32));
+        pushButton_3->setStyleSheet(QLatin1String("QPushButton {\n"
+"background-color: blue\n"
+"}\n"
+"\n"
+"QPushButton:checked \n"
+"{ \n"
+"border: 2px solid orange;\n"
+"}"));
+        pushButton_3->setCheckable(true);
+        pushButton_3->setAutoExclusive(true);
+
+        horizontalLayout->addWidget(pushButton_3);
+
+        label_2 = new QLabel(TerrainTextureTool);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        horizontalLayout->addWidget(label_2);
+
+        spinBox_opacity = new QSpinBox(TerrainTextureTool);
+        spinBox_opacity->setObjectName(QStringLiteral("spinBox_opacity"));
+        spinBox_opacity->setMinimum(1);
+        spinBox_opacity->setMaximum(100);
+        spinBox_opacity->setSingleStep(1);
+        spinBox_opacity->setValue(100);
+
+        horizontalLayout->addWidget(spinBox_opacity);
 
         horizontalSlider_opacity = new QSlider(TerrainTextureTool);
         horizontalSlider_opacity->setObjectName(QStringLiteral("horizontalSlider_opacity"));
@@ -63,43 +133,7 @@ public:
         horizontalSlider_opacity->setSliderPosition(100);
         horizontalSlider_opacity->setOrientation(Qt::Horizontal);
 
-        gridLayout->addWidget(horizontalSlider_opacity, 1, 2, 1, 1);
-
-        label_2 = new QLabel(TerrainTextureTool);
-        label_2->setObjectName(QStringLiteral("label_2"));
-
-        gridLayout->addWidget(label_2, 1, 0, 1, 1);
-
-        spinBox_opacity = new QSpinBox(TerrainTextureTool);
-        spinBox_opacity->setObjectName(QStringLiteral("spinBox_opacity"));
-        spinBox_opacity->setMinimum(1);
-        spinBox_opacity->setMaximum(100);
-        spinBox_opacity->setSingleStep(1);
-        spinBox_opacity->setValue(100);
-
-        gridLayout->addWidget(spinBox_opacity, 1, 1, 1, 1);
-
-        pushButton_2 = new QPushButton(TerrainTextureTool);
-        pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
-        pushButton_2->setCheckable(true);
-        pushButton_2->setAutoExclusive(true);
-
-        gridLayout->addWidget(pushButton_2, 3, 0, 1, 3);
-
-        pushButton_3 = new QPushButton(TerrainTextureTool);
-        pushButton_3->setObjectName(QStringLiteral("pushButton_3"));
-        pushButton_3->setCheckable(true);
-        pushButton_3->setAutoExclusive(true);
-
-        gridLayout->addWidget(pushButton_3, 4, 0, 1, 3);
-
-        pushButton = new QPushButton(TerrainTextureTool);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setCheckable(true);
-        pushButton->setChecked(true);
-        pushButton->setAutoExclusive(true);
-
-        gridLayout->addWidget(pushButton, 2, 0, 1, 3);
+        horizontalLayout->addWidget(horizontalSlider_opacity);
 
 
         retranslateUi(TerrainTextureTool);
@@ -110,11 +144,11 @@ public:
     void retranslateUi(QWidget *TerrainTextureTool)
     {
         TerrainTextureTool->setWindowTitle(QApplication::translate("TerrainTextureTool", "Form", 0));
-        label->setText(QApplication::translate("TerrainTextureTool", "Brush size:", 0));
+        label->setText(QApplication::translate("TerrainTextureTool", "Size:", 0));
+        pushButton->setText(QString());
+        pushButton_2->setText(QString());
+        pushButton_3->setText(QString());
         label_2->setText(QApplication::translate("TerrainTextureTool", "Opacity %:", 0));
-        pushButton_2->setText(QApplication::translate("TerrainTextureTool", "PushButton", 0));
-        pushButton_3->setText(QApplication::translate("TerrainTextureTool", "PushButton", 0));
-        pushButton->setText(QApplication::translate("TerrainTextureTool", "PushButton", 0));
     } // retranslateUi
 
 };

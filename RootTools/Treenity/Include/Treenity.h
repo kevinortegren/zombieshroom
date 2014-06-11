@@ -1,5 +1,4 @@
-#ifndef TREENITY_H
-#define TREENITY_H
+#pragma once
 
 #include <map>
 #include <QtWidgets/QMainWindow>
@@ -72,6 +71,9 @@ public:
 	//Brushes
 	TerrainGeometryBrush* GetTerrainGeometryBrush();
 	TerrainTextureBrush* GetTerrainTextureBrush();
+
+	TerrainDialog* GetTerrainGeometryDialog();
+	TerrainTextureDialog* GetTerrainTextureDialog();
 
 	//Called as the last thing when exiting playmode
 	void ExitPlayMode();
@@ -157,5 +159,3 @@ private slots:
 	void RemoveCollisionResponder(ECS::Entity* p_entity);
 
 };
-
-#endif // TREENITY_H

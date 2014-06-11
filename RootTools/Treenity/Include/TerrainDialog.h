@@ -2,7 +2,6 @@
 
 //Qt includes
 #include <QWidget>
-#include <QDockWidget>
 #include <RootTools/Treenity/GeneratedFiles/ui_TerrainTool.h>
 
 //Engine includes
@@ -12,7 +11,7 @@
 //Other includes
 #include <sstream>
 
-class TerrainDialog : public QDockWidget
+class TerrainDialog : public QWidget
 {
 	Q_OBJECT
 public:
@@ -37,7 +36,8 @@ private slots:
 	void SetSize(int p_val);
 	void SetStrength(double p_val);
 	void SetAutoSmooth(bool p_val);
-	void SetStyle(int p_val);
+	void SetCircleStyle();
+	void SetGridStyle();
 	void SetOptions(int p_val);
 	void SmoothAll();
 };

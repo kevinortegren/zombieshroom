@@ -1,24 +1,17 @@
 #include <RootTools/Treenity/Include/TerrainDialog.h>
 
-TerrainDialog::TerrainDialog( QWidget* p_parent /*= 0*/ ): QDockWidget(p_parent)
+TerrainDialog::TerrainDialog( QWidget* p_parent /*= 0*/ ): QWidget(p_parent)
 {
-	QWidget* contents = new QWidget();
+	ui.setupUi(this);
 
-	ui.setupUi(contents);
-
-	setAllowedAreas(Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
-	setGeometry(ui.gridLayout->geometry());
-	setWindowTitle("Terrain sculpt");
-	setFloating(true);
 	hide();
-
-	setWidget(contents);
 
 	//Connect items from UI to methods
 	connect(ui.spinBox_size,				SIGNAL(valueChanged(int)),			this, SLOT(SetSize(int)));
 	connect(ui.doubleSpinBox_strength,		SIGNAL(valueChanged(double)),		this, SLOT(SetStrength(double)));
 	connect(ui.checkBox_autosmooth,			SIGNAL(clicked(bool)),				this, SLOT(SetAutoSmooth(bool)));
-	connect(ui.comboBox_brushStyle,			SIGNAL(currentIndexChanged(int)),	this, SLOT(SetStyle(int)));
+	connect(ui.buttonCircle,				SIGNAL(clicked()),					this, SLOT(SetCircleStyle()));
+	connect(ui.buttonGrid,					SIGNAL(clicked()),					this, SLOT(SetGridStyle()));
 	connect(ui.comboBox_options,			SIGNAL(currentIndexChanged(int)),	this, SLOT(SetOptions(int)));
 
 }
@@ -32,18 +25,31 @@ void TerrainDialog::DisplayData()
 {
 	ui.spinBox_size->blockSignals(true);
 	ui.doubleSpinBox_strength->blockSignals(true);	
-	ui.comboBox_brushStyle->blockSignals(true);
+	ui.buttonCircle->blockSignals(true);
+	ui.buttonGrid->blockSignals(true);
 	ui.comboBox_options->blockSignals(true);
 
 	ui.spinBox_size->setValue(m_editorInterface->GetTerrainGeometryBrush()->GetSize());
 	ui.doubleSpinBox_strength->setValue(m_editorInterface->GetTerrainGeometryBrush()->GetStrength());		
 	ui.checkBox_autosmooth->setChecked(m_editorInterface->GetTerrainGeometryBrush()->GetAutoSmooth());					
-	ui.comboBox_brushStyle->setCurrentIndex(m_editorInterface->GetTerrainGeometryBrush()->GetActiveMaterialIndex());
+	int matID = m_editorInterface->GetTerrainGeometryBrush()->GetActiveMaterialIndex();
+	if(matID == 0)
+	{
+		ui.buttonCircle->setChecked(true);
+		ui.buttonGrid->setChecked(false);
+	}
+	else if(matID == 1)
+	{
+		ui.buttonGrid->setChecked(true);
+		ui.buttonCircle->setChecked(false);
+	}
+
 	ui.comboBox_options->setCurrentIndex(m_editorInterface->GetTerrainGeometryBrush()->GetOptionIndex());
 
 	ui.spinBox_size->blockSignals(false);
 	ui.doubleSpinBox_strength->blockSignals(false);
-	ui.comboBox_brushStyle->blockSignals(false);
+	ui.buttonCircle->blockSignals(false);
+	ui.buttonGrid->blockSignals(false);
 	ui.comboBox_options->blockSignals(false);
 }
 
@@ -83,11 +89,6 @@ void TerrainDialog::SmoothAll()
 	//TODO
 }
 
-void TerrainDialog::SetStyle( int p_val )
-{
-	m_editorInterface->GetTerrainGeometryBrush()->SetActiveMaterial(p_val);
-}
-
 void TerrainDialog::SetOptions( int p_val )
 {
 	m_editorInterface->GetTerrainGeometryBrush()->SetOptionIndex(p_val);
@@ -109,4 +110,14 @@ void TerrainDialog::SetOptions( int p_val )
 		m_editorInterface->GetTerrainGeometryBrush()->SetSmoothOnly(true);
 	}
 	
+}
+
+void TerrainDialog::SetCircleStyle()
+{
+	m_editorInterface->GetTerrainGeometryBrush()->SetActiveMaterial(0);
+}
+
+void TerrainDialog::SetGridStyle()
+{
+	m_editorInterface->GetTerrainGeometryBrush()->SetActiveMaterial(1);
 }

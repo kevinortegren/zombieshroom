@@ -98,7 +98,7 @@ void TerrainTextureDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
 }
 
 const QMetaObject TerrainTextureDialog::staticMetaObject = {
-    { &QDockWidget::staticMetaObject, qt_meta_stringdata_TerrainTextureDialog.data,
+    { &QWidget::staticMetaObject, qt_meta_stringdata_TerrainTextureDialog.data,
       qt_meta_data_TerrainTextureDialog,  qt_static_metacall, 0, 0}
 };
 
@@ -113,12 +113,12 @@ void *TerrainTextureDialog::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_TerrainTextureDialog.stringdata))
         return static_cast<void*>(const_cast< TerrainTextureDialog*>(this));
-    return QDockWidget::qt_metacast(_clname);
+    return QWidget::qt_metacast(_clname);
 }
 
 int TerrainTextureDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QDockWidget::qt_metacall(_c, _id, _a);
+    _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
