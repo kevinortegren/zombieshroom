@@ -118,7 +118,7 @@ void Canvas3D::CreateOpenGLContext() //Horrible name
 
 void Canvas3D::wheelEvent(QWheelEvent* event)
 {
-	if(!m_editorInterface->GetTerrainTextureDialog()->MouseScroll(event->delta()))
+	if(!m_editorInterface->GetTerrainTextureDialog()->MouseScroll(event->delta()) && !m_editorInterface->GetTerrainGeometryDialog()->MouseScroll(event->delta()))
 	{
 		SDL_Event scrollEvent;
 		scrollEvent.type = SDL_MOUSEWHEEL;
@@ -132,7 +132,7 @@ void Canvas3D::mousePressEvent( QMouseEvent* event )
 
 	if (event->button() == Qt::RightButton && !(event->modifiers() & Qt::AltModifier)) 
 	{
-		if(!m_editorInterface->GetTerrainTextureDialog()->MouseClick())
+		if(!m_editorInterface->GetTerrainTextureDialog()->MouseClick() && !m_editorInterface->GetTerrainGeometryDialog()->MouseClick())
 			m_pieMenu->showMenu();
 	}
 
@@ -141,9 +141,11 @@ void Canvas3D::mousePressEvent( QMouseEvent* event )
 
 void Canvas3D::mouseReleaseEvent( QMouseEvent *event )
 {
-	if(!m_editorInterface->GetTerrainTextureDialog()->MouseRelease())
-		if (m_pieMenu->canSee())
-			m_pieMenu->closeMenu();
+	m_editorInterface->GetTerrainTextureDialog()->MouseRelease();
+	m_editorInterface->GetTerrainGeometryDialog()->MouseRelease();
+
+	if (m_pieMenu->canSee())
+		m_pieMenu->closeMenu();
 
 	QWidget::mouseReleaseEvent(event);
 }

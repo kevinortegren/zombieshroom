@@ -11,6 +11,8 @@
 //Other includes
 #include <sstream>
 
+#include <RootTools/Treenity/Include/PieMenu.h>
+
 class TerrainDialog : public QWidget
 {
 	Q_OBJECT
@@ -21,6 +23,10 @@ public:
 	void SetEngineInterface(EngineInterface* p_engineInterface);
 	void SetEditorInterface(EditorInterface* p_editorInterFace);
 
+	bool MouseClick();
+	bool MouseRelease();
+	bool MouseScroll(int p_scrollDelta);
+
 public slots:
 	void Show();
 
@@ -29,6 +35,8 @@ private:
 	EditorInterface* m_editorInterface;
 
 	Ui::TerrainTool ui;
+
+	PieMenu* m_pieMenu;
 
 private slots:
 	
@@ -40,4 +48,8 @@ private slots:
 	void SetGridStyle();
 	void SetOptions(int p_val);
 	void SmoothAll();
+
+	void PieButton1();
+	void PieButton2();
+	void PieButton3();
 };
