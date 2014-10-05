@@ -1,4 +1,4 @@
-zombieshroom
+Zombieshroom - Root Force powered by Root Engine
 ============
 
-Stort spelprojekt
+Large game project @ Blekinge Institute of Technology 2014
