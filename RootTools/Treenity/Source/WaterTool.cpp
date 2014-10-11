@@ -30,6 +30,7 @@ WaterTool::WaterTool( QWidget* p_parent /*= 0*/ ): QDockWidget(p_parent)
 	connect(ui.pushButton_waterColor,		SIGNAL(clicked()),				this, SLOT(OpenColorDialog()));
 	connect(ui.pushButton_initWater,		SIGNAL(clicked()),				this, SLOT(InitWater()));
 	connect(ui.pushButton_resetWater,		SIGNAL(clicked()),				this, SLOT(ResetWater()));
+	connect(ui.checkBox_wireframe,			SIGNAL(clicked(bool)),				this, SLOT(SetWireFrame(bool)));
 }
 
 WaterTool::~WaterTool()
@@ -143,4 +144,11 @@ void WaterTool::OpenColorDialog()
 {
 	m_colorDialog->colorSelected(m_waterColor);
 	m_colorDialog->show();
+}
+
+void WaterTool::SetWireFrame( bool p_active )
+{
+	std::stringstream ss;
+	ss << "water wf";
+	m_engineInterface->SetWaterParam(&ss);
 }

@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_WaterTool_t {
-    QByteArrayData data[18];
-    char stringdata[211];
+    QByteArrayData data[19];
+    char stringdata[224];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -46,14 +46,16 @@ QT_MOC_LITERAL(13, 153, 7),
 QT_MOC_LITERAL(14, 161, 10),
 QT_MOC_LITERAL(15, 172, 9),
 QT_MOC_LITERAL(16, 182, 11),
-QT_MOC_LITERAL(17, 194, 15)
+QT_MOC_LITERAL(17, 194, 12),
+QT_MOC_LITERAL(18, 207, 15)
     },
     "WaterTool\0Show\0\0SetWaterSpeed\0p_speed\0"
     "SetWaterDepth\0p_depth\0SetWaterRefractions\0"
     "p_active\0SetWaterReflections\0"
     "SetWaterNormals\0SetWaterPause\0"
     "SetWaterColor\0p_color\0ResetWater\0"
-    "InitWater\0DisplayData\0OpenColorDialog\0"
+    "InitWater\0DisplayData\0SetWireFrame\0"
+    "OpenColorDialog\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -63,7 +65,7 @@ static const uint qt_meta_data_WaterTool[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   14, // methods
+      13,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -71,18 +73,19 @@ static const uint qt_meta_data_WaterTool[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   74,    2, 0x0a,
-       3,    1,   75,    2, 0x08,
-       5,    1,   78,    2, 0x08,
-       7,    1,   81,    2, 0x08,
-       9,    1,   84,    2, 0x08,
-      10,    1,   87,    2, 0x08,
-      11,    1,   90,    2, 0x08,
-      12,    1,   93,    2, 0x08,
-      14,    0,   96,    2, 0x08,
-      15,    0,   97,    2, 0x08,
-      16,    0,   98,    2, 0x08,
-      17,    0,   99,    2, 0x08,
+       1,    0,   79,    2, 0x0a,
+       3,    1,   80,    2, 0x08,
+       5,    1,   83,    2, 0x08,
+       7,    1,   86,    2, 0x08,
+       9,    1,   89,    2, 0x08,
+      10,    1,   92,    2, 0x08,
+      11,    1,   95,    2, 0x08,
+      12,    1,   98,    2, 0x08,
+      14,    0,  101,    2, 0x08,
+      15,    0,  102,    2, 0x08,
+      16,    0,  103,    2, 0x08,
+      17,    1,  104,    2, 0x08,
+      18,    0,  107,    2, 0x08,
 
  // slots: parameters
     QMetaType::Void,
@@ -96,6 +99,7 @@ static const uint qt_meta_data_WaterTool[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Bool,    8,
     QMetaType::Void,
 
        0        // eod
@@ -117,7 +121,8 @@ void WaterTool::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         case 8: _t->ResetWater(); break;
         case 9: _t->InitWater(); break;
         case 10: _t->DisplayData(); break;
-        case 11: _t->OpenColorDialog(); break;
+        case 11: _t->SetWireFrame((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 12: _t->OpenColorDialog(); break;
         default: ;
         }
     }
@@ -148,13 +153,13 @@ int WaterTool::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 12)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 12;
+        _id -= 13;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 12)
+        if (_id < 13)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 12;
+        _id -= 13;
     }
     return _id;
 }

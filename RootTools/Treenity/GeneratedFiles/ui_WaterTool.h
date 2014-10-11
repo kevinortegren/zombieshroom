@@ -27,22 +27,24 @@ class Ui_WaterUI
 {
 public:
     QGridLayout *gridLayout;
-    QLabel *label_5;
     QLabel *label_6;
+    QLabel *label_5;
     QLabel *label_3;
+    QLabel *label_2;
     QLabel *label;
     QLabel *label_4;
-    QLabel *label_2;
     QPushButton *pushButton_resetWater;
-    QPushButton *pushButton_initWater;
-    QDoubleSpinBox *doubleSpinBox_waterSpeed;
     QCheckBox *checkBox_waterRefractions;
     QDoubleSpinBox *doubleSpinBox_waterDepth;
-    QPushButton *pushButton_waterColor;
-    QCheckBox *checkBox_waterNormals;
-    QCheckBox *checkBox_waterReflections;
+    QPushButton *pushButton_initWater;
+    QDoubleSpinBox *doubleSpinBox_waterSpeed;
     QLabel *label_7;
+    QPushButton *pushButton_waterColor;
+    QCheckBox *checkBox_waterReflections;
+    QCheckBox *checkBox_waterNormals;
     QCheckBox *checkBox_waterPause;
+    QLabel *label_8;
+    QCheckBox *checkBox_wireframe;
 
     void setupUi(QWidget *WaterUI)
     {
@@ -51,20 +53,25 @@ public:
         WaterUI->resize(419, 347);
         gridLayout = new QGridLayout(WaterUI);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        label_5 = new QLabel(WaterUI);
-        label_5->setObjectName(QStringLiteral("label_5"));
-
-        gridLayout->addWidget(label_5, 5, 0, 1, 1);
-
         label_6 = new QLabel(WaterUI);
         label_6->setObjectName(QStringLiteral("label_6"));
 
         gridLayout->addWidget(label_6, 2, 0, 1, 1);
 
+        label_5 = new QLabel(WaterUI);
+        label_5->setObjectName(QStringLiteral("label_5"));
+
+        gridLayout->addWidget(label_5, 5, 0, 1, 1);
+
         label_3 = new QLabel(WaterUI);
         label_3->setObjectName(QStringLiteral("label_3"));
 
         gridLayout->addWidget(label_3, 3, 0, 1, 1);
+
+        label_2 = new QLabel(WaterUI);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        gridLayout->addWidget(label_2, 1, 0, 1, 1);
 
         label = new QLabel(WaterUI);
         label->setObjectName(QStringLiteral("label"));
@@ -77,27 +84,10 @@ public:
 
         gridLayout->addWidget(label_4, 4, 0, 1, 1);
 
-        label_2 = new QLabel(WaterUI);
-        label_2->setObjectName(QStringLiteral("label_2"));
-
-        gridLayout->addWidget(label_2, 1, 0, 1, 1);
-
         pushButton_resetWater = new QPushButton(WaterUI);
         pushButton_resetWater->setObjectName(QStringLiteral("pushButton_resetWater"));
 
-        gridLayout->addWidget(pushButton_resetWater, 8, 0, 1, 2);
-
-        pushButton_initWater = new QPushButton(WaterUI);
-        pushButton_initWater->setObjectName(QStringLiteral("pushButton_initWater"));
-
-        gridLayout->addWidget(pushButton_initWater, 7, 0, 1, 2);
-
-        doubleSpinBox_waterSpeed = new QDoubleSpinBox(WaterUI);
-        doubleSpinBox_waterSpeed->setObjectName(QStringLiteral("doubleSpinBox_waterSpeed"));
-        doubleSpinBox_waterSpeed->setMinimum(1);
-        doubleSpinBox_waterSpeed->setMaximum(50);
-
-        gridLayout->addWidget(doubleSpinBox_waterSpeed, 0, 1, 1, 1);
+        gridLayout->addWidget(pushButton_resetWater, 9, 0, 1, 2);
 
         checkBox_waterRefractions = new QCheckBox(WaterUI);
         checkBox_waterRefractions->setObjectName(QStringLiteral("checkBox_waterRefractions"));
@@ -113,17 +103,28 @@ public:
 
         gridLayout->addWidget(doubleSpinBox_waterDepth, 1, 1, 1, 1);
 
+        pushButton_initWater = new QPushButton(WaterUI);
+        pushButton_initWater->setObjectName(QStringLiteral("pushButton_initWater"));
+
+        gridLayout->addWidget(pushButton_initWater, 8, 0, 1, 2);
+
+        doubleSpinBox_waterSpeed = new QDoubleSpinBox(WaterUI);
+        doubleSpinBox_waterSpeed->setObjectName(QStringLiteral("doubleSpinBox_waterSpeed"));
+        doubleSpinBox_waterSpeed->setMinimum(1);
+        doubleSpinBox_waterSpeed->setMaximum(50);
+
+        gridLayout->addWidget(doubleSpinBox_waterSpeed, 0, 1, 1, 1);
+
+        label_7 = new QLabel(WaterUI);
+        label_7->setObjectName(QStringLiteral("label_7"));
+
+        gridLayout->addWidget(label_7, 6, 0, 1, 1);
+
         pushButton_waterColor = new QPushButton(WaterUI);
         pushButton_waterColor->setObjectName(QStringLiteral("pushButton_waterColor"));
         pushButton_waterColor->setMinimumSize(QSize(0, 40));
 
         gridLayout->addWidget(pushButton_waterColor, 2, 1, 1, 1);
-
-        checkBox_waterNormals = new QCheckBox(WaterUI);
-        checkBox_waterNormals->setObjectName(QStringLiteral("checkBox_waterNormals"));
-        checkBox_waterNormals->setChecked(true);
-
-        gridLayout->addWidget(checkBox_waterNormals, 5, 1, 1, 1);
 
         checkBox_waterReflections = new QCheckBox(WaterUI);
         checkBox_waterReflections->setObjectName(QStringLiteral("checkBox_waterReflections"));
@@ -131,15 +132,26 @@ public:
 
         gridLayout->addWidget(checkBox_waterReflections, 4, 1, 1, 1);
 
-        label_7 = new QLabel(WaterUI);
-        label_7->setObjectName(QStringLiteral("label_7"));
+        checkBox_waterNormals = new QCheckBox(WaterUI);
+        checkBox_waterNormals->setObjectName(QStringLiteral("checkBox_waterNormals"));
+        checkBox_waterNormals->setChecked(true);
 
-        gridLayout->addWidget(label_7, 6, 0, 1, 1);
+        gridLayout->addWidget(checkBox_waterNormals, 5, 1, 1, 1);
 
         checkBox_waterPause = new QCheckBox(WaterUI);
         checkBox_waterPause->setObjectName(QStringLiteral("checkBox_waterPause"));
 
         gridLayout->addWidget(checkBox_waterPause, 6, 1, 1, 1);
+
+        label_8 = new QLabel(WaterUI);
+        label_8->setObjectName(QStringLiteral("label_8"));
+
+        gridLayout->addWidget(label_8, 7, 0, 1, 1);
+
+        checkBox_wireframe = new QCheckBox(WaterUI);
+        checkBox_wireframe->setObjectName(QStringLiteral("checkBox_wireframe"));
+
+        gridLayout->addWidget(checkBox_wireframe, 7, 1, 1, 1);
 
 
         retranslateUi(WaterUI);
@@ -150,20 +162,22 @@ public:
     void retranslateUi(QWidget *WaterUI)
     {
         WaterUI->setWindowTitle(QApplication::translate("WaterUI", "Form", 0));
-        label_5->setText(QApplication::translate("WaterUI", "Water normals:", 0));
         label_6->setText(QApplication::translate("WaterUI", "Water color:", 0));
+        label_5->setText(QApplication::translate("WaterUI", "Water normals:", 0));
         label_3->setText(QApplication::translate("WaterUI", "Water refractions:", 0));
+        label_2->setText(QApplication::translate("WaterUI", "Water depth:", 0));
         label->setText(QApplication::translate("WaterUI", "Water speed:", 0));
         label_4->setText(QApplication::translate("WaterUI", "Water reflections:", 0));
-        label_2->setText(QApplication::translate("WaterUI", "Water depth:", 0));
         pushButton_resetWater->setText(QApplication::translate("WaterUI", "Reset water", 0));
-        pushButton_initWater->setText(QApplication::translate("WaterUI", "Init water", 0));
         checkBox_waterRefractions->setText(QString());
-        pushButton_waterColor->setText(QString());
-        checkBox_waterNormals->setText(QString());
-        checkBox_waterReflections->setText(QString());
+        pushButton_initWater->setText(QApplication::translate("WaterUI", "Init water", 0));
         label_7->setText(QApplication::translate("WaterUI", "Water pause:", 0));
+        pushButton_waterColor->setText(QString());
+        checkBox_waterReflections->setText(QString());
+        checkBox_waterNormals->setText(QString());
         checkBox_waterPause->setText(QString());
+        label_8->setText(QApplication::translate("WaterUI", "Wireframe:", 0));
+        checkBox_wireframe->setText(QString());
     } // retranslateUi
 
 };

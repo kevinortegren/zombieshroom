@@ -44,5 +44,6 @@ private slots:
 	void ResetWater();
 	void InitWater();
 	void DisplayData();
+	void SetWireFrame(bool p_active);
 	void OpenColorDialog();
 };

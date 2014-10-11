@@ -6,7 +6,7 @@ layout(location = 2) in vec2 in_texcoord;
 layout(location = 3) in vec3 in_tangent;
 layout(location = 4) in vec3 in_bitangent;
 
-layout(std140) uniform PerFrame
+layout(binding = 1, std140) uniform PerFrame
 {
 	mat4 projectionMatrix;
 	mat4 viewMatrix;
